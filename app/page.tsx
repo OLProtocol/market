@@ -20,7 +20,7 @@ export default function Home() {
   const { data, error, isLoading } = useSWR(`/ordx/getTopTickers`, () =>
     getTopTickers({})
   );
-  const list = useMemo(() => data?.data?.recommend || [], [data]);
+  const list = useMemo(() => data?.data || [], [data]);
   console.log(data);
   const toDetail = (e) => {
     router.push(`/ordx/ticker/${e}`)

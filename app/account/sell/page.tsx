@@ -46,7 +46,7 @@ export default function SellPage() {
         address,
       });
       const res = await submitOrder({ address, raw: orderRaw });
-      if (res.code === 0) {
+      if (res.code === 200) {
         notification.success({
           message: "Listed successfully",
           description: `The order has been submitted successfully, please wait for the buyer to buy it.`,

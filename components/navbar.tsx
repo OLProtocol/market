@@ -16,7 +16,7 @@ import { link as linkStyles } from "@nextui-org/theme";
 import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
 import clsx from "clsx";
-
+import { FeerateSelectButton } from "@/components/fee/FeerateSelectButton";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
   TwitterIcon,
@@ -81,7 +81,10 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+        {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
+        <NavbarItem className="hidden lg:flex">
+          <FeerateSelectButton />
+        </NavbarItem>
         <NavbarItem className="hidden sm:flex gap-2">
           {/* <Link isExternal href={siteConfig.links.twitter} aria-label="Twitter">
             <TwitterIcon className="text-default-500" />

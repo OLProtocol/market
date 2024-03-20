@@ -11,6 +11,7 @@
   "dependencies": {
     "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
     "@cmdcode/tapscript": "^1.4.6",
+    "@iconify/react": "^4.1.1",
     "@nextui-org/button": "2.0.26",
     "@nextui-org/code": "2.0.24",
     "@nextui-org/input": "2.1.16",
@@ -36,7 +37,9 @@
     "eslint-config-next": "14.0.2",
     "framer-motion": "^11.0.8",
     "intl-messageformat": "^10.5.0",
+    "lodash": "^4.17.21",
     "next": "14.0.2",
+    "next-runtime-env": "^3.2.0",
     "next-themes": "^0.2.1",
     "postcss": "8.4.31",
     "react": "18.2.0",

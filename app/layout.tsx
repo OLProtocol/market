@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import { Metadata } from "next";
+import { PublicEnvScript } from "next-runtime-env";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
@@ -32,7 +33,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        <PublicEnvScript />
+      </head>
       <body
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
