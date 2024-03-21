@@ -69,9 +69,16 @@ export const createUnisatStore = (
         const accounts = await unisat.getAccounts();
         if (accounts.length) {
           const address = accounts[0];
+          const network = await unisat.getNetwork();
           const publicKey = await unisat.getPublicKey();
           const balance = await unisat.getBalance();
-          set((state) => ({ publicKey, address, balance, connected: true }));
+          set((state) => ({
+            publicKey,
+            address,
+            balance,
+            connected: true,
+            network: network,
+          }));
         }
       } catch (error) {
         console.error("Error checking unisat", error);
@@ -88,8 +95,15 @@ export const createUnisatStore = (
         if (accounts.length) {
           const address = accounts[0];
           const publicKey = await unisat.getPublicKey();
+          const network = await unisat.getNetwork();
           const balance = await unisat.getBalance();
-          set((state) => ({ publicKey, address, balance, connected: true }));
+          set((state) => ({
+            publicKey,
+            address,
+            balance,
+            connected: true,
+            network,
+          }));
         }
       } catch (error) {
         console.error("Error checking unisat", error);

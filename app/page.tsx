@@ -21,37 +21,39 @@ export default function Home() {
     getTopTickers({})
   );
   const list = useMemo(() => data?.data || [], [data]);
-  console.log(data);
   const toDetail = (e) => {
-    router.push(`/ordx/ticker/${e}`)
+    router.push(`/ordx/ticker/${e}`);
   };
   return (
-    <Table
-      isHeaderSticky
-      isStriped
-      onRowAction={toDetail}
-      aria-label="Example table with infinite pagination"
-    >
-      <TableHeader>
-        <TableColumn key="ticker">Ticker</TableColumn>
-        <TableColumn key="total_amount">Volumn</TableColumn>
-        <TableColumn key="lowest_price">Price</TableColumn>
-        <TableColumn key="onsell_order_count">Num of sales</TableColumn>
-        <TableColumn key="holder_count">Holders</TableColumn>
-      </TableHeader>
-      <TableBody
-        isLoading={isLoading}
-        items={list}
-        loadingContent={<Spinner />}
+    <div className="pt-4">
+      <Table
+        isHeaderSticky
+        isStriped
+        onRowAction={toDetail}
+        aria-label="Example table with infinite pagination"
       >
-        {(item: any) => (
-          <TableRow key={item.ticker} className="cursor-pointer">
-            {(columnKey) => (
-              <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+        <TableHeader>
+          <TableColumn key="ticker">Ticker</TableColumn>
+          <TableColumn key="total_amount">Volumn</TableColumn>
+          <TableColumn key="lowest_price">Price</TableColumn>
+          <TableColumn key="onsell_order_count">Num of sales</TableColumn>
+          <TableColumn key="holder_count">Holders</TableColumn>
+        </TableHeader>
+        <TableBody
+          isLoading={isLoading}
+          items={list}
+          emptyContent={"No Data."}
+          loadingContent={<Spinner />}
+        >
+          {(item: any) => (
+            <TableRow key={item.ticker} className="cursor-pointer">
+              {(columnKey) => (
+                <TableCell>{getKeyValue(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

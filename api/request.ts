@@ -51,9 +51,22 @@ export const getOrders = async ({
   size,
   sort = 0,
   type = 1,
+  address,
 }: GetOrders) => {
   const res = await request("/ordx/GetOrders", {
-    data: { ticker, offset, size, sort, type },
+    data: { ticker, offset, size, sort, type, address },
+  });
+  return res.json();
+};
+export const getHistory = async ({
+  ticker,
+  offset,
+  size,
+  sort = 0, // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
+  address,
+}: any) => {
+  const res = await request("/ordx/GetHistory", {
+    data: { ticker, offset, size, sort, address },
   });
   return res.json();
 };
@@ -77,6 +90,13 @@ export const submitOrder = async ({ address, raw }: any) => {
   const res = await request("/ordx/SubmitOrder", {
     method: "POST",
     data: { address, raw },
+  });
+  return res.json();
+};
+export const cancelOrder = async ({ address, order_id }: any) => {
+  const res = await request("/ordx/CancelOrder", {
+    method: "POST",
+    data: { address, order_id },
   });
   return res.json();
 };

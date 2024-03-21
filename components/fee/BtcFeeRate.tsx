@@ -1,14 +1,20 @@
 import { Input, Slider } from "@nextui-org/react";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, use } from "react";
 import { BtcFeeRateItem } from "./BtcFeeRateItem";
-import { fetchChainFeeRate } from "@/api";
 import { useUnisatStore } from "@/providers/unisat-store-provider";
-import useSWR from "swr";
 
 interface BtcFeeRate {
-  onChange?: (value: number) => void;
+  onChange?: ({ value, type }: any) => void;
+  feeRateData?: any;
+  value?: number;
+  feeType?: string;
 }
-export const BtcFeeRate = ({ onChange }: BtcFeeRate) => {
+export const BtcFeeRate = ({
+  onChange,
+  feeRateData,
+  value,
+  feeType,
+}: BtcFeeRate) => {
   const { network } = useUnisatStore((state) => state);
   const [type, setType] = useState("Normal");
   const [customValue, setCustomValue] = useState(1);
@@ -17,20 +23,15 @@ export const BtcFeeRate = ({ onChange }: BtcFeeRate) => {
   const [minFee, setMinFee] = useState(1);
   const [maxFee, setMaxFee] = useState(500);
 
-  const {
-    data: feeRateData,
-    isLoading,
-    error,
-  } = useSWR(`fetchChainFeeRate-${network}`, () =>
-    fetchChainFeeRate(network as any)
-  );
-
   const clickHandler = (_type: string, value: number) => {
     if (type === _type) {
       return;
     }
     setType(_type);
-    onChange?.(value);
+    onChange?.({
+      type: _type,
+      value,
+    });
   };
   const setRecommendFee = async () => {
     const defaultFee = network === "testnet" ? 1 : 50;
@@ -63,12 +64,20 @@ export const BtcFeeRate = ({ onChange }: BtcFeeRate) => {
   );
   useEffect(() => {
     setRecommendFee();
-  }, [feeRateData, error]);
+  }, [feeRateData]);
   useEffect(() => {
     if (type === "Custom") {
-      onChange?.(customValue);
+      onChange?.({ value: customValue, type: "Custom" });
     }
   }, [customValue]);
+  useEffect(() => {
+    if (feeType === "Custom" && value) {
+      setCustomValue(value);
+      setType(feeType);
+    } else if (feeType) {
+      setType(feeType);
+    }
+  }, [feeType, value]);
   return (
     <div>
       <div className="grid grid-cols-3 gap-3 mb-2">
@@ -103,7 +112,7 @@ export const BtcFeeRate = ({ onChange }: BtcFeeRate) => {
             step={1}
             maxValue={maxFee}
             minValue={minFee}
-            defaultValue={20}
+            value={customValue}
             className="flex-1"
             onChange={(e) => {
               setCustomValue(e as number);

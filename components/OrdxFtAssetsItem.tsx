@@ -6,61 +6,55 @@ import {
   CardFooter,
   CardBody,
 } from "@nextui-org/react";
-import { use, useMemo } from "react";
+import { useMemo, useState } from "react";
 
-const TickerContent = ({ content }: any) => {
+export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
+  const [loading, setLoading] = useState(false);
+  const sellHandler = async () => {
+    setLoading(true);
+    await onSell(item);
+    setLoading(false);
+  };
   return (
-    <div className="h-36 max-w-full">
-      <div className="w-full h-full flex justify-center items-center break-words break-all p-4">
-        <p>{content}</p>
-      </div>
-    </div>
-  );
-};
-
-export const OrdxFtAssetsItem = ({ item, onSell }: any) => {
-  const inscriptionNum = useMemo(() => {
-    return item?.tickers?.map((v) => `# ${v.inscriptionnum}`)?.join("-") || "";
-  }, [item]);
-  const ticker = useMemo(() => {
-    return item?.tickers?.[0];
-  }, [item]);
-  return (
-    <Card radius="lg" className="border-none w-60">
+    <Card radius="lg" className="border-none w-full min-h-[15rem]">
       <CardBody>
-        <TickerContent
-          content={JSON.stringify({
-            p: "ordx",
-            op: "mint",
-            tick: ticker?.ticker,
-            amt: ticker?.amount,
-          })}
-        />
+        <div className="flex-1">
+          {item?.tickers?.map((v: any) => (
+            <div key={v.inscriptionnum}>
+              <div># {v.inscriptionnum}</div>
+              <div>{v.ticker}</div>
+              <div>{v.amount}</div>
+            </div>
+          ))}
+        </div>
       </CardBody>
       <Divider />
       <CardFooter className="">
         <div className="flex-1">
-          <div className="text-tiny  mb-2">{inscriptionNum}</div>
           <div>
-            <ButtonGroup className="w-full">
+            {item.order_id === 0 ? (
               <Button
-                className="text-tiny  "
+                className="text-tiny "
                 variant="flat"
+                fullWidth
                 color="default"
                 radius="lg"
-                onClick={onSell}
+                onClick={sellHandler}
               >
                 上架
               </Button>
+            ) : (
               <Button
-                className="text-tiny  "
+                className="text-tiny"
+                fullWidth
                 variant="flat"
                 color="default"
                 radius="lg"
+                onClick={onCancelOrder}
               >
-                上架
+                下架（{item.price} {item.currency}）
               </Button>
-            </ButtonGroup>
+            )}
           </div>
         </div>
       </CardFooter>

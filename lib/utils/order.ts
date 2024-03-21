@@ -166,9 +166,8 @@ export const buildBuyOrder = async ({
   const sellerOutput = sellPsbt.txOutputs[0];
   buyPsbt.addOutput(sellerOutput);
 
-  console.log("sellAmount", sellAmount);
   const spendValue = sellAmount + fee;
-  let changeValue = totalValue - spendValue + dummyValue - DUMMY_UTXO_VALUE * 2;
+  let changeValue = totalValue - spendValue - DUMMY_UTXO_VALUE * 2;
   if (
     NEXT_PUBLIC_IS_FREE === "0" &&
     serviceFee &&
@@ -184,6 +183,7 @@ export const buildBuyOrder = async ({
     address,
     value: DUMMY_UTXO_VALUE,
   });
+  // 145,928
   buyPsbt.addOutput({
     address,
     value: DUMMY_UTXO_VALUE,
@@ -196,5 +196,10 @@ export const buildBuyOrder = async ({
   buyPsbt.addOutput(changeOutput);
 
   const signed = await window.unisat.signPsbt(buyPsbt.toHex());
-  return signed;
+  const psbt = bitcoinjs.Psbt.fromHex(signed, {
+    network: btccoinNetwork,
+  });
+  const tx = psbt.extractTransaction();
+  const rawTxHex = tx.toHex();
+  return rawTxHex;
 };

@@ -6,6 +6,8 @@ export const Pagination = ({ total, page, size, onChange }: any) => {
     <NextPagination
       isCompact
       showControls
+      showShadow
+      color="primary"
       total={total}
       initialPage={1}
       page={page}

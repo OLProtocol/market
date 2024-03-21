@@ -30,3 +30,11 @@ export const removeObjectEmptyValue = (obj: any) => {
   });
   return _obj;
 };
+
+export const resolveMempoolTxLink = (txid: string, network: string) => {
+  const href =
+    network === "testnet"
+      ? `https://mempool.space/testnet/tx/${txid}`
+      : `https://mempool.space/tx/${txid}`;
+  return href;
+};

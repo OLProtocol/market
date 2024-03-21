@@ -17,6 +17,7 @@ import { hideStr, filterUtxosByValue, buildBuyOrder } from "@/lib/utils";
 
 import { getUtxoByValue, buyOrder } from "@/api";
 import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useState } from "react";
 import useSWR from "swr";
 import { useCommonStore } from "@/stores";
 
@@ -24,11 +25,13 @@ interface OrderBuyModalProps {
   visiable: boolean;
   item: any;
   onClose?: () => void;
+  onSuccess?: () => void;
 }
 export const OrderBuyModal = ({
   visiable,
   item,
   onClose: onModalClose,
+  onSuccess,
 }: OrderBuyModalProps) => {
   const NEXT_PUBLIC_SERVICE_FEE = env("NEXT_PUBLIC_SERVICE_FEE");
   const NEXT_PUBLIC_IS_FREE = env("NEXT_PUBLIC_IS_FREE");
@@ -39,7 +42,7 @@ export const OrderBuyModal = ({
   }
   const { feeRate } = useCommonStore((state) => state);
   const { balance, address, network } = useUnisatStore((state) => state);
-
+  const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data, isLoading } = useSWR(
     `getUtxoByValue-${address}-${network}`,
@@ -59,6 +62,7 @@ export const OrderBuyModal = ({
           description: `数据错误`,
         });
       }
+      setLoading(true);
       const buyRaw = await buildBuyOrder({
         orderId: item.order_id,
         utxos: networkFeeAndUtxos.utxos,
@@ -79,6 +83,7 @@ export const OrderBuyModal = ({
           message: "buy successfully",
           description: `The order has been submitted successfully, please wait for the buyer to buy it.`,
         });
+        onSuccess?.();
         closeHandler();
       } else {
         notification.error({
@@ -91,6 +96,8 @@ export const OrderBuyModal = ({
         message: "buy failed",
         description: error.message,
       });
+    } finally {
+      setLoading(false);
     }
   };
   const networkFeeAndUtxos = useMemo(() => {
@@ -131,6 +138,7 @@ export const OrderBuyModal = ({
 
   return (
     <Modal
+      backdrop="blur"
       isDismissable={false}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
@@ -212,6 +220,7 @@ export const OrderBuyModal = ({
                 关闭
               </Button>
               <Button
+                isLoading={loading}
                 isDisabled={!networkFeeAndUtxos.fee}
                 color="primary"
                 onPress={confirmHandler}
