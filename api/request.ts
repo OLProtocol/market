@@ -2,7 +2,7 @@ import { removeObjectEmptyValue } from "@/lib/utils";
 
 export const request = async (path: string, options: any = {}) => {
   const { headers = {}, method = "GET", data } = options;
-  let url = `https://apiprd.ordx.market${path}`;
+  let url = `https://apitest.ordx.market${path}`;
   if (method === "GET") {
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
