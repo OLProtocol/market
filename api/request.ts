@@ -1,6 +1,7 @@
 import { removeObjectEmptyValue } from "@/lib/utils";
-
+import { useUnisatStore } from "@/stores";
 export const request = async (path: string, options: any = {}) => {
+  const { signature, publicKey, unisat, connected } = useUnisatStore.getState();
   const { headers = {}, method = "GET", data } = options;
   let url = `https://apitest.ordx.market${path}`;
   if (method === "GET") {
@@ -9,6 +10,10 @@ export const request = async (path: string, options: any = {}) => {
   } else if (method === "POST") {
     options.body = JSON.stringify(data);
     headers["Content-Type"] = "application/json";
+  }
+  if (connected && signature) {
+    headers["Publickey"] = publicKey;
+    headers["Signature"] = signature;
   }
   delete options.data;
   options.headers = headers;

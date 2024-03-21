@@ -16,10 +16,15 @@ export const WalletConnectButton = () => {
   const toMyAssets = () => {
     router.push("/account");
   };
+  const connectHandler = async () => {
+    await connect();
+  }
   useEffect(() => {
     check();
   }, []);
+
   useEffect(() => {
+    console.log("connected", connected);
     if (connected) {
       unisat?.on("accountsChanged", check);
       unisat?.on("networkChanged", check);
@@ -46,6 +51,6 @@ export const WalletConnectButton = () => {
       </PopoverContent>
     </Popover>
   ) : (
-    <Button onClick={connect}>Connect Wallet</Button>
+    <Button onClick={connectHandler}>Connect Wallet</Button>
   );
 };
