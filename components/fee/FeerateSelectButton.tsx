@@ -14,7 +14,7 @@ import { useCommonStore } from "@/stores";
 import { BtcFeeRate } from "./BtcFeeRate";
 import useSWR from "swr";
 import { fetchChainFeeRate } from "@/api";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 
 export const FeerateSelectButton = () => {
   const { network } = useUnisatStore((state) => state);

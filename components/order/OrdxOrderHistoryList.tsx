@@ -16,7 +16,7 @@ import { getHistory } from "@/api";
 import { useMemo, useState } from "react";
 import { hideStr, resolveMempoolTxLink } from "@/lib/utils";
 import { Icon } from "@iconify/react";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 import { Pagination } from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
 import { useRouter } from "next/navigation";

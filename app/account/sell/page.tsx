@@ -19,7 +19,7 @@ import { useSellStore } from "@/stores";
 import { useList } from "react-use";
 import { useEffect, useMemo } from "react";
 import { parseUtxo, buildSellOrder, btcToSats } from "@/lib/utils";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 import { submitOrder } from "@/api";
 import { useRouter } from "next/navigation";
 

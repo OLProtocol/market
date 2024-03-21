@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Empty } from "antd";
 import { getOrders, getOrdxAssets } from "@/api";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 import { use, useMemo, useState } from "react";
 import { Pagination } from "@/components/Pagination";
 import { Content } from "@/components/Content";

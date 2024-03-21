@@ -1,6 +1,7 @@
+
 import "@/styles/globals.css";
 import { Metadata } from "next";
-import { PublicEnvScript } from "next-runtime-env";
+// import { PublicEnvScript } from "next-runtime-env";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
@@ -34,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <PublicEnvScript />
+        {/* <PublicEnvScript /> */}
       </head>
       <body
         className={clsx(
@@ -43,14 +44,12 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <UnisatStoreProvider>
-            <div className="relative flex flex-col h-screen">
-              <Navbar />
-              <main className="container mx-auto max-w-7xl px-4 flex-grow">
-                {children}
-              </main>
-            </div>
-          </UnisatStoreProvider>
+          <div className="relative flex flex-col h-screen">
+            <Navbar />
+            <main className="container mx-auto max-w-7xl px-4 flex-grow">
+              {children}
+            </main>
+          </div>
         </Providers>
       </body>
     </html>

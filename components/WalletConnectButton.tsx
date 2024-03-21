@@ -5,20 +5,30 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@nextui-org/react";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { hideStr } from "@/lib/utils";
 export const WalletConnectButton = () => {
   const router = useRouter();
-  const { connect, check, connected, address, disconnect, balance } =
+  const { connect, check, connected, address, disconnect, unisat } =
     useUnisatStore((state) => state);
   const toMyAssets = () => {
     router.push("/account");
   };
   useEffect(() => {
     check();
-  }, [check]);
+  }, []);
+  useEffect(() => {
+    if (connected) {
+      unisat?.on("accountsChanged", check);
+      unisat?.on("networkChanged", check);
+    }
+    return () => {
+      unisat?.removeListener("accountsChanged", check);
+      unisat?.removeListener("networkChanged", check);
+    };
+  }, [connected]);
   return connected ? (
     <Popover placement="bottom">
       <PopoverTrigger>
@@ -26,10 +36,7 @@ export const WalletConnectButton = () => {
       </PopoverTrigger>
       <PopoverContent className="p-2">
         <div className="flex flex-col gap-2">
-          <Button
-            className="w-full"
-            onClick={toMyAssets}
-          >
+          <Button className="w-full" onClick={toMyAssets}>
             我的资产
           </Button>
           <Button color="danger" variant="ghost" onClick={disconnect}>

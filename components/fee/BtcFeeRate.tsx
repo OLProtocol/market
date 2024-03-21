@@ -1,7 +1,7 @@
 import { Input, Slider } from "@nextui-org/react";
 import { useState, useMemo, useEffect, use } from "react";
 import { BtcFeeRateItem } from "./BtcFeeRateItem";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 
 interface BtcFeeRate {
   onChange?: ({ value, type }: any) => void;

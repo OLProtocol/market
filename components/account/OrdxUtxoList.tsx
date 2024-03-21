@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { notification, Empty } from "antd";
 import { getOrdxAssets, cancelOrder } from "@/api";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 import { useEffect, useMemo, useState } from "react";
 import { useSellStore } from "@/stores";
 import { Pagination } from "@/components/Pagination";

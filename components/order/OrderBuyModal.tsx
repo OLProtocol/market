@@ -16,7 +16,7 @@ import { notification } from "antd";
 import { hideStr, filterUtxosByValue, buildBuyOrder } from "@/lib/utils";
 
 import { getUtxoByValue, buyOrder } from "@/api";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 import { useState } from "react";
 import useSWR from "swr";
 import { useCommonStore } from "@/stores";
@@ -121,7 +121,6 @@ export const OrderBuyModal = ({
       smallTwoUtxos: smallTwoUtxos,
     };
   }, [feeRate, utxos, item?.price]);
-  console.log(networkFeeAndUtxos, "networkFeeAndUtxos");
   const totalPrice = useMemo(() => {
     if (item) {
       return item.price;

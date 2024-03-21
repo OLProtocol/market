@@ -1,16 +1,20 @@
 "use client";
+
 import useSWR from "swr";
 import { getTickerSummary } from "@/api";
 import { Image, Divider, Tabs, Tab } from "@nextui-org/react";
 import { OrdxOrderList } from "@/components/order/OrdxOrderList";
 import { OrdxOrderHistoryList } from "@/components/order/OrdxOrderHistoryList";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
+import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
+import { WalletConnectBus } from "@/components/WalletConnectBus";
 
-export default function Page({ params }: { params: { slug: string } }) {
+export default function Page() {
+  const params = useSearchParams();
   const { address } = useUnisatStore((state) => state);
-  const ticker = params.slug;
-  const { data, isLoading } = useSWR(`getTickerSummary`, () =>
+  const ticker = params.get("ticker") as any;
+  const { data } = useSWR(`getTickerSummary`, () =>
     getTickerSummary({ ticker })
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
@@ -35,7 +39,9 @@ export default function Page({ params }: { params: { slug: string } }) {
             <OrdxOrderHistoryList ticker={ticker} />
           </Tab>
           <Tab key="my" title="我的挂单">
-            <OrdxOrderList ticker={ticker} address={address}/>
+            <WalletConnectBus className="mx-auto mt-20 block">
+              <OrdxOrderList ticker={ticker} address={address} />
+            </WalletConnectBus>
           </Tab>
         </Tabs>
       </div>

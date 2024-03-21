@@ -7,8 +7,7 @@ import {
   CardBody,
   Chip,
 } from "@nextui-org/react";
-import { use, useMemo } from "react";
-import { Icon } from "@iconify/react";
+import { WalletConnectBus } from "@/components/WalletConnectBus";
 
 export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
   return (
@@ -30,15 +29,17 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
         </div>
       </CardBody>
       <CardFooter className="">
-        <Button
-          className="text-tiny flex-1 "
-          variant="flat"
-          color="default"
-          radius="lg"
-          onClick={onBuy}
-        >
-          购买
-        </Button>
+        <WalletConnectBus className="flex-1">
+          <Button
+            className="text-tiny flex-1 "
+            variant="flat"
+            color="default"
+            radius="lg"
+            onClick={onBuy}
+          >
+            购买
+          </Button>
+        </WalletConnectBus>
         {/* <Button
               isIconOnly
               radius="full"

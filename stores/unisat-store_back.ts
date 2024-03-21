@@ -1,5 +1,4 @@
-import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
 
 declare global {
   interface Window {
@@ -54,9 +53,11 @@ export const defaultInitState: UnisatState = {
   network: "testnet",
 };
 
-export const useUnisatStore = create<UnisatStore>()(
-  devtools((set, get) => ({
-    ...defaultInitState,
+export const createUnisatStore = (
+  initState: UnisatState = defaultInitState
+) => {
+  return createStore<UnisatStore>()((set, get) => ({
+    ...initState,
     check: async () => {
       try {
         const unisat = window.unisat;
@@ -119,6 +120,7 @@ export const useUnisatStore = create<UnisatStore>()(
         balance: { confirmed: 0, unconfirmed: 0, total: 0 },
         unisat: null,
         installed: true,
+        
       })),
     switchNetwork: async () => {
       try {
@@ -134,18 +136,12 @@ export const useUnisatStore = create<UnisatStore>()(
           const address = accounts[0];
           const publicKey = await unisat.getPublicKey();
           const balance = await unisat.getBalance();
-          set((state) => ({
-            publicKey,
-            address,
-            balance,
-            connected: true,
-            unisat,
-          }));
+          set((state) => ({ publicKey, address, balance, connected: true, unisat }));
         }
       } catch (error) {
         console.error("Error checking unisat", error);
         throw error;
       }
     },
-  }))
-);
+  }));
+};

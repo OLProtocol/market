@@ -3,7 +3,7 @@
 import { Tabs, Tab } from "@nextui-org/react";
 import { OrdxUtxoList } from "@/components/account/OrdxUtxoList";
 import { OrdxOrderHistoryList } from "@/components/order/OrdxOrderHistoryList";
-import { useUnisatStore } from "@/providers/unisat-store-provider";
+import { useUnisatStore } from "@/stores";
 
 export default function AccountPage() {
   const { address } = useUnisatStore((state) => state);

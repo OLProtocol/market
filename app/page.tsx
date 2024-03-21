@@ -22,7 +22,7 @@ export default function Home() {
   );
   const list = useMemo(() => data?.data || [], [data]);
   const toDetail = (e) => {
-    router.push(`/ordx/ticker/${e}`);
+    router.push(`/ordx/ticker?ticker=${e}`);
   };
   return (
     <div className="pt-4">
