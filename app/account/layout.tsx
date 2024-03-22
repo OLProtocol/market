@@ -19,7 +19,7 @@ export default function AccountLayout({
             <h1 className="">
               <Snippet
                 codeString={address}
-                className="bg-transparent text-2xl font-bold"
+                className="bg-transparent text-lg md:text-2xl font-bold"
                 symbol=""
                 size="lg"
                 variant="flat"
@@ -28,9 +28,9 @@ export default function AccountLayout({
               </Snippet>
             </h1>
             <div className="">
-              <p className="text-4xl font-bold">
+              <p className="text-2xl md:text-4xl font-bold">
                 {satsToBitcoin(balance.total)}
-                <span className="text-md"> BTC</span>
+                <span className="text-lg md:text-3xl"> BTC</span>
               </p>
             </div>
           </div>

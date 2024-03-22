@@ -1,8 +1,8 @@
 "use client";
 
 import useSWR from "swr";
-import { Empty } from "antd";
-import { getOrders, getOrdxAssets } from "@/api";
+import { Empty, notification } from "antd";
+import { getOrders, lockOrder, unlockOrder } from "@/api";
 import { useUnisatStore } from "@/stores";
 import { use, useMemo, useState } from "react";
 import { Pagination } from "@/components/Pagination";
@@ -17,8 +17,10 @@ interface OrdxOrderListProps {
 }
 export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const router = useRouter();
+  const { address: storeAddress } = useUnisatStore((state) => state);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
+  const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const swrKey = useMemo(() => {
@@ -30,8 +32,22 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({ offset: (page - 1) * size, size, ticker, address })
   );
-  const onBuy = (item: any) => {
+  const onBuy = async (item: any) => {
     setBuyItem(item);
+    // await unlockOrder({ address: storeAddress, order_id: item.order_id });
+    const orderDetail = await lockOrder({
+      address: storeAddress,
+      order_id: item.order_id,
+    });
+    if (!orderDetail?.data?.raw) {
+      notification.error({
+        message: "Lock order failed",
+        description: orderDetail.msg,
+      });
+      return;
+    }
+    const { raw } = orderDetail.data;
+    setOrderRaw(raw);
     setModalVisiable(true);
   };
   const onBuySuccess = () => {
@@ -46,7 +62,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     <div className="">
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] grid  grid-1 sm:grid-2 md:grid-4 lg:grid-6 gap-4 mb-4">
+        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
           {list.map((item: any) => (
             <OrdxFtOrderItem
               key={item.utxo}
@@ -69,13 +85,15 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
           />
         </div>
       )}
-
-      <OrderBuyModal
-        item={buyItem}
-        onSuccess={() => onBuySuccess()}
-        onClose={() => setModalVisiable(false)}
-        visiable={modalVisiable}
-      />
+      {!!orderRaw && (
+        <OrderBuyModal
+          item={buyItem}
+          orderRaw={orderRaw}
+          onSuccess={() => onBuySuccess()}
+          onClose={() => setModalVisiable(false)}
+          visiable={modalVisiable}
+        />
+      )}
     </div>
   );
 };

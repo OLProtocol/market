@@ -12,14 +12,14 @@ import { UnisatStoreProvider } from "@/providers/unisat-store-provider";
 
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
+    default: 'Ordx Market',
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
+  // themeColor: [
+  //   { media: "(prefers-color-scheme: light)", color: "white" },
+  //   { media: "(prefers-color-scheme: dark)", color: "black" },
+  // ],
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",

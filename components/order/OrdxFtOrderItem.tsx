@@ -8,13 +8,24 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { WalletConnectBus } from "@/components/WalletConnectBus";
+import { useState } from "react";
 
 export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
+  const [loading, setLoading] = useState(false);
+  const buyHandler = async () => {
+    setLoading(true);
+    try {
+      await onBuy(item);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <Card isPressable radius="lg" className="border-none w-60 max-h-[18rem]">
+    <Card isPressable radius="lg" className="border-none w-full h-[14rem] md:h-[20rem]">
       <CardBody>
         <div className="flex flex-col h-full">
-          <div className="flex-1">
+          <div className="flex-1 text-sm md:text-base">
             {item?.assets?.map((v: any) => (
               <div key={v.inscriptionnum}>
                 <div>Ticker: {v.ticker}</div>
@@ -32,9 +43,10 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
           <Button
             className="text-tiny flex-1 "
             variant="flat"
+            isLoading={loading}
             color="default"
             radius="lg"
-            onClick={onBuy}
+            onClick={buyHandler}
           >
             购买
           </Button>

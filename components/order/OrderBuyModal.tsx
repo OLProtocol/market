@@ -21,7 +21,7 @@ import {
   btcToSats,
 } from "@/lib/utils";
 
-import { getUtxoByValue, buyOrder } from "@/api";
+import { getUtxoByValue, buyOrder, unlockOrder } from "@/api";
 import { useUnisatStore } from "@/stores";
 import { useState } from "react";
 import useSWR from "swr";
@@ -30,12 +30,14 @@ import { useCommonStore } from "@/stores";
 interface OrderBuyModalProps {
   visiable: boolean;
   item: any;
+  orderRaw?: string;
   onClose?: () => void;
   onSuccess?: () => void;
 }
 export const OrderBuyModal = ({
   visiable,
   item,
+  orderRaw,
   onClose: onModalClose,
   onSuccess,
 }: OrderBuyModalProps) => {
@@ -60,7 +62,27 @@ export const OrderBuyModal = ({
       return pre + cur.value;
     }, 0);
   }, [utxos]);
-
+  const cancelHandler = async () => {
+    setLoading(true);
+    try {
+      const res = await unlockOrder({ address, order_id: item.order_id });
+      if (res.code !== 200) {
+        notification.error({
+          message: "Cancel order failed",
+          description: res.msg,
+        });
+        return;
+      }
+      closeHandler();
+    } catch (error: any) {
+      notification.error({
+        message: "Cancel order failed",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const closeHandler = () => {
     onModalClose?.();
     onClose();
@@ -73,10 +95,19 @@ export const OrderBuyModal = ({
           message: "buy error",
           description: `数据错误`,
         });
+        return;
+      }
+      if (!orderRaw) {
+        notification.warning({
+          message: "buy error",
+          description: "Order Raw is empty",
+        });
+        return;
       }
       setLoading(true);
       const buyRaw = await buildBuyOrder({
         orderId: item.order_id,
+        orderRaw,
         utxos: networkFeeAndUtxos.utxos,
         dummyUtxos: networkFeeAndUtxos.smallTwoUtxos,
         fee: networkFeeAndUtxos.fee,
@@ -155,6 +186,7 @@ export const OrderBuyModal = ({
 
   return (
     <Modal
+      hideCloseButton
       backdrop="blur"
       isDismissable={false}
       isOpen={isOpen}
@@ -162,95 +194,96 @@ export const OrderBuyModal = ({
       onClose={closeHandler}
     >
       <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="">立即购买</ModalHeader>
-            <ModalBody>
-              <div className="flex  justify-between">
-                <div className="flex-1">
-                  {item?.assets?.map((v: any) => (
-                    <div key={v.inscriptionnum}>
-                      <div>
-                        {v.amount} {v.ticker}
-                      </div>
-                      <div># {v.inscriptionnum}</div>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <div>价格: {item?.price} BTC</div>
-                  <div className="flex items-center">
-                    来自:
-                    <Snippet
-                      codeString={item?.address}
-                      className="bg-transparent"
-                      symbol=""
-                      size="sm"
-                      variant="flat"
-                    >
-                      {hideStr(item?.address, 4)}
-                    </Snippet>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Fee Rate</span>
-                <div>
-                  {feeRate.value} <span>sats</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>平台服务费</span>
-                <div>
-                  {serviceFee} <span>sats</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>网络费用</span>
-                {isLoading || !networkFeeAndUtxos.fee ? (
-                  <Spinner size="sm" />
-                ) : (
+        <ModalHeader className="">立即购买</ModalHeader>
+        <ModalBody>
+          <div className="flex  justify-between">
+            <div className="flex-1">
+              {item?.assets?.map((v: any) => (
+                <div key={v.inscriptionnum}>
                   <div>
-                    {networkFeeAndUtxos.fee} <span>sats</span>
+                    <div className="font-bold">Ticker: {v.ticker}</div>
+                    <div className="text-sm">Amount: {v.amount}</div>
                   </div>
-                )}
-              </div>
-              <div className="flex justify-between items-center font-bold text-lg">
-                <span>总计</span>
-                <div>
-                  {satsToBitcoin(totalPrice)} <span>BTC</span>
                 </div>
-              </div>
-              <Chip
-                radius="sm"
-                size="lg"
-                className="w-full max-w-none text-small"
-              >
-                <div
-                  className={`flex items-center justify-between ${
-                    insufficientBalance ? "text-red-600" : ""
-                  }`}
+              ))}
+            </div>
+            <div>
+              <div>价格: {item?.price} BTC</div>
+              <div className="flex items-center">
+                来自:
+                <Snippet
+                  codeString={item?.address}
+                  className="bg-transparent"
+                  symbol=""
+                  size="sm"
+                  variant="flat"
                 >
-                  <span>可用余额</span>
-                  <span>{satsToBitcoin(spendableValue)} BTC</span>
-                </div>
-              </Chip>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="danger" variant="light" onPress={closeHandler}>
-                关闭
-              </Button>
-              <Button
-                isLoading={loading}
-                isDisabled={buttonDisabled}
-                color="primary"
-                onPress={confirmHandler}
-              >
-                确认
-              </Button>
-            </ModalFooter>
-          </>
-        )}
+                  {hideStr(item?.address, 4)}
+                </Snippet>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Fee Rate</span>
+            <div>
+              {feeRate.value} <span>sats</span>
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>平台服务费</span>
+            <div>
+              {serviceFee} <span>sats</span>
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
+            <span>网络费用</span>
+            {isLoading || !networkFeeAndUtxos.fee ? (
+              <Spinner size="sm" />
+            ) : (
+              <div>
+                {networkFeeAndUtxos.fee} <span>sats</span>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between items-center font-bold text-lg">
+            <span>总计</span>
+            <div>
+              {satsToBitcoin(totalPrice)} <span>BTC</span>
+            </div>
+          </div>
+          <Chip radius="sm" size="lg" className="w-full max-w-none text-small">
+            <div
+              className={`flex items-center justify-between ${
+                insufficientBalance ? "text-red-600" : ""
+              }`}
+            >
+              <span>可用余额</span>
+              {isLoading || !networkFeeAndUtxos.fee ? (
+                <Spinner size="sm" />
+              ) : (
+                <span>{satsToBitcoin(spendableValue)} BTC</span>
+              )}
+            </div>
+          </Chip>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="danger"
+            isLoading={loading}
+            variant="light"
+            onPress={cancelHandler}
+          >
+            取消
+          </Button>
+          <Button
+            isLoading={loading}
+            isDisabled={buttonDisabled}
+            color="primary"
+            onPress={confirmHandler}
+          >
+            确认
+          </Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

@@ -28,15 +28,14 @@ export default function Home() {
     <div className="pt-4">
       <Table
         isHeaderSticky
-        isStriped
         onRowAction={toDetail}
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
           <TableColumn key="ticker">Ticker</TableColumn>
-          <TableColumn key="total_amount">Volumn</TableColumn>
+          <TableColumn key="tx_total_volume">Volumn</TableColumn>
           <TableColumn key="lowest_price">Price</TableColumn>
-          <TableColumn key="onsell_order_count">Num of sales</TableColumn>
+          <TableColumn key="tx_order_count">成交笔数</TableColumn>
           <TableColumn key="holder_count">Holders</TableColumn>
         </TableHeader>
         <TableBody
@@ -47,9 +46,27 @@ export default function Home() {
         >
           {(item: any) => (
             <TableRow key={item.ticker} className="cursor-pointer">
-              {(columnKey) => (
-                <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-              )}
+              {(columnKey) => {
+                if (columnKey === "holder_count") {
+                  return (
+                    <TableCell className="text-center">
+                      <div>{getKeyValue(item, columnKey)}</div>
+                      {/* <div>{item['holder_dispersion']}</div> */}
+                    </TableCell>
+                  );
+                } else if (
+                  ["tx_total_volume", "lowest_price"].includes(
+                    columnKey.toString()
+                  )
+                ) {
+                  console.log("item", columnKey);
+                  return (
+                    <TableCell>{getKeyValue(item, columnKey)} BTC</TableCell>
+                  );
+                } else {
+                  return <TableCell>{getKeyValue(item, columnKey)}</TableCell>;
+                }
+              }}
             </TableRow>
           )}
         </TableBody>

@@ -9,11 +9,11 @@ import {
   Divider,
   Kbd,
   Link,
+  Image,
   Input,
 } from "@nextui-org/react";
+import { useMemo } from "react";
 import { WalletConnectButton } from "@/components/WalletConnectButton";
-import { link as linkStyles } from "@nextui-org/theme";
-import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
 import clsx from "clsx";
 import { FeerateSelectButton } from "@/components/fee/FeerateSelectButton";
@@ -49,32 +49,24 @@ export const Navbar = () => {
       type="search"
     />
   );
-
+  const navMenus = useMemo(() => [{ label: "Market", href: "/" }], []);
   return (
     <NextUINavbar maxWidth="xl" position="sticky" isBordered>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
+            <Image src="/logo.jpg" alt="logo" className="w-8 h-8" />
             <p className="font-bold text-inherit">OrdX</p>
           </NextLink>
         </NavbarBrand>
-        {/* <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
+
+        <ul className="hidden lg:flex gap-4 justify-start ml-2">
+          {navMenus.map((item) => (
             <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
+              <Link href={item.href}>{item.label}</Link>
             </NavbarItem>
           ))}
-        </ul> */}
+        </ul>
       </NavbarContent>
 
       <NavbarContent
@@ -118,7 +110,7 @@ export const Navbar = () => {
         {/* <Link isExternal href={siteConfig.links.github} aria-label="Github">
           <GithubIcon className="text-default-500" />
         </Link> */}
-        
+
         <NavbarMenuToggle />
       </NavbarContent>
 
@@ -127,11 +119,16 @@ export const Navbar = () => {
         <div className="flex flex-col gap-2">
           <NavbarMenuItem>
             <div className="flex items-center gap-4">
-            <FeerateSelectButton />
-            <ThemeSwitch />
+              <FeerateSelectButton />
+              <ThemeSwitch />
             </div>
-            
           </NavbarMenuItem>
+          <Divider />
+          {navMenus.map((item) => (
+            <NavbarMenuItem key={item.href}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavbarMenuItem>
+          ))}
         </div>
       </NavbarMenu>
     </NextUINavbar>
