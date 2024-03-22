@@ -153,3 +153,9 @@ export const fetchChainFeeRate = async (network: "main" | "testnet") => {
   const data = await resp.json();
   return data;
 };
+
+export const getAppVersion = async () => {
+  const res = await fetch(`/version.txt`);
+  console.log('appVersion', await res.text());
+  return res.text();
+};

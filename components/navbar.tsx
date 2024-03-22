@@ -1,3 +1,4 @@
+"use client";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -16,6 +17,7 @@ import { useMemo } from "react";
 import { WalletConnectButton } from "@/components/walllet/WalletConnectButton";
 import NextLink from "next/link";
 import clsx from "clsx";
+import { UpdateVersionModal } from "./UpdateVersionModal";
 import { FeerateSelectButton } from "@/components/fee/FeerateSelectButton";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -50,7 +52,7 @@ export const Navbar = () => {
     />
   );
   const navMenus = useMemo(() => [{ label: "Market", href: "/" }], []);
-  
+
   return (
     <NextUINavbar maxWidth="xl" position="sticky" isBordered>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -132,6 +134,7 @@ export const Navbar = () => {
           ))}
         </div>
       </NavbarMenu>
+      <UpdateVersionModal />
     </NextUINavbar>
   );
 };
