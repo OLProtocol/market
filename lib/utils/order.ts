@@ -85,7 +85,7 @@ export const buildBuyOrder = async ({
   const NEXT_PUBLIC_SERVICE_FEE = env("NEXT_PUBLIC_SERVICE_FEE");
   const NEXT_PUBLIC_IS_FREE = env("NEXT_PUBLIC_IS_FREE");
   const NEXT_PUBLIC_SERVICE_ADDRESS = env("NEXT_PUBLIC_SERVICE_ADDRESS");
-  await unlockOrder({ address, order_id: orderId });
+  // await unlockOrder({ address, order_id: orderId });
   const orderDetail = await lockOrder({ address, order_id: orderId });
   if (!orderDetail?.data?.raw) {
     throw new Error(orderDetail.msg);
@@ -147,7 +147,6 @@ export const buildBuyOrder = async ({
     witnessUtxo: sellPsbt.data.inputs[0].witnessUtxo,
     finalScriptWitness: sellPsbt.data.inputs[0].finalScriptWitness,
   };
-  console.log(sellerInput);
 
   buyPsbt.addInput(sellerInput);
 

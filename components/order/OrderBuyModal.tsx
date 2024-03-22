@@ -13,7 +13,13 @@ import {
 } from "@nextui-org/react";
 import { env } from "next-runtime-env";
 import { notification } from "antd";
-import { hideStr, filterUtxosByValue, buildBuyOrder } from "@/lib/utils";
+import {
+  hideStr,
+  filterUtxosByValue,
+  buildBuyOrder,
+  satsToBitcoin,
+  btcToSats,
+} from "@/lib/utils";
 
 import { getUtxoByValue, buyOrder } from "@/api";
 import { useUnisatStore } from "@/stores";
@@ -49,6 +55,12 @@ export const OrderBuyModal = ({
     () => getUtxoByValue({ address, network, value: 500 })
   );
   const utxos = useMemo(() => data?.data || [], [data]);
+  const spendableValue = useMemo(() => {
+    return utxos.reduce((pre, cur) => {
+      return pre + cur.value;
+    }, 0);
+  }, [utxos]);
+
   const closeHandler = () => {
     onModalClose?.();
     onClose();
@@ -123,10 +135,16 @@ export const OrderBuyModal = ({
   }, [feeRate, utxos, item?.price]);
   const totalPrice = useMemo(() => {
     if (item) {
-      return item.price;
+      return btcToSats(item.price) + serviceFee + networkFeeAndUtxos.fee;
     }
     return 0;
-  }, [item]);
+  }, [item, serviceFee, networkFeeAndUtxos.fee]);
+  const insufficientBalance = useMemo(() => {
+    return spendableValue < totalPrice;
+  }, [spendableValue, totalPrice]);
+  const buttonDisabled = useMemo(() => {
+    return insufficientBalance;
+  }, [insufficientBalance]);
   useEffect(() => {
     if (visiable) {
       onOpen();
@@ -200,7 +218,7 @@ export const OrderBuyModal = ({
               <div className="flex justify-between items-center font-bold text-lg">
                 <span>总计</span>
                 <div>
-                  {totalPrice} <span>BTC</span>
+                  {satsToBitcoin(totalPrice)} <span>BTC</span>
                 </div>
               </div>
               <Chip
@@ -208,9 +226,13 @@ export const OrderBuyModal = ({
                 size="lg"
                 className="w-full max-w-none text-small"
               >
-                <div className="flex items-center justify-between">
+                <div
+                  className={`flex items-center justify-between ${
+                    insufficientBalance ? "text-red-600" : ""
+                  }`}
+                >
                   <span>可用余额</span>
-                  <span>{balance.confirmed} BTC</span>
+                  <span>{satsToBitcoin(spendableValue)} BTC</span>
                 </div>
               </Chip>
             </ModalBody>
@@ -220,7 +242,7 @@ export const OrderBuyModal = ({
               </Button>
               <Button
                 isLoading={loading}
-                isDisabled={!networkFeeAndUtxos.fee}
+                isDisabled={buttonDisabled}
                 color="primary"
                 onPress={confirmHandler}
               >

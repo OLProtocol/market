@@ -21,9 +21,8 @@ export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
         <div className="flex-1">
           {item?.tickers?.map((v: any) => (
             <div key={v.inscriptionnum}>
-              <div># {v.inscriptionnum}</div>
-              <div>{v.ticker}</div>
-              <div>{v.amount}</div>
+              <div>Ticker: {v.ticker}</div>
+              <div>Amount: {v.amount}</div>
             </div>
           ))}
         </div>
