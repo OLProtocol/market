@@ -13,7 +13,7 @@ import {
   Input,
 } from "@nextui-org/react";
 import { useMemo } from "react";
-import { WalletConnectButton } from "@/components/WalletConnectButton";
+import { WalletConnectButton } from "@/components/walllet/WalletConnectButton";
 import NextLink from "next/link";
 import clsx from "clsx";
 import { FeerateSelectButton } from "@/components/fee/FeerateSelectButton";
@@ -50,6 +50,7 @@ export const Navbar = () => {
     />
   );
   const navMenus = useMemo(() => [{ label: "Market", href: "/" }], []);
+  
   return (
     <NextUINavbar maxWidth="xl" position="sticky" isBordered>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">

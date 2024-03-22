@@ -3,7 +3,7 @@
 import { useUnisatStore } from "@/stores";
 import { hideStr, satsToBitcoin } from "@/lib/utils";
 import { Divider, Snippet } from "@nextui-org/react";
-import { WalletConnectBus } from "@/components/WalletConnectBus";
+import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 
 export default function AccountLayout({
   children,

@@ -9,6 +9,7 @@ import {
   ModalBody,
   useDisclosure,
 } from "@nextui-org/react";
+import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
 import { useCommonStore } from "@/stores";
 import { BtcFeeRate } from "./BtcFeeRate";
@@ -50,7 +51,7 @@ export const FeerateSelectButton = () => {
         className="bg-transparent"
         onClick={() => onOpen()}
       >
-        Gas: {feeRate.value} sats
+        <Icon icon="mdi:gas-station" className="text-xl"/> {feeRate.value} sats/Vb
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>

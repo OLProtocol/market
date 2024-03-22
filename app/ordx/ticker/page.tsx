@@ -10,7 +10,7 @@ import { useUnisatStore } from "@/stores";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { WalletConnectBus } from "@/components/WalletConnectBus";
+import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 
 export default function Page() {
   const router = useRouter();

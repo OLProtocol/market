@@ -7,7 +7,7 @@ import {
   CardBody,
   Chip,
 } from "@nextui-org/react";
-import { WalletConnectBus } from "@/components/WalletConnectBus";
+import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 import { useState } from "react";
 
 export const OrdxFtOrderItem = ({ item, onBuy }: any) => {

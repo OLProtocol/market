@@ -7,22 +7,25 @@ import {
 } from "@nextui-org/react";
 import { useUnisatStore } from "@/stores";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { WalletSelectModal } from "./WalletSelectModal";
 import { hideStr } from "@/lib/utils";
 export const WalletConnectButton = () => {
   const router = useRouter();
   const { connect, check, connected, address, disconnect, unisat } =
     useUnisatStore((state) => state);
+  const [visiable, setVisiable] = useState(false);
   const toMyAssets = () => {
     router.push("/account");
   };
   const connectHandler = async () => {
-    await connect();
-  }
+    setVisiable(true);
+    // await connect();
+  };
   useEffect(() => {
     check();
   }, []);
-
+  
   useEffect(() => {
     console.log("connected", connected);
     if (connected) {
@@ -34,6 +37,7 @@ export const WalletConnectButton = () => {
       unisat?.removeListener("networkChanged", check);
     };
   }, [connected]);
+  
   return connected ? (
     <Popover placement="bottom">
       <PopoverTrigger>
@@ -51,6 +55,12 @@ export const WalletConnectButton = () => {
       </PopoverContent>
     </Popover>
   ) : (
-    <Button onClick={connectHandler}>Connect Wallet</Button>
+    <>
+      <Button onClick={connectHandler}>Connect Wallet</Button>
+      <WalletSelectModal
+        visiable={visiable}
+        onClose={() => setVisiable(false)}
+      />
+    </>
   );
 };
