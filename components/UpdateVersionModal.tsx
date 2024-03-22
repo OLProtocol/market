@@ -14,7 +14,7 @@ import { getAppVersion } from "@/api";
 import useSWR from "swr";
 
 export const UpdateVersionModal = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const { data: appVersion } = useSWR(`getAppVersion`, () => getAppVersion(), {
     refreshInterval: 1000 * 60 * 2,
   });
