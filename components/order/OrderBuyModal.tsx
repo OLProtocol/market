@@ -22,7 +22,7 @@ import {
 } from "@/lib/utils";
 
 import { getUtxoByValue, buyOrder, unlockOrder } from "@/api";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { useState } from "react";
 import useSWR from "swr";
 import { useCommonStore } from "@/stores";
@@ -49,7 +49,7 @@ export const OrderBuyModal = ({
     serviceFee = Number(NEXT_PUBLIC_SERVICE_FEE);
   }
   const { feeRate } = useCommonStore((state) => state);
-  const { balance, address, network } = useUnisatStore((state) => state);
+  const { balance, address, network } = useReactWalletStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data, isLoading } = useSWR(

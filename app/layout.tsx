@@ -1,4 +1,3 @@
-
 import "@/styles/globals.css";
 import { Metadata } from "next";
 // import { PublicEnvScript } from "next-runtime-env";
@@ -8,11 +7,13 @@ import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { ConfigProvider, theme } from "antd";
 import { UnisatStoreProvider } from "@/providers/unisat-store-provider";
 
 export const metadata: Metadata = {
   title: {
-    default: 'Ordx Market',
+    default: "Ordx Market",
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -34,9 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* <PublicEnvScript /> */}
-      </head>
+      <head>{/* <PublicEnvScript /> */}</head>
       <body
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
@@ -44,12 +43,24 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col h-screen">
-            <Navbar />
-            <main className="container mx-auto max-w-7xl px-4 flex-grow">
-              {children}
-            </main>
-          </div>
+          <AntdRegistry>
+            <ConfigProvider
+              theme={{
+                // 1. 单独使用暗色算法
+                algorithm: theme.darkAlgorithm,
+
+                // 2. 组合使用暗色算法与紧凑算法
+                // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
+              }}
+            >
+              <div className="relative flex flex-col h-screen">
+                <Navbar />
+                <main className="container mx-auto max-w-7xl px-4 flex-grow">
+                  {children}
+                </main>
+              </div>
+            </ConfigProvider>
+          </AntdRegistry>
         </Providers>
       </body>
     </html>

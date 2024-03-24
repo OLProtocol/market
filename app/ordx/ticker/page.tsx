@@ -6,7 +6,7 @@ import { getTickerSummary } from "@/api";
 import { Image, Divider, Tabs, Tab } from "@nextui-org/react";
 import { OrdxOrderList } from "@/components/order/OrdxOrderList";
 import { OrdxOrderHistoryList } from "@/components/order/OrdxOrderHistoryList";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 export default function Page() {
   const router = useRouter();
   const params = useSearchParams();
-  const { address } = useUnisatStore((state) => state);
+  const { address } = useReactWalletStore((state) => state);
   const ticker = params.get("ticker") as any;
   const { data } = useSWR(`getTickerSummary`, () =>
     getTickerSummary({ ticker })

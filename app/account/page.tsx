@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
 import { Tabs, Tab } from "@nextui-org/react";
 import { OrdxUtxoList } from "@/components/account/OrdxUtxoList";
 import { OrdxOrderHistoryList } from "@/components/order/OrdxOrderHistoryList";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 
 export default function AccountPage() {
-  const { address } = useUnisatStore((state) => state);
+  const { address } = useReactWalletStore((state) => state);
   return (
     <div>
       <Tabs aria-label="Options">

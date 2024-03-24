@@ -19,14 +19,14 @@ import { useSellStore } from "@/stores";
 import { useList } from "react-use";
 import { useEffect, useMemo } from "react";
 import { parseUtxo, buildSellOrder, btcToSats } from "@/lib/utils";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { submitOrder } from "@/api";
 import { useRouter } from "next/navigation";
 
 export default function SellPage() {
   const router = useRouter();
   const { list, reset } = useSellStore((state) => state);
-  const { network, address } = useUnisatStore((state) => state);
+  const { network, address } = useReactWalletStore((state) => state);
   const [
     priceList,
     { updateAt: updateAt, set: setList, clear: clearList, removeAt },

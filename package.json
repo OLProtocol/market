@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.0.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
     "@cmdcode/tapscript": "^1.4.6",
     "@iconify/react": "^4.1.1",
@@ -31,6 +32,7 @@
     "antd": "^5.15.3",
     "autoprefixer": "10.4.16",
     "bitcoinjs-lib": "^6.1.5",
+    "btc-connect": "1.2.4",
     "clsx": "^2.0.0",
     "decimal.js": "^10.4.3",
     "eslint": "8.48.0",

@@ -16,7 +16,7 @@ import { getHistory } from "@/api";
 import { useMemo, useState } from "react";
 import { hideStr, resolveMempoolTxLink } from "@/lib/utils";
 import { Icon } from "@iconify/react";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { Pagination } from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
 import { useRouter } from "next/navigation";
@@ -29,7 +29,7 @@ export const OrdxOrderHistoryList = ({
   ticker,
   address,
 }: OrdxOrderHistoryListProps) => {
-  const { network } = useUnisatStore((state) => state);
+  const { network } = useReactWalletStore((state) => state);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState(0);
@@ -217,7 +217,9 @@ export const OrdxOrderHistoryList = ({
                 } else {
                   return (
                     <TableCell>
-                      {`${getKeyValue(item, columnKey)}${columnKey === "price" ? ' ' + item.currency : ""}`}
+                      {`${getKeyValue(item, columnKey)}${
+                        columnKey === "price" ? " " + item.currency : ""
+                      }`}
                     </TableCell>
                   );
                 }

@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Empty, notification } from "antd";
 import { getOrders, lockOrder, unlockOrder } from "@/api";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { use, useMemo, useState } from "react";
 import { Pagination } from "@/components/Pagination";
 import { Content } from "@/components/Content";
@@ -17,7 +17,7 @@ interface OrdxOrderListProps {
 }
 export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const router = useRouter();
-  const { address: storeAddress } = useUnisatStore((state) => state);
+  const { address: storeAddress } = useReactWalletStore((state) => state);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();

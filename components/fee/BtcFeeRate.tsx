@@ -1,7 +1,7 @@
 import { Input, Slider } from "@nextui-org/react";
 import { useState, useMemo, useEffect, use } from "react";
 import { BtcFeeRateItem } from "./BtcFeeRateItem";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 
 interface BtcFeeRate {
   onChange?: ({ value, type }: any) => void;
@@ -15,7 +15,7 @@ export const BtcFeeRate = ({
   value,
   feeType,
 }: BtcFeeRate) => {
-  const { network } = useUnisatStore((state) => state);
+  const { network } = useReactWalletStore((state) => state);
   const [type, setType] = useState("Normal");
   const [customValue, setCustomValue] = useState(1);
   const [economyValue, setEconomyValue] = useState(1);

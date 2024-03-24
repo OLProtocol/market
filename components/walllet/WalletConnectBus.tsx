@@ -1,8 +1,11 @@
 "use client";
 import { Button } from "@nextui-org/react";
-import { useUnisatStore } from "@/stores";
+import {
+  useReactWalletStore,
+  WalletConnectReact,
+} from "btc-connect/dist/react";
 import React from "react";
-import { WalletSelectModal } from "./WalletSelectModal";
+import { useTheme } from "next-themes";
 
 interface WalletConnectBusProps {
   children: React.ReactNode;
@@ -12,26 +15,19 @@ export const WalletConnectBus = ({
   children,
   className,
 }: WalletConnectBusProps) => {
-  const [visiable, setVisiable] = React.useState(false);
-
-  const { connected } = useUnisatStore((state) => state);
-  return connected ? (
-    <>{children}</>
-  ) : (
-    <>
-      <Button
-        onClick={() => setVisiable(true)}
-        size="sm"
-        radius="full"
-        className={className}
-        color="primary"
-      >
-        Connect Wallet
-      </Button>
-      <WalletSelectModal
-        visiable={visiable}
-        onClose={() => setVisiable(false)}
-      />
-    </>
+  const { theme } = useTheme();
+  return (
+    <WalletConnectReact
+      config={{
+        network: "livenet",
+        defaultConnectorId: "okx",
+      }}
+      ui={{
+        connectClass: "block mx-auto mt-20",
+      }}
+      theme={theme === "dark" ? "dark" : "light"}
+    >
+      {children}
+    </WalletConnectReact>
   );
 };

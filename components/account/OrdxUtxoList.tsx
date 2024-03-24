@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { notification, Empty } from "antd";
 import { getOrdxAssets, cancelOrder } from "@/api";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { useEffect, useMemo, useState } from "react";
 import { useSellStore } from "@/stores";
 import { Pagination } from "@/components/Pagination";
@@ -12,7 +12,7 @@ import { OrdxFtAssetsItem } from "@/components/OrdxFtAssetsItem";
 import { useRouter } from "next/navigation";
 export const OrdxUtxoList = () => {
   const router = useRouter();
-  const { address } = useUnisatStore((state) => state);
+  const { address } = useReactWalletStore((state) => state);
   const { add: addSell, reset } = useSellStore((state) => state);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
@@ -59,7 +59,7 @@ export const OrdxUtxoList = () => {
   return (
     <div className="p-4">
       <Content loading={isLoading}>
-        {!list.length && <Empty className="mt-10"/>}
+        {!list.length && <Empty className="mt-10" />}
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
           {list.map((item: any) => (
             <OrdxFtAssetsItem

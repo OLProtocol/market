@@ -10,8 +10,9 @@ import {
   CardBody,
   Image,
 } from "@nextui-org/react";
+
 import { notification } from "antd";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { useState } from "react";
 
 interface WalletSelectModalProps {
@@ -22,11 +23,13 @@ export const WalletSelectModal = ({
   visiable,
   onClose: onModalClose,
 }: WalletSelectModalProps) => {
-  const { connect, installed } = useUnisatStore((state) => state);
+  const { connect, connectors, localConnectorId, init, switchConnector } =
+  useReactWalletStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-  const connectHander = async () => {
+  const connectHander = async (id: any) => {
+    switchConnector(id);
     setLoading(true);
     try {
       await connect();
@@ -40,6 +43,9 @@ export const WalletSelectModal = ({
       setLoading(false);
     }
   };
+  useEffect(() => {
+    init({ defaultConnectorId: "okx", network: "livenet" });
+  }, []);
   useEffect(() => {
     if (visiable) {
       onOpen();
@@ -59,31 +65,39 @@ export const WalletSelectModal = ({
       <ModalContent>
         <ModalHeader className="">Select a wallet to connect</ModalHeader>
         <ModalBody className="pb-4">
-          <Card isPressable isDisabled={loading} onClick={connectHander}>
-            <CardBody>
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <Spinner />
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <Image
-                    src="/logo/unisat.svg"
-                    alt="unisat logo"
-                    className="w-10 h-10 mr-2"
-                  />
-                  <span className="text-lg md:text-2xl font-bold flex-1">
-                    Unisat Wallet
-                  </span>
-                  {!installed && (
-                    <span className="justify-self-end text-orange-400">
-                      Not Installed
+          {connectors?.map((item) => (
+            <Card
+              key={item.name}
+              isPressable
+              isDisabled={loading}
+              onClick={() => connectHander(item.id)}
+            >
+              <CardBody>
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Image
+                      src={item.logo}
+                      alt={item.name}
+                      className="w-10 h-10 mr-2"
+                    />
+                    <span className="text-lg md:text-2xl font-bold flex-1">
+                      {item.name}
+                      {item.id === localConnectorId && " (Current)"}
                     </span>
-                  )}
-                </div>
-              )}
-            </CardBody>
-          </Card>
+                    {!item.installed && (
+                      <span className="justify-self-end text-orange-400">
+                        Not Installed
+                      </span>
+                    )}
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+          ))}
         </ModalBody>
       </ModalContent>
     </Modal>

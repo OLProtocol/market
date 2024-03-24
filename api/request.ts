@@ -1,7 +1,7 @@
 import { removeObjectEmptyValue } from "@/lib/utils";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 export const request = async (path: string, options: any = {}) => {
-  const { signature, publicKey, unisat, connected } = useUnisatStore.getState();
+  const { publicKey, connected } = useReactWalletStore.getState();
   const { headers = {}, method = "GET", data } = options;
   let url = `https://apitest.ordx.market${path}`;
   if (method === "GET") {
@@ -11,10 +11,10 @@ export const request = async (path: string, options: any = {}) => {
     options.body = JSON.stringify(data);
     headers["Content-Type"] = "application/json";
   }
-  if (connected && signature) {
-    headers["Publickey"] = publicKey;
-    headers["Signature"] = signature;
-  }
+  // if (connected && signature) {
+  //   headers["Publickey"] = publicKey;
+  //   headers["Signature"] = signature;
+  // }
   delete options.data;
   options.headers = headers;
   const res = await fetch(url, options);
@@ -156,6 +156,6 @@ export const fetchChainFeeRate = async (network: "main" | "testnet") => {
 
 export const getAppVersion = async () => {
   const res = await fetch(`/version.txt`);
-  console.log('appVersion', await res.text());
+  console.log("appVersion", await res.text());
   return res.text();
 };

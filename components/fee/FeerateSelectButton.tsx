@@ -15,10 +15,10 @@ import { useCommonStore } from "@/stores";
 import { BtcFeeRate } from "./BtcFeeRate";
 import useSWR from "swr";
 import { fetchChainFeeRate } from "@/api";
-import { useUnisatStore } from "@/stores";
+import { useReactWalletStore } from "btc-connect/dist/react";
 
 export const FeerateSelectButton = () => {
-  const { network } = useUnisatStore((state) => state);
+  const { network } = useReactWalletStore((state) => state);
   const { isOpen, onClose, onOpenChange, onOpen } = useDisclosure();
   const [fee, setFee] = useState({ value: 1, type: "Normal" });
 
@@ -51,7 +51,8 @@ export const FeerateSelectButton = () => {
         className="bg-transparent"
         onClick={() => onOpen()}
       >
-        <Icon icon="mdi:gas-station" className="text-xl"/> {feeRate.value} sats/Vb
+        <Icon icon="mdi:gas-station" className="text-xl" /> {feeRate.value}{" "}
+        sats/Vb
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
