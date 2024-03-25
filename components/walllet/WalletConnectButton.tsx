@@ -5,7 +5,6 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@nextui-org/react";
-import { useWalletStore } from "@/stores";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -16,27 +15,28 @@ import "btc-connect/dist/style/index.css";
 import { useTheme } from "next-themes";
 import { hideStr } from "@/lib/utils";
 import { notification } from "antd";
+import { useCommonStore } from "@/store";
 
 export const WalletConnectButton = () => {
   const router = useRouter();
   const { theme } = useTheme();
   const { connected, check, address, disconnect, btcWallet } =
     useReactWalletStore((state) => state);
-  const [visiable, setVisiable] = useState(false);
+  const { setSignature, signature } = useCommonStore((state) => state);
   const toMyAssets = () => {
     router.push("/account");
   };
-  const connectHandler = async () => {
-    setVisiable(true);
-    // await connect();
-  };
   useEffect(() => {
-    // check();
+    check();
   }, []);
-  const testConnect = async (wallet: any) => {
-    console.log("Connected Wallet", wallet);
-    console.log(wallet.connected);
-    console.log(wallet.address);
+  const onConnectSuccess = async (wallet: any) => {
+    if (!signature) {
+      console.log("signature text", process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
+      const _s = await wallet.signMessage(
+        process.env.NEXT_PUBLIC_SIGNATURE_TEXT
+      );
+      setSignature(_s);
+    }
   };
   const onConnectError = (error: any) => {
     console.error("Connect Wallet Failed", error);
@@ -45,15 +45,17 @@ export const WalletConnectButton = () => {
       description: error.message,
     });
   };
-
+  const onDisconnectSuccess = () => {
+    setSignature("");
+  };
   useEffect(() => {
     console.log("connected", connected);
     if (connected) {
-      // btcWallet?.on("accountChanged", check);
+      btcWallet?.on("accountsChanged", check);
       btcWallet?.on("networkChanged", check);
     }
     return () => {
-      // btcWallet?.removeListener("accountChanged", check);
+      btcWallet?.removeListener("accountChanged", check);
       btcWallet?.removeListener("networkChanged", check);
     };
   }, [connected]);
@@ -64,8 +66,9 @@ export const WalletConnectButton = () => {
         defaultConnectorId: "okx",
       }}
       theme={theme === "dark" ? "dark" : "light"}
-      onConnectSuccess={testConnect}
+      onConnectSuccess={onConnectSuccess}
       onConnectError={onConnectError}
+      onDisconnectSuccess={onDisconnectSuccess}
     >
       <>
         <Popover placement="bottom">

@@ -3,7 +3,6 @@ import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import { Address, Script } from "@cmdcode/tapscript";
 import { btcToSats } from "@/lib/utils";
 import { useReactWalletStore } from "btc-connect/dist/react";
-import { env } from "next-runtime-env";
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from "@/lib/constants";
 import { getTxHex, lockOrder, unlockOrder } from "@/api";
 interface SellOrderProps {
@@ -77,9 +76,9 @@ export const buildBuyOrder = async ({
   serviceFee,
   dummyUtxos,
 }: BuyOrderProps) => {
-  const NEXT_PUBLIC_SERVICE_FEE = env("NEXT_PUBLIC_SERVICE_FEE");
-  const NEXT_PUBLIC_IS_FREE = env("NEXT_PUBLIC_IS_FREE");
-  const NEXT_PUBLIC_SERVICE_ADDRESS = env("NEXT_PUBLIC_SERVICE_ADDRESS");
+  const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
+  const NEXT_PUBLIC_IS_FREE = process.env.NEXT_PUBLIC_IS_FREE;
+  const NEXT_PUBLIC_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
   const { btcWallet } = useReactWalletStore.getState();
 
   bitcoinjs.initEccLib(ecc);
@@ -169,7 +168,6 @@ export const buildBuyOrder = async ({
     address,
     value: DUMMY_UTXO_VALUE,
   });
-  // 145,928
   buyPsbt.addOutput({
     address,
     value: DUMMY_UTXO_VALUE,

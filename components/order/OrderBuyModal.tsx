@@ -11,7 +11,6 @@ import {
   Chip,
   Spinner,
 } from "@nextui-org/react";
-import { env } from "next-runtime-env";
 import { notification } from "antd";
 import {
   hideStr,
@@ -25,7 +24,7 @@ import { getUtxoByValue, buyOrder, unlockOrder } from "@/api";
 import { useReactWalletStore } from "btc-connect/dist/react";
 import { useState } from "react";
 import useSWR from "swr";
-import { useCommonStore } from "@/stores";
+import { useCommonStore } from "@/store";
 
 interface OrderBuyModalProps {
   visiable: boolean;
@@ -41,12 +40,10 @@ export const OrderBuyModal = ({
   onClose: onModalClose,
   onSuccess,
 }: OrderBuyModalProps) => {
-  const NEXT_PUBLIC_SERVICE_FEE = env("NEXT_PUBLIC_SERVICE_FEE");
-  const NEXT_PUBLIC_IS_FREE = env("NEXT_PUBLIC_IS_FREE");
 
   let serviceFee = 0;
-  if (NEXT_PUBLIC_SERVICE_FEE && NEXT_PUBLIC_IS_FREE == "0") {
-    serviceFee = Number(NEXT_PUBLIC_SERVICE_FEE);
+  if (process.env.NEXT_PUBLIC_SERVICE_FEE && process.env.NEXT_PUBLIC_IS_FREE == "0") {
+    serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
   const { feeRate } = useCommonStore((state) => state);
   const { balance, address, network } = useReactWalletStore((state) => state);

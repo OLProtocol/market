@@ -15,7 +15,7 @@ import {
   TableCell,
 } from "@nextui-org/react";
 import { notification } from "antd";
-import { useSellStore } from "@/stores";
+import { useSellStore } from "@/store";
 import { useList } from "react-use";
 import { useEffect, useMemo } from "react";
 import { parseUtxo, buildSellOrder, btcToSats } from "@/lib/utils";

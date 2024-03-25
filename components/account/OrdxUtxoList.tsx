@@ -5,7 +5,7 @@ import { notification, Empty } from "antd";
 import { getOrdxAssets, cancelOrder } from "@/api";
 import { useReactWalletStore } from "btc-connect/dist/react";
 import { useEffect, useMemo, useState } from "react";
-import { useSellStore } from "@/stores";
+import { useSellStore } from "@/store";
 import { Pagination } from "@/components/Pagination";
 import { Content } from "@/components/Content";
 import { OrdxFtAssetsItem } from "@/components/OrdxFtAssetsItem";

@@ -1,7 +1,9 @@
 import { removeObjectEmptyValue } from "@/lib/utils";
+import { useCommonStore } from "@/store";
 import { useReactWalletStore } from "btc-connect/dist/react";
 export const request = async (path: string, options: any = {}) => {
   const { publicKey, connected } = useReactWalletStore.getState();
+  const { signature } = useCommonStore.getState();
   const { headers = {}, method = "GET", data } = options;
   let url = `https://apitest.ordx.market${path}`;
   if (method === "GET") {
@@ -11,10 +13,10 @@ export const request = async (path: string, options: any = {}) => {
     options.body = JSON.stringify(data);
     headers["Content-Type"] = "application/json";
   }
-  // if (connected && signature) {
-  //   headers["Publickey"] = publicKey;
-  //   headers["Signature"] = signature;
-  // }
+  if (connected && signature) {
+    headers["Publickey"] = publicKey;
+    headers["Signature"] = signature;
+  }
   delete options.data;
   options.headers = headers;
   const res = await fetch(url, options);

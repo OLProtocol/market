@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
-import { useCommonStore } from "@/stores";
+import { useCommonStore } from "@/store";
 import { BtcFeeRate } from "./BtcFeeRate";
 import useSWR from "swr";
 import { fetchChainFeeRate } from "@/api";

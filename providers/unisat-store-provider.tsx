@@ -12,7 +12,7 @@ import {
   type UnisatStore,
   createUnisatStore,
   initUnisatStore,
-} from "@/stores/unisat-store_back";
+} from "@/store/unisat-store_back";
 
 export const UnisatStoreContext = createContext<StoreApi<UnisatStore> | null>(
   null
