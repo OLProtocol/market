@@ -6,6 +6,7 @@ import {
   CardFooter,
   CardBody,
 } from "@nextui-org/react";
+import { Icon } from "@iconify/react";
 import { useMemo, useState } from "react";
 
 export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
@@ -49,6 +50,11 @@ export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
                 variant="flat"
                 color="default"
                 radius="lg"
+                startContent={
+                  item.locker == "1" ? (
+                    <Icon icon="mdi:lock" className="text-lg" />
+                  ) : null
+                }
                 onClick={onCancelOrder}
               >
                 下架（{item.price} {item.currency}）

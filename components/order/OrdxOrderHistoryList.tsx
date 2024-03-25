@@ -39,7 +39,7 @@ export const OrdxOrderHistoryList = ({
       getHistory({ offset: (page - 1) * size, size, ticker, address, sort }),
     {
       revalidateOnMount: true,
-    }
+    },
   );
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
@@ -48,13 +48,14 @@ export const OrdxOrderHistoryList = ({
   };
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
-    [data, size]
+    [data, size],
   );
   const typeMap = useMemo(() => {
     return {
       1: "成交",
       2: "下架",
       3: "无效",
+      4: "上架",
       10: "卖出",
       11: "买入",
     };
@@ -100,7 +101,7 @@ export const OrdxOrderHistoryList = ({
       },
     ];
     const addressColumnIndex = defaultColumns.findIndex(
-      (column) => column.key === "txaddress"
+      (column) => column.key === "txaddress",
     );
 
     if (address) {
@@ -190,7 +191,7 @@ export const OrdxOrderHistoryList = ({
                       <a
                         href={resolveMempoolTxLink(
                           getKeyValue(item, columnKey),
-                          network
+                          network,
                         )}
                         target="_blank"
                       >
@@ -203,7 +204,7 @@ export const OrdxOrderHistoryList = ({
                     <TableCell>
                       <span>
                         {new Date(
-                          Number(getKeyValue(item, columnKey))
+                          Number(getKeyValue(item, columnKey)),
                         ).toLocaleString()}
                       </span>
                     </TableCell>

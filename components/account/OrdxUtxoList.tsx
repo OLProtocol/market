@@ -25,7 +25,7 @@ export const OrdxUtxoList = () => {
     () => getOrdxAssets({ address, offset: (page - 1) * size, size }),
     {
       revalidateOnMount: true,
-    }
+    },
   );
 
   const toSell = async (item: any) => {
@@ -33,6 +33,13 @@ export const OrdxUtxoList = () => {
     router.push("/account/sell");
   };
   const onCancelOrder = async (item: any) => {
+    if (item.locker === "1") {
+      notification.error({
+        message: "Cancel order failed",
+        description: `The order is locked, please wait unlock it first`,
+      });
+      return;
+    }
     const res = await cancelOrder({ address, order_id: item.order_id });
     if (res.code === 200) {
       notification.success({
@@ -49,7 +56,7 @@ export const OrdxUtxoList = () => {
   };
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / 10) : 0),
-    [data]
+    [data],
   );
   const list = useMemo(() => data?.data?.assets || [], [data]);
 
