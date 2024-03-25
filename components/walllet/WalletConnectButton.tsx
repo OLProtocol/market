@@ -15,12 +15,13 @@ import {
 import "btc-connect/dist/style/index.css";
 import { useTheme } from "next-themes";
 import { hideStr } from "@/lib/utils";
+import { notification } from "antd";
 
 export const WalletConnectButton = () => {
   const router = useRouter();
   const { theme } = useTheme();
   const { connected, check, address, disconnect, btcWallet } =
-  useReactWalletStore((state) => state);
+    useReactWalletStore((state) => state);
   const [visiable, setVisiable] = useState(false);
   const toMyAssets = () => {
     router.push("/account");
@@ -37,6 +38,14 @@ export const WalletConnectButton = () => {
     console.log(wallet.connected);
     console.log(wallet.address);
   };
+  const onConnectError = (error: any) => {
+    console.error("Connect Wallet Failed", error);
+    notification.error({
+      message: "Connect Wallet Failed",
+      description: error.message,
+    });
+  };
+
   useEffect(() => {
     console.log("connected", connected);
     if (connected) {
@@ -56,7 +65,7 @@ export const WalletConnectButton = () => {
       }}
       theme={theme === "dark" ? "dark" : "light"}
       onConnectSuccess={testConnect}
-      onConnectError={console.error}
+      onConnectError={onConnectError}
     >
       <>
         <Popover placement="bottom">
