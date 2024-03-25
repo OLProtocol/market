@@ -2,6 +2,7 @@ import * as bitcoinjs from "bitcoinjs-lib";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import { Address, Script } from "@cmdcode/tapscript";
 import { btcToSats } from "@/lib/utils";
+import { useReactWalletStore } from "btc-connect/dist/react";
 import { env } from "next-runtime-env";
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from "@/lib/constants";
 import { getTxHex, lockOrder, unlockOrder } from "@/api";
@@ -29,6 +30,7 @@ export const buildSellOrder = async ({
   network,
   address,
 }: SellOrderProps) => {
+  const { btcWallet } = useReactWalletStore.getState();
   const rawTx = await getTxHex(inscriptionUtxo.txid, network);
   const ordinalPreTx = bitcoinjs.Transaction.fromHex(rawTx);
   console.log(ordinalPreTx);
@@ -52,7 +54,10 @@ export const buildSellOrder = async ({
     address,
     value: total,
   });
-  const signed = await window.unisat.signPsbt(sell.toHex());
+  if (!btcWallet) {
+    throw new Error("Wallet not initialized");
+  }
+  const signed = await btcWallet.signPsbt(sell.toHex());
   return signed;
   // txb.addInput(inscriptionUtxo, 0);
   // txb.addOutput(address, amount);
@@ -74,7 +79,6 @@ interface BuyOrderProps {
   fee: number;
 }
 export const buildBuyOrder = async ({
-  orderId,
   orderRaw,
   network,
   address,
@@ -86,9 +90,7 @@ export const buildBuyOrder = async ({
   const NEXT_PUBLIC_SERVICE_FEE = env("NEXT_PUBLIC_SERVICE_FEE");
   const NEXT_PUBLIC_IS_FREE = env("NEXT_PUBLIC_IS_FREE");
   const NEXT_PUBLIC_SERVICE_ADDRESS = env("NEXT_PUBLIC_SERVICE_ADDRESS");
-  // console.log(orderDetail);
-  // const orderRaw =
-  //   "70736274ff01005e02000000012eeca6f14b6778df4dc13f41caf42c3a1bc405ef02b7ef5358993e28665fb0a90000000000ffffffff01d0070000000000002251205971a7e6b181b0cb407ee8cc50330293dc580259ffeda320b8bb94da059ee9ab000000000001012be8030000000000002251205971a7e6b181b0cb407ee8cc50330293dc580259ffeda320b8bb94da059ee9ab0108430141cab0c9b4f4d04fd27afa483df33992f79d7945edc8809ed589e0c5b7826141406d1272f8a52c0683a4c285a606bc92f93827f2b8b710eda74ff06c9186543965830000";
+  const { btcWallet } = useReactWalletStore.getState();
 
   bitcoinjs.initEccLib(ecc);
   const btccoinNetwork =
@@ -189,7 +191,10 @@ export const buildBuyOrder = async ({
   };
   buyPsbt.addOutput(changeOutput);
 
-  const signed = await window.unisat.signPsbt(buyPsbt.toHex());
+  if (!btcWallet) {
+    throw new Error("Wallet not initialized");
+  }
+  const signed = await btcWallet.signPsbt(buyPsbt.toHex());
   const psbt = bitcoinjs.Psbt.fromHex(signed, {
     network: btccoinNetwork,
   });

@@ -87,6 +87,9 @@ export const OrderBuyModal = ({
     onModalClose?.();
     onClose();
   };
+  const priceSats = useMemo(() => {
+    return item?.price ? btcToSats(item?.price) : 0;
+  }, [item?.price]);
   const confirmHandler = async () => {
     console.log("confirmHandler");
     try {
@@ -145,15 +148,17 @@ export const OrderBuyModal = ({
   };
   const networkFeeAndUtxos = useMemo(() => {
     const virtualFee = (180 * 3 + 34 * 10 + 10) * feeRate.value;
-    if (!utxos.length || !item?.price) {
+    if (!utxos.length || !priceSats) {
       return {
         fee: 0,
         utxos: [],
       };
     }
+    console.log(priceSats);
+    console.log(virtualFee + 330 + priceSats + serviceFee);
     const { utxos: filterConsumUtxos, smallTwoUtxos } = filterUtxosByValue(
       utxos,
-      virtualFee + 330 + item?.price + serviceFee
+      virtualFee + 330 + priceSats + serviceFee
     );
 
     const realityFee =
@@ -163,10 +168,11 @@ export const OrderBuyModal = ({
       utxos: filterConsumUtxos,
       smallTwoUtxos: smallTwoUtxos,
     };
-  }, [feeRate, utxos, item?.price]);
+  }, [feeRate, utxos, priceSats]);
+  console.log("networkFeeAndUtxos", networkFeeAndUtxos);
   const totalPrice = useMemo(() => {
     if (item) {
-      return btcToSats(item.price) + serviceFee + networkFeeAndUtxos.fee;
+      return btcToSats(item?.price) + serviceFee + networkFeeAndUtxos.fee;
     }
     return 0;
   }, [item, serviceFee, networkFeeAndUtxos.fee]);
