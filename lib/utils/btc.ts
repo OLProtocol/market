@@ -77,7 +77,13 @@ export const filterUtxosByValue = (
   const twoUtxos = sortUtxos.slice(0, 2);
   const smallTwoUtxos: any[] = [];
   for (let i = 0; i < twoUtxos.length; i++) {
-    if (avialableUtxo.every((item) => item.txid !== twoUtxos[i].txid)) {
+    if (
+      avialableUtxo.every(
+        (item) =>
+          `${item.txid}:${item.vout}` !==
+          `${twoUtxos[i].txid}:${twoUtxos[i].vout}`,
+      )
+    ) {
       smallTwoUtxos.push(twoUtxos[i]);
     }
   }
