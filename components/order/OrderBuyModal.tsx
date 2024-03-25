@@ -91,7 +91,6 @@ export const OrderBuyModal = ({
     return item?.price ? btcToSats(item?.price) : 0;
   }, [item?.price]);
   const confirmHandler = async () => {
-    console.log("confirmHandler");
     try {
       if (!(address && network && networkFeeAndUtxos.smallTwoUtxos?.length)) {
         notification.warning({
@@ -104,6 +103,13 @@ export const OrderBuyModal = ({
         notification.warning({
           message: "buy error",
           description: "Order Raw is empty",
+        });
+        return;
+      }
+      if (networkFeeAndUtxos.smallTwoUtxos?.length < 2) {
+        notification.warning({
+          message: "Buy error",
+          description: "dummyUtxos lack of two utxos",
         });
         return;
       }
@@ -154,8 +160,6 @@ export const OrderBuyModal = ({
         utxos: [],
       };
     }
-    console.log(priceSats);
-    console.log(virtualFee + 330 + priceSats + serviceFee);
     const { utxos: filterConsumUtxos, smallTwoUtxos } = filterUtxosByValue(
       utxos,
       virtualFee + 330 + priceSats + serviceFee

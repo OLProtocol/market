@@ -1,6 +1,6 @@
 import { Decimal } from "decimal.js";
 import { DUST_UTXO_VALUE, MS_BRC20_UTXO_VALUE } from "@/lib/constants";
-import { sortBy, reverse, cloneDeep } from 'lodash';
+import { sortBy, reverse, cloneDeep } from "lodash";
 
 export const parseUtxo = (utxo: string) => {
   const [txid, vout] = utxo.split(":");
@@ -13,17 +13,17 @@ export const parseUtxo = (utxo: string) => {
 export const satsToBitcoin = (sats) => {
   if (sats >= 100000000) sats = sats * 10;
   let string =
-    String(sats).padStart(8, '0').slice(0, -9) +
-    '.' +
-    String(sats).padStart(8, '0').slice(-9);
-  if (string.substring(0, 1) == '.') string = '0' + string;
+    String(sats).padStart(8, "0").slice(0, -9) +
+    "." +
+    String(sats).padStart(8, "0").slice(-9);
+  if (string.substring(0, 1) == ".") string = "0" + string;
   return string;
 };
 export const btcToSats = (btc: number) => {
-  let [whole, decimal] = btc.toString().split('.');
-  if (!decimal) decimal = '0';
-  return parseInt(whole) * 100000000 + parseInt(decimal.padEnd(8, '0'));
-}
+  let [whole, decimal] = btc.toString().split(".");
+  if (!decimal) decimal = "0";
+  return parseInt(whole) * 100000000 + parseInt(decimal.padEnd(8, "0"));
+};
 export const safeOutputValue = (
   value: number | Decimal,
   isMs = false
@@ -53,9 +53,12 @@ export const safeOutputValue = (
   return value.round().toNumber();
 };
 
-
-export const filterUtxosByValue = (utxos: any[], value, reverseStatus = true) => {
-  const sortUtxos = sortBy(utxos, 'value');
+export const filterUtxosByValue = (
+  utxos: any[],
+  value,
+  reverseStatus = true
+) => {
+  const sortUtxos = sortBy(utxos, "value");
   const _utxoList = cloneDeep(sortUtxos);
   if (reverseStatus) {
     reverse(_utxoList);
@@ -70,11 +73,19 @@ export const filterUtxosByValue = (utxos: any[], value, reverseStatus = true) =>
       break;
     }
   }
+  const twoUtxos = sortUtxos.slice(0, 2);
+  const smallTwoUtxos: any[] = [];
+  for (let i = 0; i < twoUtxos.length; i++) {
+    if (!avialableUtxo.some((item) => item.txid === twoUtxos[i].txid)) {
+      smallTwoUtxos.push(twoUtxos[i]);
+    }
+  }
+
   return {
     minUtxo: sortUtxos[0],
-    maxUtxo: sortUtxos[sortUtxos.length -1],
+    maxUtxo: sortUtxos[sortUtxos.length - 1],
     utxos: avialableUtxo,
-    smallTwoUtxos: sortUtxos.slice(0, 2),
+    smallTwoUtxos,
     total: avialableValue,
   };
 };
