@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "node updateVersion && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky",
+    "pre-commit": "lint-staged"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
@@ -44,5 +46,9 @@
     "tiny-secp256k1": "^2.2.3",
     "typescript": "5.0.4",
     "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2"
   }
 }
