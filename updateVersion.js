@@ -1,13 +1,11 @@
 /* eslint-disable no-undef */
 const fs = require("fs");
 const path = require("path");
+const { exec } = require("child_process");
 
 function updateVersion() {
   const filePath = path.join(__dirname, "public", "version.txt");
-  const assetFilePath = path.join(
-    __dirname,
-    "assets/version.js",
-  );
+  const assetFilePath = path.join(__dirname, "assets/version.js");
 
   // 读取version.txt文件中的数字
   fs.readFile(filePath, "utf8", (err, data) => {
@@ -38,7 +36,16 @@ function updateVersion() {
           console.error("写入文件失败:", err);
           return;
         }
-      }
+      },
+    );
+    exec(
+      "git add public/version.txt assets/version.js",
+      (err, stdout, stderr) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+      },
     );
   });
 }
