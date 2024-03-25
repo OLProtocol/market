@@ -8,6 +8,7 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
+import { Icon } from "@iconify/react";
 import { useState } from "react";
 
 export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
@@ -22,7 +23,11 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
     }
   };
   return (
-    <Card isPressable radius="lg" className="border-none w-full h-[14rem] md:h-[20rem]">
+    <Card
+      isPressable
+      radius="lg"
+      className="border-none w-full h-[14rem] md:h-[20rem]"
+    >
       <CardBody>
         <div className="flex flex-col h-full">
           <div className="flex-1 text-sm md:text-base">
@@ -46,6 +51,11 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
             isLoading={loading}
             color="default"
             radius="lg"
+            startContent={
+              item.locker == "1" ? (
+                <Icon icon="mdi:lock" className="text-lg" />
+              ) : null
+            }
             onClick={buyHandler}
           >
             购买

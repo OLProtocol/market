@@ -40,9 +40,11 @@ export const OrderBuyModal = ({
   onClose: onModalClose,
   onSuccess,
 }: OrderBuyModalProps) => {
-
   let serviceFee = 0;
-  if (process.env.NEXT_PUBLIC_SERVICE_FEE && process.env.NEXT_PUBLIC_IS_FREE == "0") {
+  if (
+    process.env.NEXT_PUBLIC_SERVICE_FEE &&
+    process.env.NEXT_PUBLIC_IS_FREE == "0"
+  ) {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
   const { feeRate } = useCommonStore((state) => state);
@@ -51,7 +53,7 @@ export const OrderBuyModal = ({
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data, isLoading } = useSWR(
     `getUtxoByValue-${address}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 })
+    () => getUtxoByValue({ address, network, value: 500 }),
   );
   const utxos = useMemo(() => data?.data || [], [data]);
   const spendableValue = useMemo(() => {
@@ -90,6 +92,9 @@ export const OrderBuyModal = ({
   const confirmHandler = async () => {
     try {
       if (!(address && network && networkFeeAndUtxos.smallTwoUtxos?.length)) {
+        console.log(address);
+        console.log(network);
+        console.log(networkFeeAndUtxos);
         notification.warning({
           message: "buy error",
           description: `数据错误`,
@@ -159,7 +164,7 @@ export const OrderBuyModal = ({
     }
     const { utxos: filterConsumUtxos, smallTwoUtxos } = filterUtxosByValue(
       utxos,
-      virtualFee + 330 + priceSats + serviceFee
+      virtualFee + 330 + priceSats + serviceFee,
     );
 
     const realityFee =
@@ -244,7 +249,7 @@ export const OrderBuyModal = ({
           </div>
           <div className="flex justify-between items-center">
             <span>网络费用</span>
-            {isLoading || !networkFeeAndUtxos.fee ? (
+            {isLoading ? (
               <Spinner size="sm" />
             ) : (
               <div>
@@ -265,7 +270,7 @@ export const OrderBuyModal = ({
               }`}
             >
               <span>可用余额</span>
-              {isLoading || !networkFeeAndUtxos.fee ? (
+              {isLoading ? (
                 <Spinner size="sm" />
               ) : (
                 <span>{satsToBitcoin(spendableValue)} BTC</span>
