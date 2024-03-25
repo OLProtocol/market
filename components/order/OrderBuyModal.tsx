@@ -169,7 +169,7 @@ export const OrderBuyModal = ({
       utxos: filterConsumUtxos,
       smallTwoUtxos: smallTwoUtxos,
     };
-  }, [feeRate, utxos, priceSats]);
+  }, [feeRate, utxos, priceSats, serviceFee]);
   console.log("networkFeeAndUtxos", networkFeeAndUtxos);
   const totalPrice = useMemo(() => {
     if (item) {

@@ -70,7 +70,7 @@ export default function SellPage() {
   );
   useEffect(() => {
     setList(Array.from(list).fill(0));
-  }, [list]);
+  }, [list, setList]);
 
   return (
     <div>
