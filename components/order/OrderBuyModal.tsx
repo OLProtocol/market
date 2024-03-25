@@ -92,9 +92,6 @@ export const OrderBuyModal = ({
   const confirmHandler = async () => {
     try {
       if (!(address && network && networkFeeAndUtxos.smallTwoUtxos?.length)) {
-        console.log(address);
-        console.log(network);
-        console.log(networkFeeAndUtxos);
         notification.warning({
           message: "buy error",
           description: `数据错误`,

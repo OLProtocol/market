@@ -26,7 +26,7 @@ export const btcToSats = (btc: number) => {
 };
 export const safeOutputValue = (
   value: number | Decimal,
-  isMs = false
+  isMs = false,
 ): number => {
   const threshold = isMs ? MS_BRC20_UTXO_VALUE : DUST_UTXO_VALUE;
 
@@ -34,13 +34,13 @@ export const safeOutputValue = (
   if (typeof value === "number") {
     if (value < threshold) {
       throw new Error(
-        `The amount you are trying is too small. Maybe try a larger amount.`
+        `The amount you are trying is too small. Maybe try a larger amount.`,
       );
     }
   } else {
     if (value.lessThan(threshold)) {
       throw new Error(
-        `The amount you are trying is too small. Maybe try a larger amount.`
+        `The amount you are trying is too small. Maybe try a larger amount.`,
       );
     }
   }
@@ -56,9 +56,10 @@ export const safeOutputValue = (
 export const filterUtxosByValue = (
   utxos: any[],
   value,
-  reverseStatus = true
+  reverseStatus = true,
 ) => {
   const sortUtxos = sortBy(utxos, "value");
+  console.log("sortUtxos", sortUtxos);
   const _utxoList = cloneDeep(sortUtxos);
   if (reverseStatus) {
     reverse(_utxoList);
@@ -76,11 +77,11 @@ export const filterUtxosByValue = (
   const twoUtxos = sortUtxos.slice(0, 2);
   const smallTwoUtxos: any[] = [];
   for (let i = 0; i < twoUtxos.length; i++) {
-    if (!avialableUtxo.some((item) => item.txid === twoUtxos[i].txid)) {
+    if (avialableUtxo.every((item) => item.txid !== twoUtxos[i].txid)) {
       smallTwoUtxos.push(twoUtxos[i]);
     }
   }
-
+  console.log("smallTwoUtxos", smallTwoUtxos);
   return {
     minUtxo: sortUtxos[0],
     maxUtxo: sortUtxos[sortUtxos.length - 1],
