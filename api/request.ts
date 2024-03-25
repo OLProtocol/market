@@ -141,7 +141,7 @@ export const getUtxoByValue = async ({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ address, value }),
-    }
+    },
   );
   return res.json();
 };
@@ -158,6 +158,5 @@ export const fetchChainFeeRate = async (network: "main" | "testnet") => {
 
 export const getAppVersion = async () => {
   const res = await fetch(`/version.txt`);
-  console.log("appVersion", await res.text());
   return res.text();
 };
