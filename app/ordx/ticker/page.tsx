@@ -18,7 +18,7 @@ export default function Page() {
   const { address } = useReactWalletStore((state) => state);
   const ticker = params.get("ticker") as any;
   const { data } = useSWR(`getTickerSummary`, () =>
-    getTickerSummary({ ticker })
+    getTickerSummary({ ticker }),
   );
   const toAccount = () => {
     router.push(`/account`);
@@ -27,13 +27,13 @@ export default function Page() {
   const headList = useMemo(() => {
     return [
       { value: summary.tx_order_count, label: "总交易笔数" },
-      { value: summary.tx_total_amount, label: "Volume" },
+      { value: summary.tx_total_amount, label: "总成交数量" },
       { value: summary.tx_total_volume, label: "总成交额" },
       { value: summary.onsell_order_count, label: "在售交易笔数" },
       { value: summary.onsell_total_amount, label: "在售ordx的资产数量" },
       { value: summary.lowest_price, label: "地板价" },
       { value: summary.highest_price, label: "最高价" },
-      { value: summary.holder_count, label: "在售持有者数量" },
+      { value: summary.holder_count, label: "持有者数量" },
     ];
   }, [summary]);
   return (

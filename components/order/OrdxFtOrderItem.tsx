@@ -26,7 +26,7 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
     <Card
       isPressable
       radius="lg"
-      className="border-none w-full h-[14rem] md:h-[20rem]"
+      className="border-none w-full h-[14rem] md:h-[18rem]"
     >
       <CardBody>
         <div className="flex flex-col h-full">

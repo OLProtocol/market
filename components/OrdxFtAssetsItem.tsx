@@ -17,7 +17,7 @@ export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
     setLoading(false);
   };
   return (
-    <Card radius="lg" className="border-none w-full  h-[14rem] md:h-[20rem]">
+    <Card radius="lg" className="border-none w-full  h-[14rem] md:h-[18rem]">
       <CardBody>
         <div className="flex-1 text-sm md:text-base">
           {item?.tickers?.map((v: any) => (

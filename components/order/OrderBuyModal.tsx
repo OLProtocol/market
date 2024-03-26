@@ -143,6 +143,7 @@ export const OrderBuyModal = ({
         });
       }
     } catch (error: any) {
+      console.log("buy order error", error);
       notification.error({
         message: "buy failed",
         description: error.message,

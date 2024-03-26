@@ -18,7 +18,7 @@ interface SellOrderProps {
 }
 export const addresToScriptPublicKey = (address: string) => {
   const scriptPublicKey = Script.fmt.toAsm(
-    Address.toScriptPubKey(address)
+    Address.toScriptPubKey(address),
   )?.[0];
   return scriptPublicKey;
 };
@@ -81,6 +81,16 @@ export const buildBuyOrder = async ({
   const NEXT_PUBLIC_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
   const { btcWallet } = useReactWalletStore.getState();
 
+  console.log(
+    "build buy order params",
+    orderRaw,
+    network,
+    address,
+    fee,
+    utxos,
+    serviceFee,
+    dummyUtxos,
+  );
   bitcoinjs.initEccLib(ecc);
   const btccoinNetwork =
     network === "testnet"
