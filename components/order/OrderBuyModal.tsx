@@ -19,6 +19,7 @@ import {
   satsToBitcoin,
   btcToSats,
 } from "@/lib/utils";
+import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from "@/lib/constants";
 
 import { getUtxoByValue, buyOrder, unlockOrder } from "@/api";
 import { useReactWalletStore } from "btc-connect/dist/react";
@@ -61,6 +62,38 @@ export const OrderBuyModal = ({
       return pre + cur.value;
     }, 0);
   }, [utxos]);
+  const priceSats = useMemo(() => {
+    return item?.price ? btcToSats(item?.price) : 0;
+  }, [item?.price]);
+
+  const networkFeeAndUtxos = useMemo(() => {
+    const virtualFee = (180 * 10 + 34 * 10 + 10) * feeRate.value;
+    if (!utxos.length || !priceSats) {
+      return {
+        fee: 0,
+        utxos: [],
+      };
+    }
+    const { utxos: filterConsumUtxos, smallTwoUtxos } = filterUtxosByValue(
+      utxos,
+      virtualFee + 330 + priceSats + serviceFee + DUMMY_UTXO_VALUE * 2,
+    );
+
+    const realityFee =
+      (180 * (filterConsumUtxos.length + 4) + 34 * 4 + 10) * feeRate.value;
+    return {
+      fee: realityFee,
+      utxos: filterConsumUtxos,
+      smallTwoUtxos: smallTwoUtxos,
+    };
+  }, [feeRate, utxos, priceSats, serviceFee]);
+  const totalPrice = useMemo(() => {
+    if (item) {
+      return btcToSats(item?.price) + serviceFee + networkFeeAndUtxos.fee;
+    }
+    return 0;
+  }, [item, serviceFee, networkFeeAndUtxos.fee]);
+  console.log("networkFeeAndUtxos", networkFeeAndUtxos);
   const cancelHandler = async () => {
     setLoading(true);
     try {
@@ -86,9 +119,7 @@ export const OrderBuyModal = ({
     onModalClose?.();
     onClose();
   };
-  const priceSats = useMemo(() => {
-    return item?.price ? btcToSats(item?.price) : 0;
-  }, [item?.price]);
+
   const confirmHandler = async () => {
     try {
       if (!(address && network && networkFeeAndUtxos.smallTwoUtxos?.length)) {
@@ -152,34 +183,7 @@ export const OrderBuyModal = ({
       setLoading(false);
     }
   };
-  const networkFeeAndUtxos = useMemo(() => {
-    const virtualFee = (180 * 3 + 34 * 10 + 10) * feeRate.value;
-    if (!utxos.length || !priceSats) {
-      return {
-        fee: 0,
-        utxos: [],
-      };
-    }
-    const { utxos: filterConsumUtxos, smallTwoUtxos } = filterUtxosByValue(
-      utxos,
-      virtualFee + 330 + priceSats + serviceFee,
-    );
 
-    const realityFee =
-      (180 * (filterConsumUtxos.length + 4) + 34 * 4 + 10) * feeRate.value;
-    return {
-      fee: realityFee,
-      utxos: filterConsumUtxos,
-      smallTwoUtxos: smallTwoUtxos,
-    };
-  }, [feeRate, utxos, priceSats, serviceFee]);
-  console.log("networkFeeAndUtxos", networkFeeAndUtxos);
-  const totalPrice = useMemo(() => {
-    if (item) {
-      return btcToSats(item?.price) + serviceFee + networkFeeAndUtxos.fee;
-    }
-    return 0;
-  }, [item, serviceFee, networkFeeAndUtxos.fee]);
   const insufficientBalance = useMemo(() => {
     return spendableValue < totalPrice;
   }, [spendableValue, totalPrice]);
