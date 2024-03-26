@@ -4,7 +4,7 @@ import useSWR from "swr";
 import { notification, Empty } from "antd";
 import { getOrdxAssets, cancelOrder } from "@/api";
 import { useReactWalletStore } from "btc-connect/dist/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSellStore } from "@/store";
 import { Pagination } from "@/components/Pagination";
 import { Content } from "@/components/Content";
@@ -15,11 +15,13 @@ export const OrdxUtxoList = () => {
   const { address } = useReactWalletStore((state) => state);
   const { add: addSell, reset } = useSellStore((state) => state);
   const [page, setPage] = useState(1);
+  // const page = useRef(1);
   const [size, setSize] = useState(10);
 
   const swrKey = useMemo(() => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}`;
   }, [address, page, size]);
+  console.log("swrKey", swrKey);
   const { data, isLoading, mutate } = useSWR(
     swrKey,
     () => getOrdxAssets({ address, offset: (page - 1) * size, size }),
@@ -82,10 +84,12 @@ export const OrdxUtxoList = () => {
         <div className="flex justify-center">
           <Pagination
             total={total}
-            offset={page}
             size={size}
+            page={page}
             onChange={(offset, size) => {
               setPage(offset);
+              // page.current = offset;
+              // console.log("page", page.current);
               // setSize(size);
             }}
           />

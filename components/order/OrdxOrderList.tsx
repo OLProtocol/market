@@ -30,7 +30,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     return `/ordx/getOrders-${ticker}-${page}-${size}`;
   }, [ticker, address, page, size]);
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
-    getOrders({ offset: (page - 1) * size, size, ticker, address })
+    getOrders({ offset: (page - 1) * size, size, ticker, address }),
   );
   const onBuy = async (item: any) => {
     setBuyItem(item);
@@ -55,7 +55,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   };
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
-    [data, size]
+    [data, size],
   );
   const list = useMemo(() => data?.data?.order_list || [], [data]);
   return (
@@ -76,7 +76,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
         <div className="flex justify-center">
           <Pagination
             total={total}
-            offset={page}
+            page={page}
             size={size}
             onChange={(offset, size) => {
               setPage(offset);

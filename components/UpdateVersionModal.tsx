@@ -5,9 +5,6 @@ import {
   ModalHeader,
   ModalFooter,
   Button,
-  Spinner,
-  Card,
-  CardBody,
 } from "@nextui-org/react";
 import { version } from "@/assets/version";
 import { getAppVersion } from "@/api";

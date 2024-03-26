@@ -133,7 +133,7 @@ export const OrdxOrderHistoryList = ({
             <div className="flex justify-center">
               <Pagination
                 total={total}
-                offset={page}
+                page={page}
                 size={size}
                 onChange={(offset, size) => {
                   setPage(offset);
