@@ -18,7 +18,12 @@ import { notification } from "antd";
 import { useSellStore } from "@/store";
 import { useList } from "react-use";
 import { useEffect, useMemo } from "react";
-import { parseUtxo, buildSellOrder, btcToSats } from "@/lib/utils";
+import {
+  parseUtxo,
+  buildSellOrder,
+  btcToSats,
+  satsToBitcoin,
+} from "@/lib/utils";
 import { useReactWalletStore } from "btc-connect/dist/react";
 import { submitOrder } from "@/api";
 import { useRouter } from "next/navigation";
@@ -30,46 +35,60 @@ export default function SellPage() {
   const [
     priceList,
     { updateAt: updateAt, set: setList, clear: clearList, removeAt },
-  ] = useList<number>([]);
+  ] = useList<string>([]);
   const listItems = async () => {
     for (let i = 0; i < list.length; i++) {
-      const item = list[i];
-      const inscriptionUtxo = {
-        ...parseUtxo(item.utxo),
-        value: item.value,
-      };
-      const orderRaw = await buildSellOrder({
-        inscriptionUtxo,
-        amount: 1,
-        total: btcToSats(priceList[i]),
-        network,
-        address,
-      });
-      const res = await submitOrder({ address, raw: orderRaw });
-      if (res.code === 200) {
-        notification.success({
-          message: "Listed successfully",
-          description: `The order has been submitted successfully, please wait for the buyer to buy it.`,
+      try {
+        const item = list[i];
+        const inscriptionUtxo = {
+          ...parseUtxo(item.utxo),
+          value: item.value,
+        };
+        const orderRaw = await buildSellOrder({
+          inscriptionUtxo,
+          amount: 1,
+          total: btcToSats(Number(priceList[i])),
+          network,
+          address,
         });
-        reset();
-        router.back();
-      } else {
+        const res = await submitOrder({ address, raw: orderRaw });
+        if (res.code === 200) {
+          notification.success({
+            message: "Listed successfully",
+            description: `The order has been submitted successfully, please wait for the buyer to buy it.`,
+          });
+          reset();
+          router.back();
+        } else {
+          notification.error({
+            message: "List failed",
+            description: res.msg,
+          });
+        }
+      } catch (error: any) {
+        console.error("List failed", error);
         notification.error({
           message: "List failed",
-          description: res.msg,
+          description: error.message,
         });
       }
     }
   };
   const priceChange = (i, v: any) => {
-    updateAt(i, Number(v));
+    updateAt(i, v);
+  };
+  const inputBlur = (i) => {
+    if (Number(priceList[i]) < 0.00000546) {
+      updateAt(i, "0.00000546");
+    }
   };
   const totalPrice = useMemo(
-    () => priceList.reduce((a, b) => a + b, 0) || 0,
-    [priceList]
+    () => priceList.reduce((a, b) => Number(a) + Number(b), 0) || 0,
+    [priceList],
   );
+  console.log("priceList", priceList);
   useEffect(() => {
-    setList(Array.from(list).fill(0));
+    setList(Array.from(list).fill("0"));
   }, [list, setList]);
 
   return (
@@ -101,7 +120,9 @@ export default function SellPage() {
                     <Input
                       type="number"
                       placeholder="0.00"
+                      value={priceList[i]}
                       onChange={(e) => priceChange(i, e.target.value)}
+                      onBlur={() => inputBlur(i)}
                       endContent={
                         <div className="pointer-events-none flex items-center">
                           <span className="text-default-400 text-small">

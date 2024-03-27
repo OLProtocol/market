@@ -66,10 +66,10 @@ export const OrdxUtxoList = () => {
     reset();
   }, []);
   return (
-    <div className="p-4">
+    <div className="py-2 sm:py-4">
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-4 mb-4">
           {list.map((item: any) => (
             <OrdxFtAssetsItem
               key={item.utxo}

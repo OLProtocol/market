@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   const { data, error, isLoading } = useSWR(`/ordx/getTopTickers`, () =>
-    getTopTickers({})
+    getTopTickers({}),
   );
   const list = useMemo(() => data?.data || [], [data]);
   const toDetail = (e) => {
@@ -29,14 +29,25 @@ export default function Home() {
       <Table
         isHeaderSticky
         onRowAction={toDetail}
+        className="text-sm md:text-base"
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
-          <TableColumn key="ticker">Ticker</TableColumn>
-          <TableColumn key="tx_total_volume">Volumn</TableColumn>
-          <TableColumn key="lowest_price">Price</TableColumn>
-          <TableColumn key="tx_order_count">成交笔数</TableColumn>
-          <TableColumn key="holder_count">Holders</TableColumn>
+          <TableColumn key="ticker" className="text-sm md:text-base">
+            Ticker
+          </TableColumn>
+          <TableColumn key="tx_total_volume" className="text-sm md:text-base">
+            Volumn
+          </TableColumn>
+          <TableColumn key="lowest_price" className="text-sm md:text-base">
+            Price
+          </TableColumn>
+          <TableColumn key="tx_order_count" className="text-sm md:text-base">
+            成交笔数
+          </TableColumn>
+          <TableColumn key="holder_count" className="text-sm md:text-base">
+            Holders
+          </TableColumn>
         </TableHeader>
         <TableBody
           isLoading={isLoading}
@@ -49,22 +60,28 @@ export default function Home() {
               {(columnKey) => {
                 if (columnKey === "holder_count") {
                   return (
-                    <TableCell className="text-center">
+                    <TableCell className="text-sm md:text-base">
                       <div>{getKeyValue(item, columnKey)}</div>
                       {/* <div>{item['holder_dispersion']}</div> */}
                     </TableCell>
                   );
                 } else if (
                   ["tx_total_volume", "lowest_price"].includes(
-                    columnKey.toString()
+                    columnKey.toString(),
                   )
                 ) {
                   console.log("item", columnKey);
                   return (
-                    <TableCell>{getKeyValue(item, columnKey)} BTC</TableCell>
+                    <TableCell className="text-sm md:text-base">
+                      {getKeyValue(item, columnKey)} BTC
+                    </TableCell>
                   );
                 } else {
-                  return <TableCell>{getKeyValue(item, columnKey)}</TableCell>;
+                  return (
+                    <TableCell className="text-sm md:text-base">
+                      {getKeyValue(item, columnKey)}
+                    </TableCell>
+                  );
                 }
               }}
             </TableRow>
