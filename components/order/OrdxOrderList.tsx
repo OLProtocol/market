@@ -22,7 +22,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(12);
   const swrKey = useMemo(() => {
     if (address) {
       return `/ordx/getOrders-${ticker}-${address}-${page}-${size}`;

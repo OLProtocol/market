@@ -31,7 +31,7 @@ export const OrdxOrderHistoryList = ({
 }: OrdxOrderHistoryListProps) => {
   const { network } = useReactWalletStore((state) => state);
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(12);
   const [sort, setSort] = useState(0);
   const { data, isLoading } = useSWR(
     `/ordx/history-${ticker}-${address}-${page}-${size}-${sort}`,

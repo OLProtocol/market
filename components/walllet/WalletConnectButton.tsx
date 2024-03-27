@@ -27,13 +27,14 @@ export const WalletConnectButton = () => {
     router.push("/account");
   };
   useEffect(() => {
+    console.log("check");
     check();
   }, []);
   const onConnectSuccess = async (wallet: any) => {
     if (!signature) {
       console.log("signature text", process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
       const _s = await wallet.signMessage(
-        process.env.NEXT_PUBLIC_SIGNATURE_TEXT
+        process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
       );
       setSignature(_s);
     }
@@ -45,18 +46,39 @@ export const WalletConnectButton = () => {
       description: error.message,
     });
   };
-  const onDisconnectSuccess = () => {
+  const handlerDisconnect = async () => {
+    console.log("disconnect success");
     setSignature("");
+    await disconnect();
+  };
+  const accountAndNetworkChange = async () => {
+    console.log("accountAndNetworkChange");
+    console.log("connected", connected);
+    try {
+      if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
+        const _s = await btcWallet?.signMessage(
+          process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+        );
+        if (_s) {
+          setSignature(_s);
+        }
+      }
+      // await check();
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
-    console.log("connected", connected);
     if (connected) {
-      btcWallet?.on("accountsChanged", check);
-      btcWallet?.on("networkChanged", check);
+      btcWallet?.on("accountsChanged", accountAndNetworkChange);
+      btcWallet?.on("networkChanged", accountAndNetworkChange);
+    } else {
+      btcWallet?.removeListener("accountsChanged", accountAndNetworkChange);
+      btcWallet?.removeListener("networkChanged", accountAndNetworkChange);
     }
     return () => {
-      btcWallet?.removeListener("accountChanged", check);
-      btcWallet?.removeListener("networkChanged", check);
+      btcWallet?.removeListener("accountsChanged", accountAndNetworkChange);
+      btcWallet?.removeListener("networkChanged", accountAndNetworkChange);
     };
   }, [connected]);
   return (
@@ -68,7 +90,6 @@ export const WalletConnectButton = () => {
       theme={theme === "dark" ? "dark" : "light"}
       onConnectSuccess={onConnectSuccess}
       onConnectError={onConnectError}
-      onDisconnectSuccess={onDisconnectSuccess}
     >
       <>
         <Popover placement="bottom">
@@ -80,7 +101,11 @@ export const WalletConnectButton = () => {
               <Button className="w-full" onClick={toMyAssets}>
                 我的资产
               </Button>
-              <Button color="danger" variant="ghost" onClick={disconnect}>
+              <Button
+                color="danger"
+                variant="ghost"
+                onClick={handlerDisconnect}
+              >
                 Disconnect
               </Button>
             </div>

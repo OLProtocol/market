@@ -16,7 +16,7 @@ export const OrdxUtxoList = () => {
   const { add: addSell, reset } = useSellStore((state) => state);
   const [page, setPage] = useState(1);
   // const page = useRef(1);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(12);
 
   const swrKey = useMemo(() => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}`;
@@ -57,7 +57,7 @@ export const OrdxUtxoList = () => {
     }
   };
   const total = useMemo(
-    () => (data?.data?.total ? Math.ceil(data?.data?.total / 10) : 0),
+    () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data],
   );
   const list = useMemo(() => data?.data?.assets || [], [data]);
