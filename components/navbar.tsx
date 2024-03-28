@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -12,34 +12,36 @@ import {
   Link,
   Image,
   Input,
-} from "@nextui-org/react";
-import { useMemo } from "react";
-import { WalletConnectButton } from "@/components/walllet/WalletConnectButton";
-import NextLink from "next/link";
-import clsx from "clsx";
-import { UpdateVersionModal } from "./UpdateVersionModal";
-import { FeerateSelectButton } from "@/components/fee/FeerateSelectButton";
-import { ThemeSwitch } from "@/components/theme-switch";
+} from '@nextui-org/react';
+import { useMemo } from 'react';
+import { WalletConnectButton } from '@/components/walllet/WalletConnectButton';
+import { LanguageSelect } from '@/components/LanguageSelect';
+import NextLink from 'next/link';
+import clsx from 'clsx';
+import { UpdateVersionModal } from './UpdateVersionModal';
+import { FeerateSelectButton } from '@/components/fee/FeerateSelectButton';
+import { ThemeSwitch } from '@/components/theme-switch';
 import {
   TwitterIcon,
   GithubIcon,
   DiscordIcon,
   HeartFilledIcon,
   SearchIcon,
-} from "@/components/icons";
-
-import { Logo } from "@/components/icons";
+} from '@/components/icons';
+import { useTranslation } from 'next-export-i18n';
+import { Logo } from '@/components/icons';
 
 export const Navbar = () => {
+  const { t } = useTranslation();
   const searchInput = (
     <Input
       aria-label="Search"
       classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
+        inputWrapper: 'bg-default-100',
+        input: 'text-sm',
       }}
       endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
+        <Kbd className="hidden lg:inline-block" keys={['command']}>
           K
         </Kbd>
       }
@@ -51,8 +53,10 @@ export const Navbar = () => {
       type="search"
     />
   );
-  const navMenus = useMemo(() => [{ label: "Market", href: "/" }], []);
-
+  const navMenus = useMemo(
+    () => [{ label: t('pages.market.title'), href: '/' }],
+    [],
+  );
   return (
     <NextUINavbar maxWidth="xl" position="sticky" isBordered>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -87,6 +91,7 @@ export const Navbar = () => {
           {/* <Link isExternal href={siteConfig.links.github} aria-label="Github">
 						<GithubIcon className="text-default-500" />
 					</Link> */}
+          <LanguageSelect />
           <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className="">

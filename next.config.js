@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
+// const nextTranslate = require('next-translate-plugin');
 const nextConfig = {
-  output: "export",
-  publicRuntimeConfig: {
-    test: "test",
-  },
+  output: 'export',
 };
 
 module.exports = nextConfig;
