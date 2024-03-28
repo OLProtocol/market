@@ -63,11 +63,15 @@ const WalletConnectButton = () => {
     console.log('connected', connected);
     try {
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
-        const _s = await btcWallet?.signMessage(
-          process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-        );
-        if (_s) {
-          setSignature(_s);
+        try {
+          const _s = await btcWallet?.signMessage(
+            process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+          );
+          if (_s) {
+            setSignature(_s);
+          }
+        } catch (error) {
+          await disconnect();
         }
       }
       // await check();
