@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { getTopTickers } from "@/api";
-import useSWR from "swr";
+import { getTopTickers } from '@/api';
+import useSWR from 'swr';
 import {
   Table,
   TableBody,
@@ -11,11 +11,13 @@ import {
   TableColumn,
   Spinner,
   getKeyValue,
-} from "@nextui-org/react";
-import { useMemo } from "react";
-import { useRouter } from "next/navigation";
+} from '@nextui-org/react';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { data, error, isLoading } = useSWR(`/ordx/getTopTickers`, () =>
     getTopTickers({}),
@@ -34,31 +36,31 @@ export default function Home() {
       >
         <TableHeader>
           <TableColumn key="ticker" className="text-sm md:text-base">
-            Ticker
+            {t('common.tick')}
           </TableColumn>
           <TableColumn key="tx_total_volume" className="text-sm md:text-base">
-            Volumn
+            {t('common.volumn')}
           </TableColumn>
           <TableColumn key="lowest_price" className="text-sm md:text-base">
-            Price
+            {t('common.price')}
           </TableColumn>
           <TableColumn key="tx_order_count" className="text-sm md:text-base">
-            成交笔数
+            {t('common.tx_order_count')}
           </TableColumn>
           <TableColumn key="holder_count" className="text-sm md:text-base">
-            Holders
+            {t('common.holder_count')}
           </TableColumn>
         </TableHeader>
         <TableBody
           isLoading={isLoading}
           items={list}
-          emptyContent={"No Data."}
+          emptyContent={'No Data.'}
           loadingContent={<Spinner />}
         >
           {(item: any) => (
             <TableRow key={item.ticker} className="cursor-pointer">
               {(columnKey) => {
-                if (columnKey === "holder_count") {
+                if (columnKey === 'holder_count') {
                   return (
                     <TableCell className="text-sm md:text-base">
                       <div>{getKeyValue(item, columnKey)}</div>
@@ -66,11 +68,11 @@ export default function Home() {
                     </TableCell>
                   );
                 } else if (
-                  ["tx_total_volume", "lowest_price"].includes(
+                  ['tx_total_volume', 'lowest_price'].includes(
                     columnKey.toString(),
                   )
                 ) {
-                  console.log("item", columnKey);
+                  console.log('item', columnKey);
                   return (
                     <TableCell className="text-sm md:text-base">
                       {getKeyValue(item, columnKey)} BTC

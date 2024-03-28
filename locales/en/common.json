@@ -1,8 +1,24 @@
 {
   "tick": "Tick",
+  "close": "Close",
+  "ok": "OK",
+  "gas_fee": "Gas Fee",
+  "fee_economy": "Economy",
+  "fee_normal": "Normal",
+  "fee_custom": "Custom",
   "holder": "Holder",
   "volumn": "Volumn",
+  "item": "Item",
+  "amount": "Amount",
   "price": "Price",
+  "unit_price": "Unit Price",
+  "total": "Total",
+  "your_profits": "Your profits",
+  "not_sort": "Not Sort",
+  "sort_price_ascending": "Price Ascending",
+  "sort_price_descending": "Price Descending",
+  "sort_time_ascending": "Time Ascending",
+  "sort_time_descending": "Time Descending",
   "order_num": "Num of Order",
   "sale_num": "Num of Sale",
   "tx_order_count": "Num of Transaction",
@@ -12,5 +28,7 @@
   "onsell_total_amount": "Total Onsell Amount",
   "lowest_price": "Lowest Price",
   "highest_price": "Highest Price",
-  "holder_count": "Num of Holder"
+  "holder_count": "Num of Holder",
+  "tx_history": "Transaction History",
+  "my_listings": "My Listings"
 }

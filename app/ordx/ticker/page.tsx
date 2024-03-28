@@ -59,7 +59,7 @@ export default function Page() {
           </div>
           <WalletConnectBus>
             <Button onClick={toAccount} color="primary">
-              上架
+              {t('buttons.list_sale')}
             </Button>
           </WalletConnectBus>
         </div>
@@ -81,13 +81,13 @@ export default function Page() {
       <Divider />
       <div className="pt-4">
         <Tabs aria-label="Options">
-          <Tab key="market" title="市场">
+          <Tab key="market" title={t('pages.market.title')}>
             <OrdxOrderList ticker={ticker} />
           </Tab>
-          <Tab key="history" title="交易历史">
+          <Tab key="history" title={t('common.tx_history')}>
             <OrdxOrderHistoryList ticker={ticker} />
           </Tab>
-          <Tab key="my" title="我的挂单">
+          <Tab key="my" title={t('common.my_listings')}>
             <WalletConnectBus className="mx-auto mt-20 block">
               <OrdxOrderList ticker={ticker} address={address} />
             </WalletConnectBus>

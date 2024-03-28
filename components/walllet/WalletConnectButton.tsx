@@ -74,7 +74,7 @@ const WalletConnectButton = () => {
           await disconnect();
         }
       }
-      // await check();
+      await check();
     } catch (error) {
       console.log(error);
     }

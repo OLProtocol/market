@@ -5,11 +5,13 @@ import {
   Card,
   CardFooter,
   CardBody,
-} from "@nextui-org/react";
-import { Icon } from "@iconify/react";
-import { useMemo, useState } from "react";
+} from '@nextui-org/react';
+import { Icon } from '@iconify/react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const sellHandler = async () => {
     setLoading(true);
@@ -41,7 +43,7 @@ export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
                 radius="lg"
                 onClick={sellHandler}
               >
-                上架
+                {t('buttons.list_sale')}
               </Button>
             ) : (
               <Button
@@ -51,13 +53,14 @@ export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
                 color="default"
                 radius="lg"
                 startContent={
-                  item.locker == "1" ? (
+                  item.locker == '1' ? (
                     <Icon icon="mdi:lock" className="text-lg" />
                   ) : null
                 }
                 onClick={onCancelOrder}
               >
-                下架（{item.price} {item.currency}）
+                {t('buttons.remove_sale')}
+                {item.price} {item.currency}）
               </Button>
             )}
           </div>

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Button,
@@ -8,23 +8,25 @@ import {
   ModalHeader,
   ModalBody,
   useDisclosure,
-} from "@nextui-org/react";
-import { Icon } from "@iconify/react";
-import { useEffect, useState } from "react";
-import { useCommonStore } from "@/store";
-import { BtcFeeRate } from "./BtcFeeRate";
-import useSWR from "swr";
-import { fetchChainFeeRate } from "@/api";
-import { useReactWalletStore } from "btc-connect/dist/react";
+} from '@nextui-org/react';
+import { Icon } from '@iconify/react';
+import { useEffect, useState } from 'react';
+import { useCommonStore } from '@/store';
+import { BtcFeeRate } from './BtcFeeRate';
+import useSWR from 'swr';
+import { useTranslation } from 'react-i18next';
+import { fetchChainFeeRate } from '@/api';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 
 export const FeerateSelectButton = () => {
+  const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
   const { isOpen, onClose, onOpenChange, onOpen } = useDisclosure();
-  const [fee, setFee] = useState({ value: 1, type: "Normal" });
+  const [fee, setFee] = useState({ value: 1, type: 'Normal' });
 
   const { data: feeRateData, isLoading } = useSWR(
     `fetchChainFeeRate-${network}`,
-    () => fetchChainFeeRate(network as any)
+    () => fetchChainFeeRate(network as any),
   );
 
   const { setFeeRate, feeRate } = useCommonStore((state) => state);
@@ -40,7 +42,7 @@ export const FeerateSelectButton = () => {
     setFee(fee);
   };
   useEffect(() => {
-    setFeeRate({ value: feeRateData?.halfHourFee || 1, type: "Normal" });
+    setFeeRate({ value: feeRateData?.halfHourFee || 1, type: 'Normal' });
   }, [feeRateData]);
 
   return (
@@ -51,12 +53,14 @@ export const FeerateSelectButton = () => {
         className="bg-transparent"
         onClick={() => onOpen()}
       >
-        <Icon icon="mdi:gas-station" className="text-xl" /> {feeRate.value}{" "}
+        <Icon icon="mdi:gas-station" className="text-xl" /> {feeRate.value}{' '}
         sats/Vb
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Gas Fee</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            {t('common.gas_fee')}
+          </ModalHeader>
           <ModalBody>
             <BtcFeeRate
               onChange={feeChange}
@@ -67,10 +71,10 @@ export const FeerateSelectButton = () => {
           </ModalBody>
           <ModalFooter>
             <Button color="danger" variant="light" onPress={handleCancel}>
-              Close
+              {t('common.close')}
             </Button>
             <Button color="primary" onPress={handleOk}>
-              Ok
+              {t('common.ok')}
             </Button>
           </ModalFooter>
         </ModalContent>

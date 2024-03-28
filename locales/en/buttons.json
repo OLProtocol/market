@@ -1,5 +1,8 @@
 {
   "connect": "Connect",
   "my_assets": "My Assets",
-  "disconnect": "Disconnect"
+  "disconnect": "Disconnect",
+  "buy": "Buy",
+  "list_sale": "List for Sale",
+  "remove_sale": "Remove for Sale"
 }

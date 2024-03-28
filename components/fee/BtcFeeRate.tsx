@@ -1,7 +1,8 @@
-import { Input, Slider } from "@nextui-org/react";
-import { useState, useMemo, useEffect, use } from "react";
-import { BtcFeeRateItem } from "./BtcFeeRateItem";
-import { useReactWalletStore } from "btc-connect/dist/react";
+import { Input, Slider } from '@nextui-org/react';
+import { useState, useMemo, useEffect, use } from 'react';
+import { BtcFeeRateItem } from './BtcFeeRateItem';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useTranslation } from 'react-i18next';
 
 interface BtcFeeRate {
   onChange?: ({ value, type }: any) => void;
@@ -15,8 +16,9 @@ export const BtcFeeRate = ({
   value,
   feeType,
 }: BtcFeeRate) => {
+  const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
-  const [type, setType] = useState("Normal");
+  const [type, setType] = useState('Normal');
   const [customValue, setCustomValue] = useState(1);
   const [economyValue, setEconomyValue] = useState(1);
   const [normalValue, setNormalValue] = useState(1);
@@ -34,44 +36,44 @@ export const BtcFeeRate = ({
     });
   };
   const setRecommendFee = async () => {
-    const defaultFee = network === "testnet" ? 1 : 50;
+    const defaultFee = network === 'testnet' ? 1 : 50;
     setCustomValue(feeRateData?.fastestFee || defaultFee);
     setEconomyValue(feeRateData?.hourFee || defaultFee);
     setNormalValue(feeRateData?.halfHourFee || defaultFee);
     setMinFee(feeRateData?.minimumFee || defaultFee);
     onChange?.(feeRateData?.halfHourFee || defaultFee);
-    setType("Normal");
+    setType('Normal');
   };
   const list = useMemo(
     () => [
       {
-        label: "Economy",
-        name: "Economy",
+        label: t('common.fee_economy'),
+        name: 'Economy',
         value: economyValue,
       },
       {
-        label: "Normal",
-        name: "Normal",
+        label: t('common.fee_normal'),
+        name: 'Normal',
         value: normalValue,
       },
       {
-        label: "Custom",
-        name: "Custom",
+        label: t('common.fee_custom'),
+        name: 'Custom',
         value: customValue,
       },
     ],
-    [economyValue, normalValue, customValue]
+    [economyValue, normalValue, customValue],
   );
   useEffect(() => {
     setRecommendFee();
   }, [feeRateData]);
   useEffect(() => {
-    if (type === "Custom") {
-      onChange?.({ value: customValue, type: "Custom" });
+    if (type === 'Custom') {
+      onChange?.({ value: customValue, type: 'Custom' });
     }
   }, [customValue]);
   useEffect(() => {
-    if (feeType === "Custom" && value) {
+    if (feeType === 'Custom' && value) {
       setCustomValue(value);
       setType(feeType);
     } else if (feeType) {
@@ -84,7 +86,7 @@ export const BtcFeeRate = ({
         {list.map((item) => (
           <BtcFeeRateItem
             className={
-              type === item.label ? " border-orange-400 " : "border-gray-500"
+              type === item.label ? ' border-orange-400 ' : 'border-gray-500'
             }
             key={item.label}
             label={item.name}
@@ -98,7 +100,7 @@ export const BtcFeeRate = ({
           {t("pages.inscribe.fee.high_hint")}
         </div>
       )} */}
-      {type === "Custom" && (
+      {type === 'Custom' && (
         <div className="flex items-center gap-4">
           <Input
             type="number"

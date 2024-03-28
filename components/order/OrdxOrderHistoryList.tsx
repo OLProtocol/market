@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import useSWR from "swr";
+import useSWR from 'swr';
 import {
   Spinner,
   Table,
@@ -11,15 +11,15 @@ import {
   TableCell,
   getKeyValue,
   Snippet,
-} from "@nextui-org/react";
-import { getHistory } from "@/api";
-import { useMemo, useState } from "react";
-import { hideStr, resolveMempoolTxLink } from "@/lib/utils";
-import { Icon } from "@iconify/react";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { Pagination } from "@/components/Pagination";
-import { SortDropdown } from "@/components/SortDropdown";
-import { useRouter } from "next/navigation";
+} from '@nextui-org/react';
+import { getHistory } from '@/api';
+import { useMemo, useState } from 'react';
+import { hideStr, resolveMempoolTxLink } from '@/lib/utils';
+import { Icon } from '@iconify/react';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { Pagination } from '@/components/Pagination';
+import { SortDropdown } from '@/components/SortDropdown';
+import { useRouter } from 'next/navigation';
 
 interface OrdxOrderHistoryListProps {
   ticker?: string;
@@ -52,64 +52,64 @@ export const OrdxOrderHistoryList = ({
   );
   const typeMap = useMemo(() => {
     return {
-      1: "成交",
-      2: "下架",
-      3: "无效",
-      4: "上架",
-      10: "卖出",
-      11: "买入",
+      1: '成交',
+      2: '下架',
+      3: '无效',
+      4: '上架',
+      10: '卖出',
+      11: '买入',
     };
   }, []);
   const coumns = useMemo(() => {
     const defaultColumns = [
       {
-        key: "utxo",
-        label: "Utxo",
-        align: "center",
+        key: 'utxo',
+        label: 'Utxo',
+        align: 'center',
       },
       {
-        key: "price",
-        label: "Price",
-        align: "center",
+        key: 'price',
+        label: 'Price',
+        align: 'center',
       },
       {
-        key: "value",
-        label: "Num",
-        align: "center",
+        key: 'value',
+        label: 'Num',
+        align: 'center',
       },
       {
-        key: "address",
-        label: "From",
-        align: "center",
+        key: 'address',
+        label: 'From',
+        align: 'center',
       },
       {
-        key: "txaddress",
-        label: "To",
-        align: "center",
+        key: 'txaddress',
+        label: 'To',
+        align: 'center',
         hideHeader: true,
       },
       {
-        key: "txtime",
-        label: "Time",
-        align: "center",
+        key: 'txtime',
+        label: 'Time',
+        align: 'center',
       },
       {
-        key: "txid",
-        label: "Tx",
+        key: 'txid',
+        label: 'Tx',
         allowsSorting: false,
-        align: "center",
+        align: 'center',
       },
     ];
     const addressColumnIndex = defaultColumns.findIndex(
-      (column) => column.key === "txaddress",
+      (column) => column.key === 'txaddress',
     );
 
     if (address) {
       defaultColumns.splice(addressColumnIndex, 1);
       defaultColumns.unshift({
-        key: "result",
-        label: "Type",
-        align: "center",
+        key: 'result',
+        label: 'Type',
+        align: 'center',
       });
     }
     return defaultColumns;
@@ -156,16 +156,16 @@ export const OrdxOrderHistoryList = ({
         <TableBody
           isLoading={isLoading}
           items={list}
-          emptyContent={"No Data."}
+          emptyContent={'No Data.'}
           loadingContent={<Spinner />}
         >
           {(item: any) => (
-            <TableRow key={item.order_id}>
+            <TableRow key={item.order_id + item.result}>
               {(columnKey) => {
                 if (
-                  columnKey === "utxo" ||
-                  columnKey === "txaddress" ||
-                  columnKey === "address"
+                  columnKey === 'utxo' ||
+                  columnKey === 'txaddress' ||
+                  columnKey === 'address'
                 ) {
                   const v = getKeyValue(item, columnKey);
                   return (
@@ -181,11 +181,11 @@ export const OrdxOrderHistoryList = ({
                           {hideStr(v, 6)}
                         </Snippet>
                       ) : (
-                        "-"
+                        '-'
                       )}
                     </TableCell>
                   );
-                } else if (columnKey === "txid") {
+                } else if (columnKey === 'txid') {
                   return (
                     <TableCell>
                       <a
@@ -199,7 +199,7 @@ export const OrdxOrderHistoryList = ({
                       </a>
                     </TableCell>
                   );
-                } else if (columnKey === "txtime") {
+                } else if (columnKey === 'txtime') {
                   return (
                     <TableCell>
                       <span>
@@ -209,7 +209,7 @@ export const OrdxOrderHistoryList = ({
                       </span>
                     </TableCell>
                   );
-                } else if (columnKey === "result") {
+                } else if (columnKey === 'result') {
                   return (
                     <TableCell>
                       {typeMap[getKeyValue(item, columnKey)]}
@@ -219,7 +219,7 @@ export const OrdxOrderHistoryList = ({
                   return (
                     <TableCell>
                       {`${getKeyValue(item, columnKey)}${
-                        columnKey === "price" ? " " + item.currency : ""
+                        columnKey === 'price' ? ' ' + item.currency : ''
                       }`}
                     </TableCell>
                   );

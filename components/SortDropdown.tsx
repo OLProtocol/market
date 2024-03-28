@@ -1,5 +1,6 @@
-import { Select, SelectSection, SelectItem } from "@nextui-org/react";
-import { useState } from "react";
+import { Select, SelectSection, SelectItem } from '@nextui-org/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SortDropdownProps {
   sortList?: { label: string; value: number }[];
@@ -12,13 +13,14 @@ export const SortDropdown = ({
   onChange,
   disabled = false,
 }: SortDropdownProps) => {
-  const [selectKeys, setSelectKeys] = useState([value?.toString() || "0"]);
+  const [selectKeys, setSelectKeys] = useState([value?.toString() || '0']);
+  const { t } = useTranslation();
   const sortList = [
-    { label: "不排序", value: 0 },
-    { label: "价格升序", value: 1 },
-    { label: "价格降序", value: 2 },
-    { label: "时间升序", value: 3 },
-    { label: "时间降序", value: 4 },
+    { label: t('common.not_sort'), value: 0 },
+    { label: t('common.sort_price_ascending'), value: 1 },
+    { label: t('common.sort_price_descending'), value: 2 },
+    { label: t('common.sort_time_ascending'), value: 3 },
+    { label: t('common.sort_time_descending'), value: 4 },
   ];
   const onSelectionChange = (keys: any) => {
     setSelectKeys(keys);
@@ -29,10 +31,10 @@ export const SortDropdown = ({
   return (
     <Select
       isDisabled={disabled}
-      className="w-40"
+      className="w-48"
       selectionMode="single"
       selectedKeys={selectKeys}
-      defaultSelectedKeys={["0"]}
+      defaultSelectedKeys={['0']}
       onSelectionChange={onSelectionChange}
     >
       {sortList.map((animal) => (

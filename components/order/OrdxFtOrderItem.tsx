@@ -6,13 +6,15 @@ import {
   CardFooter,
   CardBody,
   Chip,
-} from "@nextui-org/react";
-import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
-import { Icon } from "@iconify/react";
-import { useState } from "react";
+} from '@nextui-org/react';
+import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import { Icon } from '@iconify/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
   const buyHandler = async () => {
     setLoading(true);
     try {
@@ -52,13 +54,13 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
             color="default"
             radius="lg"
             startContent={
-              item.locker == "1" ? (
+              item.locker == '1' ? (
                 <Icon icon="mdi:lock" className="text-lg" />
               ) : null
             }
             onClick={buyHandler}
           >
-            购买
+            {t('buttons.buy')}
           </Button>
         </WalletConnectBus>
         {/* <Button

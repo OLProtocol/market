@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Divider,
@@ -13,22 +13,24 @@ import {
   TableBody,
   TableRow,
   TableCell,
-} from "@nextui-org/react";
-import { notification } from "antd";
-import { useSellStore } from "@/store";
-import { useList } from "react-use";
-import { useEffect, useMemo } from "react";
+} from '@nextui-org/react';
+import { notification } from 'antd';
+import { useSellStore } from '@/store';
+import { useList } from 'react-use';
+import { useEffect, useMemo } from 'react';
 import {
   parseUtxo,
   buildSellOrder,
   btcToSats,
   satsToBitcoin,
-} from "@/lib/utils";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { submitOrder } from "@/api";
-import { useRouter } from "next/navigation";
+} from '@/lib/utils';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { submitOrder } from '@/api';
+import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 
 export default function SellPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { list, reset } = useSellStore((state) => state);
   const { network, address } = useReactWalletStore((state) => state);
@@ -54,21 +56,21 @@ export default function SellPage() {
         const res = await submitOrder({ address, raw: orderRaw });
         if (res.code === 200) {
           notification.success({
-            message: "Listed successfully",
-            description: `The order has been submitted successfully, please wait for the buyer to buy it.`,
+            message: t('notification.list_success_title'),
+            description: t('notification.list_success_description'),
           });
           reset();
           router.back();
         } else {
           notification.error({
-            message: "List failed",
+            message: t('notification.list_failed_title'),
             description: res.msg,
           });
         }
       } catch (error: any) {
-        console.error("List failed", error);
+        console.error('List failed', error);
         notification.error({
-          message: "List failed",
+          message: t('notification.list_failed_title'),
           description: error.message,
         });
       }
@@ -79,16 +81,16 @@ export default function SellPage() {
   };
   const inputBlur = (i) => {
     if (Number(priceList[i]) < 0.00000546) {
-      updateAt(i, "0.00000546");
+      updateAt(i, '0.00000546');
     }
   };
   const totalPrice = useMemo(
     () => priceList.reduce((a, b) => Number(a) + Number(b), 0) || 0,
     [priceList],
   );
-  console.log("priceList", priceList);
+  console.log('priceList', priceList);
   useEffect(() => {
-    setList(Array.from(list).fill("0"));
+    setList(Array.from(list).fill('0'));
   }, [list, setList]);
 
   return (
@@ -97,9 +99,9 @@ export default function SellPage() {
         <div className="flex-1 overflow-hidden">
           <Table aria-label="Example static collection table">
             <TableHeader>
-              <TableColumn>Item</TableColumn>
-              <TableColumn>Unit Price</TableColumn>
-              <TableColumn>Amount</TableColumn>
+              <TableColumn>{t('common.item')}</TableColumn>
+              <TableColumn>{t('common.unit_rice')}</TableColumn>
+              <TableColumn>{t('common.amount')}</TableColumn>
             </TableHeader>
             <TableBody>
               {list.map((item, i) => (
@@ -107,13 +109,13 @@ export default function SellPage() {
                   <TableCell>
                     <div>
                       Ticker：
-                      {item.tickers?.map((v) => ` ${v.ticker}`)?.join("-")}
+                      {item.tickers?.map((v) => ` ${v.ticker}`)?.join('-')}
                     </div>
                     <div>
                       Inscription：
                       {item.tickers
                         ?.map((v) => `# ${v.inscriptionnum}`)
-                        ?.join("-")}
+                        ?.join('-')}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -126,7 +128,7 @@ export default function SellPage() {
                       endContent={
                         <div className="pointer-events-none flex items-center">
                           <span className="text-default-400 text-small">
-                            btc
+                            BTC
                           </span>
                         </div>
                       }
@@ -140,8 +142,12 @@ export default function SellPage() {
         </div>
         <Card className="w-60">
           <CardBody>
-            <div>Total: {list.length}</div>
-            <div>Your profits: {totalPrice} BTC</div>
+            <div>
+              {t('common.total')}: {list.length}
+            </div>
+            <div>
+              {t('common.your_profits')}: {totalPrice} BTC
+            </div>
           </CardBody>
           <CardFooter>
             <Button
@@ -150,7 +156,7 @@ export default function SellPage() {
               className="w-full"
               onClick={listItems}
             >
-              List
+              {t('buttons.list_sale')}
             </Button>
           </CardFooter>
         </Card>
