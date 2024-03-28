@@ -13,8 +13,9 @@ import {
   Image,
   Input,
 } from '@nextui-org/react';
+import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
-import { WalletConnectButton } from '@/components/walllet/WalletConnectButton';
+// import { WalletConnectButton } from '@/components/walllet/WalletConnectButton';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import NextLink from 'next/link';
 import clsx from 'clsx';
@@ -32,6 +33,11 @@ import i18n from '@/i18n';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { Logo } from '@/components/icons';
+
+const WalletButton = dynamic(
+  () => import('../components/walllet/WalletConnectButton') as any,
+  { ssr: false },
+);
 
 export const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -95,7 +101,7 @@ export const Navbar = () => {
           <ThemeSwitch />
         </NavbarItem>
         <NavbarItem className="">
-          <WalletConnectButton />
+          <WalletButton />
         </NavbarItem>
         <NavbarItem className="sm:hidden">
           <NavbarMenuToggle />

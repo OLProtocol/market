@@ -8,7 +8,6 @@ import {
   Button,
 } from '@nextui-org/react';
 import { useState, useMemo } from 'react';
-import { TranslationOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
 export const LanguageSelect = () => {
   const { i18n } = useTranslation();
@@ -16,8 +15,6 @@ export const LanguageSelect = () => {
     { key: 'en', label: 'Engish' },
     { key: 'zh', label: '中文' },
   ];
-  console.log(i18n);
-  console.log(i18n.language);
   const [selectedKeys, setSelectedKeys] = useState(new Set([i18n.language]));
 
   const selectedValue = useMemo(
@@ -27,10 +24,7 @@ export const LanguageSelect = () => {
   const onSelectionChange = (e: any) => {
     const _l = Array.from(e)[0] as string;
     if (_l) {
-      console.log(_l);
       i18n.changeLanguage(_l);
-      // setLang(_l);
-      // i18n.changeLanguage(_l);
     }
     setSelectedKeys(e);
   };

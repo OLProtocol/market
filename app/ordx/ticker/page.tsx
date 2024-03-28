@@ -1,22 +1,24 @@
-"use client";
+'use client';
 
-import useSWR from "swr";
-import { Card, CardBody, Button } from "@nextui-org/react";
-import { getTickerSummary } from "@/api";
-import { Image, Divider, Tabs, Tab } from "@nextui-org/react";
-import { OrdxOrderList } from "@/components/order/OrdxOrderList";
-import { OrdxOrderHistoryList } from "@/components/order/OrdxOrderHistoryList";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
+import useSWR from 'swr';
+import { Card, CardBody, Button } from '@nextui-org/react';
+import { getTickerSummary } from '@/api';
+import { Image, Divider, Tabs, Tab } from '@nextui-org/react';
+import { OrdxOrderList } from '@/components/order/OrdxOrderList';
+import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
 
 export default function Page() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
-  const ticker = params.get("ticker") as any;
+  const ticker = params.get('ticker') as any;
   const { data } = useSWR(`getTickerSummary`, () =>
     getTickerSummary({ ticker }),
   );
@@ -26,14 +28,20 @@ export default function Page() {
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
     return [
-      { value: summary.tx_order_count, label: "总交易笔数" },
-      { value: summary.tx_total_amount, label: "总成交数量" },
-      { value: summary.tx_total_volume, label: "总成交额" },
-      { value: summary.onsell_order_count, label: "在售交易笔数" },
-      { value: summary.onsell_total_amount, label: "在售ordx的资产数量" },
-      { value: summary.lowest_price, label: "地板价" },
-      { value: summary.highest_price, label: "最高价" },
-      { value: summary.holder_count, label: "持有者数量" },
+      { value: summary.tx_order_count, label: t('common.tx_order_count') },
+      { value: summary.tx_total_amount, label: t('common.tx_total_amount') },
+      { value: summary.tx_total_volume, label: t('common.tx_total_volume') },
+      {
+        value: summary.onsell_order_count,
+        label: t('common.onsell_order_count'),
+      },
+      {
+        value: summary.onsell_total_amount,
+        label: t('common.onsell_total_amount'),
+      },
+      { value: summary.lowest_price, label: t('common.lowest_price') },
+      { value: summary.highest_price, label: t('common.highest_price') },
+      { value: summary.holder_count, label: t('common.holder_count') },
     ];
   }, [summary]);
   return (
@@ -59,7 +67,7 @@ export default function Page() {
             {headList.map((item) => (
               <Card isHoverable key={item.label} className="px-2">
                 <CardBody className="text-center">
-                  <div className="text-base h-6 md:h-8 md:text-2xl font-bold ">
+                  <div className="text-base md:text-2xl font-bold ">
                     {item.value}
                   </div>
                   <div className="text-xs md:text-sm">{item.label}</div>

@@ -6,13 +6,9 @@ import { fontSans } from '@/config/fonts';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
-// import { i18nConfig } from '../i18n';
-// import i18n from '../i18n';
 import '@/i18n';
-import I18nProvider from 'next-translate/I18nProvider';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme } from 'antd';
-import useTranslation from 'next-translate/useTranslation';
 
 // export const metadata: Metadata = {
 //   title: {

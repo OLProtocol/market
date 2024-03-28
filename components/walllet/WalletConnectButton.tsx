@@ -1,38 +1,39 @@
-"use client";
+'use client';
+
 import {
   Button,
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "@nextui-org/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+} from '@nextui-org/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   WalletConnectReact,
   useReactWalletStore,
-} from "btc-connect/dist/react";
-import "btc-connect/dist/style/index.css";
-import { useTheme } from "next-themes";
-import { hideStr } from "@/lib/utils";
-import { notification } from "antd";
-import { useCommonStore } from "@/store";
+} from 'btc-connect/dist/react';
+import 'btc-connect/dist/style/index.css';
+import { useTheme } from 'next-themes';
+import { hideStr } from '@/lib/utils';
+import { notification } from 'antd';
+import { useCommonStore } from '@/store';
 
-export const WalletConnectButton = () => {
+const WalletConnectButton = () => {
   const router = useRouter();
   const { theme } = useTheme();
   const { connected, check, address, disconnect, btcWallet } =
     useReactWalletStore((state) => state);
   const { setSignature, signature } = useCommonStore((state) => state);
   const toMyAssets = () => {
-    router.push("/account");
+    router.push('/account');
   };
   useEffect(() => {
-    console.log("check");
+    console.log('check');
     check();
   }, []);
   const onConnectSuccess = async (wallet: any) => {
     if (!signature) {
-      console.log("signature text", process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
+      console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
       const _s = await wallet.signMessage(
         process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
       );
@@ -40,20 +41,20 @@ export const WalletConnectButton = () => {
     }
   };
   const onConnectError = (error: any) => {
-    console.error("Connect Wallet Failed", error);
+    console.error('Connect Wallet Failed', error);
     notification.error({
-      message: "Connect Wallet Failed",
+      message: 'Connect Wallet Failed',
       description: error.message,
     });
   };
   const handlerDisconnect = async () => {
-    console.log("disconnect success");
-    setSignature("");
+    console.log('disconnect success');
+    setSignature('');
     await disconnect();
   };
   const accountAndNetworkChange = async () => {
-    console.log("accountAndNetworkChange");
-    console.log("connected", connected);
+    console.log('accountAndNetworkChange');
+    console.log('connected', connected);
     try {
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
         const _s = await btcWallet?.signMessage(
@@ -70,31 +71,31 @@ export const WalletConnectButton = () => {
   };
   useEffect(() => {
     if (connected) {
-      btcWallet?.on("accountsChanged", accountAndNetworkChange);
-      btcWallet?.on("networkChanged", accountAndNetworkChange);
+      btcWallet?.on('accountsChanged', accountAndNetworkChange);
+      btcWallet?.on('networkChanged', accountAndNetworkChange);
     } else {
-      btcWallet?.removeListener("accountsChanged", accountAndNetworkChange);
-      btcWallet?.removeListener("networkChanged", accountAndNetworkChange);
+      btcWallet?.removeListener('accountsChanged', accountAndNetworkChange);
+      btcWallet?.removeListener('networkChanged', accountAndNetworkChange);
     }
     return () => {
-      btcWallet?.removeListener("accountsChanged", accountAndNetworkChange);
-      btcWallet?.removeListener("networkChanged", accountAndNetworkChange);
+      btcWallet?.removeListener('accountsChanged', accountAndNetworkChange);
+      btcWallet?.removeListener('networkChanged', accountAndNetworkChange);
     };
   }, [connected]);
   return (
     <WalletConnectReact
       config={{
-        network: "livenet",
-        defaultConnectorId: "okx",
+        network: 'livenet',
+        defaultConnectorId: 'okx',
       }}
-      theme={theme === "dark" ? "dark" : "light"}
+      theme={theme === 'dark' ? 'dark' : 'light'}
       onConnectSuccess={onConnectSuccess}
       onConnectError={onConnectError}
     >
       <>
         <Popover placement="bottom">
           <PopoverTrigger>
-            <Button>{hideStr(address, 4, "**")}</Button>
+            <Button>{hideStr(address, 4, '**')}</Button>
           </PopoverTrigger>
           <PopoverContent className="p-2">
             <div className="flex flex-col gap-2">
@@ -115,3 +116,5 @@ export const WalletConnectButton = () => {
     </WalletConnectReact>
   );
 };
+
+export default WalletConnectButton;
