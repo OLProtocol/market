@@ -1,7 +1,7 @@
-"use client";
-import { Button } from "@nextui-org/react";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import React from "react";
+'use client';
+import { Button } from '@nextui-org/react';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import React from 'react';
 
 interface WalletConnectBusProps {
   children: React.ReactNode;
@@ -12,6 +12,7 @@ export const WalletConnectBus = ({
   className,
 }: WalletConnectBusProps) => {
   const { connected, setModalVisible } = useReactWalletStore((state) => state);
+  console.log(connected);
   return connected ? (
     <>{children}</>
   ) : (

@@ -41,9 +41,10 @@ export default function Page() {
       },
       { value: summary.lowest_price, label: t('common.lowest_price') },
       { value: summary.highest_price, label: t('common.highest_price') },
-      { value: summary.holder_count, label: t('common.holder_count') },
+      { value: summary.holder_count, label: i18n.t('common.holder_count') },
     ];
   }, [summary, i18n.language]);
+
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">

@@ -16,9 +16,11 @@ import 'btc-connect/dist/style/index.css';
 import { useTheme } from 'next-themes';
 import { hideStr } from '@/lib/utils';
 import { notification } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
 
 const WalletConnectButton = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
   const { connected, check, address, disconnect, btcWallet } =
@@ -28,16 +30,20 @@ const WalletConnectButton = () => {
     router.push('/account');
   };
   useEffect(() => {
-    console.log('check');
+    console.log('check', connected);
     check();
   }, []);
   const onConnectSuccess = async (wallet: any) => {
     if (!signature) {
       console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
-      const _s = await wallet.signMessage(
-        process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-      );
-      setSignature(_s);
+      try {
+        const _s = await wallet.signMessage(
+          process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+        );
+        setSignature(_s);
+      } catch (error) {
+        await disconnect();
+      }
     }
   };
   const onConnectError = (error: any) => {
@@ -70,6 +76,7 @@ const WalletConnectButton = () => {
     }
   };
   useEffect(() => {
+    console.log('connected', connected);
     if (connected) {
       btcWallet?.on('accountsChanged', accountAndNetworkChange);
       btcWallet?.on('networkChanged', accountAndNetworkChange);
@@ -100,14 +107,14 @@ const WalletConnectButton = () => {
           <PopoverContent className="p-2">
             <div className="flex flex-col gap-2">
               <Button className="w-full" onClick={toMyAssets}>
-                我的资产
+                {t('buttons.my_assets')}
               </Button>
               <Button
                 color="danger"
                 variant="ghost"
                 onClick={handlerDisconnect}
               >
-                Disconnect
+                {t('buttons.disconnect')}
               </Button>
             </div>
           </PopoverContent>

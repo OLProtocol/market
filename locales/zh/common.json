@@ -1,6 +1,6 @@
 {
   "tick": "Tick",
-  "holder": "Holder",
+  "holder": "持有者",
   "volumn": "Volumn",
   "price": "Price",
   "order_num": "Num of Order",
@@ -12,5 +12,5 @@
   "onsell_total_amount": "Total Onsell Amount",
   "lowest_price": "Lowest Price",
   "highest_price": "Highest Price",
-  "holder_count": "Num of Holder"
+  "holder_count": "持有者数量"
 }

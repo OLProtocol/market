@@ -26,7 +26,7 @@
     "antd": "^5.15.3",
     "autoprefixer": "10.4.16",
     "bitcoinjs-lib": "^6.1.5",
-    "btc-connect": "1.4.2",
+    "btc-connect": "1.4.4",
     "clsx": "^2.0.0",
     "decimal.js": "^10.4.3",
     "eslint": "8.48.0",
