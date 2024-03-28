@@ -1,3 +1,4 @@
+'use client';
 import '@/styles/globals.css';
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
@@ -5,8 +6,10 @@ import { fontSans } from '@/config/fonts';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
-import i18n from '../i18n';
-
+// import { i18nConfig } from '../i18n';
+// import i18n from '../i18n';
+import '@/i18n';
+import I18nProvider from 'next-translate/I18nProvider';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme } from 'antd';
 import useTranslation from 'next-translate/useTranslation';
@@ -33,9 +36,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // const lang = i18nConfig.defaultLocale;
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>{/* <PublicEnvScript /> */}</head>
+      <head>
+        <title>Ordx Market</title>
+      </head>
       <body
         className={clsx(
           'min-h-screen bg-background font-sans antialiased',

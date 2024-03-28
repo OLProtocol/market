@@ -28,11 +28,14 @@ import {
   HeartFilledIcon,
   SearchIcon,
 } from '@/components/icons';
-import { useTranslation } from 'next-export-i18n';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
+// import useTranslation from 'next-translate/useTranslation';
 import { Logo } from '@/components/icons';
 
 export const Navbar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -53,10 +56,7 @@ export const Navbar = () => {
       type="search"
     />
   );
-  const navMenus = useMemo(
-    () => [{ label: t('pages.market.title'), href: '/' }],
-    [],
-  );
+  const navMenus = [{ label: t('pages.market.title'), href: '/' }];
   return (
     <NextUINavbar maxWidth="xl" position="sticky" isBordered>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">

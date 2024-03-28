@@ -1,5 +1,5 @@
 'use client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslation } from 'react-i18next';
 import {
   Dropdown,
   DropdownTrigger,
@@ -8,17 +8,17 @@ import {
   Button,
 } from '@nextui-org/react';
 import { useState, useMemo } from 'react';
-import { useSelectedLanguage } from 'next-export-i18n';
 import { TranslationOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
 export const LanguageSelect = () => {
-  const { lang, setLang } = useSelectedLanguage();
-
+  const { i18n } = useTranslation();
   const items = [
     { key: 'en', label: 'Engish' },
     { key: 'zh', label: '中文' },
   ];
-  const [selectedKeys, setSelectedKeys] = useState(new Set(['zh']));
+  console.log(i18n);
+  console.log(i18n.language);
+  const [selectedKeys, setSelectedKeys] = useState(new Set([i18n.language]));
 
   const selectedValue = useMemo(
     () => Array.from(selectedKeys).join(', ').replaceAll('_', ' '),
@@ -28,7 +28,8 @@ export const LanguageSelect = () => {
     const _l = Array.from(e)[0] as string;
     if (_l) {
       console.log(_l);
-      setLang(_l);
+      i18n.changeLanguage(_l);
+      // setLang(_l);
       // i18n.changeLanguage(_l);
     }
     setSelectedKeys(e);
