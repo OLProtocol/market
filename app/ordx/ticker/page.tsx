@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
 
 export default function Page() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
@@ -43,7 +43,7 @@ export default function Page() {
       { value: summary.highest_price, label: t('common.highest_price') },
       { value: summary.holder_count, label: t('common.holder_count') },
     ];
-  }, [summary]);
+  }, [summary, i18n.language]);
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">

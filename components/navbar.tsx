@@ -29,7 +29,6 @@ import {
   HeartFilledIcon,
   SearchIcon,
 } from '@/components/icons';
-import i18n from '@/i18n';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { Logo } from '@/components/icons';

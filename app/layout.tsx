@@ -6,7 +6,7 @@ import { fontSans } from '@/config/fonts';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
-import '@/i18n';
+import '@/locales';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme } from 'antd';
 
