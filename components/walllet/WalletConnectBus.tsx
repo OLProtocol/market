@@ -26,7 +26,7 @@ export const WalletConnectBus = ({
         className={className}
         color="primary"
       >
-        {t('buttons.connect_wallet')}
+        {t('buttons.connect')}
       </Button>
     </>
   );
