@@ -95,8 +95,8 @@ export default function SellPage() {
 
   return (
     <div>
-      <div className="flex justify-between gap-4 ">
-        <div className="flex-1 overflow-hidden">
+      <div className="md:flex justify-between gap-4">
+        <div className="flex-1 overflow-hidden mb-2 md:mb-0">
           <Table aria-label="Example static collection table">
             <TableHeader>
               <TableColumn>{t('common.item')}</TableColumn>
@@ -140,7 +140,7 @@ export default function SellPage() {
             </TableBody>
           </Table>
         </div>
-        <Card className="w-60">
+        <Card className="w-full md:w-60">
           <CardBody>
             <div>
               {t('common.total')}: {list.length}
