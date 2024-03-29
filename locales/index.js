@@ -39,9 +39,9 @@ i18n
       order: [
         'htmlTag',
         'navigator',
-        // 'localStorage',
-        // 'sessionStorage',
-        // 'cookie',
+        'localStorage',
+        'sessionStorage',
+        'cookie',
       ],
     },
     interpolation: {

@@ -1,16 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   ModalContent,
   ModalHeader,
   ModalFooter,
   Button,
-} from "@nextui-org/react";
-import { version } from "@/assets/version";
-import { getAppVersion } from "@/api";
-import useSWR from "swr";
+} from '@nextui-org/react';
+import { version } from '@/assets/version';
+import { getAppVersion } from '@/api';
+import useSWR from 'swr';
+import { useTranslation } from 'react-i18next';
 
 export const UpdateVersionModal = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const showModal = () => {
     setOpen(true);
@@ -48,13 +50,15 @@ export const UpdateVersionModal = () => {
       onClose={hideModal}
     >
       <ModalContent>
-        <ModalHeader className="">有新版本，是否更新？</ModalHeader>
+        <ModalHeader className="">
+          {t('pages.app.version_update_title')}
+        </ModalHeader>
         <ModalFooter>
           <Button color="primary" variant="light" onPress={hideModal}>
-            稍后再说
+            {t('buttons.talk_later')}
           </Button>
           <Button color="danger" onPress={refresh}>
-            立即更新
+            {t('buttons.update_now')}
           </Button>
         </ModalFooter>
       </ModalContent>

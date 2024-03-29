@@ -1,5 +1,13 @@
 {
+  "app": {
+    "title": "OrdX Market",
+    "version_update_title": "有新版本，您想更新吗？"
+  },
   "market": {
     "title": "市场"
+  },
+  "order": {
+    "title": "订单",
+    "modal_title": "购买订单"
   }
 }

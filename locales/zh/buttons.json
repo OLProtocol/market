@@ -1,3 +1,12 @@
 {
-  "connect": "Connect Wallet"
+  "connect": "连接",
+  "my_assets": "我的资产",
+  "disconnect": "断开连接",
+  "cancel": "取消",
+  "confirm": "确认",
+  "buy": "买入",
+  "talk_later": "稍后再谈",
+  "update_now": "现在更新",
+  "list_sale": "列出待售",
+  "remove_sale": "移除待售"
 }

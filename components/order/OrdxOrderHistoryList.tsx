@@ -20,6 +20,7 @@ import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Pagination } from '@/components/Pagination';
 import { SortDropdown } from '@/components/SortDropdown';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 interface OrdxOrderHistoryListProps {
   ticker?: string;
@@ -29,6 +30,7 @@ export const OrdxOrderHistoryList = ({
   ticker,
   address,
 }: OrdxOrderHistoryListProps) => {
+  const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
@@ -52,50 +54,50 @@ export const OrdxOrderHistoryList = ({
   );
   const typeMap = useMemo(() => {
     return {
-      1: '成交',
-      2: '下架',
-      3: '无效',
-      4: '上架',
-      10: '卖出',
-      11: '买入',
+      1: t('common.executed'),
+      2: t('common.delist'),
+      3: t('common.invalid'),
+      4: t('common.list'),
+      10: t('common.sell'),
+      11: t('common.buy'),
     };
   }, []);
   const coumns = useMemo(() => {
     const defaultColumns = [
       {
         key: 'utxo',
-        label: 'Utxo',
+        label: t('common.utxo'),
         align: 'center',
       },
       {
         key: 'price',
-        label: 'Price',
+        label: t('common.price'),
         align: 'center',
       },
       {
         key: 'value',
-        label: 'Num',
+        label: t('common.num'),
         align: 'center',
       },
       {
         key: 'address',
-        label: 'From',
+        label: t('common.from'),
         align: 'center',
       },
       {
         key: 'txaddress',
-        label: 'To',
+        label: t('common.to'),
         align: 'center',
         hideHeader: true,
       },
       {
         key: 'txtime',
-        label: 'Time',
+        label: t('common.time'),
         align: 'center',
       },
       {
         key: 'txid',
-        label: 'Tx',
+        label: t('common.tx'),
         allowsSorting: false,
         align: 'center',
       },

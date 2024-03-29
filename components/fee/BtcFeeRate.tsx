@@ -16,7 +16,7 @@ export const BtcFeeRate = ({
   value,
   feeType,
 }: BtcFeeRate) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
   const [type, setType] = useState('Normal');
   const [customValue, setCustomValue] = useState(1);
@@ -44,26 +44,28 @@ export const BtcFeeRate = ({
     onChange?.(feeRateData?.halfHourFee || defaultFee);
     setType('Normal');
   };
-  const list = useMemo(
-    () => [
+  const list = useMemo(() => {
+    console.log(i18n.language);
+    console.log(t('common.fee_economy'));
+    return [
       {
-        label: t('common.fee_economy'),
-        name: 'Economy',
+        label: 'Economy',
+        name: t('common.fee_economy'),
         value: economyValue,
       },
       {
-        label: t('common.fee_normal'),
-        name: 'Normal',
+        label: 'Normal',
+        name: t('common.fee_normal'),
         value: normalValue,
       },
       {
-        label: t('common.fee_custom'),
-        name: 'Custom',
+        label: 'Custom',
+        name: t('common.fee_custom'),
         value: customValue,
       },
-    ],
-    [economyValue, normalValue, customValue],
-  );
+    ];
+  }, [economyValue, normalValue, customValue, i18n.language]);
+  console.log(list);
   useEffect(() => {
     setRecommendFee();
   }, [feeRateData]);

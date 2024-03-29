@@ -1,5 +1,13 @@
 {
+  "app": {
+    "title": "OrdX Market",
+    "version_update_title": "There is a new version, do you want to update it?"
+  },
   "market": {
     "title": "Market"
+  },
+  "order": {
+    "title": "Order",
+    "modal_title": "Buy Order"
   }
 }

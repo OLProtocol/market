@@ -1,5 +1,13 @@
 {
   "list_failed_title": "Listed failed",
   "list_success_title": "Listed successfully",
-  "list_success_description": "The order has been submitted successfully, please wait for the buyer to buy it."
+  "list_success_description": "The order has been submitted successfully, please wait for the buyer to buy it.",
+  "lock_order_failed_title": "Lock order failed",
+  "order_cancel_failed_title": "Order cancel failed",
+  "order_buy_success_title": "Order buy successfully",
+  "order_buy_success_description": "The order has been submitted successfully, please wait for the buyer to buy it.",
+  "order_buy_failed_title": "Order buy failed",
+  "order_buy_failed_description_1": "Lack dumy utxos",
+  "order_buy_failed_description_2": "Order Raw is empty",
+  "order_buy_failed_description_3": "dummyUtxos lack of two utxos"
 }

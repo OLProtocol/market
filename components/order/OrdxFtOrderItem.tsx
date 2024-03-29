@@ -35,8 +35,12 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
           <div className="flex-1 text-sm md:text-base">
             {item?.assets?.map((v: any) => (
               <div key={v.inscriptionnum}>
-                <div>Ticker: {v.ticker}</div>
-                <div>Amount: {v.amount}</div>
+                <div>
+                  {t('common.tick')}: {v.ticker}
+                </div>
+                <div>
+                  {t('common.amount')}: {v.amount}
+                </div>
               </div>
             ))}
           </div>

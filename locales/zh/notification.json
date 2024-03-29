@@ -1,0 +1,14 @@
+
+{
+  "list_failed_title": "挂单失败",
+  "list_success_title": "挂单成功",
+  "list_success_description": "订单已成功提交，请等待买家购买。",
+  "lock_order_failed_title": "锁定订单失败",
+  "order_cancel_failed_title": "取消订单失败",
+  "order_buy_success_title": "购买订单成功",
+  "order_buy_success_description": "订单已成功提交，请等待卖家发货。",
+  "order_buy_failed_title": "购买订单失败",
+  "order_buy_failed_description_1": "缺少虚拟UTXO",
+  "order_buy_failed_description_2": "订单原始数据为空",
+  "order_buy_failed_description_3": "虚拟UTXO缺少两个UTXO"
+}

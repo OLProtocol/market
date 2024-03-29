@@ -31,8 +31,8 @@ export const LanguageSelect = () => {
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button variant="bordered" className="capitalize">
-          {selectedValue}
+        <Button variant="light" isIconOnly className="capitalize">
+          <Icon icon="iconoir:language" className="text-xl" />
         </Button>
       </DropdownTrigger>
       <DropdownMenu

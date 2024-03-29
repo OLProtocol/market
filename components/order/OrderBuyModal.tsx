@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from 'react';
 import {
   Modal,
   ModalContent,
@@ -10,22 +10,23 @@ import {
   Snippet,
   Chip,
   Spinner,
-} from "@nextui-org/react";
-import { notification } from "antd";
+} from '@nextui-org/react';
+import { notification } from 'antd';
 import {
   hideStr,
   filterUtxosByValue,
   buildBuyOrder,
   satsToBitcoin,
   btcToSats,
-} from "@/lib/utils";
-import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from "@/lib/constants";
+} from '@/lib/utils';
+import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
 
-import { getUtxoByValue, buyOrder, unlockOrder } from "@/api";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { useState } from "react";
-import useSWR from "swr";
-import { useCommonStore } from "@/store";
+import { getUtxoByValue, buyOrder, unlockOrder } from '@/api';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useState } from 'react';
+import useSWR from 'swr';
+import { useTranslation } from 'react-i18next';
+import { useCommonStore } from '@/store';
 
 interface OrderBuyModalProps {
   visiable: boolean;
@@ -41,10 +42,11 @@ export const OrderBuyModal = ({
   onClose: onModalClose,
   onSuccess,
 }: OrderBuyModalProps) => {
+  const { t } = useTranslation();
   let serviceFee = 0;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
-    process.env.NEXT_PUBLIC_IS_FREE == "0"
+    process.env.NEXT_PUBLIC_IS_FREE == '0'
   ) {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
@@ -93,14 +95,14 @@ export const OrderBuyModal = ({
     }
     return 0;
   }, [item, serviceFee, networkFeeAndUtxos.fee]);
-  console.log("networkFeeAndUtxos", networkFeeAndUtxos);
+  console.log('networkFeeAndUtxos', networkFeeAndUtxos);
   const cancelHandler = async () => {
     setLoading(true);
     try {
       const res = await unlockOrder({ address, order_id: item.order_id });
       if (res.code !== 200) {
         notification.error({
-          message: "Cancel order failed",
+          message: t('notification.order_cancel_failed_title'),
           description: res.msg,
         });
         return;
@@ -108,7 +110,7 @@ export const OrderBuyModal = ({
       closeHandler();
     } catch (error: any) {
       notification.error({
-        message: "Cancel order failed",
+        message: t('notification.order_cancel_failed_title'),
         description: error.message,
       });
     } finally {
@@ -124,22 +126,22 @@ export const OrderBuyModal = ({
     try {
       if (!(address && network && networkFeeAndUtxos.smallTwoUtxos?.length)) {
         notification.warning({
-          message: "buy error",
-          description: `数据错误`,
+          message: t('notification.order_buy_failed_title'),
+          description: t('notification.order_buy_failed_description_1'),
         });
         return;
       }
       if (!orderRaw) {
         notification.warning({
-          message: "buy error",
-          description: "Order Raw is empty",
+          message: t('notification.order_buy_failed_title'),
+          description: t('notification.order_buy_failed_description_2'),
         });
         return;
       }
       if (networkFeeAndUtxos.smallTwoUtxos?.length < 2) {
         notification.warning({
-          message: "Buy error",
-          description: "dummyUtxos lack of two utxos",
+          message: t('notification.order_buy_failed_title'),
+          description: t('notification.order_buy_failed_description_3'),
         });
         return;
       }
@@ -162,21 +164,21 @@ export const OrderBuyModal = ({
       });
       if (res.code === 200) {
         notification.success({
-          message: "buy successfully",
-          description: `The order has been submitted successfully, please wait for the buyer to buy it.`,
+          message: t('notification.order_buy_success_title'),
+          description: t('notification.order_buy_success_description'),
         });
         onSuccess?.();
         closeHandler();
       } else {
         notification.error({
-          message: "buy failed",
+          message: t('notification.order_buy_failed_title'),
           description: res.msg,
         });
       }
     } catch (error: any) {
-      console.log("buy order error", error);
+      console.log('buy order error', error);
       notification.error({
-        message: "buy failed",
+        message: t('notification.order_buy_failed_title'),
         description: error.message,
       });
     } finally {
@@ -208,23 +210,29 @@ export const OrderBuyModal = ({
       onClose={closeHandler}
     >
       <ModalContent>
-        <ModalHeader className="">立即购买</ModalHeader>
+        <ModalHeader className="">{t('pages.order.modal_title')}</ModalHeader>
         <ModalBody>
           <div className="flex  justify-between">
             <div className="flex-1">
               {item?.assets?.map((v: any) => (
                 <div key={v.inscriptionnum}>
                   <div>
-                    <div className="font-bold">Ticker: {v.ticker}</div>
-                    <div className="text-sm">Amount: {v.amount}</div>
+                    <div className="font-bold">
+                      {t('common.tick')}: {v.ticker}
+                    </div>
+                    <div className="text-sm">
+                      {t('common.amount')}: {v.amount}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
             <div>
-              <div>价格: {item?.price} BTC</div>
+              <div>
+                {t('common.price')}: {item?.price} BTC
+              </div>
               <div className="flex items-center">
-                来自:
+                {t('common.from')}:
                 <Snippet
                   codeString={item?.address}
                   className="bg-transparent"
@@ -238,19 +246,19 @@ export const OrderBuyModal = ({
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <span>Fee Rate</span>
+            <span>{t('common.fee_rate')}</span>
             <div>
               {feeRate.value} <span>sats</span>
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <span>平台服务费</span>
+            <span>{t('common.service_fee')}</span>
             <div>
               {serviceFee} <span>sats</span>
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <span>网络费用</span>
+            <span>{t('common.network_fee')}</span>
             {isLoading ? (
               <Spinner size="sm" />
             ) : (
@@ -260,7 +268,7 @@ export const OrderBuyModal = ({
             )}
           </div>
           <div className="flex justify-between items-center font-bold text-lg">
-            <span>总计</span>
+            <span>{t('common.total')}</span>
             <div>
               {satsToBitcoin(totalPrice)} <span>BTC</span>
             </div>
@@ -268,10 +276,10 @@ export const OrderBuyModal = ({
           <Chip radius="sm" size="lg" className="w-full max-w-none text-small">
             <div
               className={`flex items-center justify-between ${
-                insufficientBalance ? "text-red-600" : ""
+                insufficientBalance ? 'text-red-600' : ''
               }`}
             >
-              <span>可用余额</span>
+              <span>{t('common.available_balance')}</span>
               {isLoading ? (
                 <Spinner size="sm" />
               ) : (
@@ -287,7 +295,7 @@ export const OrderBuyModal = ({
             variant="light"
             onPress={cancelHandler}
           >
-            取消
+            {t('buttons.cancel')}
           </Button>
           <Button
             isLoading={loading}
@@ -295,7 +303,7 @@ export const OrderBuyModal = ({
             color="primary"
             onPress={confirmHandler}
           >
-            确认
+            {t('buttons.confirm')}
           </Button>
         </ModalFooter>
       </ModalContent>

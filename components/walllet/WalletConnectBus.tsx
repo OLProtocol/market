@@ -2,6 +2,7 @@
 import { Button } from '@nextui-org/react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface WalletConnectBusProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ export const WalletConnectBus = ({
   children,
   className,
 }: WalletConnectBusProps) => {
+  const { t } = useTranslation();
   const { connected, setModalVisible } = useReactWalletStore((state) => state);
   console.log(connected);
   return connected ? (
@@ -24,7 +26,7 @@ export const WalletConnectBus = ({
         className={className}
         color="primary"
       >
-        Connect Wallet
+        {t('buttons.connect_wallet')}
       </Button>
     </>
   );

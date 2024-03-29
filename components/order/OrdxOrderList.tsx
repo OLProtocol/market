@@ -1,21 +1,23 @@
-"use client";
+'use client';
 
-import useSWR from "swr";
-import { Empty, notification } from "antd";
-import { getOrders, lockOrder, unlockOrder } from "@/api";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { use, useMemo, useState } from "react";
-import { Pagination } from "@/components/Pagination";
-import { Content } from "@/components/Content";
-import { OrdxFtOrderItem } from "@/components/order/OrdxFtOrderItem";
-import { OrderBuyModal } from "@/components/order/OrderBuyModal";
-import { useRouter } from "next/navigation";
+import useSWR from 'swr';
+import { Empty, notification } from 'antd';
+import { getOrders, lockOrder, unlockOrder } from '@/api';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { use, useMemo, useState } from 'react';
+import { Pagination } from '@/components/Pagination';
+import { Content } from '@/components/Content';
+import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
+import { OrderBuyModal } from '@/components/order/OrderBuyModal';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 interface OrdxOrderListProps {
   ticker: string;
   address?: string;
 }
 export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { address: storeAddress } = useReactWalletStore((state) => state);
   const [modalVisiable, setModalVisiable] = useState(false);
@@ -41,7 +43,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     });
     if (!orderDetail?.data?.raw) {
       notification.error({
-        message: "Lock order failed",
+        message: t('notification.lock_order_failed_title'),
         description: orderDetail.msg,
       });
       return;
