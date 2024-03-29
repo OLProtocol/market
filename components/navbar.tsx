@@ -126,6 +126,7 @@ export const Navbar = () => {
             <div className="flex items-center gap-4">
               <FeerateSelectButton />
               <ThemeSwitch />
+              <LanguageSelect />
             </div>
           </NavbarMenuItem>
           <Divider />
