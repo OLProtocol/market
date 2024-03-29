@@ -30,7 +30,7 @@ export const OrdxOrderHistoryList = ({
   ticker,
   address,
 }: OrdxOrderHistoryListProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
@@ -53,6 +53,7 @@ export const OrdxOrderHistoryList = ({
     [data, size],
   );
   const typeMap = useMemo(() => {
+    console.log(t('common.executed'));
     return {
       1: t('common.executed'),
       2: t('common.delist'),
@@ -61,7 +62,8 @@ export const OrdxOrderHistoryList = ({
       10: t('common.sell'),
       11: t('common.buy'),
     };
-  }, []);
+  }, [i18n.language]);
+  console.log(typeMap);
   const coumns = useMemo(() => {
     const defaultColumns = [
       {
@@ -109,14 +111,21 @@ export const OrdxOrderHistoryList = ({
     if (address) {
       defaultColumns.splice(addressColumnIndex, 1);
       defaultColumns.unshift({
-        key: 'result',
+        key: 'result_text',
         label: 'Type',
         align: 'center',
       });
     }
     return defaultColumns;
-  }, [address]);
-  const list = useMemo(() => data?.data?.order_list || [], [data]);
+  }, [address, i18n.language]);
+  const list = useMemo(
+    () =>
+      data?.data?.order_list?.map((v) => ({
+        ...v,
+        result_text: typeMap[v.result],
+      })) || [],
+    [data, typeMap],
+  );
   return (
     <div className="">
       <Table
@@ -162,7 +171,7 @@ export const OrdxOrderHistoryList = ({
           loadingContent={<Spinner />}
         >
           {(item: any) => (
-            <TableRow key={item.order_id + item.result}>
+            <TableRow key={item.order_id + item.result + i18n.language}>
               {(columnKey) => {
                 if (
                   columnKey === 'utxo' ||
@@ -211,12 +220,8 @@ export const OrdxOrderHistoryList = ({
                       </span>
                     </TableCell>
                   );
-                } else if (columnKey === 'result') {
-                  return (
-                    <TableCell>
-                      {typeMap[getKeyValue(item, columnKey)]}
-                    </TableCell>
-                  );
+                } else if (columnKey === 'result_text') {
+                  return <TableCell>{getKeyValue(item, columnKey)}</TableCell>;
                 } else {
                   return (
                     <TableCell>

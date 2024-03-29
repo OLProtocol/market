@@ -45,8 +45,6 @@ export const BtcFeeRate = ({
     setType('Normal');
   };
   const list = useMemo(() => {
-    console.log(i18n.language);
-    console.log(t('common.fee_economy'));
     return [
       {
         label: 'Economy',
