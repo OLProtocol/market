@@ -1,21 +1,22 @@
-import { removeObjectEmptyValue } from "@/lib/utils";
-import { useCommonStore } from "@/store";
-import { useReactWalletStore } from "btc-connect/dist/react";
+import { removeObjectEmptyValue } from '@/lib/utils';
+import { useCommonStore } from '@/store';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+
 export const request = async (path: string, options: any = {}) => {
-  const { publicKey, connected } = useReactWalletStore.getState();
+  const { publicKey, connected, network } = useReactWalletStore.getState();
   const { signature } = useCommonStore.getState();
-  const { headers = {}, method = "GET", data } = options;
-  let url = `https://apitest.ordx.market${path}`;
-  if (method === "GET") {
+  const { headers = {}, method = 'GET', data } = options;
+  let url = `https://apitest.ordx.market${network === 'testnet' ? '/testnet' : ''}${path}`;
+  if (method === 'GET') {
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
-  } else if (method === "POST") {
+  } else if (method === 'POST') {
     options.body = JSON.stringify(data);
-    headers["Content-Type"] = "application/json";
+    headers['Content-Type'] = 'application/json';
   }
   if (connected && signature) {
-    headers["Publickey"] = publicKey;
-    headers["Signature"] = signature;
+    headers['Publickey'] = publicKey;
+    headers['Signature'] = signature;
   }
   delete options.data;
   options.headers = headers;
@@ -29,7 +30,7 @@ export const getOrdxAssets = async ({
   type,
   ticker,
 }: any) => {
-  const res = await request("/ordx/GetAddressOrdxAssets", {
+  const res = await request('/ordx/GetAddressOrdxAssets', {
     data: { address, offset, size, type, ticker },
   });
   return res.json();
@@ -39,7 +40,7 @@ interface GetTickerSummary {
   ticker: string;
 }
 export const getTickerSummary = async ({ ticker }: GetTickerSummary) => {
-  const res = await request("/ordx/GetTickerSummary", {
+  const res = await request('/ordx/GetTickerSummary', {
     data: { ticker },
   });
   return res.json();
@@ -60,7 +61,7 @@ export const getOrders = async ({
   type = 1,
   address,
 }: GetOrders) => {
-  const res = await request("/ordx/GetOrders", {
+  const res = await request('/ordx/GetOrders', {
     data: { ticker, offset, size, sort, type, address },
   });
   return res.json();
@@ -72,7 +73,7 @@ export const getHistory = async ({
   sort = 0, // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
   address,
 }: any) => {
-  const res = await request("/ordx/GetHistory", {
+  const res = await request('/ordx/GetHistory', {
     data: { ticker, offset, size, sort, address },
   });
   return res.json();
@@ -81,50 +82,50 @@ export const getHistory = async ({
 interface GetTopTickers {
   interval?: number;
   top_count?: number;
-  top_list?: "recommend" | "tx_count" | "tx_amount" | "tx_volume";
+  top_list?: 'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
 }
 export const getTopTickers = async ({
   interval = 1,
   top_count = 10,
-  top_list = "tx_amount",
+  top_list = 'tx_amount',
 }: GetTopTickers) => {
-  const res = await request("/ordx/GetTopTickers", {
+  const res = await request('/ordx/GetTopTickers', {
     data: { interval, top_count, top_list },
   });
   return res.json();
 };
 export const submitOrder = async ({ address, raw }: any) => {
-  const res = await request("/ordx/SubmitOrder", {
-    method: "POST",
+  const res = await request('/ordx/SubmitOrder', {
+    method: 'POST',
     data: { address, raw },
   });
   return res.json();
 };
 export const cancelOrder = async ({ address, order_id }: any) => {
-  const res = await request("/ordx/CancelOrder", {
-    method: "POST",
+  const res = await request('/ordx/CancelOrder', {
+    method: 'POST',
     data: { address, order_id },
   });
   return res.json();
 };
 export const lockOrder = async ({ address, order_id }: any) => {
-  const res = await request("/ordx/LockOrder", {
-    method: "POST",
+  const res = await request('/ordx/LockOrder', {
+    method: 'POST',
     data: { address, order_id },
   });
   return res.json();
 };
 export const unlockOrder = async ({ address, order_id }: any) => {
-  const res = await request("/ordx/UnlockOrder", {
-    method: "POST",
+  const res = await request('/ordx/UnlockOrder', {
+    method: 'POST',
     data: { address, order_id },
   });
   return res.json();
 };
 
 export const buyOrder = async ({ address, order_id, raw }: any) => {
-  const res = await request("/ordx/BuyOrder", {
-    method: "POST",
+  const res = await request('/ordx/BuyOrder', {
+    method: 'POST',
     data: { address, order_id, raw },
   });
   return res.json();
@@ -138,19 +139,19 @@ export const getUtxoByValue = async ({
   const res = await fetch(
     `https://apitest.ordx.space/testnet/utxo/getUtxoByValue`,
     {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address, value }),
     },
   );
   return res.json();
 };
 
-export const fetchChainFeeRate = async (network: "main" | "testnet") => {
+export const fetchChainFeeRate = async (network: 'main' | 'testnet') => {
   const url =
-    network === "testnet"
-      ? "https://mempool.space/testnet/api/v1/fees/recommended"
-      : "https://mempool.space/api/v1/fees/recommended";
+    network === 'testnet'
+      ? 'https://mempool.space/testnet/api/v1/fees/recommended'
+      : 'https://mempool.space/api/v1/fees/recommended';
   const resp = await fetch(url);
   const data = await resp.json();
   return data;
