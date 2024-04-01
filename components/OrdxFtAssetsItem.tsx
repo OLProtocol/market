@@ -59,8 +59,7 @@ export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
                 }
                 onClick={onCancelOrder}
               >
-                {t('buttons.remove_sale')}
-                {item.price} {item.currency}）
+                {t('buttons.remove_sale')}（{item.price} {item.currency}）
               </Button>
             )}
           </div>

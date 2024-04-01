@@ -67,17 +67,75 @@ export const OrderBuyModal = ({
   const priceSats = useMemo(() => {
     return item?.price ? btcToSats(item?.price) : 0;
   }, [item?.price]);
-  const dummyUtxos = useMemo(() => {
-    return utxos.filter((v) => v.value === DUMMY_UTXO_VALUE)?.slice(0, 2) || [];
-  }, [utxos]);
-  const dummyFee = useMemo(() => {
-    const virtualFee = (180 * 10 + 34 * 3 + 10) * feeRate.value;
-    if (dummyUtxos.length === 2) {
-      return 0;
+  const calcUtxos = useMemo(() => {
+    const dummyUtxos =
+      utxos.filter((v) => v.value === DUMMY_UTXO_VALUE)?.slice(0, 2) || [];
+    console.log('dummyUtxos', dummyUtxos);
+    let dummyFee = 0;
+    let dummyConsumedBalance = 0;
+    let dummyConsumeUtxos: any[] = [];
+    if (dummyUtxos.length !== 2) {
+      const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
+      const { utxos: filterDummyConsumUtxos } = filterUtxosByValue(
+        utxos,
+        virtualDummyFee + 330 + DUMMY_UTXO_VALUE * 2,
+      );
+      dummyFee =
+        (170 * filterDummyConsumUtxos.length + 34 * 4 + 10) * feeRate.value;
+      dummyConsumeUtxos = filterDummyConsumUtxos;
+      const totalDummyConsumedValue = filterDummyConsumUtxos.reduce(
+        (pre, cur) => pre + cur.value,
+        0,
+      );
+      dummyConsumedBalance = totalDummyConsumedValue - dummyFee;
     }
-  }, [dummyUtxos]);
+    console.log('dummyFee', dummyFee);
+    const { utxos: filterDummyUtxos } = utxos.filter(
+      (v) =>
+        dummyUtxos.every(
+          (v1) => `${v1.txid}:${v1.vout}` !== `${v.txid}:${v.vout}`,
+        ) &&
+        dummyConsumeUtxos.every(
+          (v1) => `${v1.txid}:${v1.vout}` !== `${v.txid}:${v.vout}`,
+        ),
+    );
+    const virtualFee = (170 * 10 + 34 * 7 + 10) * feeRate.value;
+    const { utxos: filterConsumUtxos } = filterUtxosByValue(
+      utxos,
+      virtualFee + 330 + priceSats + serviceFee - dummyConsumedBalance,
+    );
+    const realityFee =
+      (170 * (filterConsumUtxos.length + 2) +
+        34 * (serviceFee === 0 ? 6 : 7) +
+        10) *
+      feeRate.value;
+    console.log('filterDummyUtxos', filterDummyUtxos);
+    console.log('realityFee', realityFee);
+  }, [utxos, feeRate]);
+  // const dummyUtxos = useMemo(() => {
+  //   return utxos.filter((v) => v.value === DUMMY_UTXO_VALUE)?.slice(0, 2) || [];
+  // }, [utxos]);
+  // const dummyFee = useMemo(() => {
+  //   const virtualFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
+  //   if (dummyUtxos.length === 2) {
+  //     return {
+  //       fee: 0,
+  //       utxos: [],
+  //     };
+  //   }
+  //   const { utxos: filterConsumUtxos } = filterUtxosByValue(
+  //     utxos,
+  //     virtualFee + 330 + DUMMY_UTXO_VALUE * 2,
+  //   );
+  //   const realityFee =
+  //     (170 * filterConsumUtxos.length + 34 * 4 + 10) * feeRate.value;
+  //   return {
+  //     fee: realityFee,
+  //     utxos: filterConsumUtxos,
+  //   };
+  // }, [dummyUtxos]);
   const networkFeeAndUtxos = useMemo(() => {
-    const virtualFee = (180 * 10 + 34 * 10 + 10) * feeRate.value;
+    const virtualFee = (170 * 10 + 34 * 10 + 10) * feeRate.value;
     if (!utxos.length || !priceSats) {
       return {
         fee: 0,
@@ -90,7 +148,7 @@ export const OrderBuyModal = ({
     );
 
     const realityFee =
-      (180 * (filterConsumUtxos.length + 4) + 34 * 4 + 10) * feeRate.value;
+      (170 * (filterConsumUtxos.length + 4) + 34 * 4 + 10) * feeRate.value;
     return {
       fee: realityFee,
       utxos: filterConsumUtxos,
