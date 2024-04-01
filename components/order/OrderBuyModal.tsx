@@ -67,7 +67,15 @@ export const OrderBuyModal = ({
   const priceSats = useMemo(() => {
     return item?.price ? btcToSats(item?.price) : 0;
   }, [item?.price]);
-
+  const dummyUtxos = useMemo(() => {
+    return utxos.filter((v) => v.value === DUMMY_UTXO_VALUE)?.slice(0, 2) || [];
+  }, [utxos]);
+  const dummyFee = useMemo(() => {
+    const virtualFee = (180 * 10 + 34 * 3 + 10) * feeRate.value;
+    if (dummyUtxos.length === 2) {
+      return 0;
+    }
+  }, [dummyUtxos]);
   const networkFeeAndUtxos = useMemo(() => {
     const virtualFee = (180 * 10 + 34 * 10 + 10) * feeRate.value;
     if (!utxos.length || !priceSats) {
@@ -95,7 +103,7 @@ export const OrderBuyModal = ({
     }
     return 0;
   }, [item, serviceFee, networkFeeAndUtxos.fee]);
-  console.log('networkFeeAndUtxos', networkFeeAndUtxos);
+
   const cancelHandler = async () => {
     setLoading(true);
     try {

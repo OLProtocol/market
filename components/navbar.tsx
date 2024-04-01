@@ -61,7 +61,10 @@ export const Navbar = () => {
       type="search"
     />
   );
-  const navMenus = [{ label: t('pages.market.title'), href: '/' }];
+  const navMenus = [
+    { label: t('pages.market.title'), href: '/' },
+    { label: t('buttons.my_assets'), href: '/account' },
+  ];
   return (
     <NextUINavbar maxWidth="xl" position="sticky" isBordered>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
