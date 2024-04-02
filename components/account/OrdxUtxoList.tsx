@@ -10,8 +10,10 @@ import { Pagination } from '@/components/Pagination';
 import { Content } from '@/components/Content';
 import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
 import { useRouter } from 'next/navigation';
+import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 export const OrdxUtxoList = () => {
   const router = useRouter();
+  const [ticker, setTicker] = useState<string>('');
   const { address } = useReactWalletStore((state) => state);
   const { add: addSell, reset } = useSellStore((state) => state);
   const [page, setPage] = useState(1);
@@ -19,12 +21,12 @@ export const OrdxUtxoList = () => {
   const [size, setSize] = useState(12);
 
   const swrKey = useMemo(() => {
-    return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}`;
-  }, [address, page, size]);
+    return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
+  }, [address, page, size, ticker]);
   console.log('swrKey', swrKey);
   const { data, isLoading, mutate } = useSWR(
     swrKey,
-    () => getOrdxAssets({ address, offset: (page - 1) * size, size }),
+    () => getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
     {
       revalidateOnMount: true,
     },
@@ -56,6 +58,9 @@ export const OrdxUtxoList = () => {
       });
     }
   };
+  const onTIckerChange = (ticker: string) => {
+    setTicker(ticker);
+  };
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data],
@@ -66,7 +71,10 @@ export const OrdxUtxoList = () => {
     reset();
   }, []);
   return (
-    <div className="py-2 sm:py-4">
+    <div className="">
+      <div>
+        <OrdxUtxoTypeList onChange={onTIckerChange} />
+      </div>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">

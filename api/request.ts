@@ -20,8 +20,13 @@ export const request = async (path: string, options: any = {}) => {
   }
   delete options.data;
   options.headers = headers;
-  const res = await fetch(url, options);
-  return res;
+  let res = await fetch(url, options);
+  res = await res.json();
+  console.log(res);
+  if ((res as any).code === -1) {
+    throw new Error((res as any).msg);
+  }
+  return res as any;
 };
 export const getOrdxAssets = async ({
   address,
@@ -33,7 +38,19 @@ export const getOrdxAssets = async ({
   const res = await request('/ordx/GetAddressOrdxAssets', {
     data: { address, offset, size, type, ticker },
   });
-  return res.json();
+  return res;
+};
+export const getAddressOrdxList = async ({
+  address,
+  offset,
+  size,
+  type,
+  ticker,
+}: any) => {
+  const res = await request('/ordx/GetAddressOrdxList', {
+    data: { address, offset, size, type, ticker },
+  });
+  return res;
 };
 
 interface GetTickerSummary {
@@ -43,7 +60,7 @@ export const getTickerSummary = async ({ ticker }: GetTickerSummary) => {
   const res = await request('/ordx/GetTickerSummary', {
     data: { ticker },
   });
-  return res.json();
+  return res;
 };
 interface GetOrders {
   ticker: string;
@@ -64,7 +81,7 @@ export const getOrders = async ({
   const res = await request('/ordx/GetOrders', {
     data: { ticker, offset, size, sort, type, address },
   });
-  return res.json();
+  return res;
 };
 export const getHistory = async ({
   ticker,
@@ -76,7 +93,7 @@ export const getHistory = async ({
   const res = await request('/ordx/GetHistory', {
     data: { ticker, offset, size, sort, address },
   });
-  return res.json();
+  return res;
 };
 
 interface GetTopTickers {
@@ -92,35 +109,35 @@ export const getTopTickers = async ({
   const res = await request('/ordx/GetTopTickers', {
     data: { interval, top_count, top_list },
   });
-  return res.json();
+  return res;
 };
 export const submitOrder = async ({ address, raw }: any) => {
   const res = await request('/ordx/SubmitOrder', {
     method: 'POST',
     data: { address, raw },
   });
-  return res.json();
+  return res;
 };
 export const cancelOrder = async ({ address, order_id }: any) => {
   const res = await request('/ordx/CancelOrder', {
     method: 'POST',
     data: { address, order_id },
   });
-  return res.json();
+  return res;
 };
 export const lockOrder = async ({ address, order_id }: any) => {
   const res = await request('/ordx/LockOrder', {
     method: 'POST',
     data: { address, order_id },
   });
-  return res.json();
+  return res;
 };
 export const unlockOrder = async ({ address, order_id }: any) => {
   const res = await request('/ordx/UnlockOrder', {
     method: 'POST',
     data: { address, order_id },
   });
-  return res.json();
+  return res;
 };
 
 export const buyOrder = async ({ address, order_id, raw }: any) => {
@@ -128,7 +145,7 @@ export const buyOrder = async ({ address, order_id, raw }: any) => {
     method: 'POST',
     data: { address, order_id, raw },
   });
-  return res.json();
+  return res;
 };
 
 export const getUtxoByValue = async ({

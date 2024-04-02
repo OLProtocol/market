@@ -23,7 +23,7 @@ const WalletConnectButton = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
-  const { connected, check, address, disconnect, btcWallet } =
+  const { connected, check, address, disconnect, btcWallet, network } =
     useReactWalletStore((state) => state);
   const { setSignature, signature } = useCommonStore((state) => state);
   const toMyAssets = () => {
@@ -96,7 +96,7 @@ const WalletConnectButton = () => {
   return (
     <WalletConnectReact
       config={{
-        network: 'livenet',
+        network: 'testnet',
         defaultConnectorId: 'okx',
       }}
       theme={theme === 'dark' ? 'dark' : 'light'}

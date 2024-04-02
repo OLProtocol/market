@@ -102,10 +102,32 @@ export const filterUtxosByValue = (
   };
 };
 
-export const calcPsbtVirtualSize = (psbt: any) => {
-  const tx = psbt.extractTransaction();
-  const vsize = Math.ceil(tx.virtualSize());
-  return vsize;
+export const calcPsbtVirtualSize = (psbtHex: string, network: string) => {
+  const bitcoinjs = getBitcoinjs();
+  const btccoinNetwork = getBitcoinNetwork(network);
+  const psbt = bitcoinjs.Psbt.fromHex(psbtHex, {
+    network: btccoinNetwork,
+  });
+  // 从 base64 解码为 Buffer
+  // const psbtBuffer = Buffer.from(psbtBase64, 'base64');
+
+  // // 解码 PSBT 数据
+  // const psbt = bitcoin.Psbt.fromBuffer(psbtBuffer);
+
+  // 获取未签名交易十六进制
+  const unsignedTxHex = psbt.data.globalMap.unsignedTx
+    .toBuffer()
+    .toString('hex');
+
+  // 从十六进制反序列化生成 Transaction 对象
+  const tx = bitcoinjs.Transaction.fromBuffer(
+    Buffer.from(unsignedTxHex, 'hex'),
+  );
+
+  // 计算交易虚拟大小 vsize
+  const virtualSize = tx.virtualSize();
+  console.log('virtualSize', virtualSize);
+  return virtualSize;
 };
 
 export const calcPsbtVsizeByUtxos = ({ inputs, outputs, network }) => {
@@ -122,10 +144,19 @@ export const calcPsbtVsizeByUtxos = ({ inputs, outputs, network }) => {
   outputs.forEach((o) => {
     virtualPsbt.addOutput(o);
   });
-  return calcPsbtVirtualSize(virtualPsbt);
+  console.log('virtualPsbt', virtualPsbt);
+  return calcPsbtVirtualSize(virtualPsbt.toHex(), network);
 };
 
-export const calcDummyUtxosVsize = ({ utxos, address, network }) => {
+export const calcUtxosVirtualGas = ({
+  utxos,
+  address,
+  network,
+  estimateFee,
+  feeRate,
+  outputLenght,
+}) => {
+  feeRate = Math.max(1.2, 1);
   const inputs: any[] = utxos.map((v) => {
     return {
       hash: v.txid,
@@ -137,24 +168,24 @@ export const calcDummyUtxosVsize = ({ utxos, address, network }) => {
     };
   });
   const total = utxos.reduce((a, b) => a + b.value, 0);
-  const balance = total - DUMMY_UTXO_VALUE * 2;
+  const balance = total - DUMMY_UTXO_VALUE * outputLenght - estimateFee;
+  console.log('calcDummyUtxosVsize', total, balance);
   const outputs = [
-    {
-      address,
-      value: DUMMY_UTXO_VALUE,
-    },
-    {
-      address,
-      value: DUMMY_UTXO_VALUE,
-    },
     {
       address,
       value: balance,
     },
   ];
-  return calcPsbtVsizeByUtxos({
+  for (let i = 0; i < outputLenght - 1; i++) {
+    outputs.push({
+      address,
+      value: DUMMY_UTXO_VALUE,
+    });
+  }
+  const vsize = calcPsbtVsizeByUtxos({
     inputs,
     outputs,
     network,
   });
+  return estimateFee;
 };

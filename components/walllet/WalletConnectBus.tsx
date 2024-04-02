@@ -14,7 +14,6 @@ export const WalletConnectBus = ({
 }: WalletConnectBusProps) => {
   const { t } = useTranslation();
   const { connected, setModalVisible } = useReactWalletStore((state) => state);
-  console.log(connected);
   return connected ? (
     <>{children}</>
   ) : (
