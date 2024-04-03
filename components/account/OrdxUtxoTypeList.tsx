@@ -50,6 +50,10 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     <div className="py-2 sm:py-4">
       <Tabs
         variant="light"
+        classNames={{
+          tabList: 'flex-wrap',
+          tab: 'w-min',
+        }}
         aria-label="Tabs variants"
         onSelectionChange={changeHandler}
       >

@@ -1,10 +1,11 @@
-import * as bitcoinjs from "bitcoinjs-lib";
-import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
-import { Address, Script } from "@cmdcode/tapscript";
-import { btcToSats } from "@/lib/utils";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from "@/lib/constants";
-import { getTxHex, lockOrder, unlockOrder } from "@/api";
+import * as bitcoinjs from 'bitcoinjs-lib';
+import * as ecc from '@bitcoin-js/tiny-secp256k1-asmjs';
+import { Address, Script } from '@cmdcode/tapscript';
+import { btcToSats } from '@/lib/utils';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
+import { getBitcoinjs, getBitcoinNetwork } from '@/lib/utils/bitcoin';
+import { getTxHex, lockOrder, unlockOrder } from '@/api';
 interface SellOrderProps {
   inscriptionUtxo: {
     txid: string;
@@ -39,7 +40,7 @@ export const buildSellOrder = async ({
   };
   const sell = new bitcoinjs.Psbt({
     network:
-      network === "testnet"
+      network === 'testnet'
         ? bitcoinjs.networks.testnet
         : bitcoinjs.networks.bitcoin,
   });
@@ -50,8 +51,10 @@ export const buildSellOrder = async ({
     value: total,
   });
   if (!btcWallet) {
-    throw new Error("Wallet not initialized");
+    throw new Error('Wallet not initialized');
   }
+  const tx = sell.extractTransaction();
+  console.log(tx);
   const signed = await btcWallet.signPsbt(sell.toHex());
   return signed;
 };
@@ -67,6 +70,72 @@ interface BuyOrderProps {
   dummyUtxos: any[];
   fee: number;
 }
+export const buildDummyUtxos = async ({ utxos, fee, address, network }) => {
+  const { btcWallet } = useReactWalletStore.getState();
+  const bitcoinjs = getBitcoinjs();
+  const btccoinNetwork = getBitcoinNetwork(network);
+  const psbt = new bitcoinjs.Psbt({
+    network: btccoinNetwork,
+  });
+
+  const inputs = utxos.map((v) => {
+    return {
+      hash: v.txid,
+      index: v.vout,
+      witnessUtxo: {
+        script: Buffer.from(addresToScriptPublicKey(address), 'hex'),
+        value: v.value,
+      },
+    };
+  });
+  inputs.forEach((i) => {
+    psbt.addInput(i);
+  });
+  const totalValue = utxos.reduce((a, b) => a + b.value, 0);
+  const balance = totalValue - DUMMY_UTXO_VALUE * 2 - fee;
+  const outputs = [
+    {
+      address,
+      value: balance,
+    },
+  ];
+  for (let i = 0; i < 2; i++) {
+    outputs.push({
+      address,
+      value: DUMMY_UTXO_VALUE,
+    });
+  }
+  outputs.forEach((o) => {
+    psbt.addOutput(o);
+  });
+  let dummyUtxos: any[] = [];
+  let balanceUtxo: any = {};
+  const signed = await btcWallet?.signPsbt(psbt.toHex());
+  if (signed) {
+    const txid = await btcWallet?.pushPsbt(signed);
+    balanceUtxo = {
+      txid,
+      vout: 0,
+      value: balance,
+    };
+    dummyUtxos = [
+      {
+        txid,
+        vout: 1,
+        value: DUMMY_UTXO_VALUE,
+      },
+      {
+        txid,
+        vout: 2,
+        value: DUMMY_UTXO_VALUE,
+      },
+    ];
+  }
+  return {
+    balanceUtxo,
+    dummyUtxos,
+  };
+};
 export const buildBuyOrder = async ({
   orderRaw,
   network,
@@ -82,7 +151,7 @@ export const buildBuyOrder = async ({
   const { btcWallet } = useReactWalletStore.getState();
 
   console.log(
-    "build buy order params",
+    'build buy order params',
     orderRaw,
     network,
     address,
@@ -93,7 +162,7 @@ export const buildBuyOrder = async ({
   );
   bitcoinjs.initEccLib(ecc);
   const btccoinNetwork =
-    network === "testnet"
+    network === 'testnet'
       ? bitcoinjs.networks.testnet
       : bitcoinjs.networks.bitcoin;
 
@@ -111,7 +180,7 @@ export const buildBuyOrder = async ({
       hash: v.txid,
       index: v.vout,
       witnessUtxo: {
-        script: Buffer.from(addresToScriptPublicKey(address), "hex"),
+        script: Buffer.from(addresToScriptPublicKey(address), 'hex'),
         value: v.value,
       },
     };
@@ -122,7 +191,7 @@ export const buildBuyOrder = async ({
       hash: v.txid,
       index: v.vout,
       witnessUtxo: {
-        script: Buffer.from(addresToScriptPublicKey(address), "hex"),
+        script: Buffer.from(addresToScriptPublicKey(address), 'hex'),
         value: v.value,
       },
       sighashType: bitcoinjs.Transaction.SIGHASH_ALL,
@@ -164,7 +233,7 @@ export const buildBuyOrder = async ({
   const spendValue = sellAmount + fee;
   let changeValue = totalValue - spendValue - DUMMY_UTXO_VALUE * 2;
   if (
-    NEXT_PUBLIC_IS_FREE === "0" &&
+    NEXT_PUBLIC_IS_FREE === '0' &&
     serviceFee &&
     NEXT_PUBLIC_SERVICE_ADDRESS
   ) {
@@ -190,7 +259,7 @@ export const buildBuyOrder = async ({
   buyPsbt.addOutput(changeOutput);
 
   if (!btcWallet) {
-    throw new Error("Wallet not initialized");
+    throw new Error('Wallet not initialized');
   }
   const signed = await btcWallet.signPsbt(buyPsbt.toHex());
   const psbt = bitcoinjs.Psbt.fromHex(signed, {

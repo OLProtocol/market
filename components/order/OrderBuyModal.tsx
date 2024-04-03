@@ -18,8 +18,10 @@ import {
   buildBuyOrder,
   satsToBitcoin,
   btcToSats,
+  buildDummyUtxos,
 } from '@/lib/utils';
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
+import { calcUtxosVirtualGas } from '@/lib/utils/btc';
 
 import { getUtxoByValue, buyOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -27,6 +29,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
+import { useMap } from 'react-use';
 
 interface OrderBuyModalProps {
   visiable: boolean;
@@ -43,6 +46,15 @@ export const OrderBuyModal = ({
   onSuccess,
 }: OrderBuyModalProps) => {
   const { t } = useTranslation();
+  const [calcFeeData, { set: setCalcFeeData }] = useMap<any>({
+    dummyUtxos: [],
+    balanceUtxos: [],
+    dummyFee: 0,
+    dummyConsumedBalance: 0,
+    dummyConsumeUtxos: [],
+    payUtxos: [],
+    payFee: 0,
+  });
   let serviceFee = 0;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
@@ -51,7 +63,7 @@ export const OrderBuyModal = ({
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
   const { feeRate } = useCommonStore((state) => state);
-  const { balance, address, network } = useReactWalletStore((state) => state);
+  const { address, network } = useReactWalletStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data, isLoading } = useSWR(
@@ -67,100 +79,94 @@ export const OrderBuyModal = ({
   const priceSats = useMemo(() => {
     return item?.price ? btcToSats(item?.price) : 0;
   }, [item?.price]);
-  const calcUtxos = useMemo(() => {
-    const dummyUtxos =
-      utxos.filter((v) => v.value === DUMMY_UTXO_VALUE)?.slice(0, 2) || [];
-    console.log('dummyUtxos', dummyUtxos);
-    let dummyFee = 0;
-    let dummyConsumedBalance = 0;
-    let dummyConsumeUtxos: any[] = [];
-    if (dummyUtxos.length !== 2) {
-      const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
-      const { utxos: filterDummyConsumUtxos } = filterUtxosByValue(
-        utxos,
-        virtualDummyFee + 330 + DUMMY_UTXO_VALUE * 2,
-      );
-      dummyFee =
-        (170 * filterDummyConsumUtxos.length + 34 * 4 + 10) * feeRate.value;
-      dummyConsumeUtxos = filterDummyConsumUtxos;
-      const totalDummyConsumedValue = filterDummyConsumUtxos.reduce(
-        (pre, cur) => pre + cur.value,
-        0,
-      );
-      dummyConsumedBalance = totalDummyConsumedValue - dummyFee;
+  const calcFee = async () => {
+    if (!utxos.length) {
+      return;
     }
-    console.log('dummyFee', dummyFee);
-    const { utxos: filterDummyUtxos } = utxos.filter(
-      (v) =>
-        dummyUtxos.every(
-          (v1) => `${v1.txid}:${v1.vout}` !== `${v.txid}:${v.vout}`,
-        ) &&
-        dummyConsumeUtxos.every(
-          (v1) => `${v1.txid}:${v1.vout}` !== `${v.txid}:${v.vout}`,
-        ),
-    );
-    const virtualFee = (170 * 10 + 34 * 7 + 10) * feeRate.value;
-    const { utxos: filterConsumUtxos } = filterUtxosByValue(
-      utxos,
-      virtualFee + 330 + priceSats + serviceFee - dummyConsumedBalance,
-    );
-    const realityFee =
-      (170 * (filterConsumUtxos.length + 2) +
-        34 * (serviceFee === 0 ? 6 : 7) +
-        10) *
-      feeRate.value;
-    console.log('filterDummyUtxos', filterDummyUtxos);
-    console.log('realityFee', realityFee);
-  }, [utxos, feeRate]);
-  // const dummyUtxos = useMemo(() => {
-  //   return utxos.filter((v) => v.value === DUMMY_UTXO_VALUE)?.slice(0, 2) || [];
-  // }, [utxos]);
-  // const dummyFee = useMemo(() => {
-  //   const virtualFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
-  //   if (dummyUtxos.length === 2) {
-  //     return {
-  //       fee: 0,
-  //       utxos: [],
-  //     };
-  //   }
-  //   const { utxos: filterConsumUtxos } = filterUtxosByValue(
-  //     utxos,
-  //     virtualFee + 330 + DUMMY_UTXO_VALUE * 2,
-  //   );
-  //   const realityFee =
-  //     (170 * filterConsumUtxos.length + 34 * 4 + 10) * feeRate.value;
-  //   return {
-  //     fee: realityFee,
-  //     utxos: filterConsumUtxos,
-  //   };
-  // }, [dummyUtxos]);
-  const networkFeeAndUtxos = useMemo(() => {
-    const virtualFee = (170 * 10 + 34 * 10 + 10) * feeRate.value;
-    if (!utxos.length || !priceSats) {
-      return {
-        fee: 0,
-        utxos: [],
-      };
+    setLoading(true);
+    try {
+      const dummyUtxos = utxos.filter((v) => v.value === 0)?.slice(0, 2) || [];
+      console.log('dummyUtxos', dummyUtxos);
+      let dummyFee = 0;
+      let dummyConsumedBalance = 0;
+      let dummyConsumeUtxos: any[] = [];
+      if (dummyUtxos.length !== 2) {
+        const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
+        const { utxos: filterDummyConsumUtxos } = filterUtxosByValue(
+          utxos,
+          virtualDummyFee + 330 + DUMMY_UTXO_VALUE * 2,
+        );
+        console.log('filterDummyConsumUtxos', filterDummyConsumUtxos);
+        dummyFee =
+          (170 * filterDummyConsumUtxos.length + 34 * 3 + 10) * feeRate.value;
+        dummyConsumeUtxos = filterDummyConsumUtxos;
+        const totalDummyConsumedValue = filterDummyConsumUtxos.reduce(
+          (pre, cur) => pre + cur.value,
+          0,
+        );
+        dummyConsumedBalance = totalDummyConsumedValue - dummyFee;
+        dummyFee = calcUtxosVirtualGas({
+          utxos: dummyConsumeUtxos,
+          address,
+          network,
+          estimateFee: dummyFee,
+          outputLenght: 3,
+          feeRate: feeRate.value,
+        });
+        setCalcFeeData('dummyFee', dummyFee);
+        setCalcFeeData('dummyConsumedBalance', dummyConsumedBalance);
+        setCalcFeeData('dummyConsumeUtxos', dummyConsumeUtxos);
+      }
+      console.log('dummyFee', dummyFee, dummyConsumeUtxos, dummyConsumeUtxos);
+      const filterDummyUtxos = utxos.filter(
+        (v) =>
+          dummyUtxos.every(
+            (v1) => `${v1.txid}:${v1.vout}` !== `${v.txid}:${v.vout}`,
+          ) &&
+          dummyConsumeUtxos.every(
+            (v1) => `${v1.txid}:${v1.vout}` !== `${v.txid}:${v.vout}`,
+          ),
+      );
+      const virtualFee = (170 * 10 + 34 * 7 + 10) * feeRate.value;
+      console.log(filterDummyUtxos);
+      console.log(virtualFee);
+      const { utxos: filterConsumUtxos } = filterUtxosByValue(
+        filterDummyUtxos,
+        virtualFee + 330 + priceSats + serviceFee - dummyConsumedBalance,
+      );
+      let realityFee =
+        (170 * (filterConsumUtxos.length + 2) +
+          34 * (serviceFee === 0 ? 6 : 7) +
+          10) *
+        feeRate.value;
+      realityFee = calcUtxosVirtualGas({
+        utxos: dummyConsumeUtxos,
+        address,
+        network,
+        estimateFee: realityFee,
+        outputLenght: serviceFee === 0 ? 7 : 8,
+        feeRate: feeRate.value,
+      });
+      console.log('filterConsumUtxos', filterConsumUtxos);
+      setCalcFeeData('payFee', realityFee);
+      setCalcFeeData('payUtxos', filterConsumUtxos);
+    } catch (error: any) {
+      console.error('calcFee error', error);
+    } finally {
+      setLoading(false);
     }
-    const { utxos: filterConsumUtxos, smallTwoUtxos } = filterUtxosByValue(
-      utxos,
-      virtualFee + 330 + priceSats + serviceFee + DUMMY_UTXO_VALUE * 2,
-    );
+  };
 
-    const realityFee =
-      (170 * (filterConsumUtxos.length + 4) + 34 * 4 + 10) * feeRate.value;
-    return {
-      fee: realityFee,
-      utxos: filterConsumUtxos,
-      smallTwoUtxos: smallTwoUtxos,
-    };
-  }, [feeRate, utxos, priceSats, serviceFee]);
+  const networkFee = useMemo(() => {
+    console.log('calcFeeData', calcFeeData);
+    return calcFeeData.dummyFee + calcFeeData.payFee;
+  }, [calcFeeData]);
   const totalPrice = useMemo(() => {
     if (item) {
-      return btcToSats(item?.price) + serviceFee + networkFeeAndUtxos.fee;
+      return btcToSats(item?.price) + serviceFee + networkFee;
     }
     return 0;
-  }, [item, serviceFee, networkFeeAndUtxos.fee]);
+  }, [item, serviceFee, networkFee]);
 
   const cancelHandler = async () => {
     setLoading(true);
@@ -183,14 +189,35 @@ export const OrderBuyModal = ({
       setLoading(false);
     }
   };
+  useEffect(() => {
+    calcFee();
+  }, [utxos, item.order_id]);
   const closeHandler = () => {
     onModalClose?.();
     onClose();
   };
+  const createDummyUtxo = async () => {
+    const { dummyConsumedBalance, dummyConsumeUtxos, dummyFee } = calcFeeData;
+    console.log(dummyFee, dummyConsumedBalance, dummyConsumeUtxos);
+    const { balanceUtxo, dummyUtxos } = await buildDummyUtxos({
+      utxos: dummyConsumeUtxos,
+      fee: dummyFee,
+      address,
+      network,
+    });
+    console.log('dummyUtxos', dummyUtxos);
+    console.log('balanceUtxo', balanceUtxo);
+    if (balanceUtxo && dummyUtxos?.length) {
+      const { payUtxos } = calcFeeData;
+      payUtxos.push(balanceUtxo);
 
+      setCalcFeeData('dummyUtxos', dummyUtxos);
+      setCalcFeeData('payUtxos', payUtxos);
+    }
+  };
   const confirmHandler = async () => {
     try {
-      if (!(address && network && networkFeeAndUtxos.smallTwoUtxos?.length)) {
+      if (!(address && network)) {
         notification.warning({
           message: t('notification.order_buy_failed_title'),
           description: t('notification.order_buy_failed_description_1'),
@@ -204,7 +231,7 @@ export const OrderBuyModal = ({
         });
         return;
       }
-      if (networkFeeAndUtxos.smallTwoUtxos?.length < 2) {
+      if (calcFeeData.dummyUtxos.length < 2) {
         notification.warning({
           message: t('notification.order_buy_failed_title'),
           description: t('notification.order_buy_failed_description_3'),
@@ -212,12 +239,13 @@ export const OrderBuyModal = ({
         return;
       }
       setLoading(true);
+      console.log('calcFeeData', calcFeeData);
       const buyRaw = await buildBuyOrder({
         orderId: item.order_id,
         orderRaw,
-        utxos: networkFeeAndUtxos.utxos,
-        dummyUtxos: networkFeeAndUtxos.smallTwoUtxos,
-        fee: networkFeeAndUtxos.fee,
+        utxos: calcFeeData.payUtxos,
+        dummyUtxos: calcFeeData.dummyUtxos,
+        fee: calcFeeData.payFee,
         address,
         network,
         serviceFee: serviceFee,
@@ -251,9 +279,13 @@ export const OrderBuyModal = ({
       setLoading(false);
     }
   };
-
+  const paySpendableValue = useMemo(() => {
+    return calcFeeData.payUtxos.reduce((pre, cur) => {
+      return pre + cur.value;
+    }, 0);
+  }, [calcFeeData.payUtxos]);
   const insufficientBalance = useMemo(() => {
-    return spendableValue < totalPrice;
+    return spendableValue < totalPrice || paySpendableValue < totalPrice;
   }, [spendableValue, totalPrice]);
   const buttonDisabled = useMemo(() => {
     return insufficientBalance;
@@ -329,9 +361,25 @@ export const OrderBuyModal = ({
               <Spinner size="sm" />
             ) : (
               <div>
-                {networkFeeAndUtxos.fee} <span>sats</span>
+                {networkFee} <span>sats</span>
               </div>
             )}
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Dummy Utxo length</span>
+            <div>
+              {calcFeeData.dummyUtxos.length}
+              {calcFeeData.dummyUtxos.length < 2 && (
+                <Button
+                  size="sm"
+                  className="ml-2"
+                  onClick={createDummyUtxo}
+                  isDisabled={!utxos.length}
+                >
+                  Split
+                </Button>
+              )}
+            </div>
           </div>
           <div className="flex justify-between items-center font-bold text-lg">
             <span>{t('common.total')}</span>

@@ -19,7 +19,10 @@ interface OrdxOrderListProps {
 export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const { t } = useTranslation();
   const router = useRouter();
-  const { address: storeAddress } = useReactWalletStore((state) => state);
+  const { address: storeAddress, network } = useReactWalletStore(
+    (state) => state,
+  );
+  console.log(network);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
@@ -27,10 +30,11 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const [size, setSize] = useState(12);
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${ticker}-${address}-${page}-${size}`;
+      return `/ordx/getOrders-${ticker}-${address}-${network}-${page}-${size}`;
     }
-    return `/ordx/getOrders-${ticker}-${page}-${size}`;
-  }, [ticker, address, page, size]);
+    return `/ordx/getOrders-${ticker}-${network}-${page}-${size}`;
+  }, [ticker, address, page, size, network]);
+  console.log('swrKey', swrKey);
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({ offset: (page - 1) * size, size, ticker, address }),
   );
