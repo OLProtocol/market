@@ -33,7 +33,7 @@ i18n
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
     resources,
-    fallbackLng: 'en',
+    fallbackLng: 'zh',
     debug: true,
     detection: {
       order: [
