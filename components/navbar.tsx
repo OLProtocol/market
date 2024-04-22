@@ -2,23 +2,17 @@
 import {
   Navbar as NextUINavbar,
   NavbarContent,
-  NavbarMenu,
   NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
-  Divider,
   Kbd,
   Link,
   Image,
   Input,
 } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
-import { useMemo } from 'react';
-// import { WalletConnectButton } from '@/components/walllet/WalletConnectButton';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import NextLink from 'next/link';
-import clsx from 'clsx';
 import { UpdateVersionModal } from './UpdateVersionModal';
 import { FeerateSelectButton } from '@/components/fee/FeerateSelectButton';
 import { ThemeSwitch } from '@/components/theme-switch';
@@ -66,7 +60,7 @@ export const Navbar = () => {
     { label: t('buttons.my_assets'), href: '/account' },
   ];
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" isBordered>
+    <NextUINavbar maxWidth="xl" position="sticky" className='bg-gray-800'>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -82,7 +76,7 @@ export const Navbar = () => {
 
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {navMenus.map((item) => (
-            <NavbarItem key={item.href}>
+            <NavbarItem key={item.href} className='font-bold'>
               <Link href={item.href}>{item.label}</Link>
             </NavbarItem>
           ))}
@@ -127,24 +121,6 @@ export const Navbar = () => {
 				</NavbarItem> */}
       </NavbarContent>
 
-      <NavbarMenu>
-        {/* {searchInput} */}
-        <div className="flex flex-col gap-2">
-          <NavbarMenuItem>
-            <div className="flex items-center gap-4">
-              <FeerateSelectButton />
-              <ThemeSwitch />
-              <LanguageSelect />
-            </div>
-          </NavbarMenuItem>
-          <Divider />
-          {navMenus.map((item) => (
-            <NavbarMenuItem key={item.href}>
-              <Link href={item.href}>{item.label}</Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
       <UpdateVersionModal />
     </NextUINavbar>
   );

@@ -158,7 +158,7 @@ export const OrdxOrderHistoryList = ({
         <TableHeader columns={coumns}>
           {coumns.map((c) => {
             return (
-              <TableColumn key={c.key} align={c.align as any}>
+              <TableColumn className="text-sm md:text-base" key={c.key} align={c.align as any}>
                 {c.label}
               </TableColumn>
             );
