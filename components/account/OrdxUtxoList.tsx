@@ -9,20 +9,27 @@ import { useSellStore } from '@/store';
 import { Pagination } from '@/components/Pagination';
 import { Content } from '@/components/Content';
 import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
+import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 export const OrdxUtxoList = () => {
   const router = useRouter();
   const [ticker, setTicker] = useState<string>('');
   const { address } = useReactWalletStore((state) => state);
-  const { add: addSell, reset } = useSellStore((state) => state);
+  const {
+    add: addSell,
+    reset,
+    list: sellList,
+    remove: removeSell,
+  } = useSellStore((state) => state);
+  const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
-  // const page = useRef(1);
   const [size, setSize] = useState(12);
 
   const swrKey = useMemo(() => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
   }, [address, page, size, ticker]);
+
   console.log('swrKey', swrKey);
   const { data, isLoading, mutate } = useSWR(
     swrKey,
@@ -31,10 +38,36 @@ export const OrdxUtxoList = () => {
       revalidateOnMount: true,
     },
   );
+  const total = useMemo(
+    () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
+    [data],
+  );
+  const list = useMemo(() => data?.data?.assets || [], [data]);
 
-  const toSell = async (item: any) => {
-    addSell(item);
+  const toSell = () => {
     router.push('/account/sell');
+  };
+  const sellHandler = async (item: any) => {
+    addHandler(item);
+    setCanSelect(true);
+  };
+  const addHandler = (item: any) => {
+    addSell({
+      ...item,
+      price: '0',
+      status: 'pending',
+    });
+  };
+  const selectHandler = (bol: boolean, item: any) => {
+    if (bol) {
+      addHandler(item);
+    } else {
+      removeSell(item.utxo);
+    }
+  };
+  const onBatchClose = () => {
+    setCanSelect(false);
+    reset();
   };
   const onCancelOrder = async (item: any) => {
     if (item.locker === '1') {
@@ -59,19 +92,15 @@ export const OrdxUtxoList = () => {
     }
   };
   const onTIckerChange = (ticker: string) => {
+    console.log('ticker', ticker);
     setTicker(ticker);
   };
-  const total = useMemo(
-    () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
-    [data],
-  );
-  const list = useMemo(() => data?.data?.assets || [], [data]);
 
   useEffect(() => {
     reset();
   }, []);
   return (
-    <div className="">
+    <div className={`${canSelect ? 'pb-20' : ''}`}>
       <div>
         <OrdxUtxoTypeList onChange={onTIckerChange} />
       </div>
@@ -80,9 +109,12 @@ export const OrdxUtxoList = () => {
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
           {list.map((item: any) => (
             <OrdxFtAssetsItem
+              selected={!!sellList.find((i) => i.utxo === item.utxo)}
+              canSelect={canSelect}
+              onSelect={(bol) => selectHandler(bol, item)}
               key={item.utxo}
               item={item}
-              onSell={() => toSell(item)}
+              onSell={() => sellHandler(item)}
               onCancelOrder={() => onCancelOrder(item)}
             />
           ))}
@@ -103,6 +135,7 @@ export const OrdxUtxoList = () => {
           />
         </div>
       )}
+      {canSelect && <BatchSellFooter toSell={toSell} onClose={onBatchClose} />}
     </div>
   );
 };

@@ -36,6 +36,7 @@
     "i18next-browser-languagedetector": "^7.2.0",
     "intl-messageformat": "^10.5.0",
     "lodash": "^4.17.21",
+    "mathjs": "^12.4.1",
     "next": "14.0.2",
     "next-themes": "^0.2.1",
     "postcss": "8.4.31",

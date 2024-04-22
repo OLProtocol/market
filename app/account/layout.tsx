@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { hideStr, satsToBitcoin } from "@/lib/utils";
-import { Divider, Snippet } from "@nextui-org/react";
-import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { hideStr, satsToBitcoin } from '@/lib/utils';
+import { Divider, Snippet } from '@nextui-org/react';
+import { WalletConnectBus } from '@/components/order/WalletConnectBus';
 
 export default function AccountLayout({
   children,

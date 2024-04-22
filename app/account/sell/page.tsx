@@ -17,13 +17,16 @@ import {
 import { notification } from 'antd';
 import { useSellStore } from '@/store';
 import { useList } from 'react-use';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   parseUtxo,
   buildSellOrder,
   btcToSats,
   satsToBitcoin,
+  splitBatchSignedPsbt,
+  buildBatchSellOrder,
 } from '@/lib/utils';
+import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { submitOrder } from '@/api';
 import { useTranslation } from 'react-i18next';
@@ -32,66 +35,94 @@ import { useRouter } from 'next/navigation';
 export default function SellPage() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { list, reset } = useSellStore((state) => state);
-  const { network, address } = useReactWalletStore((state) => state);
-  const [
-    priceList,
-    { updateAt: updateAt, set: setList, clear: clearList, removeAt },
-  ] = useList<string>([]);
+  const [loading, setLoading] = useState(false);
+  const { list, reset, changePrice, changeStatus } = useSellStore(
+    (state) => state,
+  );
+  const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const listItems = async () => {
-    for (let i = 0; i < list.length; i++) {
-      try {
+    const psbts: string[] = [];
+    let successCount = 0;
+    setLoading(true);
+    try {
+      for (let i = 0; i < list.length; i++) {
         const item = list[i];
+        if (item.status !== 'pending') {
+          successCount++;
+          continue;
+        }
         const inscriptionUtxo = {
           ...parseUtxo(item.utxo),
           value: item.value,
         };
-        const orderRaw = await buildSellOrder({
+        const orderPsbt = await buildSellOrder({
           inscriptionUtxo,
           amount: 1,
-          total: btcToSats(Number(priceList[i])),
+          total: btcToSats(Number(list[i].price)),
           network,
           address,
         });
-        const res = await submitOrder({ address, raw: orderRaw });
+        psbts.push(orderPsbt);
+        const signPsbt = await btcWallet?.signPsbt(orderPsbt);
+        console.log('Order raw', signPsbt);
+        const res = await submitOrder({ address, raw: signPsbt });
         if (res.code === 200) {
           notification.success({
             message: t('notification.list_success_title'),
             description: t('notification.list_success_description'),
           });
-          reset();
-          router.back();
+          changeStatus(item.utxo, 'confirmed');
+          successCount++;
         } else {
           notification.error({
             message: t('notification.list_failed_title'),
             description: res.msg,
           });
         }
-      } catch (error: any) {
-        console.error('List failed', error);
-        notification.error({
-          message: t('notification.list_failed_title'),
-          description: error.message,
-        });
       }
+      setLoading(false);
+      if (successCount === list.length) {
+        reset();
+        router.back();
+      }
+      // console.log('PSBTS', psbts);
+      // const signedPsbts = await btcWallet?.signPsbts(psbts);
+      // console.log('Signed PSBTs', signedPsbts);
+      // const batchOrderPsbt = await buildBatchSellOrder({
+      //   inscriptionUtxos: list,
+      //   address,
+      //   network,
+      // });
+      // const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
+      // console.log('Batch Order raw', signedPsbts);
+      // if (signedPsbts) {
+      //   const psbts = splitBatchSignedPsbt(signedPsbts);
+      //   console.log('PSBTS', psbts);
+      // }
+    } catch (error: any) {
+      setLoading(false);
+      console.error('List failed', error);
+      notification.error({
+        message: t('notification.list_failed_title'),
+        description: error.message,
+      });
     }
   };
-  const priceChange = (i, v: any) => {
-    updateAt(i, v);
-  };
-  const inputBlur = (i) => {
-    if (Number(priceList[i]) < 0.00000546) {
-      updateAt(i, '0.00000546');
+  const inputBlur = (utxo: string) => {
+    const currentUtxo = list.find((v) => v.utxo === utxo);
+    if (currentUtxo && Number(currentUtxo.price) < 0.00000546) {
+      changePrice(utxo, '0.00000546');
     }
   };
   const totalPrice = useMemo(
-    () => priceList.reduce((a, b) => Number(a) + Number(b), 0) || 0,
-    [priceList],
+    () =>
+      list.reduce((a, b) => {
+        const decimalA = new Decimal(a);
+        const decimalB = new Decimal(Number(b.price));
+        return decimalA.plus(decimalB).toNumber();
+      }, 0) || 0,
+    [list],
   );
-  console.log('priceList', priceList);
-  useEffect(() => {
-    setList(Array.from(list).fill('0'));
-  }, [list, setList]);
 
   return (
     <div>
@@ -122,9 +153,9 @@ export default function SellPage() {
                     <Input
                       type="number"
                       placeholder="0.00"
-                      value={priceList[i]}
-                      onChange={(e) => priceChange(i, e.target.value)}
-                      onBlur={() => inputBlur(i)}
+                      value={list[i].price}
+                      onChange={(e) => changePrice(item.utxo, e.target.value)}
+                      onBlur={() => inputBlur(item.utxo)}
                       endContent={
                         <div className="pointer-events-none flex items-center">
                           <span className="text-default-400 text-small">
@@ -153,6 +184,7 @@ export default function SellPage() {
             <Button
               isDisabled={totalPrice <= 0}
               color="primary"
+              isLoading={loading}
               className="w-full"
               onClick={listItems}
             >

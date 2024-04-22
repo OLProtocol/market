@@ -7,7 +7,7 @@ import {
   CardBody,
   Chip,
 } from '@nextui-org/react';
-import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import { WalletConnectBus } from '@/components/order/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';

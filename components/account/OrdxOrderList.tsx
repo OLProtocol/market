@@ -19,10 +19,6 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
   const { address: storeAddress, network } = useReactWalletStore(
     (state) => state,
   );
-  console.log(network);
-  const [modalVisiable, setModalVisiable] = useState(false);
-  const [buyItem, setBuyItem] = useState<any>();
-  const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
   const swrKey = useMemo(() => {

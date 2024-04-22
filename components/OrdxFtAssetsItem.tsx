@@ -5,21 +5,51 @@ import {
   Card,
   CardFooter,
   CardBody,
+  Checkbox,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-export const OrdxFtAssetsItem = ({ item, onSell, onCancelOrder }: any) => {
+interface Props {
+  item: any;
+  onSell?: (item: any) => void;
+  onCancelOrder?: () => void;
+  selected?: boolean;
+  canSelect?: boolean;
+  onSelect?: (b: boolean) => void;
+}
+export const OrdxFtAssetsItem = ({
+  item,
+  onSell,
+  onCancelOrder,
+  selected,
+  canSelect,
+  onSelect,
+}: Props) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const sellHandler = async () => {
     setLoading(true);
-    await onSell(item);
+    await onSell?.(item);
     setLoading(false);
   };
   return (
-    <Card radius="lg" className="border-none w-full  h-[14rem] md:h-[18rem]">
+    <Card
+      radius="lg"
+      className="border-none w-full  h-[14rem] md:h-[18rem] relative"
+    >
+      {canSelect && (
+        <div
+          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-10 cursor-pointer"
+          onClick={() => {
+            onSelect?.(!selected);
+          }}
+        >
+          <div className="flex absolute top-4 right-4">
+            <Checkbox isSelected={selected} onValueChange={onSelect} />
+          </div>
+        </div>
+      )}
       <CardBody>
         <div className="flex-1 text-sm md:text-base">
           {item?.tickers?.map((v: any) => (
