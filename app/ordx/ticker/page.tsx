@@ -30,17 +30,17 @@ export default function Page() {
     return [
       { value: summary.tx_order_count, label: t('common.tx_order_count') },
       { value: summary.tx_total_amount, label: t('common.tx_total_asset') },
-      { value: summary.tx_total_volume, label: t('common.tx_total_volume') },
+      { value: summary.tx_total_volume + ' BTC', label: t('common.tx_total_volume') },
       {
         value: summary.onsell_order_count,
         label: t('common.onsell_order_count'),
       },
       {
-        value: summary.onsell_total_amount,
+        value: summary.onsell_total_amount + ' BTC',
         label: t('common.onsell_total_amount'),
       },
-      { value: summary.lowest_price, label: t('common.lowest_price') },
-      { value: summary.highest_price, label: t('common.highest_price') },
+      { value: summary.lowest_price + ' BTC', label: t('common.lowest_price') },
+      { value: summary.highest_price + ' BTC', label: t('common.highest_price') },
       { value: summary.holder_count, label: i18n.t('common.holder_count') },
     ];
   }, [summary, i18n.language]);
