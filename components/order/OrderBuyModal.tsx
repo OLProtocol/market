@@ -319,7 +319,7 @@ export const OrderBuyModal = ({
                       {t('common.tick')}: {v.ticker}
                     </div>
                     <div className="text-sm">
-                      {t('common.amount')}: {v.amount}
+                      {t('common.asset_num')}: {v.amount}
                     </div>
                   </div>
                 </div>
