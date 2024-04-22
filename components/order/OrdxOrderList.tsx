@@ -11,7 +11,7 @@ import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
 import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-
+import { SortDropdown } from '@/components/SortDropdown';
 interface OrdxOrderListProps {
   ticker: string;
   address?: string;
@@ -28,16 +28,30 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
+  const [sort, setSort] = useState(1);
+  const sortList = [
+    { label: t('common.not_sort'), value: 0 },
+    { label: t('common.sort_price_ascending'), value: 1 },
+    { label: t('common.sort_price_descending'), value: 2 },
+    { label: t('common.sort_time_ascending'), value: 3 },
+    { label: t('common.sort_time_descending'), value: 4 },
+  ];
+
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${ticker}-${address}-${network}-${page}-${size}`;
+      return `/ordx/getOrders-${ticker}-${address}-${network}-${page}-${size}-${sort}`;
     }
-    return `/ordx/getOrders-${ticker}-${network}-${page}-${size}`;
-  }, [ticker, address, page, size, network]);
+    return `/ordx/getOrders-${ticker}-${network}-${page}-${size}-${sort}`;
+  }, [ticker, address, page, size, network, sort]);
   console.log('swrKey', swrKey);
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
-    getOrders({ offset: (page - 1) * size, size, ticker, address }),
+    getOrders({ offset: (page - 1) * size, size, ticker, address, sort }),
   );
+  const onSortChange = (sort?: number) => {
+    if (sort !== undefined) {
+      setSort(sort);
+    }
+  };
   const onBuy = async (item: any) => {
     setBuyItem(item);
     // await unlockOrder({ address: storeAddress, order_id: item.order_id });
@@ -68,10 +82,20 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     <div className="">
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
+        {!!list.length && (
+          <div className="flex justify-end mb-4">
+            <SortDropdown
+              sortList={sortList}
+              value={sort}
+              disabled={!list.length}
+              onChange={onSortChange}
+            ></SortDropdown>
+          </div>
+        )}
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
-          {list.map((item: any) => (
+          {list.map((item: any, i) => (
             <OrdxFtOrderItem
-              key={item.utxo}
+              key={item.utxo + i}
               item={item}
               onBuy={() => onBuy(item)}
             />

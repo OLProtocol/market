@@ -118,6 +118,13 @@ export const OrdxOrderHistoryList = ({
     }
     return defaultColumns;
   }, [address, i18n.language]);
+  const sortList = [
+    { label: t('common.not_sort'), value: 0 },
+    { label: t('common.sort_price_ascending'), value: 1 },
+    { label: t('common.sort_price_descending'), value: 2 },
+    { label: t('common.sort_time_ascending'), value: 3 },
+    { label: t('common.sort_time_descending'), value: 4 },
+  ];
   const list = useMemo(
     () =>
       data?.data?.order_list?.map((v) => ({
@@ -134,6 +141,8 @@ export const OrdxOrderHistoryList = ({
         topContent={
           <div className="flex justify-end">
             <SortDropdown
+              sortList={sortList}
+              value={sort}
               disabled={!list.length}
               onChange={onSortChange}
             ></SortDropdown>
@@ -158,7 +167,11 @@ export const OrdxOrderHistoryList = ({
         <TableHeader columns={coumns}>
           {coumns.map((c) => {
             return (
-              <TableColumn key={c.key} align={c.align as any}>
+              <TableColumn
+                className="text-sm md:text-base"
+                key={c.key}
+                align={c.align as any}
+              >
                 {c.label}
               </TableColumn>
             );
@@ -170,8 +183,8 @@ export const OrdxOrderHistoryList = ({
           emptyContent={'No Data.'}
           loadingContent={<Spinner />}
         >
-          {(item: any) => (
-            <TableRow key={item.order_id + item.result + i18n.language}>
+          {list.map((item: any, i) => (
+            <TableRow key={item.utxo + i}>
               {(columnKey) => {
                 if (
                   columnKey === 'utxo' ||
@@ -233,7 +246,7 @@ export const OrdxOrderHistoryList = ({
                 }
               }}
             </TableRow>
-          )}
+          ))}
         </TableBody>
       </Table>
     </div>

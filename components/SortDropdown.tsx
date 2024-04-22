@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface SortDropdownProps {
-  sortList?: { label: string; value: number }[];
+  sortList: { label: string; value: number }[];
   value?: number;
   disabled?: boolean;
   onChange?: (value?: number) => void;
@@ -11,17 +11,18 @@ interface SortDropdownProps {
 export const SortDropdown = ({
   value,
   onChange,
+  sortList,
   disabled = false,
 }: SortDropdownProps) => {
   const [selectKeys, setSelectKeys] = useState([value?.toString() || '0']);
   const { t } = useTranslation();
-  const sortList = [
-    { label: t('common.not_sort'), value: 0 },
-    { label: t('common.sort_price_ascending'), value: 1 },
-    { label: t('common.sort_price_descending'), value: 2 },
-    { label: t('common.sort_time_ascending'), value: 3 },
-    { label: t('common.sort_time_descending'), value: 4 },
-  ];
+  // const sortList = [
+  //   { label: t('common.not_sort'), value: 0 },
+  //   { label: t('common.sort_price_ascending'), value: 1 },
+  //   { label: t('common.sort_price_descending'), value: 2 },
+  //   { label: t('common.sort_time_ascending'), value: 3 },
+  //   { label: t('common.sort_time_descending'), value: 4 },
+  // ];
   const onSelectionChange = (keys: any) => {
     setSelectKeys(keys);
     const _v = Number(Array.from(keys.values())[0]);

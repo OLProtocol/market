@@ -130,9 +130,15 @@ export default function SellPage() {
         <div className="flex-1 mb-2 md:mb-0">
           <Table aria-label="Example static collection table">
             <TableHeader>
-              <TableColumn>{t('common.item')}</TableColumn>
-              <TableColumn>{t('common.unit_rice')}</TableColumn>
-              <TableColumn>{t('common.amount')}</TableColumn>
+              <TableColumn className="text-sm md:text-base">
+                {t('common.item')}
+              </TableColumn>
+              <TableColumn className="text-sm md:text-base">
+                {t('common.unit_rice')}
+              </TableColumn>
+              <TableColumn className="text-sm md:text-base">
+                {t('common.amount')}
+              </TableColumn>
             </TableHeader>
             <TableBody>
               {list.map((item, i) => (

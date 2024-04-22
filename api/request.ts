@@ -67,7 +67,7 @@ interface GetOrders {
   address?: string;
   offset: number;
   size: number;
-  sort?: 0 | 1 | 2 | 3 | 4; // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
+  sort?: number; // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
   type?: 1 | 2; // 1: 卖出订单 2: 买入订单， 当前只支持1（默认为1）
 }
 export const getOrders = async ({
