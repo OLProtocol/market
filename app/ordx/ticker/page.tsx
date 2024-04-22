@@ -29,7 +29,7 @@ export default function Page() {
   const headList = useMemo(() => {
     return [
       { value: summary.tx_order_count, label: t('common.tx_order_count') },
-      { value: summary.tx_total_amount, label: t('common.tx_total_amount') },
+      { value: summary.tx_total_amount, label: t('common.tx_total_asset') },
       { value: summary.tx_total_volume, label: t('common.tx_total_volume') },
       {
         value: summary.onsell_order_count,

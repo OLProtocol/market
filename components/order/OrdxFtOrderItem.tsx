@@ -41,7 +41,7 @@ export const OrdxFtOrderItem = ({ item, onBuy, onCancelOrder }: any) => {
                   {t('common.tick')}: {v.ticker}
                 </div>
                 <div>
-                  {t('common.amount')}: {v.amount}
+                  {t('common.asset_num')}: {v.amount}
                 </div>
               </div>
             ))}
