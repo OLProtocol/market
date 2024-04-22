@@ -63,7 +63,7 @@ export const getTickerSummary = async ({ ticker }: GetTickerSummary) => {
   return res;
 };
 interface GetOrders {
-  ticker: string;
+  ticker?: string;
   address?: string;
   offset: number;
   size: number;

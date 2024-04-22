@@ -3,6 +3,7 @@
 import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxUtxoList } from '@/components/account/OrdxUtxoList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
+import { OrdxOrderList } from '@/components/account/OrdxOrderList';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +18,9 @@ export default function AccountPage() {
         </Tab>
         <Tab key="history" title={t('common.tx_history')}>
           <OrdxOrderHistoryList address={address} />
+        </Tab>
+        <Tab key="order" title={t('common.my_listings')}>
+          <OrdxOrderList address={address} />
         </Tab>
       </Tabs>
     </div>

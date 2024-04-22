@@ -8,11 +8,13 @@ import {
   Chip,
 } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
+export const OrdxFtOrderItem = ({ item, onBuy, onCancelOrder }: any) => {
+  const { address: currentAddress } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const buyHandler = async () => {
@@ -51,21 +53,39 @@ export const OrdxFtOrderItem = ({ item, onBuy }: any) => {
       </CardBody>
       <CardFooter className="">
         <WalletConnectBus className="flex-1">
-          <Button
-            className="text-tiny flex-1 "
-            variant="flat"
-            isLoading={loading}
-            color="default"
-            radius="lg"
-            startContent={
-              item.locker == '1' ? (
-                <Icon icon="mdi:lock" className="text-lg" />
-              ) : null
-            }
-            onClick={buyHandler}
-          >
-            {t('buttons.buy')}
-          </Button>
+          {item?.address === currentAddress ? (
+            <Button
+              className="text-tiny"
+              fullWidth
+              variant="flat"
+              color="default"
+              radius="lg"
+              startContent={
+                item.locker == '1' ? (
+                  <Icon icon="mdi:lock" className="text-lg" />
+                ) : null
+              }
+              onClick={onCancelOrder}
+            >
+              {t('buttons.remove_sale')}（{item.price} {item.currency}）
+            </Button>
+          ) : (
+            <Button
+              className="text-tiny flex-1 "
+              variant="flat"
+              isLoading={loading}
+              color="default"
+              radius="lg"
+              startContent={
+                item.locker == '1' ? (
+                  <Icon icon="mdi:lock" className="text-lg" />
+                ) : null
+              }
+              onClick={buyHandler}
+            >
+              {t('buttons.buy')}
+            </Button>
+          )}
         </WalletConnectBus>
         {/* <Button
               isIconOnly
