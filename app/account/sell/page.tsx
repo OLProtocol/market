@@ -123,12 +123,12 @@ export default function SellPage() {
     } else if (
       currentUtxo &&
       Number(currentUtxo.price) < 546 &&
-      currentUtxo.unit === 'sat'
+      currentUtxo.unit === 'sats'
     ) {
       changePrice(utxo, '546');
     }
   };
-  const onUnitChange = (i: number, utxo: string, unit: 'btc' | 'sat') => {
+  const onUnitChange = (i: number, utxo: string, unit: 'btc' | 'sats') => {
     changeUnit(utxo, unit);
   };
   const totalPrice = useMemo(
@@ -194,8 +194,8 @@ export default function SellPage() {
                           <SelectItem key="btc" value="btc">
                             BTC
                           </SelectItem>
-                          <SelectItem key="sat" value="sat">
-                            sat
+                          <SelectItem key="sats" value="sats">
+                            sats
                           </SelectItem>
                         </Select>
                       }

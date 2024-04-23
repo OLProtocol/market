@@ -5,7 +5,7 @@ export interface UtxoAssetItem {
   utxo: string;
   value: number;
   price: string;
-  unit: 'btc' | 'sat';
+  unit: 'btc' | 'sats';
   status: 'pending' | 'confirmed' | 'failed';
   tickers: {
     ticker: string;
@@ -22,7 +22,7 @@ interface SellState {
     status: 'pending' | 'confirmed' | 'failed',
   ) => void;
   changePrice: (utxo: string, price: string) => void;
-  changeUnit: (utxo: string, unit: 'btc' | 'sat') => void;
+  changeUnit: (utxo: string, unit: 'btc' | 'sats') => void;
   remove: (utxo: string) => void;
   reset: () => void;
 }
