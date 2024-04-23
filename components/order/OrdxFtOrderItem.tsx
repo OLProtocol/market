@@ -7,6 +7,8 @@ import {
   CardBody,
   Chip,
   Checkbox,
+  Listbox,
+  ListboxItem,
 } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/order/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -62,25 +64,24 @@ export const OrdxFtOrderItem = ({
         </div>
       )}
       <CardBody>
-        <div className="flex flex-col h-full">
-          <div className="flex-1 text-sm md:text-base">
-            {item?.assets?.map((v: any) => (
-              <div key={v.inscriptionnum}>
-                <div>
-                  {t('common.tick')}: {v.ticker}
-                </div>
-                <div>
-                  {t('common.asset_num')}: {v.amount}
-                </div>
-              </div>
-            ))}
-          </div>
-          <Chip size="lg" className="w-full max-w-none text-small">
-            <div>{item?.price} BTC</div>
-          </Chip>
+        <div className="flex-1 text-sm md:text-base">
+          {item?.assets?.map((v: any) => (
+            <Listbox key={v.inscriptionnum}>
+              <ListboxItem key={v.ticker}>
+                {t('common.tick')}: {v.ticker}
+              </ListboxItem>
+              <ListboxItem key={v.ticker + '-' + v.amount}>
+                {t('common.asset_num')}: {v.amount}
+              </ListboxItem>
+            </Listbox>
+          ))}
         </div>
       </CardBody>
-      <CardFooter className="">
+      <CardFooter className="block bg-gray-800">
+        <div className="pb-2 flex">
+          <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
+          <span className="text-sm text-amber-500">{item?.price}</span>
+        </div>
         <WalletConnectBus className="flex-1">
           {item?.address === currentAddress ? (
             <Button
@@ -100,10 +101,11 @@ export const OrdxFtOrderItem = ({
             </Button>
           ) : (
             <Button
-              className="text-tiny flex-1 "
-              variant="flat"
+              className="text-tiny flex-1"
+              fullWidth
+              variant="ghost"
               isLoading={loading}
-              color="default"
+              color="primary"
               radius="lg"
               startContent={
                 item.locker == '1' ? (

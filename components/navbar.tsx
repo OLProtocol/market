@@ -26,6 +26,7 @@ import {
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { Logo } from '@/components/icons';
+import { useState } from 'react';
 
 const WalletButton = dynamic(
   () => import('../components/walllet/WalletConnectButton') as any,
@@ -55,10 +56,35 @@ export const Navbar = () => {
       type="search"
     />
   );
-  const navMenus = [
-    { label: t('pages.market.title'), href: '/' },
-    { label: t('buttons.my_assets'), href: '/account' },
-  ];
+
+  const handle = (label: string) => {
+    let temp: any = [];
+    navMenus.forEach((item) => {
+      if (item.label === label) {
+        item.isActive = true;
+        item.style = 'text-white';
+      } else {
+        item.isActive = false;
+        item.style = 'text-slate-300';
+      }
+      temp.push(item);
+    });
+    setNavMenus(temp);
+  };
+  const [navMenus, setNavMenus] = useState([
+    {
+      label: t('pages.market.title'),
+      href: '/',
+      isActive: true,
+      style: 'text-white',
+    },
+    {
+      label: t('buttons.my_assets'),
+      href: '/account',
+      isActive: false,
+      style: 'text-slate-300',
+    },
+  ]);
   return (
     <NextUINavbar maxWidth="xl" position="sticky" className="bg-gray-800">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -76,8 +102,14 @@ export const Navbar = () => {
 
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {navMenus.map((item) => (
-            <NavbarItem key={item.href} className="font-bold">
-              <Link href={item.href}>{item.label}</Link>
+            <NavbarItem key={item.href} isActive={item.isActive}>
+              <Link
+                href={item.href}
+                className={item.style}
+                onClick={() => handle(item.label)}
+              >
+                {item.label}
+              </Link>
             </NavbarItem>
           ))}
         </ul>
