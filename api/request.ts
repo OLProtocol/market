@@ -24,7 +24,7 @@ export const request = async (path: string, options: any = {}) => {
   res = await res.json();
   console.log(res);
   if ((res as any).code === -1) {
-    throw new Error((res as any).msg);
+    throw (res as any).msg;
   }
   return res as any;
 };

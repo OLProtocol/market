@@ -13,6 +13,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Select,
+  SelectItem,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useSellStore } from '@/store';
@@ -36,7 +38,7 @@ export default function SellPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const { list, reset, changePrice, changeStatus } = useSellStore(
+  const { list, reset, changeUnit, changePrice, changeStatus } = useSellStore(
     (state) => state,
   );
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
@@ -55,10 +57,12 @@ export default function SellPage() {
           ...parseUtxo(item.utxo),
           value: item.value,
         };
+        const total =
+          item.unit === 'btc' ? item.price : satsToBitcoin(item.price);
         const orderPsbt = await buildSellOrder({
           inscriptionUtxo,
           amount: 1,
-          total: btcToSats(Number(list[i].price)),
+          total: btcToSats(Number(total)),
           network,
           address,
         });
@@ -110,15 +114,30 @@ export default function SellPage() {
   };
   const inputBlur = (utxo: string) => {
     const currentUtxo = list.find((v) => v.utxo === utxo);
-    if (currentUtxo && Number(currentUtxo.price) < 0.00000546) {
+    if (
+      currentUtxo &&
+      Number(currentUtxo.price) < 0.00000546 &&
+      currentUtxo.unit === 'btc'
+    ) {
       changePrice(utxo, '0.00000546');
+    } else if (
+      currentUtxo &&
+      Number(currentUtxo.price) < 546 &&
+      currentUtxo.unit === 'sat'
+    ) {
+      changePrice(utxo, '546');
     }
+  };
+  const onUnitChange = (i: number, utxo: string, unit: 'btc' | 'sat') => {
+    changeUnit(utxo, unit);
   };
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
         const decimalA = new Decimal(a);
-        const decimalB = new Decimal(Number(b.price));
+        let _b = b.unit === 'btc' ? b.price : satsToBitcoin(b.price);
+        console.log(b);
+        const decimalB = new Decimal(Number(_b));
         return decimalA.plus(decimalB).toNumber();
       }, 0) || 0,
     [list],
@@ -163,11 +182,22 @@ export default function SellPage() {
                       onChange={(e) => changePrice(item.utxo, e.target.value)}
                       onBlur={() => inputBlur(item.utxo)}
                       endContent={
-                        <div className="pointer-events-none flex items-center">
-                          <span className="text-default-400 text-small">
+                        <Select
+                          size="sm"
+                          color="primary"
+                          selectedKeys={[list[i].unit]}
+                          onChange={(e) =>
+                            onUnitChange(i, item.utxo, e.target.value as any)
+                          }
+                          className="w-32"
+                        >
+                          <SelectItem key="btc" value="btc">
                             BTC
-                          </span>
-                        </div>
+                          </SelectItem>
+                          <SelectItem key="sat" value="sat">
+                            sat
+                          </SelectItem>
+                        </Select>
                       }
                     />
                   </TableCell>

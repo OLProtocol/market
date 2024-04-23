@@ -6,7 +6,9 @@ import { getOrders, lockOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { use, useMemo, useState } from 'react';
 import { Pagination } from '@/components/Pagination';
+import { BatchBuyFooter } from '@/components/BatchBuyFooter';
 import { Content } from '@/components/Content';
+import { useBuyStore } from '@/store';
 import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
 import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
@@ -22,7 +24,8 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const { address: storeAddress, network } = useReactWalletStore(
     (state) => state,
   );
-  console.log(network);
+  const { list: buyList, add: addBuy, remove: removeBuy } = useBuyStore();
+  const [canSelect, setCanSelect] = useState(false);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
@@ -52,23 +55,64 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
       setSort(sort);
     }
   };
-  const onBuy = async (item: any) => {
-    setBuyItem(item);
-    // await unlockOrder({ address: storeAddress, order_id: item.order_id });
-    const orderDetail = await lockOrder({
-      address: storeAddress,
-      order_id: item.order_id,
-    });
-    if (!orderDetail?.data?.raw) {
+  const buyHandler = async (item) => {
+    try {
+      const orderDetail = await lockOrder({
+        address: storeAddress,
+        order_id: item.order_id,
+      });
+      if (!orderDetail?.data?.raw) {
+        notification.error({
+          message: t('notification.lock_order_failed_title'),
+          description: orderDetail.msg,
+        });
+        return;
+      }
+      addBuy({ ...item, status: 'pending' });
+    } catch (error: any) {
+      console.log(error);
       notification.error({
         message: t('notification.lock_order_failed_title'),
-        description: orderDetail.msg,
+        description: error,
       });
-      return;
     }
-    const { raw } = orderDetail.data;
-    setOrderRaw(raw);
-    setModalVisiable(true);
+  };
+  const selectHandler = async (s: boolean, item: any) => {
+    if (s) {
+      await buyHandler(item);
+    } else {
+      await cancelHandler(item);
+    }
+  };
+  console.log('buyList', buyList);
+  const cancelHandler = async (item) => {
+    try {
+      const res = await unlockOrder({
+        address: storeAddress,
+        order_id: item.order_id,
+      });
+      if (res.code !== 200) {
+        notification.error({
+          message: t('notification.order_cancel_failed_title'),
+          description: res.msg,
+        });
+        return;
+      }
+      removeBuy(item.utxo);
+    } catch (error: any) {
+      notification.error({
+        message: t('notification.order_cancel_failed_title'),
+        description: error.message,
+      });
+    }
+  };
+  const onBuy = async (item: any) => {
+    await buyHandler(item);
+    setCanSelect(true);
+    // await unlockOrder({ address: storeAddress, order_id: item.order_id });
+    // const { raw } = orderDetail.data;
+    // setOrderRaw(raw);
+    // setModalVisiable(true);
   };
   const onBuySuccess = () => {
     mutate(swrKey);
@@ -79,7 +123,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   );
   const list = useMemo(() => data?.data?.order_list || [], [data]);
   return (
-    <div className="">
+    <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         {!!list.length && (
@@ -95,8 +139,11 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
           {list.map((item: any, i) => (
             <OrdxFtOrderItem
+              canSelect={canSelect}
+              selected={!!buyList.find((i) => i.utxo === item.utxo)}
               key={item.utxo + i}
               item={item}
+              onSelect={(s) => selectHandler(s, item)}
               onBuy={() => onBuy(item)}
             />
           ))}
@@ -124,6 +171,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
           visiable={modalVisiable}
         />
       )}
+      {canSelect && <BatchBuyFooter />}
     </div>
   );
 };

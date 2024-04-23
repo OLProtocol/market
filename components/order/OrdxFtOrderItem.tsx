@@ -6,6 +6,7 @@ import {
   CardFooter,
   CardBody,
   Chip,
+  Checkbox,
 } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/order/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -13,7 +14,23 @@ import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const OrdxFtOrderItem = ({ item, onBuy, onCancelOrder }: any) => {
+interface Props {
+  item: any;
+  onBuy: any;
+  onCancelOrder?: () => void;
+  canSelect?: boolean;
+  selected?: boolean;
+  onSelect?: (s: boolean) => void;
+}
+
+export const OrdxFtOrderItem = ({
+  item,
+  onBuy,
+  canSelect,
+  selected,
+  onSelect,
+  onCancelOrder,
+}: Props) => {
   const { address: currentAddress } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
@@ -30,8 +47,20 @@ export const OrdxFtOrderItem = ({ item, onBuy, onCancelOrder }: any) => {
     <Card
       isPressable
       radius="lg"
-      className="border-none w-full h-[14rem] md:h-[18rem]"
+      className="border-none w-full h-[14rem] md:h-[18rem] relative"
     >
+      {canSelect && (
+        <div
+          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-10 cursor-pointer"
+          onClick={() => {
+            onSelect?.(!selected);
+          }}
+        >
+          <div className="flex absolute top-4 right-4">
+            <Checkbox isSelected={selected} onValueChange={onSelect} />
+          </div>
+        </div>
+      )}
       <CardBody>
         <div className="flex flex-col h-full">
           <div className="flex-1 text-sm md:text-base">
