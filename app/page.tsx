@@ -35,16 +35,16 @@ export default function Home() {
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
-          <TableColumn key="ticker" className="text-sm md:text-base">
+          <TableColumn key="ticker" className="text-sm md:text-base font-extralight">
             {t('common.tick')}
           </TableColumn>
-          <TableColumn key="tx_total_volume" className="text-sm md:text-base">
+          <TableColumn key="tx_total_volume" className="text-sm md:text-base font-extralight">
             {t('common.volumn')}
           </TableColumn>
-          <TableColumn key="lowest_price" className="text-sm md:text-base">
+          <TableColumn key="lowest_price" className="text-sm md:text-base font-extralight">
             {t('common.price')}
           </TableColumn>
-          <TableColumn key="tx_order_count" className="text-sm md:text-base">
+          <TableColumn key="tx_order_count" className="text-sm md:text-base font-extralight">
             {t('common.tx_order_count')}
           </TableColumn>
           <TableColumn key="holder_count" className="text-sm md:text-base">

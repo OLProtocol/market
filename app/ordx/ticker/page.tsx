@@ -67,11 +67,11 @@ export default function Page() {
           <div className="flex gap-2 flex-wrap">
             {headList.map((item) => (
               <Card isHoverable key={item.label} className="px-2">
-                <CardBody className="text-center">
-                  <div className="text-base md:text-2xl font-bold ">
+                <CardBody className="text-left">
+                  <div className="text-base md:text-2xl ">
                     {item.value}
                   </div>
-                  <div className="text-xs md:text-sm">{item.label}</div>
+                  <div className="text-xs md:text-sm text-gray-400">{item.label}</div>
                 </CardBody>
               </Card>
             ))}
@@ -80,7 +80,7 @@ export default function Page() {
       </div>
       <Divider />
       <div className="pt-4">
-        <Tabs aria-label="Options">
+        <Tabs aria-label="Options" size="lg" color="primary">
           <Tab key="market" title={t('pages.market.title')}>
             <OrdxOrderList ticker={ticker} />
           </Tab>

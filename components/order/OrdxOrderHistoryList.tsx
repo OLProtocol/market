@@ -167,11 +167,7 @@ export const OrdxOrderHistoryList = ({
         <TableHeader columns={coumns}>
           {coumns.map((c) => {
             return (
-              <TableColumn
-                className="text-sm md:text-base"
-                key={c.key}
-                align={c.align as any}
-              >
+              <TableColumn className="text-sm md:text-base text-center font-extralight" key={c.key} align={c.align as any}>
                 {c.label}
               </TableColumn>
             );
@@ -193,7 +189,7 @@ export const OrdxOrderHistoryList = ({
                 ) {
                   const v = getKeyValue(item, columnKey);
                   return (
-                    <TableCell>
+                    <TableCell className='text-center font-light'>
                       {v ? (
                         <Snippet
                           codeString={v}
@@ -202,7 +198,7 @@ export const OrdxOrderHistoryList = ({
                           size="lg"
                           variant="flat"
                         >
-                          {hideStr(v, 6)}
+                          <span className='font-light text-sm'>{hideStr(v, 6)}</span>
                         </Snippet>
                       ) : (
                         '-'
@@ -211,7 +207,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txid') {
                   return (
-                    <TableCell>
+                    <TableCell className='text-center font-light'>
                       <a
                         href={resolveMempoolTxLink(
                           getKeyValue(item, columnKey),
@@ -225,7 +221,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txtime') {
                   return (
-                    <TableCell>
+                    <TableCell className='text-center font-light'>
                       <span>
                         {new Date(
                           Number(getKeyValue(item, columnKey)),
@@ -234,10 +230,10 @@ export const OrdxOrderHistoryList = ({
                     </TableCell>
                   );
                 } else if (columnKey === 'result_text') {
-                  return <TableCell>{getKeyValue(item, columnKey)}</TableCell>;
+                  return <TableCell className='text-center font-light'>{getKeyValue(item, columnKey)}</TableCell>;
                 } else {
                   return (
-                    <TableCell>
+                    <TableCell className='text-center font-light'>
                       {`${getKeyValue(item, columnKey)}${
                         columnKey === 'price' ? ' ' + item.currency : ''
                       }`}

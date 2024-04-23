@@ -78,9 +78,13 @@ export const OrdxFtOrderItem = ({
         </div>
       </CardBody>
       <CardFooter className="block bg-gray-800">
-        <div className="pb-2 flex">
-          <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
-          <span className="text-sm text-amber-500">{item?.price}</span>
+        <div className='pb-2 flex'>
+          {item.currency === 'BTC' ? (
+            <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5'/>
+          ) : (
+            <span></span>
+          )}
+          <span className='text-sm text-amber-500'>{item?.price}</span>
         </div>
         <WalletConnectBus className="flex-1">
           {item?.address === currentAddress ? (
@@ -101,7 +105,7 @@ export const OrdxFtOrderItem = ({
             </Button>
           ) : (
             <Button
-              className="text-tiny flex-1"
+              className="flex-1"
               fullWidth
               variant="ghost"
               isLoading={loading}
