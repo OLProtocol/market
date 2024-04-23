@@ -39,10 +39,16 @@ export default function Home() {
             {t('common.tick')}
           </TableColumn>
           <TableColumn key="tx_total_volume" className="text-sm md:text-base">
-            {t('common.volumn')}
+            {t('common.tx_total_volume')}
           </TableColumn>
           <TableColumn key="lowest_price" className="text-sm md:text-base">
-            {t('common.price')}
+            {t('common.lowest_price')}
+          </TableColumn>
+          <TableColumn
+            key="lowest_price_change"
+            className="text-sm md:text-base"
+          >
+            {t('common.market_change')}
           </TableColumn>
           <TableColumn key="tx_order_count" className="text-sm md:text-base">
             {t('common.tx_order_count')}
