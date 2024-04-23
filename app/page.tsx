@@ -15,12 +15,15 @@ import {
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 
 export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { data, error, isLoading } = useSWR(`/ordx/getTopTickers`, () =>
-    getTopTickers({}),
+  const { network } = useReactWalletStore();
+  const { data, error, isLoading } = useSWR(
+    `/ordx/getTopTickers-${network}`,
+    () => getTopTickers({}),
   );
   const list = useMemo(() => data?.data || [], [data]);
   const toDetail = (e) => {
@@ -70,7 +73,11 @@ export default function Home() {
                   return (
                     <TableCell className="text-sm md:text-base">
                       <div>{getKeyValue(item, columnKey)}</div>
-                      {/* <div>{item['holder_dispersion']}</div> */}
+                      <div
+                        className={`text-xs ${item['holder_dispersion'].indexOf('-') === 0 ? 'text-red-500' : 'text-green-500'}`}
+                      >
+                        {item['holder_dispersion']}
+                      </div>
                     </TableCell>
                   );
                 } else if (
