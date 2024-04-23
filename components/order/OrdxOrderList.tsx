@@ -24,7 +24,12 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const { address: storeAddress, network } = useReactWalletStore(
     (state) => state,
   );
-  const { list: buyList, add: addBuy, remove: removeBuy } = useBuyStore();
+  const {
+    list: buyList,
+    add: addBuy,
+    remove: removeBuy,
+    reset,
+  } = useBuyStore();
   const [canSelect, setCanSelect] = useState(false);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
@@ -117,6 +122,31 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const onBuySuccess = () => {
     mutate(swrKey);
   };
+  const batchCloseHandler = async () => {
+    setCanSelect(false);
+    const listPromise = buyList.map((item) =>
+      unlockOrder({ address: storeAddress, order_id: item.order_id }),
+    );
+    try {
+      const res = await Promise.all(listPromise);
+      if (res.some((i) => i.code !== 200)) {
+        notification.error({
+          message: t('notification.order_cancel_failed_title'),
+          description: t('notification.order_cancel_failed_description'),
+        });
+        return;
+      }
+      reset();
+      setCanSelect(false);
+      setModalVisiable(false);
+      mutate(swrKey);
+    } catch (error: any) {
+      notification.error({
+        message: t('notification.order_cancel_failed_title'),
+        description: error.message,
+      });
+    }
+  };
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data, size],
@@ -171,7 +201,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
           visiable={modalVisiable}
         />
       )}
-      {canSelect && <BatchBuyFooter />}
+      {canSelect && <BatchBuyFooter onClose={batchCloseHandler} />}
     </div>
   );
 };

@@ -62,10 +62,8 @@ export const Navbar = () => {
     navMenus.forEach((item) => {
       if (item.label === label) {
         item.isActive = true;
-        item.style = 'text-white';
       } else {
         item.isActive = false;
-        item.style = 'text-slate-300';
       }
       temp.push(item);
     });
@@ -76,17 +74,15 @@ export const Navbar = () => {
       label: t('pages.market.title'),
       href: '/',
       isActive: true,
-      style: 'text-white',
     },
     {
       label: t('buttons.my_assets'),
       href: '/account',
       isActive: false,
-      style: 'text-slate-300',
     },
   ]);
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" className="bg-gray-800">
+    <NextUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -105,7 +101,7 @@ export const Navbar = () => {
             <NavbarItem key={item.href} isActive={item.isActive}>
               <Link
                 href={item.href}
-                className={item.style}
+                className="text-inherit"
                 onClick={() => handle(item.label)}
               >
                 {item.label}

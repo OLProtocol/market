@@ -54,7 +54,8 @@ export const FeerateSelectButton = () => {
         onClick={() => onOpen()}
       >
         <Icon icon="mdi:gas-station" className="text-xl0" />
-        {feeRate.value} <span className="text-gray-400">sat/vB</span>
+        {feeRate.value}{' '}
+        <span className="dark:text-gray-400 text-slate-600">sat/vB</span>
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>

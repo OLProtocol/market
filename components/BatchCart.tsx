@@ -14,10 +14,10 @@ export const BatchCart = () => {
     [list],
   );
   return (
-    <div className="fixed max-w-screen w-96 bottom-20 right-0 bg-slate-900 rounded-t-lg px-4">
+    <div className="fixed max-w-screen w-96 bottom-20 right-0 bg-gray-100 dark:bg-slate-900 rounded-t-lg px-4 z-10">
       <div className="h-10 flex items-center justify-between">
         <span>Cart ({list.length})</span>
-        <span className="text-white">Total: {totalPrice} BTC</span>
+        <span>Total: {totalPrice} BTC</span>
       </div>
       <div>
         {list.map((item) => (
