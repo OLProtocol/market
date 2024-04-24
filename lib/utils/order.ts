@@ -1,11 +1,18 @@
-import * as bitcoinjs from 'bitcoinjs-lib';
 import * as ecc from '@bitcoin-js/tiny-secp256k1-asmjs';
 import { Address, Script } from '@cmdcode/tapscript';
 import { btcToSats } from '@/lib/utils';
 import { parseUtxo } from './btc';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
-import { getBitcoinjs, getBitcoinNetwork } from '@/lib/utils/bitcoin';
+import {
+  bitcoin,
+  toPsbtNetwork,
+  NetworkType,
+  buildTransaction,
+  Transaction,
+  convertUtxosToBtcUtxos,
+  PsbtInput,
+} from '../wallet';
 import { UtxoAssetItem } from '@/store';
 import { getTxHex, lockOrder, unlockOrder } from '@/api';
 interface SellOrderProps {
@@ -40,7 +47,7 @@ export const buildSellOrder = async ({
   );
   const { btcWallet } = useReactWalletStore.getState();
   const rawTx = await getTxHex(inscriptionUtxo.txid, network);
-  const ordinalPreTx = bitcoinjs.Transaction.fromHex(rawTx);
+  const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx);
   console.log(ordinalPreTx);
   const utxoInput = {
     hash: inscriptionUtxo.txid,
@@ -48,12 +55,11 @@ export const buildSellOrder = async ({
     witnessUtxo: ordinalPreTx.outs[inscriptionUtxo.vout],
     sighashType: SIGHASH_SINGLE_ANYONECANPAY,
   };
-  bitcoinjs.initEccLib(ecc);
-  const sell = new bitcoinjs.Psbt({
-    network:
-      network === 'testnet'
-        ? bitcoinjs.networks.testnet
-        : bitcoinjs.networks.bitcoin,
+  const psbtNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
+  const sell = new bitcoin.Psbt({
+    network: psbtNetwork,
   });
 
   sell.addInput(utxoInput);
@@ -64,6 +70,7 @@ export const buildSellOrder = async ({
   if (!btcWallet) {
     throw new Error('Wallet not initialized');
   }
+  console.log(sell);
   return sell.toHex();
   // const tx = sell.extractTransaction();
   // console.log(tx);
@@ -86,18 +93,17 @@ export const buildBatchSellOrder = async ({
     network,
     address,
   );
-  bitcoinjs.initEccLib(ecc);
-  const batchSell = new bitcoinjs.Psbt({
-    network:
-      network === 'testnet'
-        ? bitcoinjs.networks.testnet
-        : bitcoinjs.networks.bitcoin,
+  const psbtNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
+  const batchSell = new bitcoin.Psbt({
+    network: psbtNetwork,
   });
   for (let i = 0; i < inscriptionUtxos.length; i++) {
     const { utxo, price } = inscriptionUtxos[i];
     const { txid, vout } = parseUtxo(utxo);
     const rawTx = await getTxHex(txid, network);
-    const ordinalPreTx = bitcoinjs.Transaction.fromHex(rawTx);
+    const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx);
     console.log(ordinalPreTx);
     const utxoInput = {
       hash: txid,
@@ -114,17 +120,31 @@ export const buildBatchSellOrder = async ({
   return batchSell.toHex();
 };
 
-export const splitBatchSignedPsbt = (signedHex: string) => {
+export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
   console.log('split batch signed psbt', signedHex);
-  const psbt = bitcoinjs.Psbt.fromHex(signedHex);
+  const psbt = bitcoin.Psbt.fromHex(signedHex);
   console.log(psbt);
-  // console.log(psbt?.signers);
+  const psbtNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
   const { inputCount } = psbt;
+  const newPsbts: string[] = [];
   for (let i = 0; i < inputCount; i++) {
-    const element = inputCount;
-    const tx = new bitcoinjs.Transaction();
-    // tx.addInput(psbt.txInputs[i]);
+    const newPsbt = new bitcoin.Psbt({
+      network: psbtNetwork,
+    });
+    const batchInput = {
+      hash: psbt.txInputs[i].hash as any,
+      index: psbt.txInputs[i].index,
+      witnessUtxo: psbt.data.inputs[i].witnessUtxo as any,
+      finalScriptWitness: psbt.data.inputs[i].finalScriptWitness,
+    };
+    const batchOutput = psbt.txOutputs[i];
+    newPsbt.addInput(batchInput);
+    newPsbt.addOutput(batchOutput);
+    newPsbts.push(newPsbt.toHex());
   }
+  return newPsbts;
 };
 
 interface BuyOrderProps {
@@ -138,63 +158,38 @@ interface BuyOrderProps {
   dummyUtxos: any[];
   fee: number;
 }
-export const buildDummyUtxos = async ({ utxos, fee, address, network }) => {
-  const { btcWallet } = useReactWalletStore.getState();
-  const bitcoinjs = getBitcoinjs();
-  const btccoinNetwork = getBitcoinNetwork(network);
-  const psbt = new bitcoinjs.Psbt({
-    network: btccoinNetwork,
-  });
-
-  const inputs = utxos.map((v) => {
-    return {
-      hash: v.txid,
-      index: v.vout,
-      witnessUtxo: {
-        script: Buffer.from(addresToScriptPublicKey(address), 'hex'),
-        value: v.value,
-      },
-    };
-  });
-  inputs.forEach((i) => {
-    psbt.addInput(i);
-  });
-  const totalValue = utxos.reduce((a, b) => a + b.value, 0);
-  const balance = totalValue - DUMMY_UTXO_VALUE * 2 - fee;
-  const outputs = [
-    {
-      address,
-      value: balance,
-    },
-  ];
-  for (let i = 0; i < 2; i++) {
+export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
+  const { btcWallet, publicKey, address, network } =
+    useReactWalletStore.getState();
+  const outputs: any = [];
+  for (let i = 0; i < num; i++) {
     outputs.push({
       address,
       value: DUMMY_UTXO_VALUE,
     });
   }
-  outputs.forEach((o) => {
-    psbt.addOutput(o);
+  const psbt = await buildTransaction({
+    utxos,
+    outputs,
+    feeRate,
+    network,
+    address,
+    publicKey,
   });
   let dummyUtxos: any[] = [];
   let balanceUtxo: any = {};
   const signed = await btcWallet?.signPsbt(psbt.toHex());
   if (signed) {
     const txid = await btcWallet?.pushPsbt(signed);
-    balanceUtxo = {
-      txid,
-      vout: 0,
-      value: balance,
-    };
     dummyUtxos = [
       {
         txid,
-        vout: 1,
+        vout: 0,
         value: DUMMY_UTXO_VALUE,
       },
       {
         txid,
-        vout: 2,
+        vout: 1,
         value: DUMMY_UTXO_VALUE,
       },
     ];
@@ -205,133 +200,94 @@ export const buildDummyUtxos = async ({ utxos, fee, address, network }) => {
   };
 };
 export const buildBuyOrder = async ({
-  orderRaw,
-  network,
-  address,
-  fee,
+  orders,
   utxos,
   serviceFee,
+  feeRate,
   dummyUtxos,
-}: BuyOrderProps) => {
+}: any) => {
   const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
   const NEXT_PUBLIC_IS_FREE = process.env.NEXT_PUBLIC_IS_FREE;
   const NEXT_PUBLIC_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
-  const { btcWallet } = useReactWalletStore.getState();
+  const { btcWallet, network, address, publicKey } =
+    useReactWalletStore.getState();
 
-  console.log(
-    'build buy order params',
-    orderRaw,
-    network,
-    address,
-    fee,
-    utxos,
-    serviceFee,
-    dummyUtxos,
+  console.log('build buy order params', utxos, serviceFee, dummyUtxos);
+  const psbtNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
-  bitcoinjs.initEccLib(ecc);
-  const btccoinNetwork =
-    network === 'testnet'
-      ? bitcoinjs.networks.testnet
-      : bitcoinjs.networks.bitcoin;
 
-  const sellPsbt = bitcoinjs.Psbt.fromHex(orderRaw, {
-    network: btccoinNetwork,
-  });
-
-  const buyPsbt = new bitcoinjs.Psbt({
-    network: btccoinNetwork,
-  });
-  console.log(sellPsbt);
-  const totalValue = utxos.reduce((a, b) => a + b.value, 0);
-  const buyInputs: any[] = utxos.map((v) => {
-    return {
-      hash: v.txid,
-      index: v.vout,
-      witnessUtxo: {
-        script: Buffer.from(addresToScriptPublicKey(address), 'hex'),
-        value: v.value,
-      },
-    };
-  });
-  const dummyValue = dummyUtxos.reduce((a, b) => a + b.value, 0);
-  const dummyInputs: any[] = dummyUtxos.map((v) => {
-    return {
-      hash: v.txid,
-      index: v.vout,
-      witnessUtxo: {
-        script: Buffer.from(addresToScriptPublicKey(address), 'hex'),
-        value: v.value,
-      },
-      sighashType: bitcoinjs.Transaction.SIGHASH_ALL,
-    };
-  });
-  dummyInputs.forEach((i) => {
-    buyPsbt.addInput(i);
-  });
-  buyPsbt.addOutput({
+  const btcUtxos = convertUtxosToBtcUtxos({
+    utxos,
     address,
-    value: dummyValue,
+    publicKey,
   });
 
-  console.log(buyInputs);
-  const sellerInput = {
-    hash: sellPsbt.txInputs[0].hash,
-    index: sellPsbt.txInputs[0].index,
-    witnessUtxo: sellPsbt.data.inputs[0].witnessUtxo,
-    finalScriptWitness: sellPsbt.data.inputs[0].finalScriptWitness,
-  };
-
-  buyPsbt.addInput(sellerInput);
-
-  buyInputs.forEach((i) => {
-    buyPsbt.addInput(i);
-  });
-
-  const ordValue = sellPsbt.data.inputs[0].witnessUtxo!.value;
-  const ordOutput = {
+  const psbtTx = new Transaction({
     address,
-    value: ordValue,
-  };
-  buyPsbt.addOutput(ordOutput);
+    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    feeRate,
+  });
+  console.log(btcUtxos);
+  psbtTx.setEnableRBF(true);
+  dummyUtxos.forEach((v) => {
+    psbtTx.addInput(v);
+  });
 
-  const sellAmount = sellPsbt.txOutputs[0].value;
-  const sellerOutput = sellPsbt.txOutputs[0];
-  buyPsbt.addOutput(sellerOutput);
-
-  const spendValue = sellAmount + fee;
-  let changeValue = totalValue - spendValue - DUMMY_UTXO_VALUE * 2;
-  if (
-    NEXT_PUBLIC_IS_FREE === '0' &&
-    serviceFee &&
-    NEXT_PUBLIC_SERVICE_ADDRESS
-  ) {
-    changeValue -= serviceFee;
-    buyPsbt.addOutput({
-      address: NEXT_PUBLIC_SERVICE_ADDRESS,
-      value: serviceFee,
+  const sellInputs: PsbtInput[] = [];
+  const sellOutputs: any[] = [];
+  const buyOutputs: any[] = [];
+  for (let i = 0; i < orders.length; i++) {
+    const { orderRaw } = orders[i];
+    const sellPsbt = bitcoin.Psbt.fromHex(orderRaw, {
+      network: psbtNetwork,
     });
+    const sellerInput = {
+      hash: sellPsbt.txInputs[0].hash as any,
+      index: sellPsbt.txInputs[0].index,
+      witnessUtxo: sellPsbt.data.inputs[0].witnessUtxo as any,
+      finalScriptWitness: sellPsbt.data.inputs[0].finalScriptWitness,
+    };
+    sellInputs.push(sellerInput);
+    const ordValue = sellPsbt.data.inputs[0].witnessUtxo!.value;
+    const ordOutput = {
+      address,
+      value: ordValue,
+    };
+    const sellerOutput = sellPsbt.txOutputs[0];
+    buyOutputs.push(sellerOutput);
+    sellOutputs.push(ordOutput);
   }
-  buyPsbt.addOutput({
-    address,
-    value: DUMMY_UTXO_VALUE,
+  sellInputs.forEach((i) => {
+    psbtTx.addPsbtInput(i, `${i.hash}:${i.index}`);
   });
-  buyPsbt.addOutput({
-    address,
-    value: DUMMY_UTXO_VALUE,
+  psbtTx.addSufficientUtxosForFee(btcUtxos, {
+    suitable: false,
   });
 
-  const changeOutput = {
-    address,
-    value: changeValue,
-  };
-  buyPsbt.addOutput(changeOutput);
+  const dummyTotal = dummyUtxos.reduce((a, b) => a + b.value, 0);
+  psbtTx.addOutput(address, dummyTotal);
+  sellOutputs.forEach((v) => {
+    psbtTx.addOutput(v.address, v.value);
+  });
+  buyOutputs.forEach((v) => {
+    psbtTx.addOutput(v.address, v.value);
+  });
 
+  if (serviceFee && NEXT_PUBLIC_SERVICE_FEE && NEXT_PUBLIC_SERVICE_ADDRESS) {
+    psbtTx.addOutput(NEXT_PUBLIC_SERVICE_ADDRESS, serviceFee);
+  }
+  for (let i = 0; i < dummyUtxos.length; i++) {
+    psbtTx.addOutput(address, DUMMY_UTXO_VALUE);
+  }
+
+  const buyPsbt = psbtTx.toPsbt();
   if (!btcWallet) {
     throw new Error('Wallet not initialized');
   }
   const signed = await btcWallet.signPsbt(buyPsbt.toHex());
-  const psbt = bitcoinjs.Psbt.fromHex(signed, {
-    network: btccoinNetwork,
+  const psbt = bitcoin.Psbt.fromHex(signed, {
+    network: psbtNetwork,
   });
   const tx = psbt.extractTransaction();
   const rawTxHex = tx.toHex();

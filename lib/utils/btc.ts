@@ -6,7 +6,9 @@ import {
 } from '@/lib/constants';
 import { addresToScriptPublicKey } from '@/lib/utils/order';
 import { sortBy, reverse, cloneDeep } from 'lodash';
-import { getBitcoinjs, getBitcoinNetwork } from '@/lib/utils/bitcoin';
+import { bitcoin, toPsbtNetwork, NetworkType } from '../wallet';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+
 export const parseUtxo = (utxo: string) => {
   const [txid, vout] = utxo.split(':');
   return {
@@ -58,54 +60,55 @@ export const safeOutputValue = (
   return value.round().toNumber();
 };
 
-export const filterUtxosByValue = (
-  utxos: any[],
-  value,
-  reverseStatus = true,
-) => {
-  const sortUtxos = sortBy(utxos, 'value');
-  console.log('sortUtxos', sortUtxos);
-  const _utxoList = cloneDeep(sortUtxos);
-  if (reverseStatus) {
-    reverse(_utxoList);
-  }
-  const avialableUtxo: any[] = [];
-  let avialableValue = 0;
-  for (let i = 0; i < _utxoList.length; i++) {
-    const utxo = _utxoList[i];
-    avialableUtxo.push(utxo);
-    avialableValue += utxo.value;
-    if (avialableValue >= value) {
-      break;
-    }
-  }
-  const twoUtxos = sortUtxos.slice(0, 2);
-  const smallTwoUtxos: any[] = [];
-  for (let i = 0; i < twoUtxos.length; i++) {
-    if (
-      avialableUtxo.every(
-        (item) =>
-          `${item.txid}:${item.vout}` !==
-          `${twoUtxos[i].txid}:${twoUtxos[i].vout}`,
-      )
-    ) {
-      smallTwoUtxos.push(twoUtxos[i]);
-    }
-  }
-  console.log('smallTwoUtxos', smallTwoUtxos);
-  return {
-    minUtxo: sortUtxos[0],
-    maxUtxo: sortUtxos[sortUtxos.length - 1],
-    utxos: avialableUtxo,
-    smallTwoUtxos,
-    total: avialableValue,
-  };
-};
+// export const filterUtxosByValue = (
+//   utxos: any[],
+//   value,
+//   reverseStatus = true,
+// ) => {
+//   const sortUtxos = sortBy(utxos, 'value');
+//   console.log('sortUtxos', sortUtxos);
+//   const _utxoList = cloneDeep(sortUtxos);
+//   if (reverseStatus) {
+//     reverse(_utxoList);
+//   }
+//   const avialableUtxo: any[] = [];
+//   let avialableValue = 0;
+//   for (let i = 0; i < _utxoList.length; i++) {
+//     const utxo = _utxoList[i];
+//     avialableUtxo.push(utxo);
+//     avialableValue += utxo.value;
+//     if (avialableValue >= value) {
+//       break;
+//     }
+//   }
+//   const twoUtxos = sortUtxos.slice(0, 2);
+//   const smallTwoUtxos: any[] = [];
+//   for (let i = 0; i < twoUtxos.length; i++) {
+//     if (
+//       avialableUtxo.every(
+//         (item) =>
+//           `${item.txid}:${item.vout}` !==
+//           `${twoUtxos[i].txid}:${twoUtxos[i].vout}`,
+//       )
+//     ) {
+//       smallTwoUtxos.push(twoUtxos[i]);
+//     }
+//   }
+//   console.log('smallTwoUtxos', smallTwoUtxos);
+//   return {
+//     minUtxo: sortUtxos[0],
+//     maxUtxo: sortUtxos[sortUtxos.length - 1],
+//     utxos: avialableUtxo,
+//     smallTwoUtxos,
+//     total: avialableValue,
+//   };
+// };
 
 export const calcPsbtVirtualSize = (psbtHex: string, network: string) => {
-  const bitcoinjs = getBitcoinjs();
-  const btccoinNetwork = getBitcoinNetwork(network);
-  const psbt = bitcoinjs.Psbt.fromHex(psbtHex, {
+  const btccoinNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
+  const psbt = bitcoin.Psbt.fromHex(psbtHex, {
     network: btccoinNetwork,
   });
   // 从 base64 解码为 Buffer
@@ -120,9 +123,7 @@ export const calcPsbtVirtualSize = (psbtHex: string, network: string) => {
     .toString('hex');
 
   // 从十六进制反序列化生成 Transaction 对象
-  const tx = bitcoinjs.Transaction.fromBuffer(
-    Buffer.from(unsignedTxHex, 'hex'),
-  );
+  const tx = bitcoin.Transaction.fromBuffer(Buffer.from(unsignedTxHex, 'hex'));
 
   // 计算交易虚拟大小 vsize
   const virtualSize = tx.virtualSize();
@@ -131,10 +132,11 @@ export const calcPsbtVirtualSize = (psbtHex: string, network: string) => {
 };
 
 export const calcPsbtVsizeByUtxos = ({ inputs, outputs, network }) => {
-  const bitcoinjs = getBitcoinjs();
-  const btccoinNetwork = getBitcoinNetwork(network);
+  const btccoinNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
 
-  const virtualPsbt = new bitcoinjs.Psbt({
+  const virtualPsbt = new bitcoin.Psbt({
     network: btccoinNetwork,
   });
 
@@ -188,4 +190,14 @@ export const calcUtxosVirtualGas = ({
     network,
   });
   return estimateFee;
+};
+
+export const signAndPushPsbt = async (psbt) => {
+  const { btcWallet } = useReactWalletStore.getState();
+  if (!btcWallet) {
+    throw new Error('No wallet connected');
+  }
+  const signed = await btcWallet.signPsbt(psbt.toHex());
+  const pushedTxId = await btcWallet.pushPsbt(signed);
+  return pushedTxId;
 };

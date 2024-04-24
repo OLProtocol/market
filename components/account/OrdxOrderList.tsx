@@ -4,12 +4,12 @@ import useSWR from 'swr';
 import { Empty, notification } from 'antd';
 import { getOrders, cancelOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { use, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Content } from '@/components/Content';
 import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
-import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useTranslation } from 'react-i18next';
+import { useList } from 'react-use';
 
 interface OrdxOrderListProps {
   address?: string;
@@ -30,6 +30,14 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({ offset: (page - 1) * size, size, address }),
   );
+  const [list, { set, reset: resetList, updateAt, removeAt }] = useList<any>(
+    [],
+  );
+  useEffect(() => {
+    if (data) {
+      set(data.data?.order_list || []);
+    }
+  }, [data, set]);
   const onCancelOrder = async (item: any) => {
     if (item.locker === '1') {
       notification.error({
@@ -44,7 +52,8 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
         message: 'Cancel order successfully',
         description: `The order has been canceled successfully`,
       });
-      mutate(swrKey);
+      const index = list.findIndex((i) => i.utxo === item.utxo);
+      removeAt(index);
     } else {
       notification.error({
         message: 'Cancel order failed',
@@ -56,7 +65,6 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data, size],
   );
-  const list = useMemo(() => data?.data?.order_list || [], [data]);
   return (
     <div className="">
       <Content loading={isLoading}>

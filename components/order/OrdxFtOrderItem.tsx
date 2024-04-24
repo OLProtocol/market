@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   item: any;
-  onBuy: any;
+  onBuy?: any;
   onCancelOrder?: () => void;
   canSelect?: boolean;
   selected?: boolean;
@@ -39,7 +39,7 @@ export const OrdxFtOrderItem = ({
   const buyHandler = async () => {
     setLoading(true);
     try {
-      await onBuy(item);
+      await onBuy?.(item);
     } catch (error) {
     } finally {
       setLoading(false);

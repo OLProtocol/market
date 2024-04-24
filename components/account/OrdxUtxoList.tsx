@@ -12,6 +12,7 @@ import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
+import { useList } from 'react-use';
 export const OrdxUtxoList = () => {
   const router = useRouter();
   const [ticker, setTicker] = useState<string>('');
@@ -25,7 +26,7 @@ export const OrdxUtxoList = () => {
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
-
+  const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
   }, [address, page, size, ticker]);
@@ -42,7 +43,12 @@ export const OrdxUtxoList = () => {
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data],
   );
-  const list = useMemo(() => data?.data?.assets || [], [data]);
+  useEffect(() => {
+    if (data) {
+      set(data?.data?.assets || []);
+    }
+  }, [data, set]);
+  // const list = useMemo(() => data?.data?.assets || [], [data]);
 
   const toSell = () => {
     router.push('/account/sell');
@@ -56,6 +62,7 @@ export const OrdxUtxoList = () => {
       ...item,
       price: '0',
       status: 'pending',
+      unit: 'btc',
     });
   };
   const selectHandler = (bol: boolean, item: any) => {
@@ -83,7 +90,11 @@ export const OrdxUtxoList = () => {
         message: 'Cancel order successfully',
         description: `The order has been canceled successfully`,
       });
-      mutate(swrKey);
+      const index = list.findIndex((i) => i.utxo === item.utxo);
+      item.order_id = 0;
+      if (index >= 0) {
+        updateAt(index, item);
+      }
     } else {
       notification.error({
         message: 'Cancel order failed',
@@ -91,6 +102,7 @@ export const OrdxUtxoList = () => {
       });
     }
   };
+  console.log('sellList', list);
   const onTIckerChange = (ticker: string) => {
     console.log('ticker', ticker);
     setTicker(ticker);
@@ -112,7 +124,7 @@ export const OrdxUtxoList = () => {
               selected={!!sellList.find((i) => i.utxo === item.utxo)}
               canSelect={canSelect}
               onSelect={(bol) => selectHandler(bol, item)}
-              key={item.utxo}
+              key={item.utxo + item.locked}
               item={item}
               onSell={() => sellHandler(item)}
               onCancelOrder={() => onCancelOrder(item)}

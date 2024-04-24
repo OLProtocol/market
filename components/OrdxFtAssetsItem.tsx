@@ -33,6 +33,11 @@ export const OrdxFtAssetsItem = ({
     await onSell?.(item);
     setLoading(false);
   };
+  const cancelHandler = async () => {
+    setLoading(true);
+    await onCancelOrder?.();
+    setLoading(false);
+  };
   return (
     <Card
       radius="lg"
@@ -69,6 +74,7 @@ export const OrdxFtAssetsItem = ({
                 className="text-tiny "
                 variant="flat"
                 fullWidth
+                isLoading={loading}
                 color="default"
                 radius="lg"
                 onClick={sellHandler}
@@ -82,12 +88,13 @@ export const OrdxFtAssetsItem = ({
                 variant="flat"
                 color="default"
                 radius="lg"
+                isLoading={loading}
                 startContent={
                   item.locker == '1' ? (
                     <Icon icon="mdi:lock" className="text-lg" />
                   ) : null
                 }
-                onClick={onCancelOrder}
+                onClick={cancelHandler}
               >
                 {t('buttons.remove_sale')}（{item.price} {item.currency}）
               </Button>

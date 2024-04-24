@@ -2,9 +2,9 @@
 
 import useSWR from 'swr';
 import { Empty, notification } from 'antd';
-import { getOrders, lockOrder, unlockOrder } from '@/api';
+import { getOrders, lockOrder, unlockOrder, cancelOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { use, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { BatchBuyFooter } from '@/components/BatchBuyFooter';
 import { Content } from '@/components/Content';
@@ -14,6 +14,8 @@ import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { SortDropdown } from '@/components/SortDropdown';
+import { useList } from 'react-use';
+
 interface OrdxOrderListProps {
   ticker: string;
   address?: string;
@@ -55,9 +57,40 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({ offset: (page - 1) * size, size, ticker, address, sort }),
   );
+  const [list, { set, reset: resetList, updateAt, removeAt }] = useList<any>(
+    [],
+  );
+  useEffect(() => {
+    if (data) {
+      set(data.data?.order_list || []);
+    }
+  }, [data, set]);
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
       setSort(sort);
+    }
+  };
+  const onCancelOrder = async (item: any) => {
+    if (item.locker === '1') {
+      notification.error({
+        message: 'Cancel order failed',
+        description: `The order is locked, please wait unlock it first`,
+      });
+      return;
+    }
+    const res = await cancelOrder({ address, order_id: item.order_id });
+    if (res.code === 200) {
+      notification.success({
+        message: 'Cancel order successfully',
+        description: `The order has been canceled successfully`,
+      });
+      const index = list.findIndex((i) => i.utxo === item.utxo);
+      removeAt(index);
+    } else {
+      notification.error({
+        message: 'Cancel order failed',
+        description: res.msg,
+      });
     }
   };
   const buyHandler = async (item) => {
@@ -73,7 +106,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
         });
         return;
       }
-      addBuy({ ...item, status: 'pending' });
+      addBuy({ ...item, status: 'pending', raw: orderDetail.data.raw });
     } catch (error: any) {
       console.log(error);
       notification.error({
@@ -86,11 +119,11 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     if (s) {
       await buyHandler(item);
     } else {
-      await cancelHandler(item);
+      await unlockHandler(item);
     }
   };
   console.log('buyList', buyList);
-  const cancelHandler = async (item) => {
+  const unlockHandler = async (item) => {
     try {
       const res = await unlockOrder({
         address: storeAddress,
@@ -151,7 +184,6 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data, size],
   );
-  const list = useMemo(() => data?.data?.order_list || [], [data]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
@@ -161,7 +193,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
             <SortDropdown
               sortList={sortList}
               value={sort}
-              disabled={!list.length}
+              disabled={!list.length || canSelect}
               onChange={onSortChange}
             ></SortDropdown>
           </div>
@@ -173,6 +205,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
               selected={!!buyList.find((i) => i.utxo === item.utxo)}
               key={item.utxo + i}
               item={item}
+              onCancelOrder={() => onCancelOrder(item)}
               onSelect={(s) => selectHandler(s, item)}
               onBuy={() => onBuy(item)}
             />

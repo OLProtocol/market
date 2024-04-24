@@ -13,11 +13,13 @@ import {
   getKeyValue,
 } from '@nextui-org/react';
 import { useMemo } from 'react';
+import { Transaction } from '@/lib';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
 export default function Home() {
+  console.log('Transaction', Transaction);
   const { t } = useTranslation();
   const router = useRouter();
   const { network } = useReactWalletStore();

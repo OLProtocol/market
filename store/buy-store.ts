@@ -6,6 +6,7 @@ export interface BuyUtxoAssetItem {
   value: number;
   price: string;
   status: 'pending' | 'confirmed' | 'failed';
+  raw: string;
   tickers: {
     ticker: string;
     amount: number;
