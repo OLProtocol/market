@@ -15,6 +15,7 @@ import {
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
+import { Icon } from '@iconify/react';
 
 export default function Home() {
   const { t } = useTranslation();
@@ -30,8 +31,8 @@ export default function Home() {
     <div className="pt-4">
       <Table
         isHeaderSticky
+        isStriped
         onRowAction={toDetail}
-        className="text-sm md:text-base"
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
@@ -47,7 +48,7 @@ export default function Home() {
           <TableColumn key="tx_order_count" className="text-sm md:text-base font-extralight">
             {t('common.tx_order_count')}
           </TableColumn>
-          <TableColumn key="holder_count" className="text-sm md:text-base">
+          <TableColumn key="holder_count" className="text-sm md:text-base font-extralight">
             {t('common.holder_count')}
           </TableColumn>
         </TableHeader>
@@ -58,12 +59,13 @@ export default function Home() {
           loadingContent={<Spinner />}
         >
           {(item: any) => (
-            <TableRow key={item.ticker} className="cursor-pointer">
+            <TableRow key={item.ticker} className="cursor-pointer text-sm md:text-base">
               {(columnKey) => {
                 if (columnKey === 'holder_count') {
                   return (
-                    <TableCell className="text-sm md:text-base">
-                      <div>{getKeyValue(item, columnKey)}</div>
+                    <TableCell className="font-light text-sm md:text-base">
+                      {getKeyValue(item, columnKey)}
+                      
                       {/* <div>{item['holder_dispersion']}</div> */}
                     </TableCell>
                   );
@@ -72,16 +74,18 @@ export default function Home() {
                     columnKey.toString(),
                   )
                 ) {
-                  console.log('item', columnKey);
                   return (
-                    <TableCell className="text-sm md:text-base">
-                      {getKeyValue(item, columnKey)} BTC
+                    <TableCell>
+                      <div className='flex text-sm md:text-base'>
+                        <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5'/>
+                        {getKeyValue(item, columnKey)}
+                      </div>
                     </TableCell>
                   );
                 } else {
                   return (
-                    <TableCell className="text-sm md:text-base">
-                      {getKeyValue(item, columnKey)}
+                    <TableCell className="font-light text-sm md:text-base">
+                       {getKeyValue(item, columnKey)}
                     </TableCell>
                   );
                 }

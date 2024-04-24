@@ -180,7 +180,7 @@ export const OrdxOrderHistoryList = ({
           loadingContent={<Spinner />}
         >
           {list.map((item: any, i) => (
-            <TableRow key={item.utxo + i}>
+            <TableRow key={item.utxo + i} className="text-sm md:text-base">
               {(columnKey) => {
                 if (
                   columnKey === 'utxo' ||
@@ -198,7 +198,7 @@ export const OrdxOrderHistoryList = ({
                           size="lg"
                           variant="flat"
                         >
-                          <span className='font-light text-sm'>{hideStr(v, 6)}</span>
+                          <span className='font-light'>{hideStr(v, 6)}</span>
                         </Snippet>
                       ) : (
                         '-'
@@ -221,7 +221,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txtime') {
                   return (
-                    <TableCell className='text-center font-light'>
+                    <TableCell className='text-center font-light text-sm md:text-base'>
                       <span>
                         {new Date(
                           Number(getKeyValue(item, columnKey)),
@@ -230,13 +230,29 @@ export const OrdxOrderHistoryList = ({
                     </TableCell>
                   );
                 } else if (columnKey === 'result_text') {
-                  return <TableCell className='text-center font-light'>{getKeyValue(item, columnKey)}</TableCell>;
+                  return <TableCell className='text-center font-light text-sm md:text-base'>{getKeyValue(item, columnKey)}</TableCell>;
+                } else if (columnKey === 'price') {
+                  return (
+                    <TableCell>
+                      <div className='flex text-sm md:text-base'>
+                        {item.currency === 'BTC' && (
+                          <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5'/>
+                        )}
+                      
+                        {getKeyValue(item, columnKey)}
+                        {item.currency !== 'BTC' && (
+                          ' ' + item.currency
+                        )}
+                      </div>
+                    </TableCell>
+                  );
                 } else {
                   return (
-                    <TableCell className='text-center font-light'>
-                      {`${getKeyValue(item, columnKey)}${
+                    <TableCell className='text-center font-light text-sm md:text-base'>
+                      {getKeyValue(item, columnKey)}
+                      {/* {`${getKeyValue(item, columnKey)}${
                         columnKey === 'price' ? ' ' + item.currency : ''
-                      }`}
+                      }`} */}
                     </TableCell>
                   );
                 }

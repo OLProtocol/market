@@ -71,7 +71,7 @@ export default function Page() {
                   <div className="text-base md:text-2xl ">
                     {item.value}
                   </div>
-                  <div className="text-xs md:text-sm text-gray-400">{item.label}</div>
+                  <div className="text-md md:text-sm text-gray-400">{item.label}</div>
                 </CardBody>
               </Card>
             ))}
