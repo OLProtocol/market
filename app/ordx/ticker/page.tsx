@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/order/WalletConnectBus';
+import { Icon } from '@iconify/react';
 
 export default function Page() {
   const { t, i18n } = useTranslation();
@@ -28,20 +29,39 @@ export default function Page() {
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
     return [
-      { value: summary.tx_order_count, label: t('common.tx_order_count') },
-      { value: summary.tx_total_amount, label: t('common.tx_total_asset') },
-      { value: summary.tx_total_volume + ' BTC', label: t('common.tx_total_volume') },
       {
+        value: summary.tx_order_count,
+        label: t('common.tx_order_count'),
+        unit: '',
+      }, {
+        value: summary.tx_total_amount,
+        label: t('common.tx_total_asset'),
+        unit: '',
+      }, {
+        value: summary.tx_total_volume,
+        label: t('common.tx_total_volume'),
+        unit: 'BTC',
+      }, {
         value: summary.onsell_order_count,
         label: t('common.onsell_order_count'),
-      },
-      {
-        value: summary.onsell_total_amount + ' BTC',
+        unit: '',
+      }, {
+        value: summary.onsell_total_amount,
         label: t('common.onsell_total_amount'),
+        unit: 'BTC',
+      }, {
+        value: summary.lowest_price,
+        label: t('common.lowest_price'),
+        unit: 'BTC',
+      }, {
+        value: summary.highest_price,
+        label: t('common.highest_price'),
+        unit: 'BTC',
+      }, {
+        value: summary.holder_count,
+        label: i18n.t('common.holder_count'),
+        unit: '',
       },
-      { value: summary.lowest_price + ' BTC', label: t('common.lowest_price') },
-      { value: summary.highest_price + ' BTC', label: t('common.highest_price') },
-      { value: summary.holder_count, label: i18n.t('common.holder_count') },
     ];
   }, [summary, i18n.language]);
 
@@ -68,8 +88,14 @@ export default function Page() {
             {headList.map((item) => (
               <Card isHoverable key={item.label} className="px-2">
                 <CardBody className="text-left">
-                  <div className="text-base md:text-2xl ">
-                    {item.value}
+                  <div className="flex text-base md:text-2xl">
+                    {item.unit === 'BTC' && (
+                      <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
+                    )}
+                    <span>
+                      {item.value === undefined ? '-' : item.value}
+                    </span>
+
                   </div>
                   <div className="text-md md:text-sm text-gray-400">{item.label}</div>
                 </CardBody>
@@ -78,9 +104,23 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <Divider />
+
       <div className="pt-4">
-        <Tabs aria-label="Options" size="lg" color="primary">
+        {/* <Tabs aria-label="Options" size="lg" color="primary"> */}
+        <Tabs
+          aria-label="Options"
+          color="primary"
+          size='lg'
+          variant="underlined"
+          classNames={{
+            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+            cursor: "w-full bg-blue-500",
+            tab: "max-w-fit px-0 h-12",
+            tabContent: "group-data-[selected=true]:text-blue-400"
+          }}
+          style={{ width: '100%' }}
+        >
+
           <Tab key="market" title={t('pages.market.title')}>
             <OrdxOrderList ticker={ticker} />
           </Tab>

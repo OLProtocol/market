@@ -63,24 +63,36 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       )}
-      <CardBody>
+      <CardBody className='h-4/6'>
         <div className="flex-1 text-sm md:text-base">
           {item?.assets?.map((v: any) => (
-            <Listbox key={v.inscriptionnum}>
-              <ListboxItem key={v.ticker}>
-                {t('common.tick')}: {v.ticker}
-              </ListboxItem>
-              <ListboxItem key={v.ticker + '-' + v.amount}>
-                {t('common.asset_num')}: {v.amount}
-              </ListboxItem>
-            </Listbox>
+            <div>
+              <Chip
+                variant="shadow"
+                size='lg'
+                classNames={{
+                  base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
+                  content: "drop-shadow shadow-black text-white",
+                }}
+              >
+                {v.ticker}
+              </Chip>
+              <Listbox key={v.inscriptionnum} className='border-small border-blue-500 rounded-xl mt-5'>
+                <ListboxItem key={v.ticker + '-' + v.amount}>
+                  Inscription Num: {v.inscriptionnum}
+                </ListboxItem>
+                <ListboxItem key={v.ticker + '-' + v.amount}>
+                  {t('common.asset_num')}: {v.amount}
+                </ListboxItem>
+              </Listbox>
+            </div>
           ))}
         </div>
       </CardBody>
-      <CardFooter className="block bg-gray-800">
+      <CardFooter className="block bg-gray-800 h-2/6">
         <div className='pb-2 flex'>
           {item.currency === 'BTC' ? (
-            <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5'/>
+            <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
           ) : (
             <span></span>
           )}
@@ -108,6 +120,7 @@ export const OrdxFtOrderItem = ({
               className="flex-1"
               fullWidth
               variant="ghost"
+              size='md'
               isLoading={loading}
               color="primary"
               radius="lg"
