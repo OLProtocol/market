@@ -1,14 +1,15 @@
 import {
-  Divider,
   Button,
-  ButtonGroup,
   Card,
   CardFooter,
   CardBody,
   Checkbox,
+  Chip,
+  Listbox,
+  ListboxItem,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 interface Props {
   item: any;
@@ -50,28 +51,44 @@ export const OrdxFtAssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody>
+      <CardBody className='h-4/5'>
         <div className="flex-1 text-sm md:text-base">
+          <Chip
+            variant="shadow"
+            size='lg'
+            classNames={{
+              base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
+              content: "drop-shadow shadow-black text-white",
+            }}
+          >
+            {item?.tickers[0].ticker}
+          </Chip>
           {item?.tickers?.map((v: any) => (
-            <div key={v.inscriptionnum}>
-              <div>Ticker: {v.ticker}</div>
-              <div>Amount: {v.amount}</div>
-            </div>
+            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
+              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
+                Inscription Num: {v.inscriptionnum}
+              </ListboxItem>
+              <ListboxItem key={v.ticker + '-' + v.amount}>
+                {t('common.asset_num')}: {v.amount}
+              </ListboxItem>
+            </Listbox>
           ))}
         </div>
       </CardBody>
-      <Divider />
-      <CardFooter className="">
+
+      <CardFooter className="block bg-gray-800 h-1/5">
         <div className="flex-1">
           <div>
             {item.order_id === 0 ? (
               <Button
-                className="text-tiny "
-                variant="flat"
                 fullWidth
-                color="default"
-                radius="lg"
+                variant="ghost"
+                size='md'
+                isLoading={loading}
+                color="primary"
+                radius="sm"
                 onClick={sellHandler}
+                className='border'
               >
                 {t('buttons.list_sale')}
               </Button>

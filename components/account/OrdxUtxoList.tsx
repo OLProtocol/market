@@ -91,7 +91,7 @@ export const OrdxUtxoList = () => {
       });
     }
   };
-  const onTIckerChange = (ticker: string) => {
+  const onTickerChange = (ticker: string) => {
     console.log('ticker', ticker);
     setTicker(ticker);
   };
@@ -102,7 +102,7 @@ export const OrdxUtxoList = () => {
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <div>
-        <OrdxUtxoTypeList onChange={onTIckerChange} />
+        <OrdxUtxoTypeList onChange={onTickerChange} />
       </div>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}

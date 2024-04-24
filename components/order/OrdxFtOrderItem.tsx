@@ -1,7 +1,5 @@
 import {
-  Divider,
   Button,
-  ButtonGroup,
   Card,
   CardFooter,
   CardBody,
@@ -65,27 +63,26 @@ export const OrdxFtOrderItem = ({
       )}
       <CardBody className='h-4/6'>
         <div className="flex-1 text-sm md:text-base">
+          <Chip
+            variant="shadow"
+            size='lg'
+            radius='sm'
+            classNames={{
+              base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
+              content: "drop-shadow shadow-black text-white",
+            }}
+          >
+            {item?.assets[0].ticker}
+          </Chip>
           {item?.assets?.map((v: any) => (
-            <div>
-              <Chip
-                variant="shadow"
-                size='lg'
-                classNames={{
-                  base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
-                  content: "drop-shadow shadow-black text-white",
-                }}
-              >
-                {v.ticker}
-              </Chip>
-              <Listbox key={v.inscriptionnum} className='border-small border-blue-500 rounded-xl mt-5'>
-                <ListboxItem key={v.ticker + '-' + v.amount}>
-                  Inscription Num: {v.inscriptionnum}
-                </ListboxItem>
-                <ListboxItem key={v.ticker + '-' + v.amount}>
-                  {t('common.asset_num')}: {v.amount}
-                </ListboxItem>
-              </Listbox>
-            </div>
+            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
+              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
+                Inscription Num: {v.inscriptionnum}
+              </ListboxItem>
+              <ListboxItem key={v.ticker + '-' + v.amount}>
+                {t('common.asset_num')}: {v.amount}
+              </ListboxItem>
+            </Listbox>
           ))}
         </div>
       </CardBody>
@@ -117,13 +114,13 @@ export const OrdxFtOrderItem = ({
             </Button>
           ) : (
             <Button
-              className="flex-1"
+              className="flex-1 border"
               fullWidth
               variant="ghost"
               size='md'
               isLoading={loading}
               color="primary"
-              radius="lg"
+              radius="sm"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
