@@ -53,7 +53,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     }
     return `/ordx/getOrders-${ticker}-${network}-${page}-${size}-${sort}`;
   }, [ticker, address, page, size, network, sort]);
-  console.log('swrKey', swrKey);
+
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({ offset: (page - 1) * size, size, ticker, address, sort }),
   );
@@ -65,6 +65,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
       set(data.data?.order_list || []);
     }
   }, [data, set]);
+
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
       setSort(sort);

@@ -48,7 +48,6 @@ export const OrdxUtxoList = () => {
       set(data?.data?.assets || []);
     }
   }, [data, set]);
-  // const list = useMemo(() => data?.data?.assets || [], [data]);
 
   const toSell = () => {
     router.push('/account/sell');
@@ -102,8 +101,7 @@ export const OrdxUtxoList = () => {
       });
     }
   };
-  console.log('sellList', list);
-  const onTIckerChange = (ticker: string) => {
+  const onTickerChange = (ticker: string) => {
     console.log('ticker', ticker);
     setTicker(ticker);
   };
@@ -114,7 +112,7 @@ export const OrdxUtxoList = () => {
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <div>
-        <OrdxUtxoTypeList onChange={onTIckerChange} />
+        <OrdxUtxoTypeList onChange={onTickerChange} />
       </div>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}

@@ -1,7 +1,5 @@
 import {
-  Divider,
   Button,
-  ButtonGroup,
   Card,
   CardFooter,
   CardBody,
@@ -63,12 +61,26 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       )}
-      <CardBody>
+      <CardBody className="h-4/6">
         <div className="flex-1 text-sm md:text-base">
+          <Chip
+            variant="shadow"
+            size="lg"
+            radius="sm"
+            classNames={{
+              base: 'bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30',
+              content: 'drop-shadow shadow-black text-white',
+            }}
+          >
+            {item?.assets[0].ticker}
+          </Chip>
           {item?.assets?.map((v: any) => (
-            <Listbox key={v.inscriptionnum}>
-              <ListboxItem key={v.ticker}>
-                {t('common.tick')}: {v.ticker}
+            <Listbox
+              key={v.inscriptionnum}
+              className="border-small border-gray-700 rounded-xl mt-5"
+            >
+              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
+                Inscription Num: {v.inscriptionnum}
               </ListboxItem>
               <ListboxItem key={v.ticker + '-' + v.amount}>
                 {t('common.asset_num')}: {v.amount}
@@ -77,9 +89,13 @@ export const OrdxFtOrderItem = ({
           ))}
         </div>
       </CardBody>
-      <CardFooter className="block bg-gray-800">
+      <CardFooter className="block bg-gray-800 h-2/6">
         <div className="pb-2 flex">
-          <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
+          {item.currency === 'BTC' ? (
+            <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
+          ) : (
+            <span></span>
+          )}
           <span className="text-sm text-amber-500">{item?.price}</span>
         </div>
         <WalletConnectBus className="flex-1">
@@ -101,12 +117,13 @@ export const OrdxFtOrderItem = ({
             </Button>
           ) : (
             <Button
-              className="text-tiny flex-1"
+              className="flex-1 border"
               fullWidth
               variant="ghost"
+              size="md"
               isLoading={loading}
               color="primary"
-              radius="lg"
+              radius="sm"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />

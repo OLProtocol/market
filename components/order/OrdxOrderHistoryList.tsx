@@ -168,7 +168,7 @@ export const OrdxOrderHistoryList = ({
           {coumns.map((c) => {
             return (
               <TableColumn
-                className="text-sm md:text-base"
+                className="text-sm md:text-base text-center font-extralight"
                 key={c.key}
                 align={c.align as any}
               >
@@ -184,7 +184,7 @@ export const OrdxOrderHistoryList = ({
           loadingContent={<Spinner />}
         >
           {list.map((item: any, i) => (
-            <TableRow key={item.utxo + i}>
+            <TableRow key={item.utxo + i} className="text-sm md:text-base">
               {(columnKey) => {
                 if (
                   columnKey === 'utxo' ||
@@ -193,7 +193,7 @@ export const OrdxOrderHistoryList = ({
                 ) {
                   const v = getKeyValue(item, columnKey);
                   return (
-                    <TableCell>
+                    <TableCell className="text-center font-light">
                       {v ? (
                         <Snippet
                           codeString={v}
@@ -202,7 +202,7 @@ export const OrdxOrderHistoryList = ({
                           size="lg"
                           variant="flat"
                         >
-                          {hideStr(v, 6)}
+                          <span className="font-light">{hideStr(v, 6)}</span>
                         </Snippet>
                       ) : (
                         '-'
@@ -211,7 +211,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txid') {
                   return (
-                    <TableCell>
+                    <TableCell className="text-center font-light">
                       <a
                         href={resolveMempoolTxLink(
                           getKeyValue(item, columnKey),
@@ -225,7 +225,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txtime') {
                   return (
-                    <TableCell>
+                    <TableCell className="text-center font-light text-sm md:text-base">
                       <span>
                         {new Date(
                           Number(getKeyValue(item, columnKey)),
@@ -234,13 +234,34 @@ export const OrdxOrderHistoryList = ({
                     </TableCell>
                   );
                 } else if (columnKey === 'result_text') {
-                  return <TableCell>{getKeyValue(item, columnKey)}</TableCell>;
-                } else {
+                  return (
+                    <TableCell className="text-center font-light text-sm md:text-base">
+                      {getKeyValue(item, columnKey)}
+                    </TableCell>
+                  );
+                } else if (columnKey === 'price') {
                   return (
                     <TableCell>
-                      {`${getKeyValue(item, columnKey)}${
+                      <div className="flex text-sm md:text-base">
+                        {item.currency === 'BTC' && (
+                          <Icon
+                            icon="cryptocurrency-color:btc"
+                            className="mr-1 mt-0.5"
+                          />
+                        )}
+
+                        {getKeyValue(item, columnKey)}
+                        {item.currency !== 'BTC' && ' ' + item.currency}
+                      </div>
+                    </TableCell>
+                  );
+                } else {
+                  return (
+                    <TableCell className="text-center font-light text-sm md:text-base">
+                      {getKeyValue(item, columnKey)}
+                      {/* {`${getKeyValue(item, columnKey)}${
                         columnKey === 'price' ? ' ' + item.currency : ''
-                      }`}
+                      }`} */}
                     </TableCell>
                   );
                 }

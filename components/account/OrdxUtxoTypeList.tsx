@@ -2,14 +2,10 @@
 
 import useSWR from 'swr';
 import { Tabs, Tab } from '@nextui-org/react';
-import { notification, Empty } from 'antd';
 import { getAddressOrdxList } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { use, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSellStore } from '@/store';
-import { Pagination } from '@/components/Pagination';
-import { Content } from '@/components/Content';
-import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
 import { useRouter } from 'next/navigation';
 
 interface OrdxUtxoTypeListProps {
@@ -50,11 +46,14 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     <div className="py-2 sm:py-4">
       <Tabs
         variant="light"
+        aria-label="Tabs variants"
+        color="warning"
+        radius="full"
+        size="lg"
         classNames={{
           tabList: 'flex-wrap',
           tab: 'w-min',
         }}
-        aria-label="Tabs variants"
         onSelectionChange={changeHandler}
       >
         {list?.map((item: any) => (
