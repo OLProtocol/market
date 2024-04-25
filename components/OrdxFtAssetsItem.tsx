@@ -11,6 +11,7 @@ import {
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { thousandSeparator } from '@/lib/utils';
 interface Props {
   item: any;
   onSell?: (item: any) => void;
@@ -63,7 +64,7 @@ export const OrdxFtAssetsItem = ({
           >
             {item?.tickers[0].ticker}
           </Chip>
-          {item?.tickers?.map((v: any) => (
+          {/* {item?.tickers?.map((v: any) => (
             <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
               <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
                 Inscription Num: {v.inscriptionnum}
@@ -72,7 +73,18 @@ export const OrdxFtAssetsItem = ({
                 {t('common.asset_num')}: {v.amount}
               </ListboxItem>
             </Listbox>
-          ))}
+          ))} */}
+          <div className='flex justify-center'>
+            <section className="text-center pt-10">
+              <p className='text-2xl font-thin text-white'>
+                {thousandSeparator(item?.tickers[0].amount)}
+              </p>
+              <p className='font-thin pt-2'>
+                <span className='text-gray-500'>Inscription Num: </span>
+                <span className='text-blue-400'>{item?.tickers[0].inscriptionnum}</span>
+              </p>
+            </section>
+          </div>
         </div>
       </CardBody>
 

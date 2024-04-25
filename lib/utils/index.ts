@@ -38,3 +38,7 @@ export const resolveMempoolTxLink = (txid: string, network: string) => {
       : `https://mempool.space/tx/${txid}`;
   return href;
 };
+
+export const thousandSeparator = (num: number) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
