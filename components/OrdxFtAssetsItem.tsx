@@ -7,11 +7,12 @@ import {
   Chip,
   Listbox,
   ListboxItem,
+  Snippet,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { thousandSeparator } from '@/lib/utils';
+import { hideStr, thousandSeparator } from '@/lib/utils';
 interface Props {
   item: any;
   onSell?: (item: any) => void;
@@ -79,9 +80,13 @@ export const OrdxFtAssetsItem = ({
               <p className='text-2xl font-thin text-white'>
                 {thousandSeparator(item?.tickers[0].amount)}
               </p>
+              <p className='pt-2'>
+                <Snippet codeString={item?.utxo} className="bg-transparent text-blue-400" symbol="" size="lg" variant="flat">
+                  <span className='font-thin'>{hideStr(item?.utxo, 6)}</span>
+                </Snippet>
+              </p>
               <p className='font-thin pt-2'>
-                <span className='text-gray-500'>Inscription Num: </span>
-                <span className='text-blue-400'>{item?.tickers[0].inscriptionnum}</span>
+                <span className='text-blue-400'>#{item?.tickers[0].inscriptionnum}</span>
               </p>
             </section>
           </div>

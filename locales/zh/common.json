@@ -21,7 +21,8 @@
   "fee_normal": "正常",
   "fee_custom": "自定义",
   "holder": "持有人",
-  "volumn": "成交量",
+  "total_volumn": "总成交量",
+  "total_amount": "总资产(mint)",
   "item": "项目",
   "utxo": "未使用的交易输出",
   "utxos": "未使用的交易输出集",
@@ -43,11 +44,14 @@
   "tx_order_count": "历史总挂单数",
   "tx_total_asset": "交易总资产数量",
   "tx_total_volume": "交易总成交量",
+  "tx_total_amount": "资产(已售)",
   "onsell_order_count": "在售挂单数",
-  "onsell_total_amount": "在售总金额",
-  "lowest_price": "历史最低价格",
-  "highest_price": "历史最高价格",
+  "onsell_total_amount": "资产(在售)",
+  "lowest_price": "地板价",
+  "highest_price": "最高出价",
   "holder_count": "持有人数量",
   "tx_history": "交易历史",
-  "my_listings": "我的挂单"
+  "my_listings": "我的挂单",
+  "floor_price": "地板价",
+  "holder_dispersion": "持有分散度"
 }
