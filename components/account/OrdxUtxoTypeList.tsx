@@ -22,6 +22,7 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   const swrKey = useMemo(() => {
     return `/ordx/getAddressOrdxList-${address}-${network}-${page}-${size}`;
   }, [address, page, size, network]);
+
   const { data, isLoading, mutate } = useSWR(
     swrKey,
     () => getAddressOrdxList({ address, offset: (page - 1) * size, size }),
@@ -29,19 +30,22 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
       revalidateOnMount: true,
     },
   );
-  console.log(data);
+
   const list = useMemo(() => data?.data || [], [data]);
   useEffect(() => {
     if (list.length > 0) {
       onChange?.(list[0].ticker);
     }
   }, [list]);
+
   const changeHandler = (k: any) => {
     onChange?.(k);
   };
+
   useEffect(() => {
     reset();
   }, []);
+
   return (
     <div className="py-2 sm:py-4">
       <Tabs

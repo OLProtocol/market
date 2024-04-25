@@ -13,6 +13,7 @@ import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { thousandSeparator } from '@/lib/utils';
 
 interface Props {
   item: any;
@@ -74,11 +75,8 @@ export const OrdxFtOrderItem = ({
           >
             {item?.assets[0].ticker}
           </Chip>
-          {item?.assets?.map((v: any) => (
-            <Listbox
-              key={v.inscriptionnum}
-              className="border-small border-gray-700 rounded-xl mt-5"
-            >
+          {/* {item?.assets?.map((v: any) => (
+            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
               <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
                 Inscription Num: {v.inscriptionnum}
               </ListboxItem>
@@ -86,7 +84,22 @@ export const OrdxFtOrderItem = ({
                 {t('common.asset_num')}: {v.amount}
               </ListboxItem>
             </Listbox>
-          ))}
+          ))} */}
+          <div className="flex justify-center">
+            <section className="text-center pt-10">
+              <p className="text-2xl font-thin text-white">
+                {thousandSeparator(item?.assets[0].amount)}
+              </p>
+              <p className="pt-2">
+                <span className="font-medium text-blue-400">
+                  {item?.assets[0].unit_price}
+                </span>
+                <span className="font-thin text-gray-500">
+                  &nbsp;sat/{item?.assets[0].ticker}
+                </span>
+              </p>
+            </section>
+          </div>
         </div>
       </CardBody>
       <CardFooter className="block bg-gray-800 h-2/6">
