@@ -90,9 +90,9 @@ export const OrdxFtOrderItem = ({
               <p className='text-2xl font-thin text-white'>
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
-              <p className='font-thin pt-2'>
-                <span className='text-blue-400'>{item?.assets[0].unit_price}</span>
-                <span className='text-gray-500'>&nbsp;sat/{item?.assets[0].ticker}</span>
+              <p className='pt-2'>
+                <span className='font-medium text-blue-400'>{item?.assets[0].unit_price}</span>
+                <span className='font-thin text-gray-500'>&nbsp;sat/{item?.assets[0].ticker}</span>
               </p>
             </section>
           </div>
