@@ -82,11 +82,12 @@ export default function Home() {
                       {getKeyValue(item, columnKey)}&nbsp;
                       <Tooltip color="warning" content={t('common.holder_dispersion')} delay={1000}>
 
-                        {getKeyValue(item, 'holder_dispersion').includes('-') ? (
+                        {getKeyValue(item, 'holder_dispersion') !== '' && getKeyValue(item, 'holder_dispersion').includes('-') && (
                           <Button color="danger" variant="flat">
                             {getKeyValue(item, 'holder_dispersion')}
                           </Button>
-                        ) : (
+                        )}
+                        {getKeyValue(item, 'holder_dispersion') !== '' && !getKeyValue(item, 'holder_dispersion').includes('-') && (
                           <Button color="success" variant="flat">
                             {getKeyValue(item, 'holder_dispersion')}
                           </Button>
@@ -98,11 +99,12 @@ export default function Home() {
                   return (
                     <TableCell className="font-light text-sm md:text-base">
                       {getKeyValue(item, columnKey)}&nbsp;
-                      {getKeyValue(item, 'onsell_amount_change').includes('-') ? (
+                      {getKeyValue(item, 'onsell_amount_change') !== '' && getKeyValue(item, 'onsell_amount_change').length > 1 && getKeyValue(item, 'onsell_amount_change').includes('-') && (
                         <Button color="danger" variant="flat">
                           {getKeyValue(item, 'onsell_amount_change')}
                         </Button>
-                      ) : (
+                      )}
+                      {getKeyValue(item, 'onsell_amount_change') !== '' && !getKeyValue(item, 'onsell_amount_change').includes('-') && (
                         <Button color="success" variant="flat">
                           {getKeyValue(item, 'onsell_amount_change')}
                         </Button>
