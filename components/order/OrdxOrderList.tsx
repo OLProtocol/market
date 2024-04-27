@@ -205,9 +205,10 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
             ></SortDropdown>
           </div>
         )}
-        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 mb-4">
+        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
           {list.map((item: any, i) => (
             <OrdxFtOrderItem
+              showResale={false}
               canSelect={canSelect}
               selected={!!buyList.find((i) => i.utxo === item.utxo)}
               key={item.utxo + i}

@@ -2,7 +2,7 @@ import { Button } from '@nextui-org/react';
 import { useBuyStore } from '@/store';
 import { Icon } from '@iconify/react';
 import { BatchCart } from './BatchCart';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { notification } from 'antd';
@@ -14,6 +14,7 @@ import {
   filterUtxosByValue,
   btcToSats,
   buildBuyOrder,
+  calcBuyOrderFee,
 } from '@/lib';
 import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -36,6 +37,7 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   const { list } = useBuyStore();
   const { t } = useTranslation();
   const [show, setShow] = useState(true);
+  const [networkFee, setNetworkFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
   const { address, network } = useReactWalletStore();
   const { data, isLoading } = useSWR(
@@ -48,6 +50,10 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
+  );
+  const splitDummyBol = useMemo(
+    () => dummyLength > dummyUtxos.length,
+    [dummyLength],
   );
   const canSpendableUtxos = useMemo(
     () => utxos.filter((v) => v.value !== DUMMY_UTXO_VALUE),
@@ -64,6 +70,7 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   );
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
+    // const spendableDummyUtxos = dummyUtxos?.slice(0, 1) || [];
     const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
     const dis = dummyLength - spendableDummyUtxos.length;
     let balanceUtxo: any;
@@ -89,6 +96,33 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
       spendedUtxos,
     };
   };
+  const calcFee = async () => {
+    const newDummyUtxos = dummyUtxos?.slice(0, dummyLength);
+    const virtualFee =
+      (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
+    const { utxos: filterConsumUtxos } = filterUtxosByValue(
+      canSpendableUtxos,
+      virtualFee +
+        330 +
+        totalPrice +
+        serviceFee +
+        DUMMY_UTXO_VALUE * dummyLength,
+    );
+    const networkFee = await calcBuyOrderFee({
+      orders: list,
+      utxos: filterConsumUtxos,
+      dummyUtxos: newDummyUtxos,
+      serviceFee: serviceFee,
+      feeRate: feeRate.value,
+    });
+
+    setNetworkFee(networkFee);
+  };
+  useEffect(() => {
+    if (canSpendableUtxos.length && dummyLength) {
+      calcFee();
+    }
+  }, [dummyLength, dummyUtxos, canSpendableUtxos, totalPrice, feeRate.value]);
   const buyHandler = async () => {
     try {
       if (!utxos.length) {
@@ -99,7 +133,12 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
         return;
       }
       setLoading(true);
-      const { dummyUtxos, balanceUtxo, spendedUtxos } = await findDummyUtxos();
+      const {
+        dummyUtxos: newDummyUtxos,
+        balanceUtxo,
+        spendedUtxos,
+      } = await findDummyUtxos();
+
       console.log('canSpendableUtxos', canSpendableUtxos);
       const spendableUtxos = canSpendableUtxos.filter((v) => {
         const l = !!spendedUtxos.find(
@@ -124,7 +163,7 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
       const buyRaw = await buildBuyOrder({
         orders: list,
         utxos: filterConsumUtxos,
-        dummyUtxos: dummyUtxos,
+        dummyUtxos: newDummyUtxos,
         serviceFee: serviceFee,
         feeRate: feeRate.value,
       });
@@ -164,7 +203,13 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   //   address,
   return (
     <>
-      {show && <BatchCart />}
+      {show && (
+        <BatchCart
+          splitDummyBol={splitDummyBol}
+          networkFee={networkFee}
+          serviceFee={serviceFee}
+        />
+      )}
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-20">
         <div className="flex justify-between items-center w-full h-full px-4">
           <div className="flex-1">{list.length}</div>

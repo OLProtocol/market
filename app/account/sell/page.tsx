@@ -111,8 +111,8 @@ export default function SellPage() {
             message: t('notification.list_success_title'),
             description: t('notification.list_success_description'),
           });
-          // reset();
-          // router.back();
+          reset();
+          router.back();
         } else {
           notification.error({
             message: t('notification.list_failed_title'),

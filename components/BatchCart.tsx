@@ -1,8 +1,15 @@
 import { useBuyStore } from '@/store';
+import { Divider } from '@nextui-org/react';
 import { useMemo } from 'react';
 import { Decimal } from 'decimal.js';
-
-export const BatchCart = () => {
+import { satsToBitcoin } from '@/lib';
+interface Props {
+  splitDummyBol: boolean;
+  networkFee: number;
+  dummyNetworkFee?: number;
+  serviceFee: number;
+}
+export const BatchCart = ({ splitDummyBol, networkFee, serviceFee }: Props) => {
   const { list } = useBuyStore();
   const totalPrice = useMemo(
     () =>
@@ -19,6 +26,7 @@ export const BatchCart = () => {
         <span>Cart ({list.length})</span>
         <span>Total: {totalPrice} BTC</span>
       </div>
+      <Divider className="my-2" />
       <div>
         {list.map((item) => (
           <div
@@ -33,6 +41,18 @@ export const BatchCart = () => {
             <span>{item.price}</span>
           </div>
         ))}
+      </div>
+      <div>{splitDummyBol && <div>需要分割虚拟UTXO</div>}</div>
+      <Divider className="my-2" />
+      <div>
+        <div className="flex justify-between items-center">
+          <span>network fee</span>
+          <span>~ {satsToBitcoin(networkFee)} BTC</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span>sercice fee</span>
+          <span>{satsToBitcoin(serviceFee)} BTC</span>
+        </div>
       </div>
     </div>
   );

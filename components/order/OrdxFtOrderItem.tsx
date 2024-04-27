@@ -12,13 +12,15 @@ import {
 import { WalletConnectBus } from '@/components/order/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
 
 interface Props {
   item: any;
   onBuy?: any;
+  showResale?: boolean;
+
   onCancelOrder?: () => void;
   canSelect?: boolean;
   selected?: boolean;
@@ -32,6 +34,7 @@ export const OrdxFtOrderItem = ({
   selected,
   onSelect,
   onCancelOrder,
+  showResale = true,
 }: Props) => {
   const { address: currentAddress } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
@@ -45,6 +48,17 @@ export const OrdxFtOrderItem = ({
       setLoading(false);
     }
   };
+  const canBuy = useMemo(
+    () => currentAddress && item.address !== currentAddress,
+    [currentAddress, item.address],
+  );
+  const selectHandler = (b: boolean) => {
+    if (!canBuy) {
+      return;
+    }
+    onSelect?.(b);
+  };
+
   return (
     <Card
       isPressable
@@ -55,11 +69,15 @@ export const OrdxFtOrderItem = ({
         <div
           className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-10 cursor-pointer"
           onClick={() => {
-            onSelect?.(!selected);
+            selectHandler?.(!selected);
           }}
         >
           <div className="flex absolute top-4 right-4">
-            <Checkbox isSelected={selected} onValueChange={onSelect} />
+            <Checkbox
+              isDisabled={!canBuy}
+              isSelected={selected}
+              onValueChange={selectHandler}
+            />
           </div>
         </div>
       )}
@@ -76,16 +94,6 @@ export const OrdxFtOrderItem = ({
           >
             {item?.assets[0].ticker}
           </Chip>
-          {/* {item?.assets?.map((v: any) => (
-            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
-              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
-                Inscription Num: {v.inscriptionnum}
-              </ListboxItem>
-              <ListboxItem key={v.ticker + '-' + v.amount}>
-                {t('common.asset_num')}: {v.amount}
-              </ListboxItem>
-            </Listbox>
-          ))} */}
           <div className="flex justify-center">
             <section className="text-center pt-8">
               <p className="text-2xl font-thin text-white">
@@ -122,7 +130,7 @@ export const OrdxFtOrderItem = ({
           <span className="text-sm text-amber-500">{item?.price}</span>
         </div>
         <WalletConnectBus className="flex-1">
-          {item?.address === currentAddress ? (
+          {item?.address === currentAddress && showResale ? (
             <Button
               className="text-tiny"
               fullWidth
@@ -144,6 +152,7 @@ export const OrdxFtOrderItem = ({
               fullWidth
               variant="ghost"
               size="md"
+              isDisabled={!canBuy}
               isLoading={loading}
               color="primary"
               radius="sm"

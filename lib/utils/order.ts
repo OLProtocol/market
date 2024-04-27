@@ -184,28 +184,24 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
   });
   let dummyUtxos: any[] = [];
   let balanceUtxo: any = {};
-  console.log(psbt);
   const signed = await btcWallet?.signPsbt(psbt.toHex());
   if (signed) {
     const txid = await btcWallet?.pushPsbt(signed);
-    dummyUtxos = [
-      {
+    for (let i = 0; i < num; i++) {
+      dummyUtxos.push({
         txid,
         vout: 0,
         value: DUMMY_UTXO_VALUE,
-      },
-      {
-        txid,
-        vout: 1,
-        value: DUMMY_UTXO_VALUE,
-      },
-    ];
+      });
+    }
     balanceUtxo = {
       txid,
       vout: psbt.txOutputs.length - 1,
       value: psbt.txOutputs[psbt.txOutputs.length - 1].value,
     };
   }
+  console.log(dummyUtxos);
+  console.log(balanceUtxo);
   return {
     balanceUtxo,
     dummyUtxos,
@@ -234,11 +230,6 @@ export const buildBuyOrder = async ({
     address,
     publicKey,
   });
-  // const btcDummyUtxos = convertUtxosToBtcUtxos({
-  //   utxos: dummyUtxos,
-  //   address,
-  //   publicKey,
-  // });
   const dummyInputs: any[] = dummyUtxos.map((v) => {
     return {
       hash: v.txid,
@@ -329,22 +320,14 @@ export const buildBuyOrder = async ({
   const rawTxHex = tx.toHex();
   return rawTxHex;
 };
-export const buildBuyOrder11 = async ({
+
+export const calcBuyOrderFee = async ({
   orders,
   utxos,
   serviceFee,
   feeRate,
   dummyUtxos,
 }: any) => {
-  console.log('build order b start');
-  const bbbuypsbt = await buildBuyOrder({
-    orders,
-    utxos,
-    serviceFee,
-    feeRate: 1,
-    dummyUtxos,
-  });
-  console.log('build order b start');
   const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
   const NEXT_PUBLIC_IS_FREE = process.env.NEXT_PUBLIC_IS_FREE;
   const NEXT_PUBLIC_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
@@ -356,9 +339,10 @@ export const buildBuyOrder11 = async ({
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
 
-  const btcInputs = converUtxosToInputs({
+  const btcUtxos = convertUtxosToBtcUtxos({
     utxos,
     address,
+    publicKey,
   });
   const dummyInputs: any[] = dummyUtxos.map((v) => {
     return {
@@ -371,12 +355,15 @@ export const buildBuyOrder11 = async ({
       sighashType: bitcoin.Transaction.SIGHASH_ALL,
     };
   });
-  const buyPsbt = new bitcoin.Psbt({
-    network: psbtNetwork,
+
+  const psbtTx = new Transaction({
+    address,
+    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    feeRate,
   });
-  console.log(btcInputs);
+  psbtTx.setEnableRBF(false);
   dummyInputs.forEach((v) => {
-    buyPsbt.addInput(v);
+    psbtTx.addPsbtInput(v);
   });
 
   const sellInputs: PsbtInput[] = [];
@@ -384,11 +371,9 @@ export const buildBuyOrder11 = async ({
   const buyOutputs: any[] = [];
   for (let i = 0; i < orders.length; i++) {
     const { raw } = orders[i];
-    console.log(raw);
     const sellPsbt = bitcoin.Psbt.fromHex(raw, {
       network: psbtNetwork,
     });
-    console.log(sellPsbt);
     const sellerInput = {
       hash: sellPsbt.txInputs[0].hash as any,
       index: sellPsbt.txInputs[0].index,
@@ -407,83 +392,29 @@ export const buildBuyOrder11 = async ({
     buyOutputs.push(sellerOutput);
   }
   sellInputs.forEach((i) => {
-    buyPsbt.addInput(i);
-  });
-
-  btcInputs.forEach((v) => {
-    buyPsbt.addInput(v);
+    psbtTx.addPsbtInput(i);
   });
 
   const dummyTotal = dummyUtxos.reduce((a, b) => a + b.value, 0);
-  buyPsbt.addOutput({
-    address,
-    value: dummyTotal,
-  });
+  psbtTx.addOutput(address, dummyTotal);
 
   sellOutputs.forEach((v) => {
-    buyPsbt.addOutput({ address: v.address, value: v.value });
+    psbtTx.addOutput(v.address, v.value);
   });
 
   buyOutputs.forEach((v) => {
-    buyPsbt.addOutput({ address: v.address, value: v.value, script: v.script });
+    psbtTx.addOutput(v.address, v.value, v.script);
   });
 
   if (serviceFee && NEXT_PUBLIC_SERVICE_FEE && NEXT_PUBLIC_SERVICE_ADDRESS) {
-    buyPsbt.addOutput({
-      address: NEXT_PUBLIC_SERVICE_ADDRESS,
-      value: serviceFee,
-    });
+    psbtTx.addOutput(NEXT_PUBLIC_SERVICE_ADDRESS, serviceFee);
   }
   for (let i = 0; i < dummyUtxos.length; i++) {
-    buyPsbt.addOutput({ address, value: DUMMY_UTXO_VALUE });
+    psbtTx.addOutput(address, DUMMY_UTXO_VALUE);
   }
-  const fee = 26000;
-  const totalValue = btcInputs.reduce((a, b) => a + b.witnessUtxo.value, 0);
-  const changeValue =
-    totalValue - DUMMY_UTXO_VALUE * dummyUtxos.length - fee - 2220;
-  buyPsbt.addOutput({ address, value: 323512 });
-  // const psbtTx = new Transaction({
-  // const buyPsbt = psbtTx.toPsbt();
-  console.log('对比 psbt');
-  console.log(buyPsbt);
-  // buyPsbt.txInputs.forEach((v, i) => {
-  //   console.log(v, bbbuypsbt.txInputs[i]);
-  //   if (
-  //     v.hash !== bbbuypsbt.txInputs[i].hash ||
-  //     v.index !== bbbuypsbt.txInputs[i].index
-  //   ) {
-  //     console.log('不一致');
-  //   }
-  // });
-  // buyPsbt.txOutputs.forEach((v, i) => {
-  //   console.log(v, bbbuypsbt.txOutputs[i]);
-  //   if (
-  //     v.script !== bbbuypsbt.txOutputs[i].script ||
-  //     v.value !== bbbuypsbt.txOutputs[i].value
-  //   ) {
-  //     console.log('不一致');
-  //   }
-  // });
-  console.log(bbbuypsbt);
-
-  if (!btcWallet) {
-    throw new Error('Wallet not initialized');
-  }
-  const signed1 = await btcWallet.signPsbt(buyPsbt.toHex());
-  // const signed2 = await btcWallet.signPsbt(bbbuypsbt.toHex());
-  console.log('signed1', signed1);
-  // console.log('signed2', signed2);
-  // console.log(signed2 === signed1);
-
-  // console.log('signed', signed)
-  // // const txid = await btcWallet.pushPsbt(signed);
-  // // console.log('buy order txid', txid);
-  // const psbt = bitcoin.Psbt.fromHex(signed, {
-  //   network: psbtNetwork,
-  // });
-
-  // const tx = psbt.extractTransaction();
-  // console.log(tx);
-  // const rawTxHex = tx.toHex();
-  // return rawTxHex;
+  await psbtTx.addSufficientUtxosForFee(btcUtxos, {
+    suitable: false,
+  });
+  console.log(psbtTx);
+  return await psbtTx.calNetworkFee();
 };
