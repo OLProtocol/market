@@ -71,6 +71,12 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
       setSort(sort);
     }
   };
+  const batchSuccessHandler = () => {
+    setCanSelect(false);
+    setModalVisiable(false);
+    reset();
+    mutate(swrKey);
+  };
   const onCancelOrder = async (item: any) => {
     if (item.locker === '1') {
       notification.error({
@@ -199,7 +205,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
             ></SortDropdown>
           </div>
         )}
-        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
+        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 mb-4">
           {list.map((item: any, i) => (
             <OrdxFtOrderItem
               canSelect={canSelect}
@@ -235,7 +241,12 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
           visiable={modalVisiable}
         />
       )}
-      {canSelect && <BatchBuyFooter onClose={batchCloseHandler} />}
+      {canSelect && (
+        <BatchBuyFooter
+          onClose={batchCloseHandler}
+          onSuccess={batchSuccessHandler}
+        />
+      )}
     </div>
   );
 };

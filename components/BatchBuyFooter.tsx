@@ -20,9 +20,11 @@ import { useReactWalletStore } from 'btc-connect/dist/react';
 
 interface Props {
   toBuy?: () => void;
+
+  onSuccess?: () => void;
   onClose?: () => void;
 }
-export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
+export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   let serviceFee = 0;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
@@ -139,6 +141,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
           message: t('notification.order_buy_success_title'),
           description: t('notification.order_buy_success_description'),
         });
+        onSuccess?.();
       } else {
         notification.error({
           message: t('notification.order_buy_failed_title'),
