@@ -25,6 +25,7 @@ interface TxInput {
     index: number;
     witnessUtxo: { value: number; script: Buffer };
     tapInternalKey?: Buffer;
+    sighashType?: any;
     finalScriptWitness?: any;
   };
   utxo: UnspentOutput;
@@ -33,6 +34,7 @@ interface TxInput {
 interface TxOutput {
   address: string;
   value: number;
+  script?: Buffer;
 }
 /**
  * Convert UnspentOutput to PSBT TxInput
@@ -150,11 +152,12 @@ export class Transaction {
     this.utxos.push(utxo);
     this.inputs.push(utxoToInput(utxo));
   }
-  addPsbtInput(input: PsbtInput, utxo: string) {
-    this.utxos.push(...convertPsbtInputsToUtxos([input]));
+  addPsbtInput(input: PsbtInput) {
+    const utxo = convertPsbtInputsToUtxos([input])[0];
+    this.utxos.push(utxo);
     this.inputs.push({
       data: input,
-      utxo: utxo,
+      utxo,
     });
   }
   removeLastInput() {
@@ -185,9 +188,10 @@ export class Transaction {
     return fee;
   }
 
-  addOutput(address: string, value: number) {
+  addOutput(address: string, value: number, script?: Buffer) {
     this.outputs.push({
       address,
+      script,
       value,
     });
   }
@@ -225,6 +229,8 @@ export class Transaction {
   toPsbt() {
     const network = toPsbtNetwork(this.networkType);
     const psbt = new bitcoin.Psbt({ network });
+    console.log(this.inputs);
+    console.log(this.outputs);
     this.inputs.forEach((v, index) => {
       if (v.utxo.addressType === (AddressType as any).P2PKH) {
         //@ts-ignore

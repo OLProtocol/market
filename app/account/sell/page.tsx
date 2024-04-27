@@ -97,6 +97,7 @@ export default function SellPage() {
         address,
         network,
       });
+      console.log('Batch Order PSBT', batchOrderPsbt);
       const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
       console.log('Batch Order raw', signedPsbts);
       if (signedPsbts) {
@@ -110,8 +111,8 @@ export default function SellPage() {
             message: t('notification.list_success_title'),
             description: t('notification.list_success_description'),
           });
-          reset();
-          router.back();
+          // reset();
+          // router.back();
         } else {
           notification.error({
             message: t('notification.list_failed_title'),

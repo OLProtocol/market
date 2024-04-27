@@ -106,7 +106,7 @@ export const convertPsbtInputsToUtxos = (
     satoshis: v.witnessUtxo.value,
     scriptPk: v.witnessUtxo.script.toString('hex'),
     pubkey: '',
-    addressType: AddressType.P2WPKH,
+    addressType: 2,
     inscriptions: [],
     atomicals: [],
   }));

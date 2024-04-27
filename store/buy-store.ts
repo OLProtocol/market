@@ -28,7 +28,18 @@ interface BuyState {
 
 export const useBuyStore = create<BuyState>()(
   devtools((set, get) => ({
-    list: [],
+    list: [
+      // {
+      //   price: '0.00032',
+      //   order_id: '1234567890',
+      //   raw: '70736274ff01005e02000000010cc06bfce26bd8fa84e893c327805f5c80f830edb7f27558307254eb4b1e75c10000000000ffffffff01ac080000000000002251205971a7e6b181b0cb407ee8cc50330293dc580259ffeda320b8bb94da059ee9ab000000000001012b22020000000000002251205971a7e6b181b0cb407ee8cc50330293dc580259ffeda320b8bb94da059ee9ab0108430141cc6a928aa68e6af6b924d8fa7467621554d05a6aba068d3edf1d2a3ef95b14be44dd3fbbe9f8272edc7532613142640d652bda8ac132c89519215bc7b29d3a9d830000',
+      //   assets: [
+      //     {
+      //       ticker: '1231',
+      //     },
+      //   ],
+      // },
+    ],
     changePrice(utxo, price) {
       const { list } = get();
       const newList = list.map((item) => {

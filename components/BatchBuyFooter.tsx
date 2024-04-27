@@ -5,6 +5,7 @@ import { BatchCart } from './BatchCart';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
+import { notification } from 'antd';
 import { Decimal } from 'decimal.js';
 import { useCommonStore } from '@/store';
 import {
@@ -14,7 +15,7 @@ import {
   btcToSats,
   buildBuyOrder,
 } from '@/lib';
-import { getUtxoByValue, buyOrder, unlockOrder } from '@/api';
+import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
 interface Props {
@@ -29,6 +30,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
   ) {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
+  const [loading, setLoading] = useState(false);
   const { list } = useBuyStore();
   const { t } = useTranslation();
   const [show, setShow] = useState(true);
@@ -39,6 +41,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
     () => getUtxoByValue({ address, network, value: 500 }),
   );
   const orderLength = useMemo(() => list.length || 0, [list]);
+  const dummyLength = useMemo(() => orderLength * 2, [orderLength]);
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
@@ -58,10 +61,11 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
     [list],
   );
   const findDummyUtxos = async () => {
-    const spendableDummyUtxos = dummyUtxos?.slice(0, orderLength) || [];
+    const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
     const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
-    const dis = orderLength - spendableDummyUtxos.length;
+    const dis = dummyLength - spendableDummyUtxos.length;
     let balanceUtxo: any;
+    let spendedUtxos: any = [];
     if (dis > 0) {
       const { utxos: filterDummyConsumUtxos } = filterUtxosByValue(
         utxos,
@@ -73,37 +77,85 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
           feeRate: feeRate.value,
           num: dis,
         });
+      spendedUtxos = filterDummyConsumUtxos;
       balanceUtxo = newBalanceUtxo;
       spendableDummyUtxos.push(...newDummyUtxos);
     }
     return {
       dummyUtxos: spendableDummyUtxos,
       balanceUtxo,
+      spendedUtxos,
     };
   };
   const buyHandler = async () => {
-    const { dummyUtxos, balanceUtxo } = await findDummyUtxos();
-    let spendableUtxos = canSpendableUtxos;
-    if (balanceUtxo) {
-      spendableUtxos.push(balanceUtxo);
+    try {
+      if (!utxos.length) {
+        notification.error({
+          message: t('notification.order_buy_failed_title'),
+          description: t('notification.order_buy_failed_description_4'),
+        });
+        return;
+      }
+      setLoading(true);
+      const { dummyUtxos, balanceUtxo, spendedUtxos } = await findDummyUtxos();
+      console.log('canSpendableUtxos', canSpendableUtxos);
+      const spendableUtxos = canSpendableUtxos.filter((v) => {
+        const l = !!spendedUtxos.find(
+          (s) => s.txid === v.txid && s.vout === v.vout,
+        );
+        return !l;
+      });
+      console.log('spendableUtxos', spendableUtxos);
+      if (balanceUtxo) {
+        spendableUtxos.push(balanceUtxo);
+      }
+      const virtualFee =
+        (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
+      const { utxos: filterConsumUtxos } = filterUtxosByValue(
+        spendableUtxos,
+        virtualFee +
+          330 +
+          totalPrice +
+          serviceFee +
+          DUMMY_UTXO_VALUE * dummyLength,
+      );
+      const buyRaw = await buildBuyOrder({
+        orders: list,
+        utxos: filterConsumUtxos,
+        dummyUtxos: dummyUtxos,
+        serviceFee: serviceFee,
+        feeRate: feeRate.value,
+      });
+
+      const order_ids = list.map((v) => v.order_id);
+      const res = await bulkBuyOrder({
+        address,
+        order_ids,
+        raw: buyRaw,
+      });
+      setLoading(false);
+      if (res.code === 200) {
+        notification.success({
+          message: t('notification.order_buy_success_title'),
+          description: t('notification.order_buy_success_description'),
+        });
+      } else {
+        notification.error({
+          message: t('notification.order_buy_failed_title'),
+          description: res.msg,
+        });
+      }
+    } catch (error: any) {
+      setLoading(false);
+      console.log('buy order error', error);
+      notification.error({
+        message: t('notification.order_buy_failed_title'),
+        description: error.message,
+      });
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-    const virtualFee =
-      (170 * 10 + 34 * (3 + orderLength * 3) + 10) * feeRate.value;
-    const { utxos: filterConsumUtxos } = filterUtxosByValue(
-      spendableUtxos,
-      virtualFee +
-        330 +
-        totalPrice +
-        serviceFee +
-        DUMMY_UTXO_VALUE * orderLength,
-    );
-    const buyRaw = await buildBuyOrder({
-      orders: list,
-      utxos: filterConsumUtxos,
-      dummyUtxos: dummyUtxos,
-      serviceFee: serviceFee,
-      feeRate: feeRate.value,
-    });
   };
   // const { data: order } = await buyOrder({
   //   address,
@@ -117,6 +169,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
             <Button
               className="btn btn-primary"
               color="primary"
+              isLoading={loading || isLoading}
               onClick={buyHandler}
             >
               {t('common.buy')}
