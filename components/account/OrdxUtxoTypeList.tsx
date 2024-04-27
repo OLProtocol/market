@@ -30,7 +30,7 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
       revalidateOnMount: true,
     },
   );
-  
+
   const list = useMemo(() => data?.data || [], [data]);
   useEffect(() => {
     if (list.length > 0) {
@@ -45,20 +45,19 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   useEffect(() => {
     reset();
   }, []);
-  
+
   return (
     <div className="py-2 sm:py-4">
       <Tabs
         variant="light"
         aria-label="Tabs variants"
-        color='warning'
-        radius='full'
-        size='lg'
+        color="warning"
+        radius="full"
+        size="lg"
         classNames={{
           tabList: 'flex-wrap',
           tab: 'w-min',
         }}
-        
         onSelectionChange={changeHandler}
       >
         {list?.map((item: any) => (

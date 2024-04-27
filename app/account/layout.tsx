@@ -23,14 +23,15 @@ export default function AccountLayout({
               symbol=""
               variant="flat"
             >
-              <span className='text-base font-thin text-slate-400'>{hideStr(address, 6)}</span>
+              <span className="text-base font-thin text-slate-400">
+                {hideStr(address, 6)}
+              </span>
             </Snippet>
             <div className="flex text-2xl">
-              <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
+              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
               {satsToBitcoin(balance.total)}
             </div>
           </div>
-          
         </div>
         <div className="">{children}</div>
       </WalletConnectBus>

@@ -19,7 +19,7 @@ import {
   satsToBitcoin,
   btcToSats,
   buildDummyUtxos,
-} from '@/lib/utils';
+} from '@/lib';
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
 import { calcUtxosVirtualGas } from '@/lib/utils/btc';
 
@@ -201,9 +201,7 @@ export const OrderBuyModal = ({
     console.log(dummyFee, dummyConsumedBalance, dummyConsumeUtxos);
     const { balanceUtxo, dummyUtxos } = await buildDummyUtxos({
       utxos: dummyConsumeUtxos,
-      fee: dummyFee,
-      address,
-      network,
+      feeRate,
     });
     console.log('dummyUtxos', dummyUtxos);
     console.log('balanceUtxo', balanceUtxo);

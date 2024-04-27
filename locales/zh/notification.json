@@ -1,4 +1,3 @@
-
 {
   "list_failed_title": "挂单失败",
   "list_success_title": "挂单成功",
@@ -10,5 +9,6 @@
   "order_buy_failed_title": "购买挂单失败",
   "order_buy_failed_description_1": "缺少虚拟UTXO",
   "order_buy_failed_description_2": "订单原始数据为空",
-  "order_buy_failed_description_3": "虚拟UTXO缺少两个UTXO"
+  "order_buy_failed_description_3": "虚拟UTXO缺少两个UTXO",
+  "order_buy_failed_description_4": "余额不足"
 }

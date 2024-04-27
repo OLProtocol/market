@@ -30,7 +30,7 @@ import {
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { submitOrder } from '@/api';
+import { submitOrder, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 
@@ -47,36 +47,72 @@ export default function SellPage() {
     let successCount = 0;
     setLoading(true);
     try {
-      for (let i = 0; i < list.length; i++) {
-        const item = list[i];
-        if (item.status !== 'pending') {
-          successCount++;
-          continue;
-        }
-        const inscriptionUtxo = {
-          ...parseUtxo(item.utxo),
-          value: item.value,
-        };
-        const total =
-          item.unit === 'btc' ? item.price : satsToBitcoin(item.price);
-        const orderPsbt = await buildSellOrder({
-          inscriptionUtxo,
-          amount: 1,
-          total: btcToSats(Number(total)),
-          network,
+      // for (let i = 0; i < list.length; i++) {
+      //   const item = list[i];
+      //   if (item.status !== 'pending') {
+      //     successCount++;
+      //     continue;
+      //   }
+      //   const inscriptionUtxo = {
+      //     ...parseUtxo(item.utxo),
+      //     value: item.value,
+      //   };
+      //   const total =
+      //     item.unit === 'btc' ? item.price : satsToBitcoin(item.price);
+      //   const orderPsbt = await buildSellOrder({
+      //     inscriptionUtxo,
+      //     amount: 1,
+      //     total: btcToSats(Number(total)),
+      //     network,
+      //     address,
+      //   });
+      //   psbts.push(orderPsbt);
+      //   const signPsbt = await btcWallet?.signPsbt(orderPsbt);
+      //   console.log('Order raw', signPsbt);
+      //   const res = await submitOrder({ address, raw: signPsbt });
+      //   if (res.code === 200) {
+      //     notification.success({
+      //       message: t('notification.list_success_title'),
+      //       description: t('notification.list_success_description'),
+      //     });
+      //     changeStatus(item.utxo, 'confirmed');
+      //     successCount++;
+      //   } else {
+      //     notification.error({
+      //       message: t('notification.list_failed_title'),
+      //       description: res.msg,
+      //     });
+      //   }
+      // }
+      // setLoading(false);
+      // if (successCount === list.length) {
+      //   reset();
+      //   router.back();
+      // }
+      // console.log('PSBTS', psbts);
+      // const signedPsbts = await btcWallet?.signPsbts(psbts);
+      // console.log('Signed PSBTs', signedPsbts);
+      const batchOrderPsbt = await buildBatchSellOrder({
+        inscriptionUtxos: list,
+        address,
+        network,
+      });
+      console.log('Batch Order PSBT', batchOrderPsbt);
+      const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
+      console.log('Batch Order raw', signedPsbts);
+      if (signedPsbts) {
+        const psbts = splitBatchSignedPsbt(signedPsbts, network);
+        const res = await submitBatchOrders({
           address,
+          raws: psbts,
         });
-        psbts.push(orderPsbt);
-        const signPsbt = await btcWallet?.signPsbt(orderPsbt);
-        console.log('Order raw', signPsbt);
-        const res = await submitOrder({ address, raw: signPsbt });
         if (res.code === 200) {
           notification.success({
             message: t('notification.list_success_title'),
             description: t('notification.list_success_description'),
           });
-          changeStatus(item.utxo, 'confirmed');
-          successCount++;
+          // reset();
+          // router.back();
         } else {
           notification.error({
             message: t('notification.list_failed_title'),
@@ -85,24 +121,6 @@ export default function SellPage() {
         }
       }
       setLoading(false);
-      if (successCount === list.length) {
-        reset();
-        router.back();
-      }
-      // console.log('PSBTS', psbts);
-      // const signedPsbts = await btcWallet?.signPsbts(psbts);
-      // console.log('Signed PSBTs', signedPsbts);
-      // const batchOrderPsbt = await buildBatchSellOrder({
-      //   inscriptionUtxos: list,
-      //   address,
-      //   network,
-      // });
-      // const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
-      // console.log('Batch Order raw', signedPsbts);
-      // if (signedPsbts) {
-      //   const psbts = splitBatchSignedPsbt(signedPsbts);
-      //   console.log('PSBTS', psbts);
-      // }
     } catch (error: any) {
       setLoading(false);
       console.error('List failed', error);

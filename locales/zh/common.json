@@ -1,5 +1,5 @@
 {
-  "tick": "Tick",
+  "tick": "Ticker",
   "close": "关闭",
   "executed": "成交",
   "delist": "下架",
@@ -41,7 +41,7 @@
   "order_num": "挂单数量",
   "sale_num": "销售数量",
   "asset_num": "资产数量",
-  "tx_order_count": "历史总挂单数",
+  "tx_order_count": "成交笔数",
   "tx_total_asset": "交易总资产数量",
   "tx_total_volume": "交易总成交量",
   "tx_total_amount": "资产(已售)",

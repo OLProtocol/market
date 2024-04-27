@@ -36,6 +36,11 @@ export const OrdxFtAssetsItem = ({
     await onSell?.(item);
     setLoading(false);
   };
+  const cancelHandler = async () => {
+    setLoading(true);
+    await onCancelOrder?.();
+    setLoading(false);
+  };
   return (
     <Card
       radius="lg"
@@ -53,14 +58,14 @@ export const OrdxFtAssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className='h-4/5'>
+      <CardBody className="h-4/5">
         <div className="flex-1 text-sm md:text-base">
           <Chip
             variant="shadow"
-            size='lg'
+            size="lg"
             classNames={{
-              base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
-              content: "drop-shadow shadow-black text-white",
+              base: 'bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30',
+              content: 'drop-shadow shadow-black text-white',
             }}
           >
             {item?.tickers[0].ticker}
@@ -75,18 +80,26 @@ export const OrdxFtAssetsItem = ({
               </ListboxItem>
             </Listbox>
           ))} */}
-          <div className='flex justify-center'>
+          <div className="flex justify-center">
             <section className="text-center pt-10">
-              <p className='text-2xl font-thin text-white'>
+              <p className="text-2xl font-thin text-white">
                 {thousandSeparator(item?.tickers[0].amount)}
               </p>
-              <p className='pt-2'>
-                <Snippet codeString={item?.utxo} className="bg-transparent text-blue-400" symbol="" size="lg" variant="flat">
-                  <span className='font-thin'>{hideStr(item?.utxo, 6)}</span>
+              <p className="pt-2">
+                <Snippet
+                  codeString={item?.utxo}
+                  className="bg-transparent text-blue-400"
+                  symbol=""
+                  size="lg"
+                  variant="flat"
+                >
+                  <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
                 </Snippet>
               </p>
-              <p className='font-thin pt-2'>
-                <span className='text-blue-400'>#{item?.tickers[0].inscriptionnum}</span>
+              <p className="font-thin pt-2">
+                <span className="text-blue-400">
+                  #{item?.tickers[0].inscriptionnum}
+                </span>
               </p>
             </section>
           </div>
@@ -100,12 +113,12 @@ export const OrdxFtAssetsItem = ({
               <Button
                 fullWidth
                 variant="ghost"
-                size='md'
+                size="md"
                 isLoading={loading}
                 color="primary"
                 radius="sm"
                 onClick={sellHandler}
-                className='border'
+                className="border"
               >
                 {t('buttons.list_sale')}
               </Button>
@@ -116,12 +129,13 @@ export const OrdxFtAssetsItem = ({
                 variant="flat"
                 color="default"
                 radius="lg"
+                isLoading={loading}
                 startContent={
                   item.locker == '1' ? (
                     <Icon icon="mdi:lock" className="text-lg" />
                   ) : null
                 }
-                onClick={onCancelOrder}
+                onClick={cancelHandler}
               >
                 {t('buttons.remove_sale')}（{item.price} {item.currency}）
               </Button>

@@ -33,31 +33,38 @@ export default function Page() {
         value: summary.tx_order_count,
         label: t('common.tx_order_count'),
         unit: '',
-      }, {
+      },
+      {
         value: summary.tx_total_amount,
         label: t('common.tx_total_asset'),
         unit: '',
-      }, {
+      },
+      {
         value: summary.tx_total_volume,
         label: t('common.tx_total_volume'),
         unit: 'BTC',
-      }, {
+      },
+      {
         value: summary.onsell_order_count,
         label: t('common.onsell_order_count'),
         unit: '',
-      }, {
+      },
+      {
         value: summary.onsell_total_amount,
         label: t('common.onsell_total_amount'),
         unit: 'BTC',
-      }, {
+      },
+      {
         value: summary.lowest_price,
         label: t('common.lowest_price'),
         unit: 'BTC',
-      }, {
+      },
+      {
         value: summary.highest_price,
         label: t('common.highest_price'),
         unit: 'BTC',
-      }, {
+      },
+      {
         value: summary.holder_count,
         label: i18n.t('common.holder_count'),
         unit: '',
@@ -90,14 +97,16 @@ export default function Page() {
                 <CardBody className="text-left">
                   <div className="flex text-base md:text-2xl">
                     {item.unit === 'BTC' && (
-                      <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
+                      <Icon
+                        icon="cryptocurrency-color:btc"
+                        className="mr-1 mt-0.5"
+                      />
                     )}
-                    <span>
-                      {item.value === undefined ? '-' : item.value}
-                    </span>
-
+                    <span>{item.value === undefined ? '-' : item.value}</span>
                   </div>
-                  <div className="text-md md:text-sm text-gray-400">{item.label}</div>
+                  <div className="text-md md:text-sm text-gray-400">
+                    {item.label}
+                  </div>
                 </CardBody>
               </Card>
             ))}
@@ -110,13 +119,14 @@ export default function Page() {
         <Tabs
           aria-label="Options"
           color="primary"
-          size='lg'
+          size="lg"
           variant="underlined"
           classNames={{
-            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
-            cursor: "w-full bg-blue-500",
-            tab: "max-w-fit px-0 h-12",
-            tabContent: "group-data-[selected=true]:text-blue-400"
+            tabList:
+              'gap-6 w-full relative rounded-none p-0 border-b border-divider',
+            cursor: 'w-full bg-blue-500',
+            tab: 'max-w-fit px-0 h-12',
+            tabContent: 'group-data-[selected=true]:text-blue-400',
           }}
           style={{ width: '100%' }}
         >

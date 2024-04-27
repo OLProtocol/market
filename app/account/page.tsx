@@ -14,13 +14,14 @@ export default function AccountPage() {
     <Tabs
       aria-label="Options"
       color="primary"
-      size='lg'
+      size="lg"
       variant="underlined"
       classNames={{
-        tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
-        cursor: "w-full bg-blue-500",
-        tab: "max-w-fit px-0 h-12",
-        tabContent: "group-data-[selected=true]:text-blue-400"
+        tabList:
+          'gap-6 w-full relative rounded-none p-0 border-b border-divider',
+        cursor: 'w-full bg-blue-500',
+        tab: 'max-w-fit px-0 h-12',
+        tabContent: 'group-data-[selected=true]:text-blue-400',
       }}
       style={{ width: '100%' }}
     >

@@ -18,7 +18,7 @@ import { hideStr, thousandSeparator } from '@/lib/utils';
 
 interface Props {
   item: any;
-  onBuy: any;
+  onBuy?: any;
   onCancelOrder?: () => void;
   canSelect?: boolean;
   selected?: boolean;
@@ -39,7 +39,7 @@ export const OrdxFtOrderItem = ({
   const buyHandler = async () => {
     setLoading(true);
     try {
-      await onBuy(item);
+      await onBuy?.(item);
     } catch (error) {
     } finally {
       setLoading(false);
@@ -63,15 +63,15 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       )}
-      <CardBody className='h-4/6'>
+      <CardBody className="h-4/6">
         <div className="flex-1 text-sm md:text-base">
           <Chip
             variant="shadow"
-            size='lg'
-            radius='sm'
+            size="lg"
+            radius="sm"
             classNames={{
-              base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
-              content: "drop-shadow shadow-black text-white",
+              base: 'bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30',
+              content: 'drop-shadow shadow-black text-white',
             }}
           >
             {item?.assets[0].ticker}
@@ -86,14 +86,18 @@ export const OrdxFtOrderItem = ({
               </ListboxItem>
             </Listbox>
           ))} */}
-          <div className='flex justify-center'>
+          <div className="flex justify-center">
             <section className="text-center pt-8">
-              <p className='text-2xl font-thin text-white'>
+              <p className="text-2xl font-thin text-white">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
               <p>
-                <span className='font-medium text-blue-400'>{item?.assets[0].unit_price}</span>
-                <span className='font-thin text-gray-400'>&nbsp;sats/{item?.assets[0].ticker}</span>
+                <span className="font-medium text-blue-400">
+                  {item?.assets[0].unit_price}
+                </span>
+                <span className="font-thin text-gray-400">
+                  &nbsp;sats/{item?.assets[0].ticker}
+                </span>
               </p>
               <p>
                 <Snippet
@@ -103,20 +107,19 @@ export const OrdxFtOrderItem = ({
                   size="lg"
                   variant="flat"
                 >
-                  <span className='font-thin'>{hideStr(item?.utxo, 6)}</span>
+                  <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
                 </Snippet>
               </p>
             </section>
           </div>
-
         </div>
       </CardBody>
       <CardFooter className="block bg-gray-800 h-2/6">
-        <div className='pb-2 flex'>
+        <div className="pb-2 flex">
           {item.currency === 'BTC' && (
-            <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
+            <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
           )}
-          <span className='text-sm text-amber-500'>{item?.price}</span>
+          <span className="text-sm text-amber-500">{item?.price}</span>
         </div>
         <WalletConnectBus className="flex-1">
           {item?.address === currentAddress ? (
@@ -140,7 +143,7 @@ export const OrdxFtOrderItem = ({
               className="flex-1 border"
               fullWidth
               variant="ghost"
-              size='md'
+              size="md"
               isLoading={loading}
               color="primary"
               radius="sm"

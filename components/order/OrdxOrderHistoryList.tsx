@@ -167,7 +167,11 @@ export const OrdxOrderHistoryList = ({
         <TableHeader columns={coumns}>
           {coumns.map((c) => {
             return (
-              <TableColumn className="text-sm md:text-base text-center font-extralight" key={c.key} align={c.align as any}>
+              <TableColumn
+                className="text-sm md:text-base text-center font-extralight"
+                key={c.key}
+                align={c.align as any}
+              >
                 {c.label}
               </TableColumn>
             );
@@ -189,7 +193,7 @@ export const OrdxOrderHistoryList = ({
                 ) {
                   const v = getKeyValue(item, columnKey);
                   return (
-                    <TableCell className='text-center font-light'>
+                    <TableCell className="text-center font-light">
                       {v ? (
                         <Snippet
                           codeString={v}
@@ -198,7 +202,7 @@ export const OrdxOrderHistoryList = ({
                           size="lg"
                           variant="flat"
                         >
-                          <span className='font-light'>{hideStr(v, 6)}</span>
+                          <span className="font-light">{hideStr(v, 6)}</span>
                         </Snippet>
                       ) : (
                         '-'
@@ -207,7 +211,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txid') {
                   return (
-                    <TableCell className='text-center font-light'>
+                    <TableCell className="text-center font-light">
                       <a
                         href={resolveMempoolTxLink(
                           getKeyValue(item, columnKey),
@@ -221,7 +225,7 @@ export const OrdxOrderHistoryList = ({
                   );
                 } else if (columnKey === 'txtime') {
                   return (
-                    <TableCell className='text-center font-light text-sm md:text-base'>
+                    <TableCell className="text-center font-light text-sm md:text-base">
                       <span>
                         {new Date(
                           Number(getKeyValue(item, columnKey)),
@@ -230,25 +234,30 @@ export const OrdxOrderHistoryList = ({
                     </TableCell>
                   );
                 } else if (columnKey === 'result_text') {
-                  return <TableCell className='text-center font-light text-sm md:text-base'>{getKeyValue(item, columnKey)}</TableCell>;
+                  return (
+                    <TableCell className="text-center font-light text-sm md:text-base">
+                      {getKeyValue(item, columnKey)}
+                    </TableCell>
+                  );
                 } else if (columnKey === 'price') {
                   return (
                     <TableCell>
-                      <div className='flex text-sm md:text-base'>
+                      <div className="flex text-sm md:text-base">
                         {item.currency === 'BTC' && (
-                          <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5'/>
+                          <Icon
+                            icon="cryptocurrency-color:btc"
+                            className="mr-1 mt-0.5"
+                          />
                         )}
-                      
+
                         {getKeyValue(item, columnKey)}
-                        {item.currency !== 'BTC' && (
-                          ' ' + item.currency
-                        )}
+                        {item.currency !== 'BTC' && ' ' + item.currency}
                       </div>
                     </TableCell>
                   );
                 } else {
                   return (
-                    <TableCell className='text-center font-light text-sm md:text-base'>
+                    <TableCell className="text-center font-light text-sm md:text-base">
                       {getKeyValue(item, columnKey)}
                       {/* {`${getKeyValue(item, columnKey)}${
                         columnKey === 'price' ? ' ' + item.currency : ''
