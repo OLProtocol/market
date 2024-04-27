@@ -78,38 +78,42 @@ export default function Home() {
               {(columnKey) => {
                 if (columnKey === 'holder_count') {
                   return (
-                    <TableCell className="font-light text-sm md:text-base">
-                      {getKeyValue(item, columnKey)}&nbsp;
-                      <Tooltip color="warning" content={t('common.holder_dispersion')} delay={1000}>
-
-                        {getKeyValue(item, 'holder_dispersion') !== '' && getKeyValue(item, 'holder_dispersion').includes('-') && (
-                          <Button color="danger" variant="flat">
-                            {getKeyValue(item, 'holder_dispersion')}
-                          </Button>
+                    <TableCell>
+                      <div className="font-light text-sm md:text-base">
+                        {getKeyValue(item, columnKey)}&nbsp;
+                        {getKeyValue(item, 'holder_dispersion') !== '' && getKeyValue(item, 'holder_dispersion').length > 1 && getKeyValue(item, 'holder_dispersion').includes('-') && (
+                          <Tooltip color="danger" content={t('common.holder_dispersion')} delay={1000}>
+                            <Button color="danger" variant="flat">
+                              {getKeyValue(item, 'holder_dispersion')}
+                            </Button>
+                          </Tooltip>
                         )}
                         {getKeyValue(item, 'holder_dispersion') !== '' && !getKeyValue(item, 'holder_dispersion').includes('-') && (
-                          <Button color="success" variant="flat">
-                            {getKeyValue(item, 'holder_dispersion')}
-                          </Button>
+                          <Tooltip color="success" content={t('common.holder_dispersion')} delay={1000}>
+                            <Button color="success" variant="flat">
+                              {getKeyValue(item, 'holder_dispersion')}
+                            </Button>
+                          </Tooltip>
                         )}
-                      </Tooltip>
+                      </div>
                     </TableCell>
                   );
                 } else if (columnKey === 'onsell_total_amount') {
                   return (
-                    <TableCell className="font-light text-sm md:text-base">
-                      {getKeyValue(item, columnKey)}&nbsp;
-                      {getKeyValue(item, 'onsell_amount_change') !== '' && getKeyValue(item, 'onsell_amount_change').length > 1 && getKeyValue(item, 'onsell_amount_change').includes('-') && (
-                        <Button color="danger" variant="flat">
-                          {getKeyValue(item, 'onsell_amount_change')}
-                        </Button>
-                      )}
-                      {getKeyValue(item, 'onsell_amount_change') !== '' && !getKeyValue(item, 'onsell_amount_change').includes('-') && (
-                        <Button color="success" variant="flat">
-                          {getKeyValue(item, 'onsell_amount_change')}
-                        </Button>
-                      )}
-
+                    <TableCell>
+                      <div className="font-light text-sm md:text-base">
+                        {getKeyValue(item, columnKey)}&nbsp;
+                        {getKeyValue(item, 'onsell_amount_change') !== '' && getKeyValue(item, 'onsell_amount_change').length > 1 && getKeyValue(item, 'onsell_amount_change').includes('-') && (
+                          <Button color="danger" variant="flat">
+                            {getKeyValue(item, 'onsell_amount_change')}
+                          </Button>
+                        )}
+                        {getKeyValue(item, 'onsell_amount_change') !== '' && !getKeyValue(item, 'onsell_amount_change').includes('-') && (
+                          <Button color="success" variant="flat">
+                            {getKeyValue(item, 'onsell_amount_change')}
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   );
                 } else if (

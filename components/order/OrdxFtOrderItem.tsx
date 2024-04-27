@@ -7,13 +7,14 @@ import {
   Checkbox,
   Listbox,
   ListboxItem,
+  Snippet,
 } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/order/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { thousandSeparator } from '@/lib/utils';
+import { hideStr, thousandSeparator } from '@/lib/utils';
 
 interface Props {
   item: any;
@@ -86,16 +87,24 @@ export const OrdxFtOrderItem = ({
             </Listbox>
           ))} */}
           <div className='flex justify-center'>
-            <section className="text-center pt-10">
+            <section className="text-center pt-8">
               <p className='text-2xl font-thin text-white'>
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
-              <p className='pt-2'>
+              <p>
                 <span className='font-medium text-blue-400'>{item?.assets[0].unit_price}</span>
                 <span className='font-thin text-gray-400'>&nbsp;sats/{item?.assets[0].ticker}</span>
               </p>
-              <p className='pt-2'>
-                <span className='text-blue-500'>#{item?.assets[0].inscriptionnum}</span>
+              <p>
+                <Snippet
+                  codeString={item?.utxo}
+                  className="bg-transparent text-gray-500"
+                  symbol=""
+                  size="lg"
+                  variant="flat"
+                >
+                  <span className='font-thin'>{hideStr(item?.utxo, 6)}</span>
+                </Snippet>
               </p>
             </section>
           </div>
