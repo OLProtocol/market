@@ -34,6 +34,7 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
   const [loading, setLoading] = useState(false);
+  const [calcLoading, setCalcLoading] = useState(false);
   const { list } = useBuyStore();
   const { t } = useTranslation();
   const [show, setShow] = useState(true);
@@ -97,6 +98,10 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
     };
   };
   const calcFee = async () => {
+    if (calcLoading) {
+      return;
+    }
+    setCalcLoading(true);
     const newDummyUtxos = dummyUtxos?.slice(0, dummyLength);
     const virtualFee =
       (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
@@ -115,7 +120,7 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
       serviceFee: serviceFee,
       feeRate: feeRate.value,
     });
-
+    setCalcLoading(false);
     setNetworkFee(networkFee);
   };
   useEffect(() => {
@@ -203,11 +208,12 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   //   address,
   return (
     <>
-      {show && (
+      {show && list.length && (
         <BatchCart
           splitDummyBol={splitDummyBol}
           networkFee={networkFee}
           serviceFee={serviceFee}
+          calcLoading={calcLoading}
         />
       )}
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-20">

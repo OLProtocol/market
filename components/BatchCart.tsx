@@ -1,15 +1,21 @@
 import { useBuyStore } from '@/store';
-import { Divider } from '@nextui-org/react';
+import { Divider, Spinner } from '@nextui-org/react';
 import { useMemo } from 'react';
 import { Decimal } from 'decimal.js';
 import { satsToBitcoin } from '@/lib';
 interface Props {
   splitDummyBol: boolean;
+  calcLoading: boolean;
   networkFee: number;
   dummyNetworkFee?: number;
   serviceFee: number;
 }
-export const BatchCart = ({ splitDummyBol, networkFee, serviceFee }: Props) => {
+export const BatchCart = ({
+  splitDummyBol,
+  calcLoading,
+  networkFee,
+  serviceFee,
+}: Props) => {
   const { list } = useBuyStore();
   const totalPrice = useMemo(
     () =>
@@ -47,7 +53,11 @@ export const BatchCart = ({ splitDummyBol, networkFee, serviceFee }: Props) => {
       <div>
         <div className="flex justify-between items-center">
           <span>network fee</span>
-          <span>~ {satsToBitcoin(networkFee)} BTC</span>
+          {calcLoading ? (
+            <Spinner size="sm" color="primary" />
+          ) : (
+            <span>{satsToBitcoin(networkFee)} BTC</span>
+          )}
         </div>
         <div className="flex justify-between items-center">
           <span>sercice fee</span>
