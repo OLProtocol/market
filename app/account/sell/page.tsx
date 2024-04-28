@@ -15,6 +15,7 @@ import {
   TableCell,
   Select,
   SelectItem,
+  Spinner,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useSellStore } from '@/store';
@@ -44,8 +45,9 @@ export default function SellPage() {
   );
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const ticker = useMemo(() => list?.[0]?.tickers?.[0].ticker, [list]);
-  const { data } = useSWR(`getTickerSummary-${ticker}`, () =>
-    getTickerSummary({ ticker }),
+  const { data, isLoading: isSummaryLoading } = useSWR(
+    `getTickerSummary-${ticker}`,
+    () => getTickerSummary({ ticker }),
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const listItems = async () => {
@@ -125,16 +127,20 @@ export default function SellPage() {
     <div className="py-2">
       <div className="md:flex justify-between gap-4">
         <div className="flex-1 mb-2 md:mb-0">
-          <div className="mb-2 flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              <span>{t('common.tick')}:</span>
-              <span>{summary.ticker}</span>
+          {isSummaryLoading ? (
+            <Spinner />
+          ) : (
+            <div className="mb-2 flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                <span>{t('common.tick')}:</span>
+                <span>{summary.ticker}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span>{t('common.lowest_price')}:</span>
+                <span>{summary.lowest_price} BTC</span>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span>{t('common.lowest_price')}:</span>
-              <span>{summary.lowest_price} BTC</span>
-            </div>
-          </div>
+          )}
           <Table aria-label="Example static collection table">
             <TableHeader>
               <TableColumn className="text-sm md:text-base">
