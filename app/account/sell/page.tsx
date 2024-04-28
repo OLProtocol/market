@@ -19,7 +19,7 @@ import {
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useSellStore } from '@/store';
-import { useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import {
   satsToBitcoin,
   splitBatchSignedPsbt,
@@ -47,6 +47,17 @@ export default function SellPage() {
     () => getTickerSummary({ ticker }),
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
+  useEffect(() => {
+    if (summary.lowest_price) {
+      for (const item of list) {
+        if (item.unit === 'btc') {
+          changePrice(item.utxo, summary.lowest_price);
+        } else {
+          changePrice(item.utxo, satsToBitcoin(summary.lowest_price));
+        }
+      }
+    }
+  }, [summary]);
   const listItems = async () => {
     const psbts: string[] = [];
     setLoading(true);
@@ -106,7 +117,9 @@ export default function SellPage() {
     }
   };
   const onUnitChange = (i: number, utxo: string, unit: 'btc' | 'sats') => {
-    changeUnit(utxo, unit);
+    for (const item of list) {
+      changeUnit(item.utxo, unit);
+    }
   };
   const totalPrice = useMemo(
     () =>
@@ -147,19 +160,31 @@ export default function SellPage() {
                 {t('common.unit_price')}
               </TableColumn>
               <TableColumn className="text-sm md:text-base">
-                {t('common.amount')}
+                {t('common.num')}
               </TableColumn>
             </TableHeader>
             <TableBody>
               {list.map((item, i) => (
                 <TableRow key={item.utxo}>
                   <TableCell>
-                    <div>
-                      Ticker：
+                    <div className="mb-2">
+                      <span className="text-gray-400">Ticker：</span>
                       {item.tickers?.map((v) => ` ${v.ticker}`)?.join('-')}
                     </div>
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <span className="text-gray-400">
+                          {t('common.asset_num')}：
+                        </span>
+                        {item.tickers?.map((v) => ` ${v.amount}`)?.join('-')}
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Sats:</span>{' '}
+                        {item.value}
+                      </div>
+                    </div>
                     <div className="flex items-center">
-                      Utxo：
+                      <span className="text-gray-400">Utxo：</span>
                       <Snippet
                         codeString={item?.utxo}
                         className="bg-transparent text-gray-500"
