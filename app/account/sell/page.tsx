@@ -43,7 +43,7 @@ export default function SellPage() {
     (state) => state,
   );
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
-  const ticker = useMemo(() => list?.[0].tickers?.[0].ticker, [list]);
+  const ticker = useMemo(() => list?.[0]?.tickers?.[0].ticker, [list]);
   const { data } = useSWR(`getTickerSummary-${ticker}`, () =>
     getTickerSummary({ ticker }),
   );
@@ -125,9 +125,13 @@ export default function SellPage() {
     <div className="py-2">
       <div className="md:flex justify-between gap-4">
         <div className="flex-1 mb-2 md:mb-0">
-          <div className="mb-2">
+          <div className="mb-2 flex items-center gap-6">
             <div className="flex items-center gap-4">
-              <span>{t('common.lowest_price')}</span>
+              <span>{t('common.tick')}:</span>
+              <span>{summary.ticker}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span>{t('common.lowest_price')}:</span>
               <span>{summary.lowest_price} BTC</span>
             </div>
           </div>
