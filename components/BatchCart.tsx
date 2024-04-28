@@ -56,7 +56,7 @@ export const BatchCart = ({
           {calcLoading ? (
             <Spinner size="sm" color="primary" />
           ) : (
-            <span>{satsToBitcoin(networkFee)} BTC</span>
+            <span>~ {satsToBitcoin(networkFee)} BTC</span>
           )}
         </div>
         <div className="flex justify-between items-center">

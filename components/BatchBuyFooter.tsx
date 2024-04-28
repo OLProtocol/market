@@ -1,4 +1,4 @@
-import { Button } from '@nextui-org/react';
+import { Button, Input, Slider } from '@nextui-org/react';
 import { useBuyStore } from '@/store';
 import { Icon } from '@iconify/react';
 import { BatchCart } from './BatchCart';
@@ -20,12 +20,17 @@ import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
 interface Props {
+  list: any[];
   toBuy?: () => void;
 
   onSuccess?: () => void;
   onClose?: () => void;
 }
-export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
+export const BatchBuyFooter = ({
+  list: assetsList,
+  onSuccess,
+  onClose,
+}: Props) => {
   let serviceFee = 0;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
@@ -33,6 +38,7 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   ) {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
+  const [selectSize, setSelectSize] = useState(0);
   const [loading, setLoading] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
   const { list } = useBuyStore();
@@ -47,6 +53,15 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
   );
   const orderLength = useMemo(() => list.length || 0, [list]);
   const dummyLength = useMemo(() => orderLength * 2, [orderLength]);
+
+  const canSelectLength = useMemo(() => {
+    return Math.min(
+      assetsList.filter((i) => i.locker === '0' && i.address !== address)
+        .length,
+      10,
+    );
+  }, [assetsList]);
+  console.log('canSelectLength', canSelectLength);
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
@@ -128,6 +143,12 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
       calcFee();
     }
   }, [dummyLength, dummyUtxos, canSpendableUtxos, totalPrice, feeRate.value]);
+  const sizeChangeHandler = (size: number) => {
+    console.log(size);
+    size = Math.max(size, 0);
+    size = Math.min(size, canSelectLength);
+    setSelectSize(size);
+  };
   const buyHandler = async () => {
     try {
       if (!utxos.length) {
@@ -218,7 +239,28 @@ export const BatchBuyFooter = ({ onSuccess, onClose }: Props) => {
       )}
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-20">
         <div className="flex justify-between items-center w-full h-full px-4">
-          <div className="flex-1">{list.length}</div>
+          <div className="flex-1 flex items-center flex-wrap gap-4">
+            {/* <div>扫货</div>
+            <div className="flex items-center gap-4 w-60">
+              <Slider
+                size="sm"
+                step={1}
+                maxValue={canSelectLength}
+                minValue={0}
+                value={selectSize}
+                className="flex-1"
+                onChange={(e) => {
+                  sizeChangeHandler(e as number);
+                }}
+              />
+              <Input
+                type="number"
+                className="w-20"
+                value={selectSize.toString()}
+                onValueChange={(e) => sizeChangeHandler(Number(e))}
+              />
+            </div> */}
+          </div>
           <div className="flex gap-2 items-center">
             <Button
               className="btn btn-primary"

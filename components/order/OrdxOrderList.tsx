@@ -64,7 +64,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     if (data) {
       set(data.data?.order_list || []);
     }
-  }, [data, set]);
+  }, [data]);
 
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
@@ -129,7 +129,6 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
       await unlockHandler(item);
     }
   };
-  console.log('buyList', buyList);
   const unlockHandler = async (item) => {
     try {
       const res = await unlockOrder({
@@ -244,6 +243,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
       )}
       {canSelect && (
         <BatchBuyFooter
+          list={list}
           onClose={batchCloseHandler}
           onSuccess={batchSuccessHandler}
         />
