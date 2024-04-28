@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { Card, CardBody, Button } from '@nextui-org/react';
+import { Card, CardBody, Button, Avatar } from '@nextui-org/react';
 import { getTickerSummary } from '@/api';
 import { Image, Divider, Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
@@ -19,15 +19,15 @@ export default function Page() {
   const router = useRouter();
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
-  const ticker = params.get('ticker') as any;
+  const ticker = params.get('ticker') as string;
   const { data } = useSWR(`getTickerSummary`, () =>
     getTickerSummary({ ticker }),
   );
   const toAccount = () => {
     router.push(`/account`);
   };
-  const showIcon = useMemo(() => {
-    return ['pearl'].includes(ticker?.toLowerCase());
+  const showTextIcon = useMemo(() => {
+    return ticker?.slice(0, 1)?.toUpperCase();
   }, [ticker]);
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
@@ -80,9 +80,12 @@ export default function Page() {
       <div className="min-h-40 flex flex-col py-2">
         <div className="flex-1 flex items-center mb-4 justify-between gap-2">
           <div className="flex flex-1 items-center flex-wrap h-20">
-            {showIcon && (
-              <Image src="/logo.jpg" alt="logo" className="mr-2 w-16 h-16" />
-            )}
+            <Avatar
+              name={showTextIcon}
+              size="lg"
+              className="mr-2 w-16 h-16"
+              classNames={{ name: 'text-4xl font-bold' }}
+            />
             <div className="flex-1">
               <div className="text-2xl md:text-4xl font-bold">
                 {summary?.ticker}
