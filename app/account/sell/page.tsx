@@ -171,7 +171,7 @@ export default function SellPage() {
                 {t('common.item')}
               </TableColumn>
               <TableColumn className="text-sm md:text-base">
-                {t('common.unit_rice')}
+                {t('common.unit_price')}
               </TableColumn>
               <TableColumn className="text-sm md:text-base">
                 {t('common.amount')}
