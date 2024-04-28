@@ -26,6 +26,9 @@ export default function Page() {
   const toAccount = () => {
     router.push(`/account`);
   };
+  const showIcon = useMemo(() => {
+    return ['pearl'].includes(ticker?.toLowerCase());
+  }, [ticker]);
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
     return [
@@ -76,8 +79,10 @@ export default function Page() {
     <div>
       <div className="min-h-40 flex flex-col py-2">
         <div className="flex-1 flex items-center mb-4 justify-between gap-2">
-          <div className="flex flex-1 items-center flex-wrap">
-            <Image src="/logo.jpg" alt="logo" className="mr-2 w-16 h-16" />
+          <div className="flex flex-1 items-center flex-wrap h-20">
+            {showIcon && (
+              <Image src="/logo.jpg" alt="logo" className="mr-2 w-16 h-16" />
+            )}
             <div className="flex-1">
               <div className="text-2xl md:text-4xl font-bold">
                 {summary?.ticker}

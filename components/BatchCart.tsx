@@ -1,7 +1,8 @@
 import { useBuyStore } from '@/store';
-import { Divider, Spinner } from '@nextui-org/react';
+import { Divider, Spinner, Button } from '@nextui-org/react';
 import { useMemo } from 'react';
 import { Decimal } from 'decimal.js';
+import { Icon } from '@iconify/react';
 import { satsToBitcoin } from '@/lib';
 interface Props {
   splitDummyBol: boolean;
@@ -16,7 +17,7 @@ export const BatchCart = ({
   networkFee,
   serviceFee,
 }: Props) => {
-  const { list } = useBuyStore();
+  const { list, remove } = useBuyStore();
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
@@ -26,6 +27,9 @@ export const BatchCart = ({
       }, 0) || 0,
     [list],
   );
+  const removeHandler = (u: string) => {
+    remove(u);
+  };
   return (
     <div className="fixed max-w-screen w-96 bottom-20 right-0 bg-gray-100 dark:bg-slate-900 rounded-t-lg px-4 z-10">
       <div className="h-10 flex items-center justify-between font-bold">
@@ -37,18 +41,30 @@ export const BatchCart = ({
         {list.map((item) => (
           <div
             key={item.order_id}
-            className="flex items-center justify-between py-2"
+            className="flex items-center justify-between py-2 h-14"
           >
             <div>
-              {item.assets.map((asset) => (
-                <div key={asset.ticker}>{asset.ticker}</div>
-              ))}
+              <div className="mb-1">
+                {item.assets.map((asset) => (
+                  <div key={asset.ticker}>{asset.ticker}</div>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Icon icon="cryptocurrency-color:btc" className="" />
+                {item.price} BTC
+              </div>
             </div>
-            <span>{item.price}</span>
+            <Button
+              isIconOnly
+              size="sm"
+              onClick={() => removeHandler(item.utxo)}
+            >
+              <Icon icon="mdi:close" className="text-white text-xl" />
+            </Button>
           </div>
         ))}
       </div>
-      <div>{splitDummyBol && <div>需要分割虚拟UTXO</div>}</div>
+      {/* <div>{splitDummyBol && <div>需要分割虚拟UTXO</div>}</div> */}
       <Divider className="my-2" />
       <div>
         <div className="flex justify-between items-center">

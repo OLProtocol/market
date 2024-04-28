@@ -103,11 +103,12 @@ interface GetTopTickers {
 }
 export const getTopTickers = async ({
   interval = 1,
-  top_count = 10,
+  top_count = 20,
   top_list = 'tx_amount',
 }: GetTopTickers) => {
+  const _interval = interval === 0 ? undefined : interval;
   const res = await request('/ordx/GetTopTickers', {
-    data: { interval, top_count, top_list },
+    data: { interval: _interval, top_count, top_list },
   });
   return res;
 };
