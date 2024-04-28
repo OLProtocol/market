@@ -43,7 +43,7 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
-          <AntdRegistry>
+          {/* <AntdRegistry>
             <ConfigProvider
               theme={{
                 // 1. 单独使用暗色算法
@@ -52,15 +52,15 @@ export default function RootLayout({
                 // 2. 组合使用暗色算法与紧凑算法
                 // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
               }}
-            >
-              <div className="relative flex flex-col h-screen">
-                <Navbar />
-                <main className="mx-auto w-screen max-w-[100rem] px-2 md:px-4 flex-grow">
-                  {children}
-                </main>
-              </div>
-            </ConfigProvider>
-          </AntdRegistry>
+            > */}
+          <div className="relative flex flex-col h-screen">
+            <Navbar />
+            <main className="mx-auto w-screen max-w-[100rem] px-2 md:px-4 flex-grow">
+              {children}
+            </main>
+          </div>
+          {/* </ConfigProvider>
+          </AntdRegistry> */}
         </Providers>
       </body>
     </html>
