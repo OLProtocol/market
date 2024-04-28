@@ -48,7 +48,7 @@ export default function Page() {
       }, {
         value: summary.onsell_total_amount,
         label: t('common.onsell_total_amount'),
-        unit: 'BTC',
+        unit: '',
       }, {
         value: summary.lowest_price,
         label: t('common.lowest_price'),
