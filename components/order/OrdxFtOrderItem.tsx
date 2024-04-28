@@ -92,7 +92,7 @@ export const OrdxFtOrderItem = ({
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
               <p>
-                <span className='font-medium text-blue-400'>{item?.assets[0].unit_price}</span>
+                <span className='font-medium text-blue-400'>{item?.assets[0].unit_price*100000000/item?.assets[0].unit_amount}</span>
                 <span className='font-thin text-gray-400'>&nbsp;sats/{item?.assets[0].ticker}</span>
               </p>
               <p>
