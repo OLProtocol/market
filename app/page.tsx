@@ -11,25 +11,19 @@ import {
   TableColumn,
   Spinner,
   getKeyValue,
-  Button,
-  Tooltip,
+  Avatar,
 } from '@nextui-org/react';
 import { useMemo } from 'react';
-import { Transaction } from '@/lib';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { thousandSeparator } from '@/lib/utils';
 
 export default function Home() {
-  console.log('Transaction', Transaction);
   const { t } = useTranslation();
   const router = useRouter();
-  const { network } = useReactWalletStore();
-  const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}`,
-    () => getTopTickers({}),
+  const { data, error, isLoading } = useSWR(`/ordx/getTopTickers`, () =>
+    getTopTickers({}),
   );
   const list = useMemo(() => data?.data || [], [data]);
   const toDetail = (e) => {
@@ -44,64 +38,25 @@ export default function Home() {
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
-          <TableColumn
-            key="ticker"
-            className="text-sm md:text-base font-extralight"
-          >
+          <TableColumn key="ticker" className="text-sm md:text-base font-extralight">
             {t('common.tick')}
           </TableColumn>
-          <TableColumn
-            key="onsell_order_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.onsell_order_count')}
+          <TableColumn key="lowest_price" className="text-sm md:text-base font-extralight">
+            {t('common.price')}
           </TableColumn>
-          <TableColumn
-            key="tx_total_volume"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.total_volumn')}
+          <TableColumn key="lowest_price_change" className="text-sm md:text-base font-extralight">
+            {t('common.price_change')}
           </TableColumn>
-          <TableColumn
-            key="total_amount"
-            className="text-sm md:text-base font-extralight"
-          >
+          <TableColumn key="tx_total_volume" className="text-sm md:text-base font-extralight">
+            {t('common.tx_total_volume')}
+          </TableColumn>
+          <TableColumn key="total_amount" className="text-sm md:text-base font-extralight">
             {t('common.total_amount')}
           </TableColumn>
-          <TableColumn
-            key="tx_total_amount"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tx_total_amount')}
-          </TableColumn>
-          <TableColumn
-            key="onsell_total_amount"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.onsell_total_amount')}
-          </TableColumn>
-          <TableColumn
-            key="lowest_price"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.lowest_price')}
-          </TableColumn>
-          <TableColumn
-            key="highest_price"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.highest_price')}
-          </TableColumn>
-          <TableColumn
-            key="tx_order_count"
-            className="text-sm md:text-base font-extralight"
-          >
+          <TableColumn key="tx_order_count" className="text-sm md:text-base font-extralight">
             {t('common.tx_order_count')}
           </TableColumn>
-          <TableColumn
-            key="holder_count"
-            className="text-sm md:text-base font-extralight"
-          >
+          <TableColumn key="holder_count" className="text-sm md:text-base font-extralight">
             {t('common.holder_count')}
           </TableColumn>
         </TableHeader>
@@ -112,94 +67,60 @@ export default function Home() {
           loadingContent={<Spinner />}
         >
           {(item: any) => (
-            <TableRow
-              key={item.ticker}
-              className="cursor-pointer text-sm md:text-base"
-            >
+            <TableRow key={item.ticker} className="cursor-pointer text-sm md:text-base">
               {(columnKey) => {
-                if (columnKey === 'holder_count') {
+                if (columnKey === 'ticker') {
+                  const tick = getKeyValue(item, columnKey);
                   return (
                     <TableCell>
-                      <div className="font-light text-sm md:text-base">
-                        {getKeyValue(item, columnKey)}&nbsp;
-                        {getKeyValue(item, 'holder_dispersion') !== '' &&
-                          getKeyValue(item, 'holder_dispersion').length > 1 &&
-                          getKeyValue(item, 'holder_dispersion').includes(
-                            '-',
-                          ) && (
-                            <Tooltip
-                              color="danger"
-                              content={t('common.holder_dispersion')}
-                              delay={1000}
-                            >
-                              <Button color="danger" variant="flat">
-                                {getKeyValue(item, 'holder_dispersion')}
-                              </Button>
-                            </Tooltip>
-                          )}
-                        {getKeyValue(item, 'holder_dispersion') !== '' &&
-                          !getKeyValue(item, 'holder_dispersion').includes(
-                            '-',
-                          ) && (
-                            <Tooltip
-                              color="success"
-                              content={t('common.holder_dispersion')}
-                              delay={1000}
-                            >
-                              <Button color="success" variant="flat">
-                                {getKeyValue(item, 'holder_dispersion')}
-                              </Button>
-                            </Tooltip>
-                          )}
+                      <div className='flex text-sm md:text-base'>&nbsp;
+                        <Avatar name={tick.charAt(0)} />
+                        <span className='pt-2'>{tick}</span>
                       </div>
                     </TableCell>
                   );
-                } else if (columnKey === 'onsell_total_amount') {
+                } else if (columnKey === 'lowest_price') {
                   return (
                     <TableCell>
-                      <div className="font-light text-sm md:text-base">
-                        {getKeyValue(item, columnKey)}&nbsp;
-                        {getKeyValue(item, 'onsell_amount_change') !== '' &&
-                          getKeyValue(item, 'onsell_amount_change').length >
-                            1 &&
-                          getKeyValue(item, 'onsell_amount_change').includes(
-                            '-',
-                          ) && (
-                            <Button color="danger" variant="flat">
-                              {getKeyValue(item, 'onsell_amount_change')}
-                            </Button>
-                          )}
-                        {getKeyValue(item, 'onsell_amount_change') !== '' &&
-                          !getKeyValue(item, 'onsell_amount_change').includes(
-                            '-',
-                          ) && (
-                            <Button color="success" variant="flat">
-                              {getKeyValue(item, 'onsell_amount_change')}
-                            </Button>
-                          )}
+                      <div className='flex text-sm md:text-base'>
+                        {(getKeyValue(item, columnKey) * 10000).toFixed(2) + ' sats'}
                       </div>
                     </TableCell>
                   );
-                } else if (
-                  ['tx_total_volume', 'lowest_price', 'highest_price'].includes(
-                    columnKey.toString(),
-                  )
-                ) {
+                } else if (columnKey === 'lowest_price_change') {
+                  const priceChange = getKeyValue(item, columnKey);
                   return (
                     <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        <Icon
-                          icon="cryptocurrency-color:btc"
-                          className="mr-1 mt-0.5"
-                        />
+                      <div className='flex text-sm md:text-base'>
+                        {priceChange === '-' && (
+                          <span>-</span>
+                        )}
+
+                        {priceChange.length > 1 && priceChange.includes('-') && (
+                          <span className='text-red-500'>{priceChange}</span>
+                        )}
+
+                        {priceChange.length > 1 && !priceChange.includes('-') && (
+                          <span className='text-green-500'>{priceChange}</span>
+                        )}
+                      </div>
+                    </TableCell>
+                  );
+                } else if (['tx_total_volume', 'total_amount'].includes(columnKey.toString())) {
+                  return (
+                    <TableCell>
+                      <div className='flex text-sm md:text-base'>
+                        <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
                         {getKeyValue(item, columnKey)}
                       </div>
                     </TableCell>
                   );
-                } else if (columnKey === 'total_amount') {
+                } else if (['tx_order_count', 'holder_count'].includes(columnKey.toString())) {
                   return (
-                    <TableCell className="font-light text-sm md:text-base">
-                      {thousandSeparator(getKeyValue(item, columnKey))}
+                    <TableCell>
+                      <div className='flex text-sm md:text-base'>
+                        {thousandSeparator(getKeyValue(item, columnKey))}
+                      </div>
                     </TableCell>
                   );
                 } else {
