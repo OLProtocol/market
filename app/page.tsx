@@ -106,7 +106,16 @@ export default function Home() {
                       </div>
                     </TableCell>
                   );
-                } else if (['tx_total_volume', 'total_amount'].includes(columnKey.toString())) {
+                } else if (columnKey === 'total_amount') {
+                  return (
+                    <TableCell>
+                      <div className='flex text-sm md:text-base'>
+                        <Icon icon="cryptocurrency-color:btc" className='mr-1 mt-0.5' />
+                        {getKeyValue(item, 'total_amount')*getKeyValue(item, 'lowest_price')}
+                      </div>
+                    </TableCell>
+                  );
+                } else if (columnKey === 'tx_total_volume') {
                   return (
                     <TableCell>
                       <div className='flex text-sm md:text-base'>
