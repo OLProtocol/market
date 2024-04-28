@@ -19,7 +19,6 @@ import {
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useSellStore } from '@/store';
-import { useList } from 'react-use';
 import { useEffect, useMemo, useState } from 'react';
 import {
   satsToBitcoin,

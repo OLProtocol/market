@@ -14,29 +14,46 @@ import {
   Button,
   Tooltip,
 } from '@nextui-org/react';
-import { useMemo } from 'react';
-import { Transaction } from '@/lib';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { thousandSeparator } from '@/lib/utils';
+import { SortDropdown } from '@/components/SortDropdown';
 
 export default function Home() {
-  console.log('Transaction', Transaction);
   const { t } = useTranslation();
   const router = useRouter();
+  const [interval, setInterval] = useState<any>(1);
+  const sortList = [
+    { label: '24小时', value: 1 },
+    { label: '7天', value: 7 },
+    { label: '30天', value: 30 },
+    { label: '全部时间', value: 0 },
+  ];
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}`,
-    () => getTopTickers({}),
+    `/ordx/getTopTickers-${network}-${interval}`,
+    () => getTopTickers({ interval }),
   );
+  const onSortChange = (i?: number) => {
+    setInterval(i);
+  };
   const list = useMemo(() => data?.data || [], [data]);
   const toDetail = (e) => {
     router.push(`/ordx/ticker?ticker=${e}`);
   };
   return (
     <div className="pt-4">
+      <div className="mb-2 flex justify-end items-center">
+        <SortDropdown
+          sortList={sortList}
+          value={interval}
+          disabled={!list.length}
+          onChange={onSortChange}
+        ></SortDropdown>
+      </div>
       <Table
         isHeaderSticky
         isStriped

@@ -15,6 +15,7 @@ import {
   btcToSats,
   buildBuyOrder,
   calcBuyOrderFee,
+  satsToBitcoin,
 } from '@/lib';
 import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -31,12 +32,12 @@ export const BatchBuyFooter = ({
   onSuccess,
   onClose,
 }: Props) => {
-  let serviceFee = 0;
+  let minServiceFee = 0;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
     process.env.NEXT_PUBLIC_IS_FREE == '0'
   ) {
-    serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
+    minServiceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
   const [selectSize, setSelectSize] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -75,6 +76,9 @@ export const BatchBuyFooter = ({
     () => utxos.filter((v) => v.value !== DUMMY_UTXO_VALUE),
     [utxos],
   );
+  const totalBalacne = useMemo(() => {
+    return canSpendableUtxos.reduce((a, b) => a + b.value, 0) || 0;
+  }, [utxos]);
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
@@ -83,6 +87,16 @@ export const BatchBuyFooter = ({
         return decimalA.plus(decimalB).toNumber();
       }, 0) || 0,
     [list],
+  );
+  const serviceFee = useMemo(() => {
+    const a = new Decimal(0.01);
+    const b = new Decimal(totalPrice);
+    const calcServie = a.mul(b).toNumber();
+    return Math.ceil(Math.max(minServiceFee, calcServie));
+  }, [totalPrice]);
+  const insufficientBalanceStatus = useMemo(
+    () => totalBalacne > totalPrice + serviceFee,
+    [totalBalacne, totalPrice, serviceFee],
   );
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
@@ -113,7 +127,7 @@ export const BatchBuyFooter = ({
     };
   };
   const calcFee = async () => {
-    if (calcLoading) {
+    if (calcLoading || !insufficientBalanceStatus || list.length === 0) {
       return;
     }
     setCalcLoading(true);
@@ -142,7 +156,14 @@ export const BatchBuyFooter = ({
     if (canSpendableUtxos.length && dummyLength) {
       calcFee();
     }
-  }, [dummyLength, dummyUtxos, canSpendableUtxos, totalPrice, feeRate.value]);
+  }, [
+    dummyLength,
+    serviceFee,
+    dummyUtxos,
+    canSpendableUtxos,
+    totalPrice,
+    feeRate.value,
+  ]);
   const sizeChangeHandler = (size: number) => {
     console.log(size);
     size = Math.max(size, 0);
@@ -262,9 +283,21 @@ export const BatchBuyFooter = ({
             </div> */}
           </div>
           <div className="flex gap-2 items-center">
+            <div>
+              <div className="mb-1 flex items-center gap-2">
+                <Icon icon="cryptocurrency-color:btc" className="" />
+                {satsToBitcoin(totalPrice)} BTC
+              </div>
+              <div
+                className={`text-xs text-right  ${!insufficientBalanceStatus ? 'text-red-500' : 'text-gray-400'}`}
+              >
+                余额：{satsToBitcoin(totalBalacne)} BTC
+              </div>
+            </div>
             <Button
               className="btn btn-primary"
               color="primary"
+              isDisabled={!insufficientBalanceStatus}
               isLoading={loading || isLoading}
               onClick={buyHandler}
             >
