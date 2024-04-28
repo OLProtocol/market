@@ -45,7 +45,6 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     }
     setSelected(k);
     onChange?.(k);
-    reset();
   };
 
   return (

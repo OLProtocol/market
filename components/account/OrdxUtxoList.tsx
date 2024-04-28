@@ -101,9 +101,15 @@ export const OrdxUtxoList = () => {
       });
     }
   };
-  const onTickerChange = (ticker: string) => {
-    console.log('ticker', ticker);
-    setTicker(ticker);
+  const onTickerChange = (t: string) => {
+    if (ticker === t) {
+      return;
+    }
+    setTicker(t);
+    reset();
+    resetList();
+    setCanSelect(false);
+    setPage(1);
   };
 
   useEffect(() => {
