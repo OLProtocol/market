@@ -7,10 +7,12 @@ import { useTranslation } from 'react-i18next';
 interface WalletConnectBusProps {
   children: React.ReactNode;
   className?: string;
+  text?: string;
 }
 export const WalletConnectBus = ({
   children,
   className,
+  text,
 }: WalletConnectBusProps) => {
   const { t } = useTranslation();
   const { connected, setModalVisible } = useReactWalletStore((state) => state);
@@ -25,7 +27,7 @@ export const WalletConnectBus = ({
         className={className}
         color="primary"
       >
-        {t('buttons.connect')}
+        {text || t('buttons.connect')}
       </Button>
     </>
   );

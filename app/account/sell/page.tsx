@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Divider,
   Card,
   CardBody,
   CardFooter,
@@ -16,18 +15,17 @@ import {
   Select,
   SelectItem,
   Spinner,
+  Snippet,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useSellStore } from '@/store';
 import { useList } from 'react-use';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  parseUtxo,
-  buildSellOrder,
-  btcToSats,
   satsToBitcoin,
   splitBatchSignedPsbt,
   buildBatchSellOrder,
+  hideStr,
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -161,11 +159,19 @@ export default function SellPage() {
                       Ticker：
                       {item.tickers?.map((v) => ` ${v.ticker}`)?.join('-')}
                     </div>
-                    <div>
-                      Inscription：
-                      {item.tickers
-                        ?.map((v) => `# ${v.inscriptionnum}`)
-                        ?.join('-')}
+                    <div className="flex items-center">
+                      Utxo：
+                      <Snippet
+                        codeString={item?.utxo}
+                        className="bg-transparent text-gray-500"
+                        symbol=""
+                        size="lg"
+                        variant="flat"
+                      >
+                        <span className="font-thin">
+                          {hideStr(item?.utxo, 6)}
+                        </span>
+                      </Snippet>
                     </div>
                   </TableCell>
                   <TableCell>

@@ -9,7 +9,7 @@ import {
   ListboxItem,
   Snippet,
 } from '@nextui-org/react';
-import { WalletConnectBus } from '@/components/order/WalletConnectBus';
+import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
@@ -129,7 +129,7 @@ export const OrdxFtOrderItem = ({
           )}
           <span className="text-sm text-amber-500">{item?.price}</span>
         </div>
-        <WalletConnectBus className="flex-1">
+        <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
             <Button
               className="text-tiny"
