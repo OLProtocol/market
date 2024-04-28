@@ -99,7 +99,7 @@ export const OrdxFtOrderItem = ({
               <p className="text-2xl font-thin text-white">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
-              <p className="pt-5">
+              <p className="pt-2">
                 <span className="font-medium text-blue-400">
                   {(
                     (item?.assets[0].unit_price * 100000000) /
@@ -110,17 +110,14 @@ export const OrdxFtOrderItem = ({
                   &nbsp;sats/{item?.assets[0].ticker}
                 </span>
               </p>
-              {/* <p>
-                <Snippet
-                  codeString={item?.utxo}
-                  className="bg-transparent text-gray-500"
-                  symbol=""
-                  size="lg"
-                  variant="flat"
-                >
-                  <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
-                </Snippet>
-              </p> */}
+              <p className='pt-2'>
+                <span className="font-medium text-blue-400">
+                  {item?.value}
+                </span>
+                <span className="font-thin text-gray-400">
+                  &nbsp;assets
+                </span>
+              </p>
             </section>
           </div>
         </div>
