@@ -76,30 +76,23 @@ export const OrdxFtOrderItem = ({
           >
             {item?.assets[0].ticker}
           </Chip>
-          {/* {item?.assets?.map((v: any) => (
-            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
-              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
-                Inscription Num: {v.inscriptionnum}
-              </ListboxItem>
-              <ListboxItem key={v.ticker + '-' + v.amount}>
-                {t('common.asset_num')}: {v.amount}
-              </ListboxItem>
-            </Listbox>
-          ))} */}
           <div className="flex justify-center">
             <section className="text-center pt-8">
               <p className="text-2xl font-thin text-white">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
-              <p>
+              <p className="pt-5">
                 <span className="font-medium text-blue-400">
-                  {item?.assets[0].unit_price}
+                  {(
+                    (item?.assets[0].unit_price * 100000000) /
+                    item?.assets[0].unit_amount
+                  ).toFixed(2)}
                 </span>
                 <span className="font-thin text-gray-400">
                   &nbsp;sats/{item?.assets[0].ticker}
                 </span>
               </p>
-              <p>
+              {/* <p>
                 <Snippet
                   codeString={item?.utxo}
                   className="bg-transparent text-gray-500"
@@ -109,7 +102,7 @@ export const OrdxFtOrderItem = ({
                 >
                   <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
                 </Snippet>
-              </p>
+              </p> */}
             </section>
           </div>
         </div>

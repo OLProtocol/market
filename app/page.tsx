@@ -51,6 +51,12 @@ export default function Home() {
             {t('common.tick')}
           </TableColumn>
           <TableColumn
+            key="onsell_order_count"
+            className="text-sm md:text-base font-extralight"
+          >
+            {t('common.onsell_order_count')}
+          </TableColumn>
+          <TableColumn
             key="tx_total_volume"
             className="text-sm md:text-base font-extralight"
           >

@@ -96,11 +96,9 @@ export const OrdxFtAssetsItem = ({
                   <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
                 </Snippet>
               </p>
-              <p className="font-thin pt-2">
-                <span className="text-blue-400">
-                  #{item?.tickers[0].inscriptionnum}
-                </span>
-              </p>
+              {/* <p className='font-thin pt-2'>
+                <span className='text-blue-400'>#{item?.tickers[0].inscriptionnum}</span>
+              </p> */}
             </section>
           </div>
         </div>
