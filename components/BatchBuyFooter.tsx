@@ -1,8 +1,8 @@
-import { Button } from '@nextui-org/react';
+import { Button, Input, Slider } from '@nextui-org/react';
 import { useBuyStore } from '@/store';
 import { Icon } from '@iconify/react';
 import { BatchCart } from './BatchCart';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { notification } from 'antd';
@@ -14,15 +14,23 @@ import {
   filterUtxosByValue,
   btcToSats,
   buildBuyOrder,
+  calcBuyOrderFee,
 } from '@/lib';
 import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
 interface Props {
+  list: any[];
   toBuy?: () => void;
+
+  onSuccess?: () => void;
   onClose?: () => void;
 }
-export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
+export const BatchBuyFooter = ({
+  list: assetsList,
+  onSuccess,
+  onClose,
+}: Props) => {
   let serviceFee = 0;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
@@ -30,10 +38,13 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
   ) {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
+  const [selectSize, setSelectSize] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [calcLoading, setCalcLoading] = useState(false);
   const { list } = useBuyStore();
   const { t } = useTranslation();
   const [show, setShow] = useState(true);
+  const [networkFee, setNetworkFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
   const { address, network } = useReactWalletStore();
   const { data, isLoading } = useSWR(
@@ -42,10 +53,23 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
   );
   const orderLength = useMemo(() => list.length || 0, [list]);
   const dummyLength = useMemo(() => orderLength * 2, [orderLength]);
+
+  const canSelectLength = useMemo(() => {
+    return Math.min(
+      assetsList.filter((i) => i.locker === '0' && i.address !== address)
+        .length,
+      10,
+    );
+  }, [assetsList]);
+  console.log('canSelectLength', canSelectLength);
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
+  );
+  const splitDummyBol = useMemo(
+    () => dummyLength > dummyUtxos.length,
+    [dummyLength],
   );
   const canSpendableUtxos = useMemo(
     () => utxos.filter((v) => v.value !== DUMMY_UTXO_VALUE),
@@ -62,6 +86,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
   );
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
+    // const spendableDummyUtxos = dummyUtxos?.slice(0, 1) || [];
     const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
     const dis = dummyLength - spendableDummyUtxos.length;
     let balanceUtxo: any;
@@ -87,6 +112,43 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
       spendedUtxos,
     };
   };
+  const calcFee = async () => {
+    if (calcLoading) {
+      return;
+    }
+    setCalcLoading(true);
+    const newDummyUtxos = dummyUtxos?.slice(0, dummyLength);
+    const virtualFee =
+      (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
+    const { utxos: filterConsumUtxos } = filterUtxosByValue(
+      canSpendableUtxos,
+      virtualFee +
+        330 +
+        totalPrice +
+        serviceFee +
+        DUMMY_UTXO_VALUE * dummyLength,
+    );
+    const networkFee = await calcBuyOrderFee({
+      orders: list,
+      utxos: filterConsumUtxos,
+      dummyUtxos: newDummyUtxos,
+      serviceFee: serviceFee,
+      feeRate: feeRate.value,
+    });
+    setCalcLoading(false);
+    setNetworkFee(networkFee);
+  };
+  useEffect(() => {
+    if (canSpendableUtxos.length && dummyLength) {
+      calcFee();
+    }
+  }, [dummyLength, dummyUtxos, canSpendableUtxos, totalPrice, feeRate.value]);
+  const sizeChangeHandler = (size: number) => {
+    console.log(size);
+    size = Math.max(size, 0);
+    size = Math.min(size, canSelectLength);
+    setSelectSize(size);
+  };
   const buyHandler = async () => {
     try {
       if (!utxos.length) {
@@ -97,7 +159,12 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
         return;
       }
       setLoading(true);
-      const { dummyUtxos, balanceUtxo, spendedUtxos } = await findDummyUtxos();
+      const {
+        dummyUtxos: newDummyUtxos,
+        balanceUtxo,
+        spendedUtxos,
+      } = await findDummyUtxos();
+
       console.log('canSpendableUtxos', canSpendableUtxos);
       const spendableUtxos = canSpendableUtxos.filter((v) => {
         const l = !!spendedUtxos.find(
@@ -122,7 +189,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
       const buyRaw = await buildBuyOrder({
         orders: list,
         utxos: filterConsumUtxos,
-        dummyUtxos: dummyUtxos,
+        dummyUtxos: newDummyUtxos,
         serviceFee: serviceFee,
         feeRate: feeRate.value,
       });
@@ -139,6 +206,7 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
           message: t('notification.order_buy_success_title'),
           description: t('notification.order_buy_success_description'),
         });
+        onSuccess?.();
       } else {
         notification.error({
           message: t('notification.order_buy_failed_title'),
@@ -161,10 +229,38 @@ export const BatchBuyFooter = ({ toBuy, onClose }: Props) => {
   //   address,
   return (
     <>
-      {show && <BatchCart />}
+      {show && list.length && (
+        <BatchCart
+          splitDummyBol={splitDummyBol}
+          networkFee={networkFee}
+          serviceFee={serviceFee}
+          calcLoading={calcLoading}
+        />
+      )}
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-20">
         <div className="flex justify-between items-center w-full h-full px-4">
-          <div className="flex-1">{list.length}</div>
+          <div className="flex-1 flex items-center flex-wrap gap-4">
+            {/* <div>扫货</div>
+            <div className="flex items-center gap-4 w-60">
+              <Slider
+                size="sm"
+                step={1}
+                maxValue={canSelectLength}
+                minValue={0}
+                value={selectSize}
+                className="flex-1"
+                onChange={(e) => {
+                  sizeChangeHandler(e as number);
+                }}
+              />
+              <Input
+                type="number"
+                className="w-20"
+                value={selectSize.toString()}
+                onValueChange={(e) => sizeChangeHandler(Number(e))}
+              />
+            </div> */}
+          </div>
           <div className="flex gap-2 items-center">
             <Button
               className="btn btn-primary"

@@ -14,7 +14,8 @@ interface OrdxUtxoTypeListProps {
 export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
-  const { add: addSell, reset } = useSellStore((state) => state);
+  const { reset } = useSellStore((state) => state);
+  const [selected, setSelected] = useState<string>();
   const [page, setPage] = useState(1);
   // const page = useRef(1);
   const [size, setSize] = useState(12);
@@ -39,12 +40,12 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   }, [list]);
 
   const changeHandler = (k: any) => {
+    if (selected === k) {
+      return;
+    }
+    setSelected(k);
     onChange?.(k);
   };
-
-  useEffect(() => {
-    reset();
-  }, []);
 
   return (
     <div className="py-2 sm:py-4">

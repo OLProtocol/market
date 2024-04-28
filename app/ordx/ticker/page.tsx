@@ -11,7 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { WalletConnectBus } from '@/components/order/WalletConnectBus';
+import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
 import { Icon } from '@iconify/react';
 
 export default function Page() {
@@ -84,7 +84,7 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <WalletConnectBus>
+          <WalletConnectBus text={t('buttons.list_sale')}>
             <Button onClick={toAccount} color="primary">
               {t('buttons.list_sale')}
             </Button>

@@ -64,12 +64,18 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     if (data) {
       set(data.data?.order_list || []);
     }
-  }, [data, set]);
+  }, [data]);
 
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
       setSort(sort);
     }
+  };
+  const batchSuccessHandler = () => {
+    setCanSelect(false);
+    setModalVisiable(false);
+    reset();
+    mutate(swrKey);
   };
   const onCancelOrder = async (item: any) => {
     if (item.locker === '1') {
@@ -123,7 +129,6 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
       await unlockHandler(item);
     }
   };
-  console.log('buyList', buyList);
   const unlockHandler = async (item) => {
     try {
       const res = await unlockOrder({
@@ -199,9 +204,10 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
             ></SortDropdown>
           </div>
         )}
-        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
+        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
           {list.map((item: any, i) => (
             <OrdxFtOrderItem
+              showResale={false}
               canSelect={canSelect}
               selected={!!buyList.find((i) => i.utxo === item.utxo)}
               key={item.utxo + i}
@@ -235,7 +241,13 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
           visiable={modalVisiable}
         />
       )}
-      {canSelect && <BatchBuyFooter onClose={batchCloseHandler} />}
+      {canSelect && (
+        <BatchBuyFooter
+          list={list}
+          onClose={batchCloseHandler}
+          onSuccess={batchSuccessHandler}
+        />
+      )}
     </div>
   );
 };
