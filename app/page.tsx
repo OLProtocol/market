@@ -17,7 +17,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { useReactWalletStore } from 'btc-connect';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 import { thousandSeparator } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
 
