@@ -56,6 +56,7 @@ export default function Home() {
       <Table
         isHeaderSticky
         isStriped
+        selectionMode='single'
         onRowAction={toDetail}
         aria-label="Example table with infinite pagination"
       >
