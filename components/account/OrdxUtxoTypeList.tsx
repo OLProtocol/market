@@ -56,7 +56,7 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
         radius="full"
         size="lg"
         classNames={{
-          tabList: 'flex-wrap',
+          tabList: 'flex-wrap rounded-none',
           tab: 'w-min',
         }}
         onSelectionChange={changeHandler}
