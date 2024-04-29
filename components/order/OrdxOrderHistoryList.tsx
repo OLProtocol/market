@@ -113,10 +113,10 @@ export const OrdxOrderHistoryList = ({
       (column) => column.key === 'txaddress',
     );
 
-    if (address) {
-      defaultColumns.splice(addressColumnIndex, 1);
-      defaultColumns.unshift();
-    }
+    // if (address) {
+    //   defaultColumns.splice(addressColumnIndex, 1);
+    //   defaultColumns.unshift();
+    // }
     return defaultColumns;
   }, [address, i18n.language]);
   const sortList = [
@@ -150,7 +150,7 @@ export const OrdxOrderHistoryList = ({
           </div>
         }
         bottomContent={
-          page > 1 ? (
+          total > 1 ? (
             <div className="flex justify-center">
               <Pagination
                 total={total}
