@@ -9,6 +9,9 @@ import {
   Link,
   Image,
   Input,
+  NavbarMenu,
+  NavbarMenuItem,
+  Divider,
 } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
 import { LanguageSelect } from '@/components/LanguageSelect';
@@ -138,7 +141,24 @@ export const Navbar = () => {
 					</Button>
 				</NavbarItem> */}
       </NavbarContent>
-
+      <NavbarMenu>
+        {/* {searchInput} */}
+        <div className="flex flex-col gap-2">
+          <NavbarMenuItem>
+            <div className="flex items-center gap-4">
+              <FeerateSelectButton />
+              <ThemeSwitch />
+              <LanguageSelect />
+            </div>
+          </NavbarMenuItem>
+          <Divider />
+          {navMenus.map((item) => (
+            <NavbarMenuItem key={item.href}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavbarMenuItem>
+          ))}
+        </div>
+      </NavbarMenu>
       <UpdateVersionModal />
     </NextUINavbar>
   );
