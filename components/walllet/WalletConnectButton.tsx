@@ -110,9 +110,9 @@ const WalletConnectButton = () => {
           </PopoverTrigger>
           <PopoverContent className="p-2">
             <div className="flex flex-col gap-2">
-              {/* <Button className="w-full" onClick={toMyAssets}>
-                {t('buttons.my_assets')}
-              </Button> */}
+              <Button className="w-full" onClick={toMyAssets}>
+                {t('buttons.to_history')}
+              </Button>
               <Button
                 color="danger"
                 variant="ghost"
