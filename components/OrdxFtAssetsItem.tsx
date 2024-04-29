@@ -82,10 +82,10 @@ export const OrdxFtAssetsItem = ({
           ))} */}
           <div className="flex justify-center">
             <section className="text-center pt-10">
-              <p className="text-2xl font-thin text-white">
+              <p className="text-3xl font-medium text-white">
                 {thousandSeparator(item?.tickers[0].amount)}
               </p>
-              <p className="pt-2">
+              <p className="pt-5">
                 <Snippet
                   codeString={item?.utxo}
                   className="bg-transparent text-blue-400"
@@ -95,14 +95,6 @@ export const OrdxFtAssetsItem = ({
                 >
                   <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
                 </Snippet>
-              </p>
-              <p className='pt-2'>
-                <span className="font-medium text-blue-400">
-                  {item?.value}
-                </span>
-                <span className="font-thin text-gray-400">
-                  &nbsp;assets
-                </span>
               </p>
             </section>
           </div>
