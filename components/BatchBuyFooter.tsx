@@ -53,7 +53,7 @@ export const BatchBuyFooter = ({
     () => getUtxoByValue({ address, network, value: 500 }),
   );
   const orderLength = useMemo(() => list.length || 0, [list]);
-  const dummyLength = useMemo(() => orderLength * 2, [orderLength]);
+  const dummyLength = useMemo(() => orderLength + 1, [orderLength]);
 
   const canSelectLength = useMemo(() => {
     return Math.min(

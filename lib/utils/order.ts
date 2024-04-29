@@ -374,6 +374,7 @@ export const calcBuyOrderFee = async ({
     const sellPsbt = bitcoin.Psbt.fromHex(raw, {
       network: psbtNetwork,
     });
+    console.log(sellPsbt);
     const sellerInput = {
       hash: sellPsbt.txInputs[0].hash as any,
       index: sellPsbt.txInputs[0].index,
