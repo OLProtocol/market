@@ -67,6 +67,11 @@ export const OrdxOrderHistoryList = ({
   const coumns = useMemo(() => {
     const defaultColumns = [
       {
+        key: 'result_text',
+        label: 'Type',
+        align: 'center',
+      },
+      {
         key: 'utxo',
         label: t('common.utxo'),
         align: 'center',
@@ -110,11 +115,7 @@ export const OrdxOrderHistoryList = ({
 
     if (address) {
       defaultColumns.splice(addressColumnIndex, 1);
-      defaultColumns.unshift({
-        key: 'result_text',
-        label: 'Type',
-        align: 'center',
-      });
+      defaultColumns.unshift();
     }
     return defaultColumns;
   }, [address, i18n.language]);

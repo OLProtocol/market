@@ -6,7 +6,7 @@ export const request = async (path: string, options: any = {}) => {
   const { publicKey, connected, network } = useReactWalletStore.getState();
   const { signature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data } = options;
-  let url = `https://apitest.ordx.market${network === 'testnet' ? '/testnet' : ''}${path}`;
+  let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
   if (method === 'GET') {
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
@@ -168,9 +168,8 @@ export const getUtxoByValue = async ({
   value = 600,
   network,
 }: any) => {
-  const res = await fetch(
-    `https://apidev.ordx.space/testnet/utxo/address/${address}/${value}`,
-  );
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/utxo/address/${address}/${value}`;
+  const res = await fetch(url);
   return res.json();
 };
 

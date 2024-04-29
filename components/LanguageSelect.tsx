@@ -13,8 +13,9 @@ export const LanguageSelect = () => {
   const { i18n } = useTranslation();
   const items = [
     { key: 'en', label: 'Engish' },
-    { key: 'zh', label: '中文' },
+    { key: 'zh-CN', label: '中文' },
   ];
+  console.log('language', i18n.language);
   const [selectedKeys, setSelectedKeys] = useState(new Set([i18n.language]));
 
   const selectedValue = useMemo(

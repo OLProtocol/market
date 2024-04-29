@@ -13,6 +13,7 @@ import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 import { useList } from 'react-use';
+import { satsToBitcoin } from '@/lib';
 export const OrdxUtxoList = () => {
   const router = useRouter();
   const [ticker, setTicker] = useState<string>('');
@@ -57,9 +58,10 @@ export const OrdxUtxoList = () => {
     setCanSelect(true);
   };
   const addHandler = (item: any) => {
+    console.log(satsToBitcoin(item.value));
     addSell({
       ...item,
-      price: '0',
+      price: satsToBitcoin(item.value)?.toString(),
       status: 'pending',
       unit: 'btc',
     });
