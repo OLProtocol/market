@@ -53,6 +53,12 @@ const WalletConnectButton = () => {
       description: error.message,
     });
   };
+  const toHistory = () => {
+    const url = `https://mempool.space${
+      network === 'testnet' ? '/testnet' : ''
+    }/address/${address}`;
+    window.open(url, '_blank');
+  };
   const handlerDisconnect = async () => {
     console.log('disconnect success');
     setSignature('');
@@ -110,7 +116,7 @@ const WalletConnectButton = () => {
           </PopoverTrigger>
           <PopoverContent className="p-2">
             <div className="flex flex-col gap-2">
-              <Button className="w-full" onClick={toMyAssets}>
+              <Button className="w-full" onClick={toHistory}>
                 {t('buttons.to_history')}
               </Button>
               <Button
