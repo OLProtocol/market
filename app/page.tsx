@@ -120,8 +120,7 @@ export default function Home() {
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base">
-                        &nbsp;
-                        <Avatar name={tick.charAt(0)} />
+                        <Avatar name={tick.slice(0, 1)?.toUpperCase()} />&nbsp;
                         <span className="pt-2">{tick}</span>
                       </div>
                     </TableCell>
