@@ -190,6 +190,9 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data, size],
   );
+  useEffect(() => {
+    reset();
+  }, []);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
