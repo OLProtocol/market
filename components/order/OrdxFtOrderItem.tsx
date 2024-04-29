@@ -96,7 +96,7 @@ export const OrdxFtOrderItem = ({
           </Chip>
           <div className="flex justify-center">
             <section className="text-center pt-8">
-              <p className="text-3xl font-medium text-white">
+              <p className="text-3xl font-medium">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
               <p className="pt-2">
