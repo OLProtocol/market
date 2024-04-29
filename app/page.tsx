@@ -22,15 +22,18 @@ import { thousandSeparator } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const [interval, setInterval] = useState<any>(1);
-  const sortList = [
-    { label: '24小时', value: 1 },
-    { label: '7天', value: 7 },
-    { label: '30天', value: 30 },
-    { label: '全部时间', value: 0 },
-  ];
+  const sortList = useMemo(
+    () => [
+      { label: t('common.time_1D'), value: 1 },
+      { label: t('common.time_7D'), value: 7 },
+      { label: t('common.time_30D'), value: 30 },
+      { label: t('common.time_all_time'), value: 0 },
+    ],
+    [i18n.language],
+  );
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
     `/ordx/getTopTickers-${network}-${interval}`,
@@ -120,7 +123,8 @@ export default function Home() {
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base">
-                        <Avatar name={tick.slice(0, 1)?.toUpperCase()} />&nbsp;
+                        <Avatar name={tick.slice(0, 1)?.toUpperCase()} />
+                        &nbsp;
                         <span className="pt-2">{tick}</span>
                       </div>
                     </TableCell>
@@ -163,8 +167,10 @@ export default function Home() {
                           icon="cryptocurrency-color:btc"
                           className="mr-1 mt-0.5"
                         />
-                        {(getKeyValue(item, 'total_amount') *
-                          getKeyValue(item, 'lowest_price')).toFixed(2)}
+                        {(
+                          getKeyValue(item, 'total_amount') *
+                          getKeyValue(item, 'lowest_price')
+                        ).toFixed(2)}
                       </div>
                     </TableCell>
                   );

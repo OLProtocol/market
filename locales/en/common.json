@@ -52,5 +52,9 @@
   "tx_history": "Trade History",
   "my_listings": "My Listings",
   "floor_price": "Floor Price",
-  "holder_dispersion": "Unique owners"
+  "holder_dispersion": "Unique owners",
+  "time_1D": "24h",
+  "time_7D": "7D",
+  "time_30D": "30D",
+  "time_all_time": "All Time"
 }
