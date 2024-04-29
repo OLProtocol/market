@@ -33,18 +33,30 @@ export default function Page() {
   const headList = useMemo(() => {
     return [
       {
-        value: summary.tx_order_count,
-        label: t('common.tx_order_count'),
-        unit: '',
-      },
-      {
-        value: summary.tx_total_amount,
-        label: t('common.tx_total_asset'),
-        unit: '',
+        value: summary.lowest_price,
+        label: t('common.lowest_price'),
+        unit: 'BTC',
       },
       {
         value: summary.tx_total_volume,
         label: t('common.tx_total_volume'),
+        unit: 'BTC',
+      },
+
+      {
+        value: summary.tx_order_count,
+        label: t('common.tx_order_count'),
+        unit: '',
+      },
+
+      // {
+      //   value: summary.tx_total_amount,
+      //   label: t('common.tx_total_asset'),
+      //   unit: '',
+      // },
+      {
+        value: (summary.total_amount * summary.lowest_price)?.toFixed(2),
+        label: t('common.total_amount'),
         unit: 'BTC',
       },
       {
@@ -52,21 +64,17 @@ export default function Page() {
         label: t('common.onsell_order_count'),
         unit: '',
       },
-      {
-        value: summary.onsell_total_amount,
-        label: t('common.onsell_total_amount'),
-        unit: '',
-      },
-      {
-        value: summary.lowest_price,
-        label: t('common.lowest_price'),
-        unit: 'BTC',
-      },
-      {
-        value: summary.highest_price,
-        label: t('common.highest_price'),
-        unit: 'BTC',
-      },
+      // {
+      //   value: summary.onsell_total_amount,
+      //   label: t('common.onsell_total_amount'),
+      //   unit: '',
+      // },
+
+      // {
+      //   value: summary.highest_price,
+      //   label: t('common.highest_price'),
+      //   unit: 'BTC',
+      // },
       {
         value: summary.holder_count,
         label: i18n.t('common.holder_count'),
@@ -78,46 +86,46 @@ export default function Page() {
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">
-        <div className="flex-1 flex items-center mb-4 justify-between gap-2">
-          <div className="flex flex-1 items-center flex-wrap h-20">
-            <Avatar
-              name={showTextIcon}
-              size="lg"
-              className="mr-2 w-16 h-16"
-              classNames={{ name: 'text-4xl font-bold' }}
-            />
-            <div className="flex-1">
-              <div className="text-2xl md:text-4xl font-bold">
-                {summary?.ticker}
+        <div className="flex-1 flex items-center mb-4 justify-between gap-4">
+          <Avatar
+            name={showTextIcon}
+            size="lg"
+            className="w-20 h-20"
+            classNames={{ name: 'text-4xl font-bold' }}
+          />
+          <div className="flex-1">
+            <div className="flex items-center flex-wrap  justify-center h-20">
+              <div className="flex-1">
+                <div className="text-2xl md:text-4xl font-bold">
+                  {summary?.ticker}
+                </div>
               </div>
+              <WalletConnectBus text={t('buttons.list_sale')}>
+                <Button onClick={toAccount} color="primary">
+                  {t('buttons.list_sale')}
+                </Button>
+              </WalletConnectBus>
             </div>
-          </div>
-          <WalletConnectBus text={t('buttons.list_sale')}>
-            <Button onClick={toAccount} color="primary">
-              {t('buttons.list_sale')}
-            </Button>
-          </WalletConnectBus>
-        </div>
-        <div>
-          <div className="flex gap-2 flex-wrap">
-            {headList.map((item) => (
-              <Card isHoverable key={item.label} className="px-2">
-                <CardBody className="text-left">
-                  <div className="flex text-base md:text-2xl">
-                    {item.unit === 'BTC' && (
-                      <Icon
-                        icon="cryptocurrency-color:btc"
-                        className="mr-1 mt-0.5"
-                      />
-                    )}
-                    <span>{item.value === undefined ? '-' : item.value}</span>
-                  </div>
-                  <div className="text-md md:text-sm text-gray-400">
-                    {item.label}
-                  </div>
-                </CardBody>
-              </Card>
-            ))}
+            <div className="grid gap-2 grid-cols-3  lg:grid-cols-6">
+              {headList.map((item) => (
+                <Card isHoverable key={item.label} className="px-2">
+                  <CardBody className="text-center">
+                    <div className="flex text-base md:text-2xl text-center justify-center">
+                      {item.unit === 'BTC' && (
+                        <Icon
+                          icon="cryptocurrency-color:btc"
+                          className="mr-1 mt-0.5"
+                        />
+                      )}
+                      <span>{item.value === undefined ? '-' : item.value}</span>
+                    </div>
+                    <div className="text-sm lg:text-md text-gray-400">
+                      {item.label}
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>
