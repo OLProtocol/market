@@ -96,7 +96,7 @@ export const OrdxFtOrderItem = ({
           </Chip>
           <div className="flex justify-center">
             <section className="text-center pt-8">
-              <p className="text-2xl font-thin text-white">
+              <p className="text-3xl font-medium text-white">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
               <p className="pt-2">
@@ -108,14 +108,6 @@ export const OrdxFtOrderItem = ({
                 </span>
                 <span className="font-thin text-gray-400">
                   &nbsp;sats/{item?.assets[0].ticker}
-                </span>
-              </p>
-              <p className='pt-2'>
-                <span className="font-medium text-blue-400">
-                  {item?.value}
-                </span>
-                <span className="font-thin text-gray-400">
-                  &nbsp;assets
                 </span>
               </p>
             </section>

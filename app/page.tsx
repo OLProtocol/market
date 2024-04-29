@@ -120,8 +120,7 @@ export default function Home() {
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base">
-                        &nbsp;
-                        <Avatar name={tick.charAt(0)} />
+                        <Avatar name={tick.slice(0, 1)?.toUpperCase()} />&nbsp;
                         <span className="pt-2">{tick}</span>
                       </div>
                     </TableCell>
@@ -164,8 +163,8 @@ export default function Home() {
                           icon="cryptocurrency-color:btc"
                           className="mr-1 mt-0.5"
                         />
-                        {getKeyValue(item, 'total_amount') *
-                          getKeyValue(item, 'lowest_price')}
+                        {(getKeyValue(item, 'total_amount') *
+                          getKeyValue(item, 'lowest_price')).toFixed(2)}
                       </div>
                     </TableCell>
                   );
