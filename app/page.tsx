@@ -163,8 +163,8 @@ export default function Home() {
                           icon="cryptocurrency-color:btc"
                           className="mr-1 mt-0.5"
                         />
-                        {getKeyValue(item, 'total_amount') *
-                          getKeyValue(item, 'lowest_price')}
+                        {(getKeyValue(item, 'total_amount') *
+                          getKeyValue(item, 'lowest_price')).toFixed(2)}
                       </div>
                     </TableCell>
                   );
