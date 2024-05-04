@@ -93,7 +93,7 @@ export const BatchBuyFooter = ({
     const b = new Decimal(totalPrice);
     const calcServie = a.mul(b).mul(new Decimal(orderLength)).toNumber();
     return Math.ceil(Math.max(minServiceFee * orderLength, calcServie));
-  }, [totalPrice]);
+  }, [totalPrice, orderLength]);
   const insufficientBalanceStatus = useMemo(
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
