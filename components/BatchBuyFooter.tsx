@@ -88,12 +88,27 @@ export const BatchBuyFooter = ({
       }, 0) || 0,
     [list],
   );
-  const serviceFee = useMemo(() => {
-    const a = new Decimal(0.01);
-    const b = new Decimal(totalPrice);
-    const calcServie = a.mul(b).mul(new Decimal(orderLength)).toNumber();
-    return Math.ceil(Math.max(minServiceFee * orderLength, calcServie));
-  }, [totalPrice, orderLength]);
+  const serviceFee = useMemo(
+    () =>
+      list.reduce((a, b) => {
+        const decimalA = new Decimal(a);
+        let decimalB = new Decimal(Number(btcToSats(b.price)));
+        decimalB = decimalB.mul(new Decimal(0.01))
+        let minServiceDecimal = new Decimal(minServiceFee);
+        if (minServiceFee > 0) {
+          decimalB = decimalB.plus(minServiceDecimal);
+        }
+        const totalSercice = decimalA.plus(decimalB).toNumber();
+        return Math.ceil(totalSercice);
+      }, 0) || 0,
+    [list],
+  );
+  // const serviceFee = useMemo(() => {
+  //   const a = new Decimal(0.01);
+  //   const b = new Decimal(totalPrice);
+  //   const calcServie = a.mul(b).mul(new Decimal(orderLength)).toNumber();
+  //   return Math.ceil(Math.max(minServiceFee * orderLength, calcServie));
+  // }, [totalPrice, orderLength]);
   const insufficientBalanceStatus = useMemo(
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
