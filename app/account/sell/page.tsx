@@ -25,6 +25,7 @@ import {
   splitBatchSignedPsbt,
   buildBatchSellOrder,
   hideStr,
+  btcToSats,
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -117,17 +118,24 @@ export default function SellPage() {
     }
   };
   const onUnitChange = (i: number, utxo: string, unit: 'btc' | 'sats') => {
+    console.log('onUnitChange', i, utxo, unit);
+    if (unit === list[i].unit || !unit) {
+      return;
+    }
     for (const item of list) {
       changeUnit(item.utxo, unit);
+      if (unit === 'btc') {
+        changePrice(item.utxo, satsToBitcoin(item.price));
+      } else {
+        changePrice(item.utxo, btcToSats(Number(item.price)).toString());
+      }
     }
   };
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
         const decimalA = new Decimal(a);
-        let _b = b.unit === 'btc' ? b.price : satsToBitcoin(b.price);
-        console.log(b);
-        const decimalB = new Decimal(Number(_b));
+        const decimalB = new Decimal(Number(b.price));
         return decimalA.plus(decimalB).toNumber();
       }, 0) || 0,
     [list],
@@ -237,7 +245,8 @@ export default function SellPage() {
               {t('common.total')}: {list.length}
             </div>
             <div>
-              {t('common.your_profits')}: {totalPrice} BTC
+              {t('common.your_profits')}: {totalPrice}{' '}
+              {list[0]?.unit === 'btc' ? 'BTC' : 'Sat'}
             </div>
           </CardBody>
           <CardFooter>
