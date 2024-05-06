@@ -103,12 +103,6 @@ export const BatchBuyFooter = ({
       }, 0) || 0,
     [list],
   );
-  // const serviceFee = useMemo(() => {
-  //   const a = new Decimal(0.01);
-  //   const b = new Decimal(totalPrice);
-  //   const calcServie = a.mul(b).mul(new Decimal(orderLength)).toNumber();
-  //   return Math.ceil(Math.max(minServiceFee * orderLength, calcServie));
-  // }, [totalPrice, orderLength]);
   const insufficientBalanceStatus = useMemo(
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
@@ -179,12 +173,6 @@ export const BatchBuyFooter = ({
     totalPrice,
     feeRate.value,
   ]);
-  const sizeChangeHandler = (size: number) => {
-    console.log(size);
-    size = Math.max(size, 0);
-    size = Math.min(size, canSelectLength);
-    setSelectSize(size);
-  };
   const buyHandler = async () => {
     try {
       if (!utxos.length) {
