@@ -8,15 +8,24 @@ interface WalletConnectBusProps {
   children: React.ReactNode;
   className?: string;
   text?: string;
+  keepStyle?: boolean;
 }
 export const WalletConnectBus = ({
   children,
   className,
   text,
+  keepStyle,
 }: WalletConnectBusProps) => {
+  console.log(children);
+  const buttonCLick = (children as any)?.props?.onClick;
+  // if (keepStyle) {
+  //   (children as any)?.props?.onClick = async () => {
+
+  //   }
+  // }
   const { t } = useTranslation();
   const { connected, setModalVisible } = useReactWalletStore((state) => state);
-  return connected ? (
+  return connected || keepStyle ? (
     <>{children}</>
   ) : (
     <>
