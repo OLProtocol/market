@@ -89,9 +89,10 @@ export const getHistory = async ({
   size,
   sort = 0, // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
   address,
+  filter,
 }: any) => {
   const res = await request('/ordx/GetHistory', {
-    data: { ticker, offset, size, sort, address },
+    data: { ticker, offset, size, sort, address, filter },
   });
   return res;
 };

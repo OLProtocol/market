@@ -13,6 +13,7 @@
   "invalid": "invalid",
   "list": "List",
   "sell": "sell",
+  "history_sell": "Sell",
   "buy": "buy",
   "ok": "OK",
   "time": "Time",
@@ -56,5 +57,8 @@
   "time_1D": "24h",
   "time_7D": "7D",
   "time_30D": "30D",
-  "time_all_time": "All Time"
+  "time_all_time": "All Time",
+  "sort": "Sort",
+  "filter": "Filter",
+  "filter_all": "All"
 }
