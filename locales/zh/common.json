@@ -12,6 +12,7 @@
   "delist": "下架",
   "invalid": "无效",
   "list": "上架",
+  "history_sell": "卖出",
   "sell": "上架",
   "buy": "购买",
   "ok": "确定",
@@ -56,5 +57,8 @@
   "time_1D": "24小时",
   "time_7D": "7天",
   "time_30D": "30天",
-  "time_all_time": "全部时间"
+  "time_all_time": "全部时间",
+  "sort": "排序",
+  "filter": "筛选",
+  "filter_all": "全部"
 }

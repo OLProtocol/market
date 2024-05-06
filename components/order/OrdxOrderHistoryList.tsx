@@ -35,10 +35,18 @@ export const OrdxOrderHistoryList = ({
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
   const [sort, setSort] = useState(0);
+  const [filter, setFilter] = useState<any>(undefined);
   const { data, isLoading } = useSWR(
-    `/ordx/history-${ticker}-${address}-${page}-${size}-${sort}`,
+    `/ordx/history-${ticker}-${address}-${page}-${size}-${sort}-${filter}`,
     () =>
-      getHistory({ offset: (page - 1) * size, size, ticker, address, sort }),
+      getHistory({
+        offset: (page - 1) * size,
+        size,
+        ticker,
+        address,
+        sort,
+        filter,
+      }),
     {
       revalidateOnMount: true,
     },
@@ -46,6 +54,11 @@ export const OrdxOrderHistoryList = ({
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
       setSort(sort);
+    }
+  };
+  const onFilterChange = (f?: number) => {
+    if (f !== undefined) {
+      setFilter(f);
     }
   };
   const total = useMemo(
@@ -59,11 +72,19 @@ export const OrdxOrderHistoryList = ({
       2: t('common.delist'),
       3: t('common.invalid'),
       4: t('common.list'),
-      10: t('common.sell'),
+      10: t('common.history_sell'),
       11: t('common.buy'),
     };
   }, [i18n.language]);
-  console.log(typeMap);
+  const filterList = [
+    { label: t('common.filter_all'), value: 0 },
+    { label: t('common.executed'), value: 1 },
+    { label: t('common.delist'), value: 2 },
+    { label: t('common.invalid'), value: 3 },
+    { label: t('common.list'), value: 4 },
+    { label: t('common.history_sell'), value: 10 },
+    { label: t('common.buy'), value: 11 },
+  ];
   const coumns = useMemo(() => {
     const defaultColumns = [
       {
@@ -140,13 +161,25 @@ export const OrdxOrderHistoryList = ({
         isHeaderSticky
         isStriped
         topContent={
-          <div className="flex justify-end">
-            <SortDropdown
-              sortList={sortList}
-              value={sort}
-              disabled={!list.length}
-              onChange={onSortChange}
-            ></SortDropdown>
+          <div className="flex justify-end gap-4">
+            <div className="flex items-center">
+              <span>{t('common.filter')}：</span>
+              <SortDropdown
+                sortList={filterList}
+                value={filter}
+                disabled={!list.length}
+                onChange={onFilterChange}
+              ></SortDropdown>
+            </div>
+            <div className="flex items-center">
+              <span>{t('common.sort')}：</span>
+              <SortDropdown
+                sortList={sortList}
+                value={sort}
+                disabled={!list.length}
+                onChange={onSortChange}
+              ></SortDropdown>
+            </div>
           </div>
         }
         bottomContent={
