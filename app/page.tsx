@@ -107,6 +107,12 @@ export default function Home() {
           >
             {t('common.holder_count')}
           </TableColumn>
+          <TableColumn
+            key="onsell_order_count"
+            className="text-sm md:text-base font-extralight"
+          >
+            {t('common.order_num')}
+          </TableColumn>
         </TableHeader>
         <TableBody
           isLoading={isLoading}

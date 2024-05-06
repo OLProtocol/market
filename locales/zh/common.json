@@ -46,7 +46,7 @@
   "sale_num": "销售数量",
   "asset_num": "资产数量",
   "tx_total_asset": "总成交资产",
-  "onsell_order_count": "在售挂单数",
+  "onsell_order_count": "上架数",
   "onsell_total_amount": "资产(在售)",
   "highest_price": "最高出价",
   "tx_history": "交易历史",
