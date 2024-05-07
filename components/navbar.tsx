@@ -26,10 +26,11 @@ import {
   HeartFilledIcon,
   SearchIcon,
 } from '@/components/icons';
+import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { usePathname } from 'next/navigation';
-import { use, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 
 const WalletButton = dynamic(
   () => import('../components/walllet/WalletConnectButton') as any,
@@ -37,6 +38,8 @@ const WalletButton = dynamic(
 );
 
 export const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const taggleRef = useRef<any>();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
   const searchInput = (
@@ -79,7 +82,13 @@ export const Navbar = () => {
     [i18n.language],
   );
   return (
-    <NextUINavbar maxWidth="full" position="sticky" className="">
+    <NextUINavbar
+      maxWidth="full"
+      position="sticky"
+      isMenuOpen={isMenuOpen}
+      isBordered
+      onMenuOpenChange={setIsMenuOpen}
+    >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -141,24 +150,29 @@ export const Navbar = () => {
 					</Button>
 				</NavbarItem> */}
       </NavbarContent>
-      <NavbarMenu>
-        {/* {searchInput} */}
-        <div className="flex flex-col gap-2">
-          <NavbarMenuItem>
-            <div className="flex items-center gap-4">
-              <FeerateSelectButton />
-              <ThemeSwitch />
-              <LanguageSelect />
-            </div>
-          </NavbarMenuItem>
-          <Divider />
-          {navMenus.map((item) => (
-            <NavbarMenuItem key={item.href}>
-              <Link href={item.href}>{item.label}</Link>
+      {isMenuOpen && (
+        <NavbarMenu>
+          {/* {searchInput} */}
+          <div className="flex flex-col gap-2">
+            <NavbarMenuItem>
+              <div className="flex items-center gap-4">
+                <FeerateSelectButton />
+                <ThemeSwitch />
+                <LanguageSelect />
+              </div>
             </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
+            <Divider />
+            {navMenus.map((item) => (
+              <NavbarMenuItem key={item.href}>
+                <Link href={item.href} onClick={() => setIsMenuOpen(false)}>
+                  {item.label}
+                </Link>
+              </NavbarMenuItem>
+            ))}
+          </div>
+        </NavbarMenu>
+      )}
+
       <UpdateVersionModal />
     </NextUINavbar>
   );

@@ -5,7 +5,7 @@ import { useReactWalletStore } from 'btc-connect/dist/react';
 export const request = async (path: string, options: any = {}) => {
   const { publicKey, connected, network, disconnect } =
     useReactWalletStore.getState();
-  const { signature } = useCommonStore.getState();
+  const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
   if (method === 'GET') {
@@ -25,9 +25,9 @@ export const request = async (path: string, options: any = {}) => {
   res = await res.json();
   console.log(res);
   if ((res as any).code === -1) {
-    if ((res as any).msg === 'api signature verification failed') {
-      await disconnect();
-    }
+    // if ((res as any).msg === 'api signature verification failed' || (res as any).msg === 'public and signature parameters are required in the request headers') {
+    //   await setSignature('');
+    // }
     throw (res as any).msg;
   }
   return res as any;
