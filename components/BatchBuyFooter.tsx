@@ -70,7 +70,7 @@ export const BatchBuyFooter = ({
   );
   const splitDummyBol = useMemo(
     () => dummyLength > dummyUtxos.length,
-    [dummyLength],
+    [dummyLength, dummyUtxos],
   );
   const canSpendableUtxos = useMemo(
     () => utxos.filter((v) => v.value !== DUMMY_UTXO_VALUE),

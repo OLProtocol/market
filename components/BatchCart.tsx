@@ -18,6 +18,7 @@ export const BatchCart = ({
   networkFee,
   serviceFee,
 }: Props) => {
+  console.log(splitDummyBol);
   const { t } = useTranslation();
   const { list, remove } = useBuyStore();
   const totalPrice = useMemo(
@@ -43,7 +44,7 @@ export const BatchCart = ({
         {list.map((item) => (
           <div
             key={item.order_id}
-            className="flex items-center justify-between py-2 h-14"
+            className="flex items-center justify-between py-2 min-h-14"
           >
             <div>
               <div className="mb-1">
@@ -66,10 +67,13 @@ export const BatchCart = ({
           </div>
         ))}
       </div>
-      <Divider className="my-2" />
+
       {splitDummyBol && (
-        <div className="text-xs text-gray-300">
-          {t('common.split_dummy_hint')}
+        <div>
+          <Divider className="my-2" />
+          <div className="text-xs text-gray-300">
+            {t('common.split_dummy_hint')}
+          </div>
         </div>
       )}
       <Divider className="my-2" />

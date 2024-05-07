@@ -19,8 +19,13 @@ import { useList } from 'react-use';
 interface OrdxOrderListProps {
   ticker: string;
   address?: string;
+  showResale?: boolean;
 }
-export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
+export const OrdxOrderList = ({
+  ticker,
+  address,
+  showResale = true,
+}: OrdxOrderListProps) => {
   const { t } = useTranslation();
   const router = useRouter();
   const { address: storeAddress, network } = useReactWalletStore(
@@ -210,7 +215,7 @@ export const OrdxOrderList = ({ ticker, address }: OrdxOrderListProps) => {
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
           {list.map((item: any, i) => (
             <OrdxFtOrderItem
-              showResale={false}
+              showResale={showResale}
               canSelect={canSelect}
               selected={!!buyList.find((i) => i.utxo === item.utxo)}
               key={item.utxo + i}

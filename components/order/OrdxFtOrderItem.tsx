@@ -20,7 +20,6 @@ interface Props {
   item: any;
   onBuy?: any;
   showResale?: boolean;
-
   onCancelOrder?: () => void;
   canSelect?: boolean;
   selected?: boolean;
