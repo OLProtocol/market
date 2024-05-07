@@ -60,5 +60,6 @@
   "time_all_time": "全部时间",
   "sort": "排序",
   "filter": "筛选",
-  "filter_all": "全部"
+  "filter_all": "全部",
+  "split_dummy_hint": "虚拟Utxo数量不够，会自动分割"
 }
