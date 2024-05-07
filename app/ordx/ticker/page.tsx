@@ -147,7 +147,7 @@ export default function Page() {
           style={{ width: '100%' }}
         >
           <Tab key="market" title={t('pages.market.title')}>
-            <OrdxOrderList ticker={ticker} />
+            <OrdxOrderList ticker={ticker} showResale={false} />
           </Tab>
           <Tab key="history" title={t('common.tx_history')}>
             <OrdxOrderHistoryList ticker={ticker} />

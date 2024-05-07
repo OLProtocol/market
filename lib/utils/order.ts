@@ -102,7 +102,7 @@ export const buildBatchSellOrder = async ({
     network: psbtNetwork,
   });
   for (let i = 0; i < inscriptionUtxos.length; i++) {
-    const { utxo, price } = inscriptionUtxos[i];
+    const { utxo, price, unit } = inscriptionUtxos[i];
     console.log(utxo, price);
     const { txid, vout } = parseUtxo(utxo);
     const rawTx = await getTxHex(txid, network);
@@ -118,7 +118,7 @@ export const buildBatchSellOrder = async ({
     batchSell.addInput(utxoInput);
     batchSell.addOutput({
       address,
-      value: btcToSats(Number(price)),
+      value: unit === 'btc' ? btcToSats(Number(price)) : Number(price),
     });
   }
   console.log(batchSell);

@@ -68,7 +68,9 @@ export const OrdxUtxoList = () => {
   };
   const selectHandler = (bol: boolean, item: any) => {
     if (bol) {
-      addHandler(item);
+      if (!item.order_id) {
+        addHandler(item);
+      }
     } else {
       removeSell(item.utxo);
     }
