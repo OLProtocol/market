@@ -73,8 +73,13 @@ export const Navbar = () => {
         href: '/',
         isActive: true,
       },
+      // {
+      //   label: t('pages.tools.title'),
+      //   href: '/tools',
+      //   isActive: false,
+      // },
       {
-        label: t('buttons.my_assets'),
+        label: t('pages.my_assets.title'),
         href: '/account',
         isActive: false,
       },

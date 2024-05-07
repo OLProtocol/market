@@ -23,7 +23,6 @@ export const request = async (path: string, options: any = {}) => {
   options.headers = headers;
   let res = await fetch(url, options);
   res = await res.json();
-  console.log(res);
   if ((res as any).code === -1) {
     // if ((res as any).msg === 'api signature verification failed' || (res as any).msg === 'public and signature parameters are required in the request headers') {
     //   await setSignature('');

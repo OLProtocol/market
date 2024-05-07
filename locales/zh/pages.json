@@ -6,6 +6,12 @@
   "market": {
     "title": "市场"
   },
+  "tools": {
+    "title": "工具箱"
+  },
+  "my_assets": {
+    "title": "我的资产"
+  },
   "order": {
     "title": "订单",
     "modal_title": "购买订单"

@@ -30,9 +30,11 @@ export const WalletConnectBus = ({
   ) : (
     <>
       <Button
+        fullWidth
+        variant="ghost"
+        size="md"
         onClick={() => setModalVisible(true)}
-        size="sm"
-        radius="full"
+        radius="sm"
         className={className}
         color="primary"
       >
