@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Decimal } from 'decimal.js';
 import { Icon } from '@iconify/react';
 import { satsToBitcoin } from '@/lib';
+import { useTranslation } from 'react-i18next';
 interface Props {
   splitDummyBol: boolean;
   calcLoading: boolean;
@@ -17,6 +18,7 @@ export const BatchCart = ({
   networkFee,
   serviceFee,
 }: Props) => {
+  const { t } = useTranslation();
   const { list, remove } = useBuyStore();
   const totalPrice = useMemo(
     () =>
@@ -64,7 +66,12 @@ export const BatchCart = ({
           </div>
         ))}
       </div>
-      {/* <div>{splitDummyBol && <div>需要分割虚拟UTXO</div>}</div> */}
+      <Divider className="my-2" />
+      {splitDummyBol && (
+        <div className="text-xs text-gray-300">
+          {t('common.split_dummy_hint')}
+        </div>
+      )}
       <Divider className="my-2" />
       <div>
         <div className="flex justify-between items-center">

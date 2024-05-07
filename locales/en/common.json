@@ -60,5 +60,6 @@
   "time_all_time": "All Time",
   "sort": "Sort",
   "filter": "Filter",
-  "filter_all": "All"
+  "filter_all": "All",
+  "split_dummy_hint": "If the number of virtual Utxo is not enough, it will be automatically divided."
 }
