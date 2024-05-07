@@ -15,6 +15,7 @@ import {
 import 'btc-connect/dist/style/index.css';
 import { useTheme } from 'next-themes';
 import { hideStr } from '@/lib/utils';
+import { message } from '@/lib/wallet-sdk';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
@@ -23,8 +24,15 @@ const WalletConnectButton = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
-  const { connected, check, address, disconnect, btcWallet, network } =
-    useReactWalletStore((state) => state);
+  const {
+    connected,
+    check,
+    address,
+    publicKey,
+    disconnect,
+    btcWallet,
+    network,
+  } = useReactWalletStore((state) => state);
   const { setSignature, signature } = useCommonStore((state) => state);
   const toMyAssets = () => {
     router.push('/account');
@@ -77,7 +85,7 @@ const WalletConnectButton = () => {
             setSignature(_s);
           }
         } catch (error) {
-          await disconnect();
+          await handlerDisconnect();
         }
       }
       await check();
@@ -85,9 +93,37 @@ const WalletConnectButton = () => {
       console.log(error);
     }
   };
+  const checkSignature = async () => {
+    if (signature) {
+      try {
+        const bol = message.verifyMessageOfECDSA(
+          publicKey,
+          process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+          signature,
+        );
+        if (!bol) {
+          notification.warning({
+            message: 'Signature Verification Failed',
+            description: 'Please check your signature and try connect again',
+          });
+          handlerDisconnect();
+        }
+      } catch (error) {
+        console.log('checkSignature', error);
+        notification.warning({
+          message: 'Signature Verification Failed',
+          description: 'Please check your signature and try connect again',
+        });
+        handlerDisconnect();
+      }
+    }
+  };
   useEffect(() => {
     console.log('connected', connected);
     if (connected) {
+      setTimeout(() => {
+        checkSignature();
+      }, 2000);
       btcWallet?.on('accountsChanged', accountAndNetworkChange);
       btcWallet?.on('networkChanged', accountAndNetworkChange);
     } else {

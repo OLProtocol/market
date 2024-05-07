@@ -126,7 +126,7 @@ export const OrdxFtOrderItem = ({
               className="text-tiny"
               fullWidth
               variant="flat"
-              color="default"
+              color="danger"
               radius="lg"
               startContent={
                 item.locker == '1' ? (
@@ -135,7 +135,7 @@ export const OrdxFtOrderItem = ({
               }
               onClick={onCancelOrder}
             >
-              {t('buttons.remove_sale')}（{item.price} {item.currency}）
+              {t('buttons.remove_sale')}
             </Button>
           ) : (
             <Button

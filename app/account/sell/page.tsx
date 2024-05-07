@@ -176,18 +176,30 @@ export default function SellPage() {
                 <TableRow key={item.utxo}>
                   <TableCell>
                     <div className="mb-2">
-                      <span className="text-gray-400">Ticker：</span>
-                      {item.tickers?.map((v) => ` ${v.ticker}`)?.join('-')}
+                      <div className="flex items-center">
+                        {item.tickers?.map((v) => (
+                          <div key={v.ticker}>
+                            <div>
+                              <span className="text-gray-400">Ticker：</span>
+                              <span>{v.ticker}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">
+                                {t('common.asset_num')}：
+                              </span>
+                              <span>{v.amount}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {item.tickers?.map((v) => (
+                        <span key={v.ticker}>{v.ticker}</span>
+                      ))}
                     </div>
                     <div className="flex items-center gap-4">
                       <div>
-                        <span className="text-gray-400">
-                          {t('common.asset_num')}：
-                        </span>
-                        {item.tickers?.map((v) => ` ${v.amount}`)?.join('-')}
-                      </div>
-                      <div>
-                        <span className="text-gray-400">Sats:</span>{' '}
+                        <span className="text-gray-400">Sats:</span>
                         {item.value}
                       </div>
                     </div>
