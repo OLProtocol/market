@@ -6,6 +6,12 @@
   "market": {
     "title": "Market"
   },
+  "tools": {
+    "title": "Tools"
+  },
+  "my_assets": {
+    "title": "My Assets"
+  },
   "order": {
     "title": "Order",
     "modal_title": "Buy Order"
