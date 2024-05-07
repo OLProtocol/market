@@ -45,7 +45,7 @@ export const OrdxOrderHistoryList = ({
         ticker,
         address,
         sort,
-        filter,
+        filter: filter === 0 ? undefined : filter,
       }),
     {
       revalidateOnMount: true,
@@ -76,15 +76,21 @@ export const OrdxOrderHistoryList = ({
       11: t('common.buy'),
     };
   }, [i18n.language]);
-  const filterList = [
-    { label: t('common.filter_all'), value: 0 },
-    { label: t('common.executed'), value: 1 },
-    { label: t('common.delist'), value: 2 },
-    { label: t('common.invalid'), value: 3 },
-    { label: t('common.list'), value: 4 },
-    { label: t('common.history_sell'), value: 10 },
-    { label: t('common.buy'), value: 11 },
-  ];
+  const filterList = useMemo(() => {
+    const _list = [
+      { label: t('common.filter_all'), value: 0 },
+      { label: t('common.executed'), value: 1 },
+      { label: t('common.delist'), value: 2 },
+      { label: t('common.invalid'), value: 3 },
+      { label: t('common.list'), value: 4 },
+      // { label: t('common.history_sell'), value: 10 },
+    ];
+    if (address) {
+      _list.push({ label: t('common.history_sell'), value: 10 });
+      _list.push({ label: t('common.history_buy'), value: 11 });
+    }
+    return _list;
+  }, [i18n.language, address]);
   const coumns = useMemo(() => {
     const defaultColumns = [
       {
