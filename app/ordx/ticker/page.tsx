@@ -33,7 +33,7 @@ export default function Page() {
   const headList = useMemo(() => {
     return [
       {
-        value: summary.lowest_price,
+        value: Number(summary.lowest_price).toFixed(2),
         label: t('common.lowest_price'),
         unit: 'BTC',
       },
