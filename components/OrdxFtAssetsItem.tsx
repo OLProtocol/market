@@ -106,7 +106,7 @@ export const OrdxFtAssetsItem = ({
           <div>
             {item.order_id === 0 ? (
               <Button
-                fullWidth
+                // fullWidth
                 variant="ghost"
                 size="md"
                 isLoading={loading}
@@ -120,7 +120,7 @@ export const OrdxFtAssetsItem = ({
             ) : (
               <Button
                 className="text-tiny"
-                fullWidth
+                // fullWidth
                 variant="flat"
                 color="default"
                 radius="lg"

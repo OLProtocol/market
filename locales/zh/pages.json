@@ -7,7 +7,14 @@
     "title": "市场"
   },
   "tools": {
-    "title": "工具箱"
+    "title": "工具箱",
+    "transaction": {
+      "title": "交易",
+      "input": "输入",
+      "output": "输出",
+      "available_utxo": "Plain UTXO",
+      "rare_sats": "Rare Sats"
+    }
   },
   "my_assets": {
     "title": "我的资产"
