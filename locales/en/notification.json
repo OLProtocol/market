@@ -14,5 +14,6 @@
   "order_buy_failed_description_1": "Lack dumy utxos",
   "order_buy_failed_description_2": "Order Raw is empty",
   "order_buy_failed_description_3": "dummyUtxos lack of two utxos",
-  "order_buy_failed_description_4": "Insufficient btc utxo"
+  "order_buy_failed_description_4": "Insufficient btc utxo",
+  "transaction_failed_title": "Transaction failed"
 }
