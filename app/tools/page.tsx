@@ -1,19 +1,18 @@
 'use client'
 import { Card, CardBody, CardHeader, Avatar, Button } from "@nextui-org/react";
-// import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function ToolsPage() {
 
-    // const router = useRouter();
+    const router = useRouter();
 
     const toTransact = () => {
         // window.location.href = '/tools/transact';
-        // router.push(`/tools/transaction`);
-        alert('开发中，敬请期待')
+        router.push(`/tools/transaction`);
     };
 
     return (
-        <div>
+        <div className="min-h-[10rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mt-4 mb-4">
             <Card className="max-w-[340px]">
                 <CardHeader className="justify-between">
                     <div className="flex gap-5">
