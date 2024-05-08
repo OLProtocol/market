@@ -191,3 +191,9 @@ export const getAppVersion = async () => {
   const res = await fetch(`/version.txt?t=${+new Date()}`);
   return res.text();
 };
+
+export const getSats = async ({ address, network }: any) => {
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/exotic/address/${address}`;
+  const res = await fetch(url);
+  return res.json();
+};

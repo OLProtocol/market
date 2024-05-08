@@ -124,7 +124,7 @@ export const OrdxFtOrderItem = ({
           {item?.address === currentAddress && showResale ? (
             <Button
               className="text-tiny"
-              fullWidth
+              // fullWidth
               variant="flat"
               color="danger"
               radius="lg"
@@ -140,7 +140,7 @@ export const OrdxFtOrderItem = ({
           ) : (
             <Button
               className="flex-1 border"
-              fullWidth
+              // fullWidth
               variant="ghost"
               size="md"
               isDisabled={!canBuy}

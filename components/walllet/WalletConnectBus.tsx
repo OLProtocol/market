@@ -30,7 +30,7 @@ export const WalletConnectBus = ({
   ) : (
     <>
       <Button
-        fullWidth
+        // fullWidth
         variant="ghost"
         size="md"
         onClick={() => setModalVisible(true)}
