@@ -1,8 +1,10 @@
 'use client';
 import { getOrdxAddressHolders, getOrdxSummary, getSats, getUtxoByValue } from "@/api";
-import { calcNetworkFee, hideStr } from "@/lib";
+import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
+import { buildTransaction, calcNetworkFee, hideStr, signAndPushPsbt } from "@/lib";
 import { useCommonStore } from "@/store";
 import { Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Divider, Image, Input, Select, SelectItem, Tooltip } from "@nextui-org/react";
+import { notification } from "antd";
 import { useReactWalletStore } from "btc-connect/dist/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +14,7 @@ export default function Transaction() {
   const { t, i18n } = useTranslation();
   const [fee, setFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
+  const [loading, setLoading] = useState(false);
   const { address, network, publicKey } = useReactWalletStore((state) => state);
 
   const [inputList, { set: setInputList }] = useMap<any>({
@@ -159,6 +162,22 @@ export default function Transaction() {
     setOutputList('items', outputList.items);
   };
 
+  const setOutputSats = (itemId: number, sats: string) => {
+    const unit = outputList.items[itemId - 1].value.unit;
+    if (unit === 'sats') {
+      outputList.items[itemId - 1].value.sats = Number(sats);
+    } else {
+      outputList.items[itemId - 1].value.sats = Number(sats) * 100000000;
+    }
+
+    setOutputList('items', outputList.items);
+  };
+
+  const outputSatsOnBlur = (e) => {
+    console.log(e);
+    calculateBalance();
+  };
+
   const calculateBalance = async () => {
     let inTotal = 0;
     let outTotal = 0;
@@ -202,19 +221,22 @@ export default function Transaction() {
   const getTickers = async () => {
     const tickers: any[] = [];
 
-    let data = await getOrdxSummary({
+    let res = await getOrdxSummary({
       address: address,
       network,
     });
 
-    if (data.code !== 0) {
-      alert(data.msg);
+    if (res.code !== 0) {
+      notification.error({
+        message: t('notification.transaction_failed_title'),
+        description: res.msg,
+      });
       return;
     }
-    const detail = data.data.detail;
+    const detail = res.data.detail;
 
     detail.map(async (item) => {
-      data = await getOrdxAddressHolders({
+      res = await getOrdxAddressHolders({
         start: 0,
         limit: 10000,
         address: address,
@@ -222,8 +244,8 @@ export default function Transaction() {
         network: network,
       });
       const utxosOfTicker: any[] = [];
-      if (data.code === 0) {
-        const details = data.data.detail;
+      if (res.code === 0) {
+        const details = res.data.detail;
         details.map((detail) => {
           const utxo = {
             txid: detail.utxo.split(':')[0],
@@ -244,19 +266,22 @@ export default function Transaction() {
   };
 
   const getAvialableTicker = async () => {
-    let data = await getUtxoByValue({
+    let res = await getUtxoByValue({
       address: address,
       value: 0,
       network,
     });
-    if (data.code !== 0) {
-      alert(data.msg);
+    if (res.code !== 0) {
+      notification.error({
+        message: t('notification.transaction_failed_title'),
+        description: res.msg,
+      });
       return;
     }
 
     return {
       ticker: t('pages.tools.transaction.available_utxo'),
-      utxos: data.data,
+      utxos: res.data,
     };
   };
 
@@ -341,7 +366,73 @@ export default function Transaction() {
   };
 
   const splitHandler = async () => {
+    if (!address) {
+      return;
+    }
+    setLoading(true);
 
+    try {
+      const inTotal = inputList.items.reduce((acc, cur) => {
+        return acc + cur.value.sats;
+      }, 0);
+
+      const outTotal = outputList.items.reduce((acc, cur) => {
+        return acc + cur.value.sats;
+      }, 0);
+
+      const utxos = inputList.items.map((v) => {
+        return {
+          txid: v.value.utxo.split(':')[0],
+          vout: Number(v.value.utxo.split(':')[1]),
+          value: v.value.sats,
+        };
+      });
+
+      const fee = await calcNetworkFee({
+        utxos,
+        outputs: outputList.items.map((v) => ({
+          address: v.value.address,
+          value: v.value.sats,
+        })),
+        feeRate: feeRate.value,
+        network,
+        address: address,
+        publicKey,
+      });
+      if (inTotal - outTotal - fee < 0) {
+        setLoading(false);
+        notification.error({
+          message: t('notification.transaction_failed_title'),
+          description: 'Not enough sats',
+        });
+        return;
+      }
+
+      const psbt = await buildTransaction({
+        utxos,
+        outputs: outputList.items.map((v) => ({
+          address: v.value.address,
+          value: v.value.sats,
+        })),
+        feeRate: feeRate.value,
+        network,
+        address: address,
+        publicKey,
+      });
+      await signAndPushPsbt(psbt);
+      setLoading(false);
+      notification.error({
+        message: t('notification.transaction_failed_title'),
+        description: 'Split & Send success',
+      });
+    } catch (error: any) {
+      console.log('error = ', error);
+      setLoading(false);
+      notification.error({
+        message: t('notification.transaction_failed_title'),
+        description: error.message || 'Split & Send failed',
+      });
+    }
   };
 
   useEffect(() => {
@@ -488,6 +579,8 @@ export default function Transaction() {
                         ? item.value.sats
                         : item.value.sats / 100000000
                     }
+                    onChange={(e) => setOutputSats(item.id, e.target.value)}
+                    onBlur={(e) => outputSatsOnBlur(e)}
                     endContent={
                       <div className="flex items-center">
                         <select
@@ -560,9 +653,11 @@ export default function Transaction() {
         </CardBody>
         <Divider />
         <CardFooter>
-          <Button color="primary" onClick={splitHandler}>
-            Send
-          </Button>
+          <WalletConnectBus className="mx-auto mt-20 block">
+            <Button color="primary" onClick={splitHandler} isLoading={loading}>
+              Send
+            </Button>
+          </WalletConnectBus>
           <span className='text-gray-400 text-sm font-light'>({'Fee: ' + fee + ' sats'})</span>
         </CardFooter>
       </Card>

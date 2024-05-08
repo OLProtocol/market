@@ -1,4 +1,5 @@
 'use client'
+import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 import { Card, CardBody, CardHeader, Avatar, Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 
@@ -7,7 +8,6 @@ export default function ToolsPage() {
     const router = useRouter();
 
     const toTransact = () => {
-        // window.location.href = '/tools/transact';
         router.push(`/tools/transaction`);
     };
 
@@ -19,19 +19,20 @@ export default function ToolsPage() {
                         <Avatar name="T" />
                         <div className="flex flex-col gap-1 items-start justify-center">
                             <h4 className="text-small font-semibold leading-none text-default-600">Transaction</h4>
-                            {/* <h5 className="text-small tracking-tight text-default-400">@zoeylang</h5> */}
                         </div>
                     </div>
-                    <Button
-                        className=""
-                        color="primary"
-                        radius="full"
-                        size="sm"
-                        variant="solid"
-                        onClick={() => toTransact()}
-                    >
-                        Split&Send
-                    </Button>
+                    <WalletConnectBus className="mx-auto mt-20 block">
+                        <Button
+                            className=""
+                            color="primary"
+                            radius="full"
+                            size="sm"
+                            variant="solid"
+                            onClick={() => toTransact()}
+                        >
+                            Split&Send
+                        </Button>
+                    </WalletConnectBus>
                 </CardHeader>
                 <CardBody className="px-3 py-0 text-small text-default-400">
                     <p>
