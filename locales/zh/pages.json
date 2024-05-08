@@ -13,7 +13,9 @@
       "input": "输入",
       "output": "输出",
       "available_utxo": "Plain UTXO",
-      "rare_sats": "Rare Sats"
+      "rare_sats": "Rare Sats",
+      "balance": "余额",
+      "balance_des": "余额小于546 sats时，会将余额转给矿工。"
     }
   },
   "my_assets": {

@@ -197,3 +197,21 @@ export const getSats = async ({ address, network }: any) => {
   const res = await fetch(url);
   return res.json();
 };
+
+export const getOrdxAddressHolders = async ({
+  address,
+  ticker,
+  network,
+  start,
+  limit,
+}: any) => {
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
+  const res = await fetch(url);
+  return res.json();
+};
+
+export const getOrdxSummary = async ({ address, network }: any) => {
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/address/summary/${address}`;
+  const res = await fetch(url);
+  return res.json();
+};

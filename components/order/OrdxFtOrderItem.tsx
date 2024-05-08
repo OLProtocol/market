@@ -101,7 +101,7 @@ export const OrdxFtOrderItem = ({
               <p className="pt-2">
                 <span className="font-medium text-blue-400">
                   {(
-                    (item?.assets[0].unit_price * 100000000) /
+                    item?.assets[0].unit_price /
                     item?.assets[0].unit_amount
                   ).toFixed(2)}
                 </span>
