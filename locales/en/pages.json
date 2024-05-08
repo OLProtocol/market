@@ -7,7 +7,14 @@
     "title": "Market"
   },
   "tools": {
-    "title": "Tools"
+    "title": "Tools",
+    "transaction": {
+      "title": "Transaction",
+      "input": "Input",
+      "output": "Output",
+      "available_utxo": "Plain UTXO",
+      "rare_sats": "Rare Sats"
+    }
   },
   "my_assets": {
     "title": "My Assets"
