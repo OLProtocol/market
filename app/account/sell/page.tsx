@@ -175,7 +175,7 @@ export default function SellPage() {
               {list.map((item, i) => (
                 <TableRow key={item.utxo}>
                   <TableCell>
-                    <div className="mb-2">
+                    <div className="mb-2 flex items-center gap-4">
                       <div className="flex items-center">
                         {item.tickers?.map((v) => (
                           <div key={v.ticker}>
@@ -192,16 +192,10 @@ export default function SellPage() {
                           </div>
                         ))}
                       </div>
-
-                      {item.tickers?.map((v) => (
-                        <span key={v.ticker}>{v.ticker}</span>
-                      ))}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <span className="text-gray-400">Sats:</span>
-                        {item.value}
-                      </div>
+                    <div>
+                      <span className="text-gray-400">Sats:</span>
+                      {item.value}
                     </div>
                     <div className="flex items-center">
                       <span className="text-gray-400">Utxo：</span>
