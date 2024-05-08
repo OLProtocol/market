@@ -174,7 +174,7 @@ export const OrderBuyModal = ({
       const res = await unlockOrder({ address, order_id: item.order_id });
       if (res.code !== 200) {
         notification.error({
-          message: t('notification.order_cancel_failed_title'),
+          message: t('notification.order_unlock_failed_title'),
           description: res.msg,
         });
         return;
@@ -182,7 +182,7 @@ export const OrderBuyModal = ({
       closeHandler();
     } catch (error: any) {
       notification.error({
-        message: t('notification.order_cancel_failed_title'),
+        message: t('notification.order_unlock_failed_title'),
         description: error.message,
       });
     } finally {

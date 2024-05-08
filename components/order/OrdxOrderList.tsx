@@ -85,22 +85,22 @@ export const OrdxOrderList = ({
   const onCancelOrder = async (item: any) => {
     if (item.locker === '1') {
       notification.error({
-        message: 'Cancel order failed',
-        description: `The order is locked, please wait unlock it first`,
+        message: t('notification.order_cancel_failed_title'),
+        description: t('notification.order_cancel_failed_description_1'),
       });
       return;
     }
     const res = await cancelOrder({ address, order_id: item.order_id });
     if (res.code === 200) {
       notification.success({
-        message: 'Cancel order successfully',
-        description: `The order has been canceled successfully`,
+        message: t('notification.order_cancel_success_title'),
+        description: t('notinication.order_cancel_success_description_1'),
       });
       const index = list.findIndex((i) => i.utxo === item.utxo);
       removeAt(index);
     } else {
       notification.error({
-        message: 'Cancel order failed',
+        message: t('notification.order_cancel_failed_title'),
         description: res.msg,
       });
     }
@@ -142,7 +142,7 @@ export const OrdxOrderList = ({
       });
       if (res.code !== 200) {
         notification.error({
-          message: t('notification.order_cancel_failed_title'),
+          message: t('notification.order_unlock_failed_title'),
           description: res.msg,
         });
         return;
@@ -150,7 +150,7 @@ export const OrdxOrderList = ({
       removeBuy(item.utxo);
     } catch (error: any) {
       notification.error({
-        message: t('notification.order_cancel_failed_title'),
+        message: t('notification.order_unlock_failed_title'),
         description: error.message,
       });
     }
@@ -175,7 +175,7 @@ export const OrdxOrderList = ({
       const res = await Promise.all(listPromise);
       if (res.some((i) => i.code !== 200)) {
         notification.error({
-          message: t('notification.order_cancel_failed_title'),
+          message: t('notification.order_unlock_failed_title'),
           description: t('notification.order_cancel_failed_description'),
         });
         return;
@@ -186,7 +186,7 @@ export const OrdxOrderList = ({
       mutate(swrKey);
     } catch (error: any) {
       notification.error({
-        message: t('notification.order_cancel_failed_title'),
+        message: t('notification.order_unlock_failed_title'),
         description: error.message,
       });
     }
