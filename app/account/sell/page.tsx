@@ -42,6 +42,7 @@ export default function SellPage() {
     list,
     reset,
     unit,
+    ticker,
     amountUnit,
     changeAmountUnit,
     changeUnit,
@@ -49,7 +50,6 @@ export default function SellPage() {
     changeStatus,
   } = useSellStore((state) => state);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
-  const ticker = useMemo(() => list?.[0]?.tickers?.[0].ticker, [list]);
   const { data, isLoading: isSummaryLoading } = useSWR(
     `getTickerSummary-${ticker}`,
     () => getTickerSummary({ ticker }),
@@ -129,13 +129,14 @@ export default function SellPage() {
     // }
   };
   const onUnitChange = (u: 'btc' | 'sats') => {
-    if (u === unit || !unit) {
+    if (u === unit || !u) {
       return;
     }
     changeUnit(u);
   };
   const onAmountUnitChange = (u: 'btc' | 'sats') => {
-    if (u === unit || !unit) {
+    console.log('unit change', u);
+    if (u === amountUnit || !u) {
       return;
     }
     changeAmountUnit(u);
@@ -160,7 +161,7 @@ export default function SellPage() {
             <div className="mb-2 flex items-center gap-6">
               <div className="flex items-center gap-4">
                 <span>{t('common.tick')}:</span>
-                <span>{summary.ticker}</span>
+                <span>{ticker}</span>
               </div>
               <div className="flex items-center gap-4">
                 <span>{t('common.lowest_price')}:</span>
@@ -216,23 +217,21 @@ export default function SellPage() {
               {list.map((item, i) => (
                 <TableRow key={item.utxo}>
                   <TableCell>
-                    <div className="mb-2 flex items-center gap-4">
-                      <div className="flex items-center">
-                        {item.tickers?.map((v) => (
-                          <div key={v.ticker}>
-                            <div>
-                              <span className="text-gray-400">Ticker：</span>
-                              <span>{v.ticker}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-400">
-                                {t('common.asset_num')}：
-                              </span>
-                              <span>{v.amount}</span>
-                            </div>
+                    <div className="mb-2 flex flex-wrap items-center gap-4">
+                      {item.tickers?.map((v) => (
+                        <div key={v.ticker}>
+                          <div>
+                            <span className="text-gray-400">Ticker：</span>
+                            <span>{v.ticker}</span>
                           </div>
-                        ))}
-                      </div>
+                          <div>
+                            <span className="text-gray-400">
+                              {t('common.asset_num')}：
+                            </span>
+                            <span>{v.amount}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <div>
                       <span className="text-gray-400">Sats:</span>
@@ -262,11 +261,7 @@ export default function SellPage() {
                       onBlur={() => inputBlur(item.utxo)}
                     />
                   </TableCell>
-                  <TableCell className="text-center">
-                    {amountUnit === 'btc'
-                      ? satsToBitcoin(item.price)
-                      : item.price}
-                  </TableCell>
+                  <TableCell className="text-center">{item.price}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
