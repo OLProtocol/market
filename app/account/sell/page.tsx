@@ -168,7 +168,7 @@ export default function SellPage() {
               </div>
             </div>
           )}
-          <Table aria-label="Example static collection table">
+          <Table isStriped aria-label="Example static collection table">
             <TableHeader>
               <TableColumn className="text-sm md:text-base">
                 {t('common.item')}

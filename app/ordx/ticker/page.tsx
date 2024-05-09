@@ -55,7 +55,10 @@ export default function Page() {
       //   unit: '',
       // },
       {
-        value: (summary.total_amount * summary.lowest_price)?.toFixed(2),
+        value: (
+          (summary.total_amount * summary.lowest_price) /
+          100000000
+        )?.toFixed(4),
         label: t('common.total_amount'),
         unit: 'BTC',
       },
