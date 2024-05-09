@@ -121,13 +121,16 @@ export const useSellStore = create<SellState>()(
             : btcToSats(item.unit_price).toString();
         const tickerAmount =
           item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
-        let amountPrice = new Decimal(unitPrice)
+
+        const satsPrice =
+          unit === 'btc' ? btcToSats(unitPrice).toString() : unitPrice;
+        let amountPrice = new Decimal(satsPrice)
           .mul(new Decimal(tickerAmount))
           .toString();
         amountPrice =
           amountUnit === 'btc'
             ? satsToBitcoin(amountPrice).toString()
-            : btcToSats(amountPrice).toString();
+            : amountPrice;
         return {
           ...item,
           unit_price: unitPrice,
