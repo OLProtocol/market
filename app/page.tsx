@@ -75,7 +75,7 @@ export default function Home() {
             key="lowest_price"
             className="text-sm md:text-base font-extralight"
           >
-            {t('common.price')}
+            {t('common.lowest_price')}
           </TableColumn>
           <TableColumn
             key="lowest_price_change"
@@ -141,8 +141,7 @@ export default function Home() {
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base">
-                        {(getKeyValue(item, columnKey) * 10000).toFixed(2) +
-                          ' sats'}
+                        {getKeyValue(item, columnKey).toFixed(2) + ' sats'}
                       </div>
                     </TableCell>
                   );
@@ -176,9 +175,10 @@ export default function Home() {
                           className="mr-1 mt-0.5"
                         />
                         {(
-                          getKeyValue(item, 'total_amount') *
-                          getKeyValue(item, 'lowest_price')
-                        ).toFixed(2)}
+                          (getKeyValue(item, 'total_amount') *
+                            getKeyValue(item, 'lowest_price')) /
+                          100000000
+                        ).toFixed(4)}
                       </div>
                     </TableCell>
                   );

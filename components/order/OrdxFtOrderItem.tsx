@@ -101,8 +101,7 @@ export const OrdxFtOrderItem = ({
               <p className="pt-2">
                 <span className="font-medium text-blue-400">
                   {(
-                    item?.assets[0].unit_price /
-                    item?.assets[0].unit_amount
+                    item?.assets[0].unit_price / item?.assets[0].unit_amount
                   ).toFixed(2)}
                 </span>
                 <span className="font-thin text-gray-400">
@@ -158,14 +157,6 @@ export const OrdxFtOrderItem = ({
             </Button>
           )}
         </WalletConnectBus>
-        {/* <Button
-              isIconOnly
-              radius="full"
-              variant="faded"
-              aria-label="Take a photo"
-            >
-              <Icon icon="material-symbols:shopping-cart-outline-rounded" className="text-lg"/>
-            </Button> */}
       </CardFooter>
     </Card>
   );
