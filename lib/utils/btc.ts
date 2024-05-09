@@ -26,7 +26,7 @@ export const satsToBitcoin = (sats) => {
   if (string.substring(0, 1) == '.') string = '0' + string;
   return string;
 };
-export const btcToSats = (btc: number) => {
+export const btcToSats = (btc: string) => {
   let [whole, decimal] = btc.toString().split('.');
   if (!decimal) decimal = '0';
   return parseInt(whole) * 100000000 + parseInt(decimal.padEnd(8, '0'));

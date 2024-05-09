@@ -14,12 +14,14 @@ import { useRouter } from 'next/navigation';
 import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
+import { Decimal } from 'decimal.js';
 export const OrdxUtxoList = () => {
   const router = useRouter();
   const [ticker, setTicker] = useState<string>('');
   const { address } = useReactWalletStore((state) => state);
   const {
     add: addSell,
+    changeTicker,
     reset,
     list: sellList,
     remove: removeSell,
@@ -59,11 +61,14 @@ export const OrdxUtxoList = () => {
   };
   const addHandler = (item: any) => {
     console.log(satsToBitcoin(item.value));
+    const tickerAmount =
+      item.tickers.find((v) => v.ticker === ticker)?.amount || 0;
+    changeTicker(ticker);
     addSell({
       ...item,
-      price: satsToBitcoin(item.value)?.toString(),
+      unit_price: '2',
       status: 'pending',
-      unit: 'btc',
+      price: new Decimal('2').mul(new Decimal(tickerAmount)).toString(),
     });
   };
   const selectHandler = (bol: boolean, item: any) => {

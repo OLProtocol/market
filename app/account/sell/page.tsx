@@ -38,9 +38,8 @@ export default function SellPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const { list, reset, changeUnit, changePrice, changeStatus } = useSellStore(
-    (state) => state,
-  );
+  const { list, reset, unit, changeUnit, changePrice, changeStatus } =
+    useSellStore((state) => state);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const ticker = useMemo(() => list?.[0]?.tickers?.[0].ticker, [list]);
   const { data, isLoading: isSummaryLoading } = useSWR(
@@ -51,10 +50,13 @@ export default function SellPage() {
   useEffect(() => {
     if (summary.lowest_price) {
       for (const item of list) {
-        if (item.unit === 'btc') {
-          changePrice(item.utxo, summary.lowest_price);
+        if (unit === 'btc') {
+          changePrice(
+            item.utxo,
+            satsToBitcoin(summary.lowest_price).toString(),
+          );
         } else {
-          changePrice(item.utxo, satsToBitcoin(summary.lowest_price));
+          changePrice(item.utxo, summary.lowest_price);
         }
       }
     }
@@ -67,6 +69,7 @@ export default function SellPage() {
         inscriptionUtxos: list,
         address,
         network,
+        unit,
       });
       console.log('Batch Order PSBT', batchOrderPsbt);
       const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
@@ -102,34 +105,37 @@ export default function SellPage() {
     }
   };
   const inputBlur = (utxo: string) => {
-    const currentUtxo = list.find((v) => v.utxo === utxo);
-    if (
-      currentUtxo &&
-      Number(currentUtxo.price) < 0.00000546 &&
-      currentUtxo.unit === 'btc'
-    ) {
-      changePrice(utxo, '0.00000546');
-    } else if (
-      currentUtxo &&
-      Number(currentUtxo.price) < 546 &&
-      currentUtxo.unit === 'sats'
-    ) {
-      changePrice(utxo, '546');
-    }
+    // const currentUtxo = list.find((v) => v.utxo === utxo);
+    // if (
+    //   currentUtxo &&
+    //   Number(currentUtxo.price) < 0.00000546 &&
+    //   unit === 'btc'
+    // ) {
+    //   changePrice(utxo, '0.00000546');
+    // } else if (
+    //   currentUtxo &&
+    //   Number(currentUtxo.price) < 546 &&
+    //   unit === 'sats'
+    // ) {
+    //   changePrice(utxo, '546');
+    // }
   };
-  const onUnitChange = (i: number, utxo: string, unit: 'btc' | 'sats') => {
-    console.log('onUnitChange', i, utxo, unit);
-    if (unit === list[i].unit || !unit) {
+  const onUnitChange = (u: 'btc' | 'sats') => {
+    if (u === unit || !unit) {
       return;
     }
-    for (const item of list) {
-      changeUnit(item.utxo, unit);
-      if (unit === 'btc') {
-        changePrice(item.utxo, satsToBitcoin(item.price));
-      } else {
-        changePrice(item.utxo, btcToSats(Number(item.price)).toString());
-      }
-    }
+    console.log('unit change', u);
+    changeUnit(u);
+    // setTimeout(() => {
+    //   for (const item of list) {
+    //     console.log('unit change price', item.unit_price)
+    //     if (u === 'btc') {
+    //       changePrice(item.utxo, satsToBitcoin(item.unit_price));
+    //     } else {
+    //       changePrice(item.utxo, btcToSats(Number(item.unit_price)).toString());
+    //     }
+    //   }
+    // }, 100);
   };
   const totalPrice = useMemo(
     () =>
@@ -140,7 +146,7 @@ export default function SellPage() {
       }, 0) || 0,
     [list],
   );
-
+  console.log(unit, list);
   return (
     <div className="py-2">
       <div className="md:flex justify-between gap-4">
@@ -155,7 +161,7 @@ export default function SellPage() {
               </div>
               <div className="flex items-center gap-4">
                 <span>{t('common.lowest_price')}:</span>
-                <span>{summary.lowest_price} BTC</span>
+                <span>{summary.lowest_price} Sats</span>
               </div>
             </div>
           )}
@@ -164,11 +170,44 @@ export default function SellPage() {
               <TableColumn className="text-sm md:text-base">
                 {t('common.item')}
               </TableColumn>
-              <TableColumn className="text-sm md:text-base">
-                {t('common.unit_price')}
+              <TableColumn className="text-sm md:text-base ">
+                <div className="flex  items-center gap-2">
+                  {t('common.sell_unit_price')}
+                  <Select
+                    size="sm"
+                    color="primary"
+                    selectedKeys={[unit]}
+                    onChange={(e) => onUnitChange(e.target.value as any)}
+                    className="w-28"
+                  >
+                    <SelectItem key="btc" value="btc">
+                      BTC
+                    </SelectItem>
+                    <SelectItem key="sats" value="sats">
+                      sats
+                    </SelectItem>
+                  </Select>
+                </div>
               </TableColumn>
               <TableColumn className="text-sm md:text-base">
-                {t('common.num')}
+                <div className="flex  items-center gap-2">
+                  {t('common.amount')}
+                  <Select
+                    size="sm"
+                    isDisabled
+                    color="primary"
+                    selectedKeys={[unit]}
+                    // onChange={(e) => onUnitChange(e.target.value as any)}
+                    className="w-28"
+                  >
+                    <SelectItem key="btc" value="btc">
+                      BTC
+                    </SelectItem>
+                    <SelectItem key="sats" value="sats">
+                      sats
+                    </SelectItem>
+                  </Select>
+                </div>
               </TableColumn>
             </TableHeader>
             <TableBody>
@@ -216,30 +255,14 @@ export default function SellPage() {
                     <Input
                       type="number"
                       placeholder="0.00"
-                      value={list[i].price}
+                      value={list[i].unit_price}
                       onChange={(e) => changePrice(item.utxo, e.target.value)}
                       onBlur={() => inputBlur(item.utxo)}
-                      endContent={
-                        <Select
-                          size="sm"
-                          color="primary"
-                          selectedKeys={[list[i].unit]}
-                          onChange={(e) =>
-                            onUnitChange(i, item.utxo, e.target.value as any)
-                          }
-                          className="w-32"
-                        >
-                          <SelectItem key="btc" value="btc">
-                            BTC
-                          </SelectItem>
-                          <SelectItem key="sats" value="sats">
-                            sats
-                          </SelectItem>
-                        </Select>
-                      }
                     />
                   </TableCell>
-                  <TableCell>1</TableCell>
+                  <TableCell className="text-center">
+                    {unit === 'btc' ? satsToBitcoin(item.price) : item.price}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -252,7 +275,7 @@ export default function SellPage() {
             </div>
             <div>
               {t('common.your_profits')}: {totalPrice}{' '}
-              {list[0]?.unit === 'btc' ? 'BTC' : 'Sat'}
+              {unit === 'btc' ? 'BTC' : 'Sat'}
             </div>
           </CardBody>
           <CardFooter>

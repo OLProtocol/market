@@ -81,11 +81,13 @@ interface BatchSellOrderProps {
   inscriptionUtxos: UtxoAssetItem[];
   network: string;
   address: string;
+  unit: string;
 }
 export const buildBatchSellOrder = async ({
   inscriptionUtxos,
   network,
   address,
+  unit,
 }: BatchSellOrderProps) => {
   console.log(
     'build batch sell order params',
@@ -102,7 +104,7 @@ export const buildBatchSellOrder = async ({
     network: psbtNetwork,
   });
   for (let i = 0; i < inscriptionUtxos.length; i++) {
-    const { utxo, price, unit } = inscriptionUtxos[i];
+    const { utxo, price } = inscriptionUtxos[i];
     console.log(utxo, price);
     const { txid, vout } = parseUtxo(utxo);
     const rawTx = await getTxHex(txid, network);
@@ -118,7 +120,7 @@ export const buildBatchSellOrder = async ({
     batchSell.addInput(utxoInput);
     batchSell.addOutput({
       address,
-      value: unit === 'btc' ? btcToSats(Number(price)) : Number(price),
+      value: unit === 'btc' ? btcToSats(price) : Number(price),
     });
   }
   console.log(batchSell);
