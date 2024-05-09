@@ -158,14 +158,6 @@ export const OrdxFtOrderItem = ({
             </Button>
           )}
         </WalletConnectBus>
-        {/* <Button
-              isIconOnly
-              radius="full"
-              variant="faded"
-              aria-label="Take a photo"
-            >
-              <Icon icon="material-symbols:shopping-cart-outline-rounded" className="text-lg"/>
-            </Button> */}
       </CardFooter>
     </Card>
   );

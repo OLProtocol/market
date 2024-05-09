@@ -103,39 +103,37 @@ export const OrdxFtAssetsItem = ({
 
       <CardFooter className="block bg-gray-800 h-1/5">
         <div className="flex-1">
-          <div>
-            {item.order_id === 0 ? (
-              <Button
-                // fullWidth
-                variant="ghost"
-                size="md"
-                isLoading={loading}
-                color="primary"
-                radius="sm"
-                onClick={sellHandler}
-                className="border"
-              >
-                {t('buttons.list_sale')}
-              </Button>
-            ) : (
-              <Button
-                className="text-tiny"
-                // fullWidth
-                variant="flat"
-                color="default"
-                radius="lg"
-                isLoading={loading}
-                startContent={
-                  item.locker == '1' ? (
-                    <Icon icon="mdi:lock" className="text-lg" />
-                  ) : null
-                }
-                onClick={cancelHandler}
-              >
-                {t('buttons.remove_sale')}（{item.price} {item.currency}）
-              </Button>
-            )}
-          </div>
+          {item.order_id === 0 ? (
+            <Button
+              // fullWidth
+              variant="ghost"
+              size="md"
+              isLoading={loading}
+              color="primary"
+              radius="sm"
+              onClick={sellHandler}
+              className="border"
+            >
+              {t('buttons.list_sale')}
+            </Button>
+          ) : (
+            <Button
+              className="text-tiny"
+              // fullWidth
+              variant="flat"
+              color="default"
+              radius="lg"
+              isLoading={loading}
+              startContent={
+                item.locker == '1' ? (
+                  <Icon icon="mdi:lock" className="text-lg" />
+                ) : null
+              }
+              onClick={cancelHandler}
+            >
+              {t('buttons.remove_sale')}（{item.price} {item.currency}）
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>
