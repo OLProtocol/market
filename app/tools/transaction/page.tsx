@@ -1,14 +1,37 @@
 'use client';
-import { getOrdxAddressHolders, getOrdxSummary, getSats, getUtxoByValue } from "@/api";
-import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
-import { buildTransaction, calcNetworkFee, hideStr, signAndPushPsbt } from "@/lib";
-import { useCommonStore } from "@/store";
-import { Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Divider, Image, Input, Select, SelectItem, Tooltip } from "@nextui-org/react";
-import { notification } from "antd";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useList, useMap } from "react-use";
+import {
+  getOrdxAddressHolders,
+  getOrdxSummary,
+  getSats,
+  getUtxoByValue,
+} from '@/api';
+import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import {
+  buildTransaction,
+  calcNetworkFee,
+  hideStr,
+  signAndPushPsbt,
+} from '@/lib';
+import { useCommonStore } from '@/store';
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Divider,
+  Image,
+  Input,
+  Select,
+  SelectItem,
+  Tooltip,
+} from '@nextui-org/react';
+import { notification } from 'antd';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useList, useMap } from 'react-use';
 
 export default function Transaction() {
   const { t, i18n } = useTranslation();
@@ -36,7 +59,7 @@ export default function Transaction() {
   });
 
   const [outputList, { set: setOutputList }] = useMap<any>({
-    items: []
+    items: [],
   });
 
   const [balance, { set: setBalance }] = useMap<any>({
@@ -53,7 +76,8 @@ export default function Transaction() {
     inputList.items[itemId - 1].value.unit = 'sats';
     inputList.items[itemId - 1].value.utxo = '';
     inputList.items[itemId - 1].value.utxos = [];
-    const selectTicker = tickerList?.find((item) => item.ticker === ticker) || [];
+    const selectTicker =
+      tickerList?.find((item) => item.ticker === ticker) || [];
     let utxos = selectTicker.utxos;
     if (inputList.items.length > 1) {
       inputList.items.forEach((inItem, index) => {
@@ -302,7 +326,7 @@ export default function Transaction() {
               hasRareStats = true;
               return;
             }
-          })
+          });
         }
 
         if (hasRareStats) {
@@ -314,7 +338,10 @@ export default function Transaction() {
 
           if (tickers.length === 0) {
             tickers.push({
-              ticker: t('pages.tools.transaction.rare_sats') + '-' + item.sats[0].satributes[0],
+              ticker:
+                t('pages.tools.transaction.rare_sats') +
+                '-' +
+                item.sats[0].satributes[0],
               utxos: [utxo],
             });
           } else {
@@ -322,15 +349,30 @@ export default function Transaction() {
             tickers.map((obj) => {
               obj.utxos.map((tmp) => {
                 if (tmp === utxo.txid + ':' + utxo.vout) {
-                  utxoExist = true;// utxo already exists
+                  utxoExist = true; // utxo already exists
                   return;
                 }
-              })
-            })
-            if (!utxoExist) {// utxo does not exist
-              if (tickers.some((obj) => obj['ticker'] === t('pages.tools.transaction.rare_sats') + '-' + item.sats[0].satributes[0])) { // the type of rare sat already exists
+              });
+            });
+            if (!utxoExist) {
+              // utxo does not exist
+              if (
+                tickers.some(
+                  (obj) =>
+                    obj['ticker'] ===
+                    t('pages.tools.transaction.rare_sats') +
+                      '-' +
+                      item.sats[0].satributes[0],
+                )
+              ) {
+                // the type of rare sat already exists
                 tickers = tickers.map((obj) => {
-                  if (obj['ticker'] === t('pages.tools.transaction.rare_sats') + '-' + item.sats[0].satributes[0]) {
+                  if (
+                    obj['ticker'] ===
+                    t('pages.tools.transaction.rare_sats') +
+                      '-' +
+                      item.sats[0].satributes[0]
+                  ) {
                     return {
                       ticker: obj['ticker'],
                       utxos: [...obj.utxos, utxo],
@@ -341,7 +383,10 @@ export default function Transaction() {
                 });
               } else {
                 tickers.push({
-                  ticker: t('pages.tools.transaction.rare_sats') + '-' + item.sats[0].satributes[0],
+                  ticker:
+                    t('pages.tools.transaction.rare_sats') +
+                    '-' +
+                    item.sats[0].satributes[0],
                   utxos: [utxo],
                 });
               }
@@ -469,7 +514,7 @@ export default function Transaction() {
     getAllTickers();
   }, [address]);
   return (
-    <div className='flex flex-col max-w-7xl mx-auto pt-8'>
+    <div className="flex flex-col max-w-7xl mx-auto pt-8">
       <Card>
         <CardHeader>
           <h1>{t('pages.tools.transaction.title')}</h1>
@@ -478,13 +523,11 @@ export default function Transaction() {
         <CardBody>
           <div>
             <div>
-              <h6>
-                {t('pages.tools.transaction.input')}
-              </h6>
+              <h6>{t('pages.tools.transaction.input')}</h6>
             </div>
             <div className="pt-2">
               {inputList.items.map((item, i) => (
-                <div className="flex gap-2 pb-2">
+                <div className="flex gap-2 pb-2" key={i}>
                   <Select
                     label="Select Ticker"
                     size="sm"
@@ -493,7 +536,7 @@ export default function Transaction() {
                     selectionMode="single"
                     value={item.value?.ticker ? item.value?.ticker : undefined}
                     onChange={(e) => {
-                      handleTickerSelectChange(item.id, e)
+                      handleTickerSelectChange(item.id, e);
                     }}
                   >
                     {tickerList?.map((utxo) => (
@@ -509,12 +552,13 @@ export default function Transaction() {
                     style={{ height: '40px' }}
                     selectionMode="single"
                     value={item?.value?.utxo ? item?.value?.utxo : undefined}
-                    onChange={(e) =>
-                      handleUtxoSelectChange(item.id, e)
-                    }
+                    onChange={(e) => handleUtxoSelectChange(item.id, e)}
                   >
                     {item?.options?.utxos.map((utxo) => (
-                      <SelectItem key={utxo.txid + ':' + utxo.vout} value={utxo.txid + ':' + utxo.vout}>
+                      <SelectItem
+                        key={utxo.txid + ':' + utxo.vout}
+                        value={utxo.txid + ':' + utxo.vout}
+                      >
                         {/* {utxo.assetamount && utxo.assetamount + ' Asset/'}
                       {utxo.value + ' sats - ' + hideStr(utxo.txid + ':' + utxo.vout)} */}
                         {utxo.txid + ':' + utxo.vout}
@@ -535,7 +579,9 @@ export default function Transaction() {
                         <select
                           className="outline-none border-0 bg-transparent text-default-400 text-small"
                           value={item.value.unit}
-                          onChange={(e) => handleInputUnitSelectChange(item.id, e)}
+                          onChange={(e) =>
+                            handleInputUnitSelectChange(item.id, e)
+                          }
                         >
                           <option>sats</option>
                           <option>btc</option>
@@ -543,8 +589,15 @@ export default function Transaction() {
                       </div>
                     }
                   />
-                  <Button radius="full" onClick={addInputItem}>+</Button>
-                  <Button radius="full" onClick={() => removeInputItem(item.id)}>-</Button>
+                  <Button radius="full" onClick={addInputItem}>
+                    +
+                  </Button>
+                  <Button
+                    radius="full"
+                    onClick={() => removeInputItem(item.id)}
+                  >
+                    -
+                  </Button>
                 </div>
               ))}
             </div>
@@ -552,13 +605,11 @@ export default function Transaction() {
           <Divider className="my-4" />
           <div>
             <div>
-              <h6>
-                {t('pages.tools.transaction.output')}
-              </h6>
+              <h6>{t('pages.tools.transaction.output')}</h6>
             </div>
             <div className="pt-2">
               {outputList.items.map((item, i) => (
-                <div className="flex gap-2 pb-2">
+                <div className="flex gap-2 pb-2" key={i}>
                   <div className="flex w-[70%]">
                     <Input
                       placeholder="BTC Address"
@@ -566,7 +617,9 @@ export default function Transaction() {
                       onChange={(e) => setBtcAddress(item.id, e.target.value)}
                     />
                     <Tooltip content="Fill the BTC address of the current account">
-                      <Button onClick={() => setBtcAddress(item.id, address)}>+</Button>
+                      <Button onClick={() => setBtcAddress(item.id, address)}>
+                        +
+                      </Button>
                     </Tooltip>
                   </div>
                   <Input
@@ -586,7 +639,9 @@ export default function Transaction() {
                         <select
                           className="outline-none border-0 bg-transparent text-default-400 text-small"
                           value={item.value.unit}
-                          onChange={(e) => handleOutputUnitSelectChange(item.id, e)}
+                          onChange={(e) =>
+                            handleOutputUnitSelectChange(item.id, e)
+                          }
                         >
                           <option>sats</option>
                           <option>btc</option>
@@ -594,8 +649,15 @@ export default function Transaction() {
                       </div>
                     }
                   />
-                  <Button radius="full" onClick={addOuputItem}>+</Button>
-                  <Button radius="full" onClick={() => removeOutputItem(item.id)}>-</Button>
+                  <Button radius="full" onClick={addOuputItem}>
+                    +
+                  </Button>
+                  <Button
+                    radius="full"
+                    onClick={() => removeOutputItem(item.id)}
+                  >
+                    -
+                  </Button>
                 </div>
               ))}
             </div>
@@ -603,10 +665,10 @@ export default function Transaction() {
           <Divider className="my-4" />
           <div>
             <div className="flex gap-2 pb-2">
-              <h6>
-                {t('pages.tools.transaction.balance')}
-              </h6>
-              <span className='text-gray-400 text-sm font-light pt-1'>({t('pages.tools.transaction.balance_des')})</span>
+              <h6>{t('pages.tools.transaction.balance')}</h6>
+              <span className="text-gray-400 text-sm font-light pt-1">
+                ({t('pages.tools.transaction.balance_des')})
+              </span>
             </div>
             <div>
               <div className="flex gap-2 pb-2">
@@ -615,7 +677,9 @@ export default function Transaction() {
                   value={address}
                   startContent={
                     <div className="pointer-events-none flex items-center w-3/12">
-                      <span className="text-default-400 text-small">Current Address</span>
+                      <span className="text-default-400 text-small">
+                        Current Address
+                      </span>
                     </div>
                   }
                 />
@@ -644,9 +708,7 @@ export default function Transaction() {
                   }
                 />
 
-                <ButtonGroup className={'w-[10%]'}>
-                  {/* 占位 */}
-                </ButtonGroup>
+                <ButtonGroup className={'w-[10%]'}>{/* 占位 */}</ButtonGroup>
               </div>
             </div>
           </div>
@@ -658,7 +720,9 @@ export default function Transaction() {
               Send
             </Button>
           </WalletConnectBus>
-          <span className='text-gray-400 text-sm font-light'>({'Fee: ' + fee + ' sats'})</span>
+          <span className="text-gray-400 text-sm font-light">
+            ({'Fee: ' + fee + ' sats'})
+          </span>
         </CardFooter>
       </Card>
     </div>

@@ -83,9 +83,9 @@ export const OrdxOrderHistoryList = ({
       { label: t('common.delist'), value: 2 },
       { label: t('common.invalid'), value: 3 },
       { label: t('common.list'), value: 4 },
-      // { label: t('common.history_sell'), value: 10 },
     ];
     if (address) {
+      _list.splice(1, 1);
       _list.push({ label: t('common.history_sell'), value: 10 });
       _list.push({ label: t('common.history_buy'), value: 11 });
     }
