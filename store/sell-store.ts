@@ -38,24 +38,23 @@ interface SellState {
 export const useSellStore = create<SellState>()(
   devtools((set, get) => ({
     unit: 'sats',
-    amountUnit: 'sats',
-    ticker: '',
+    amountUnit: 'btc',
+    ticker: '123123123123',
     list: [
-      // {
-      //   utxo: 'c1751e4beb5472305875f2b7ed30f8805c5f8027c393e884fad86be2fc6bc00c:0',
-      //   value: 546,
-      //   price: '',
-      //   unit_price: '2',
-      //   // unit: 'btc',
-      //   status: 'pending',
-      //   tickers: [
-      //     {
-      //       ticker: '123123123123',
-      //       amount: 546,
-      //       inscriptionnum: 1742327,
-      //     },
-      //   ],
-      // },
+      {
+        utxo: 'c1751e4beb5472305875f2b7ed30f8805c5f8027c393e884fad86be2fc6bc00c:0',
+        value: 546,
+        price: '',
+        unit_price: '2',
+        status: 'pending',
+        tickers: [
+          {
+            ticker: '123123123123',
+            amount: 546,
+            inscriptionnum: 1742327,
+          },
+        ],
+      },
     ],
     changePrice(utxo, price) {
       if (
@@ -66,15 +65,22 @@ export const useSellStore = create<SellState>()(
       ) {
         price = '0';
       }
-      const { list, ticker } = get();
+      const { list, ticker, amountUnit } = get();
       const newList = list.map((item) => {
         const tickerAmount =
           item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        let amountPrice = new Decimal(price)
+          .mul(new Decimal(tickerAmount))
+          .toString();
+        amountPrice =
+          amountUnit === 'btc'
+            ? satsToBitcoin(amountPrice).toString()
+            : btcToSats(amountPrice).toString();
         if (item.utxo === utxo) {
           return {
             ...item,
             unit_price: price,
-            price: new Decimal(price).mul(new Decimal(tickerAmount)).toString(),
+            price: amountPrice,
           };
         }
         return item;
@@ -108,20 +114,12 @@ export const useSellStore = create<SellState>()(
     changeUnit(unit) {
       const { list, ticker } = get();
       const newList = list.map((item) => {
-        console.log(unit);
-        console.log(item.unit_price);
-        console.log(Number(item.unit_price));
-        console.log(btcToSats(item.unit_price));
         return {
           ...item,
           unit_price:
             unit === 'btc'
               ? satsToBitcoin(item.unit_price).toString()
               : btcToSats(item.unit_price).toString(),
-          price:
-            unit === 'btc'
-              ? satsToBitcoin(item.price).toString()
-              : btcToSats(item.price).toString(),
         };
       });
       set({
@@ -130,6 +128,16 @@ export const useSellStore = create<SellState>()(
       });
     },
     changeAmountUnit(unit) {
+      const { list, ticker } = get();
+      const newList = list.map((item) => {
+        return {
+          ...item,
+          price:
+            unit === 'btc'
+              ? satsToBitcoin(item.price).toString()
+              : btcToSats(item.price).toString(),
+        };
+      });
       set({
         amountUnit: unit,
       });

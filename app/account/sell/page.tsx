@@ -38,8 +38,16 @@ export default function SellPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const { list, reset, unit, changeUnit, changePrice, changeStatus } =
-    useSellStore((state) => state);
+  const {
+    list,
+    reset,
+    unit,
+    amountUnit,
+    changeAmountUnit,
+    changeUnit,
+    changePrice,
+    changeStatus,
+  } = useSellStore((state) => state);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const ticker = useMemo(() => list?.[0]?.tickers?.[0].ticker, [list]);
   const { data, isLoading: isSummaryLoading } = useSWR(
@@ -69,7 +77,7 @@ export default function SellPage() {
         inscriptionUtxos: list,
         address,
         network,
-        unit,
+        unit: amountUnit,
       });
       console.log('Batch Order PSBT', batchOrderPsbt);
       const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
@@ -124,18 +132,13 @@ export default function SellPage() {
     if (u === unit || !unit) {
       return;
     }
-    console.log('unit change', u);
     changeUnit(u);
-    // setTimeout(() => {
-    //   for (const item of list) {
-    //     console.log('unit change price', item.unit_price)
-    //     if (u === 'btc') {
-    //       changePrice(item.utxo, satsToBitcoin(item.unit_price));
-    //     } else {
-    //       changePrice(item.utxo, btcToSats(Number(item.unit_price)).toString());
-    //     }
-    //   }
-    // }, 100);
+  };
+  const onAmountUnitChange = (u: 'btc' | 'sats') => {
+    if (u === unit || !unit) {
+      return;
+    }
+    changeAmountUnit(u);
   };
   const totalPrice = useMemo(
     () =>
@@ -194,10 +197,9 @@ export default function SellPage() {
                   {t('common.amount')}
                   <Select
                     size="sm"
-                    isDisabled
                     color="primary"
-                    selectedKeys={[unit]}
-                    // onChange={(e) => onUnitChange(e.target.value as any)}
+                    selectedKeys={[amountUnit]}
+                    onChange={(e) => onAmountUnitChange(e.target.value as any)}
                     className="w-28"
                   >
                     <SelectItem key="btc" value="btc">
@@ -261,7 +263,9 @@ export default function SellPage() {
                     />
                   </TableCell>
                   <TableCell className="text-center">
-                    {unit === 'btc' ? satsToBitcoin(item.price) : item.price}
+                    {amountUnit === 'btc'
+                      ? satsToBitcoin(item.price)
+                      : item.price}
                   </TableCell>
                 </TableRow>
               ))}
@@ -275,7 +279,7 @@ export default function SellPage() {
             </div>
             <div>
               {t('common.your_profits')}: {totalPrice}{' '}
-              {unit === 'btc' ? 'BTC' : 'Sat'}
+              {amountUnit === 'btc' ? 'BTC' : 'Sats'}
             </div>
           </CardBody>
           <CardFooter>
