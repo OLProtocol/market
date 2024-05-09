@@ -85,7 +85,7 @@ export default function Page() {
       },
     ];
   }, [summary, i18n.language]);
-
+  console.log(headList);
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">
