@@ -35,7 +35,7 @@ export default function Page() {
       {
         value: Number(summary.lowest_price).toFixed(2),
         label: t('common.lowest_price'),
-        unit: 'BTC',
+        unit: 'sats',
       },
       {
         value: summary.tx_total_volume,
@@ -118,6 +118,9 @@ export default function Page() {
                         />
                       )}
                       <span>{item.value === undefined ? '-' : item.value}</span>
+                      {item.unit === 'sats' && (
+                        <span className="text-base self-end ml-2">Sats</span>
+                      )}
                     </div>
                     <div className="text-sm lg:text-md text-gray-400">
                       {item.label}

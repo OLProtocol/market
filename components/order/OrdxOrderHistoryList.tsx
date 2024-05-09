@@ -104,6 +104,11 @@ export const OrdxOrderHistoryList = ({
         align: 'center',
       },
       {
+        key: 'ticker',
+        label: t('common.tick'),
+        align: 'center',
+      },
+      {
         key: 'price',
         label: t('common.price'),
         align: 'center',
@@ -293,6 +298,16 @@ export const OrdxOrderHistoryList = ({
                         {getKeyValue(item, columnKey)}
                         {item.currency !== 'BTC' && ' ' + item.currency}
                       </div>
+                    </TableCell>
+                  );
+                } else if (columnKey === 'ticker') {
+                  const assets = getKeyValue(item, 'assets') || [];
+                  const ticker = assets
+                    .map((asset: any) => asset.ticker)
+                    .join('-');
+                  return (
+                    <TableCell className="text-center font-light text-sm md:text-base">
+                      {ticker}
                     </TableCell>
                   );
                 } else {

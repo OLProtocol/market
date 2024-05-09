@@ -13,6 +13,7 @@
   "invalid": "invalid",
   "list": "List",
   "sell": "sell",
+  "sell_unit_price": "Unit Price",
   "history_sell": "Sell",
   "history_buy": "Buy",
   "buy": "buy",
