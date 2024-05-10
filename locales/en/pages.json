@@ -7,7 +7,7 @@
     "title": "Market"
   },
   "tools": {
-    "title": "Tools",
+    "title": "Toolbox",
     "transaction": {
       "title": "Transaction",
       "input": "Input",
@@ -16,6 +16,13 @@
       "rare_sats": "Rare Sats",
       "balance": "Balance",
       "balance_des": "When the balance is less than 546 sats, the remaining balance is transferred to the miners."
+    },
+    "search_sat": {
+      "table_title": "Search Result",
+      "table_col1": "UTXO",
+      "table_col2": "Sats/BTC",
+      "table_col3": "Sat",
+      "table_col4": "Sat Ranges"
     }
   },
   "my_assets": {
