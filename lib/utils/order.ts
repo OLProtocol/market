@@ -216,11 +216,13 @@ export const buildBuyOrder = async ({
   feeRate,
   dummyUtxos,
 }: any) => {
-  const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
-  const NEXT_PUBLIC_IS_FREE = process.env.NEXT_PUBLIC_IS_FREE;
-  const NEXT_PUBLIC_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
   const { btcWallet, network, address, publicKey } =
     useReactWalletStore.getState();
+  const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
+  const NEXT_PUBLIC_SERVICE_ADDRESS =
+    network === 'testnet'
+      ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
+      : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
 
   console.log('build buy order params', utxos, serviceFee, dummyUtxos);
   const psbtNetwork = toPsbtNetwork(
@@ -330,11 +332,13 @@ export const calcBuyOrderFee = async ({
   feeRate,
   dummyUtxos,
 }: any) => {
-  const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
-  const NEXT_PUBLIC_IS_FREE = process.env.NEXT_PUBLIC_IS_FREE;
-  const NEXT_PUBLIC_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
   const { btcWallet, network, address, publicKey } =
     useReactWalletStore.getState();
+  const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
+  const NEXT_PUBLIC_SERVICE_ADDRESS =
+    network === 'testnet'
+      ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
+      : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
 
   console.log('build buy order params', utxos, serviceFee, dummyUtxos);
   const psbtNetwork = toPsbtNetwork(

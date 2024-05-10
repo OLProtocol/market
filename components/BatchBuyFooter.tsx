@@ -157,6 +157,7 @@ export const BatchBuyFooter = ({
       dummyUtxos: newDummyUtxos,
       serviceFee: serviceFee,
       feeRate: feeRate.value,
+      network: network,
     });
     setCalcLoading(false);
     setNetworkFee(networkFee);
