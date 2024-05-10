@@ -66,7 +66,7 @@ export const OrdxFtOrderItem = ({
     >
       {canSelect && (
         <div
-          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-10 cursor-pointer"
+          className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer"
           onClick={() => {
             selectHandler?.(!selected);
           }}
