@@ -58,13 +58,14 @@ export default function SellPage() {
   useEffect(() => {
     if (summary.lowest_price) {
       for (const item of list) {
+        console.log('lowest price', item.utxo, summary.lowest_price);
         if (unit === 'btc') {
           changePrice(
             item.utxo,
-            satsToBitcoin(summary.lowest_price).toString(),
+            satsToBitcoin(parseInt(summary.lowest_price)).toString(),
           );
         } else {
-          changePrice(item.utxo, summary.lowest_price);
+          changePrice(item.utxo, parseInt(summary.lowest_price).toString());
         }
       }
     }
