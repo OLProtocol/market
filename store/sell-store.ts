@@ -159,11 +159,23 @@ export const useSellStore = create<SellState>()(
       });
     },
     add: (item) => {
-      const { list } = get();
+      const { list, ticker } = get();
       if (!list.find((i) => i.utxo === item.utxo)) {
+        const tickerAmount =
+          item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        let amountPrice = new Decimal(item.unit_price)
+          .mul(new Decimal(tickerAmount))
+          .toString();
+        amountPrice = satsToBitcoin(amountPrice).toString();
         set((state) => {
           return {
-            list: [...state.list, item],
+            list: [
+              ...state.list,
+              {
+                ...item,
+                price: amountPrice,
+              },
+            ],
           };
         });
       }
