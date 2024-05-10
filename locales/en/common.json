@@ -43,6 +43,8 @@
   "not_sort": "Not Sort",
   "sort_price_ascending": "Price Ascending",
   "sort_price_descending": "Price Descending",
+  "sort_unit_price_ascending": "Unit Price Ascending",
+  "sort_unit_price_descending": "Unit Price Descending",
   "sort_time_ascending": "Time Ascending",
   "sort_time_descending": "Time Descending",
   "order_num": "Listings",

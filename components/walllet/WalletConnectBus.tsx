@@ -16,7 +16,6 @@ export const WalletConnectBus = ({
   text,
   keepStyle,
 }: WalletConnectBusProps) => {
-  console.log(children);
   const buttonCLick = (children as any)?.props?.onClick;
   // if (keepStyle) {
   //   (children as any)?.props?.onClick = async () => {

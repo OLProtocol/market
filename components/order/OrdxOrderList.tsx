@@ -46,8 +46,10 @@ export const OrdxOrderList = ({
   const [sort, setSort] = useState(1);
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
-    { label: t('common.sort_price_ascending'), value: 1 },
-    { label: t('common.sort_price_descending'), value: 2 },
+    { label: t('common.sort_unit_price_ascending'), value: 1 },
+    { label: t('common.sort_unit_price_descending'), value: 2 },
+    { label: t('common.sort_price_ascending'), value: 5 },
+    { label: t('common.sort_price_descending'), value: 6 },
     { label: t('common.sort_time_ascending'), value: 3 },
     { label: t('common.sort_time_descending'), value: 4 },
   ];

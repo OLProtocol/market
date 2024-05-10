@@ -306,6 +306,7 @@ export const buildBuyOrder = async ({
   await psbtTx.addSufficientUtxosForFee(btcUtxos, {
     suitable: false,
   });
+  console.log(psbtTx);
   const buyPsbt = psbtTx.toPsbt();
   console.log(buyPsbt);
   if (!btcWallet) {
