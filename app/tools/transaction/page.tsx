@@ -49,6 +49,7 @@ export default function Transaction() {
           utxo: '',
           sats: 0,
           unit: 'sats',
+          description: '',
         },
         options: {
           tickers: [],
@@ -100,11 +101,21 @@ export default function Transaction() {
     const txid = utxo.split(':')[0];
     const vout = Number(utxo.split(':')[1]);
     console.log('input list = ', inputList);
-    inputList.items[itemId - 1].value.sats =
-      inputList.items[itemId - 1].options.utxos.find(
-        (item) => item.txid === txid && item.vout === vout,
-      )?.value || 0;
+
+    const utxoObj = inputList.items[itemId - 1].options.utxos.find(
+      (item) => item.txid === txid && item.vout === vout,
+    );
+
+    inputList.items[itemId - 1].value.sats = utxoObj?.value || 0;
     inputList.items[itemId - 1].value.utxo = utxo;
+
+    let description = '';
+    if (utxoObj.assetamount) {
+      description = utxoObj.assetamount + ' Asset/';
+    }
+    description += utxoObj.value + ' sats'
+    inputList.items[itemId - 1].value.description = description;
+
     setInputList('items', inputList.items);
     calculateBalance();
   };
@@ -361,8 +372,8 @@ export default function Transaction() {
                   (obj) =>
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0],
+                    '-' +
+                    item.sats[0].satributes[0],
                 )
               ) {
                 // the type of rare sat already exists
@@ -370,8 +381,8 @@ export default function Transaction() {
                   if (
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0]
+                    '-' +
+                    item.sats[0].satributes[0]
                   ) {
                     return {
                       ticker: obj['ticker'],
@@ -548,6 +559,7 @@ export default function Transaction() {
                   <Select
                     label="Select UTXO"
                     size="sm"
+                    description={item.value.description}
                     className={'w-[50%]'}
                     style={{ height: '40px' }}
                     selectionMode="single"
@@ -677,7 +689,7 @@ export default function Transaction() {
                   value={address}
                   startContent={
                     <div className="pointer-events-none flex items-center w-3/12">
-                      <span className="text-default-400 text-small">
+                      <span className="text-default-500 text-small">
                         Current Address
                       </span>
                     </div>
