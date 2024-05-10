@@ -15,5 +15,6 @@
   "order_buy_failed_description_2": "订单原始数据为空",
   "order_buy_failed_description_3": "虚拟UTXO缺少两个UTXO",
   "order_buy_failed_description_4": "余额不足",
-  "transaction_failed_title": "交易失败"
+  "transaction_failed_title": "交易失败",
+  "search_rare_sats_failed_title": "搜索稀有聪失败"
 }

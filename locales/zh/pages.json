@@ -16,6 +16,13 @@
       "rare_sats": "Rare Sats",
       "balance": "余额",
       "balance_des": "余额小于546 sats时，会将余额转给矿工。"
+    },
+    "search_sat": {
+      "table_title": "搜索结果",
+      "table_col1": "UTXO",
+      "table_col2": "Sats/BTC",
+      "table_col3": "Sat",
+      "table_col4": "Sat Ranges"
     }
   },
   "my_assets": {

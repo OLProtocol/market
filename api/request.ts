@@ -215,3 +215,19 @@ export const getOrdxSummary = async ({ address, network }: any) => {
   const res = await fetch(url);
   return res.json();
 };
+
+export const getSatsByAddress = async ({ address, sats, network }: any) => {
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/sat/FindSatsInAddress`;
+  const data = {
+    address: address,
+    sats: sats
+  }
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
