@@ -166,6 +166,7 @@ export const useSellStore = create<SellState>()(
         let amountPrice = new Decimal(item.unit_price)
           .mul(new Decimal(tickerAmount))
           .toString();
+        console.log(amountPrice);
         amountPrice = satsToBitcoin(amountPrice).toString();
         set((state) => {
           return {
