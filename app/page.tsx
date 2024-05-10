@@ -175,9 +175,8 @@ export default function Home() {
                           className="mr-1 mt-0.5"
                         />
                         {(
-                          (getKeyValue(item, 'total_amount') *
-                            getKeyValue(item, 'lowest_price')) /
-                          100000000
+                          getKeyValue(item, 'total_amount') *
+                          getKeyValue(item, 'lowest_price')/100000000
                         ).toFixed(4)}
                       </div>
                     </TableCell>
