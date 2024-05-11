@@ -32,6 +32,7 @@ import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useList, useMap } from 'react-use';
+import { Select as AntSelect } from 'antd';
 
 export default function Transaction() {
   const { t, i18n } = useTranslation();
@@ -70,8 +71,8 @@ export default function Transaction() {
 
   const [tickerList, { set: setTickerList }] = useList<any>([]);
 
-  const handleTickerSelectChange = (itemId, e) => {
-    const ticker = e.target.value;
+  const handleTickerSelectChange = (itemId, ticker) => {
+    // const ticker = e.target.value;
     inputList.items[itemId - 1].value.ticker = ticker;
     inputList.items[itemId - 1].value.sats = 0;
     inputList.items[itemId - 1].value.unit = 'sats';
@@ -96,8 +97,8 @@ export default function Transaction() {
     setInputList('items', inputList.items);
   };
 
-  const handleUtxoSelectChange = (itemId, e) => {
-    const utxo = e.target.value;
+  const handleUtxoSelectChange = (itemId, utxo) => {
+    // const utxo = e.target.value;
     const txid = utxo.split(':')[0];
     const vout = Number(utxo.split(':')[1]);
     console.log('input list = ', inputList);
@@ -120,7 +121,7 @@ export default function Transaction() {
     calculateBalance();
   };
 
-  const handleInputUnitSelectChange = (itemId: number, e: any) => {
+  const handleInputUnitSelectChange = (itemId, e) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
     setInputList('items', inputList.items);
@@ -539,44 +540,43 @@ export default function Transaction() {
             <div className="pt-2">
               {inputList.items.map((item, i) => (
                 <div className="flex gap-2 pb-2" key={i}>
-                  <Select
-                    label="Select Ticker"
-                    size="sm"
-                    className={'w-[20%]'}
-                    style={{ height: '40px' }}
-                    selectionMode="single"
+                  <AntSelect
+                    placeholder='Select Ticker'
+                    className={'w-[30%] h-10'}
                     value={item.value?.ticker ? item.value?.ticker : undefined}
-                    onChange={(e) => {
-                      handleTickerSelectChange(item.id, e);
-                    }}
-                  >
-                    {tickerList?.map((utxo) => (
-                      <SelectItem key={utxo.ticker} value={utxo.ticker}>
-                        {utxo.ticker}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  <Select
-                    label="Select UTXO"
-                    size="sm"
-                    description={item.value.description}
-                    className={'w-[50%]'}
-                    style={{ height: '40px' }}
-                    selectionMode="single"
-                    value={item?.value?.utxo ? item?.value?.utxo : undefined}
-                    onChange={(e) => handleUtxoSelectChange(item.id, e)}
-                  >
-                    {item?.options?.utxos.map((utxo) => (
-                      <SelectItem
-                        key={utxo.txid + ':' + utxo.vout}
-                        value={utxo.txid + ':' + utxo.vout}
-                      >
-                        {/* {utxo.assetamount && utxo.assetamount + ' Asset/'}
-                      {utxo.value + ' sats - ' + hideStr(utxo.txid + ':' + utxo.vout)} */}
-                        {utxo.txid + ':' + utxo.vout}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                    options={
+                      tickerList?.map((utxo) => ({
+                        label: (
+                          <div>
+                            { utxo.ticker }
+                          </div>
+                        ),
+                        value: utxo.ticker,
+                      })) || []
+                    }
+                    onChange={(e) =>
+                      handleTickerSelectChange(item.id, e)
+                    }>
+                  </AntSelect>
+                  <AntSelect
+                    placeholder='Select UTXO'
+                    className='w-[40%] h-10'
+                    value={inputList.items[i]?.value?.utxo ? inputList.items[i]?.value?.utxo: undefined}
+                    options={
+                      inputList.items[i]?.options?.utxos.map((utxo) => ({
+                        label: (
+                          <div>
+                            {utxo.assetamount && utxo.assetamount + ' Asset/'}
+                            {utxo.value + ' sats - ' + hideStr(utxo.txid + ':' + utxo.vout)}
+                          </div>
+                        ),
+                        value: utxo.txid + ':' + utxo.vout,
+                      })) || []
+                    }
+                    onChange={(e) =>
+                      handleUtxoSelectChange(item.id, e)
+                    }>
+                  </AntSelect>
                   <Input
                     key={'input-sat-' + item.id}
                     className={'w-[20%]'}
