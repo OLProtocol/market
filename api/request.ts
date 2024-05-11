@@ -103,14 +103,14 @@ export const getHistory = async ({
 interface GetTopTickers {
   interval?: number;
   top_count?: number;
-  top_name?: 'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
+  top_name?: ''; //'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
   sort_field: string;
-  sort_order: 0 | 1;//'asc' | 'desc';
+  sort_order: 0 | 1; //'asc' | 'desc';
 }
 export const getTopTickers = async ({
   interval = 1,
   top_count = 20,
-  top_name = 'recommend',
+  top_name = '',
   sort_field = '',
   sort_order = 0,
 }: GetTopTickers) => {
