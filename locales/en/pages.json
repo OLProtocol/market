@@ -10,6 +10,7 @@
     "title": "Toolbox",
     "transaction": {
       "title": "Transaction",
+      "btn_split": "Split",
       "input": "Input",
       "output": "Output",
       "available_utxo": "Plain UTXO",
