@@ -103,16 +103,20 @@ export const getHistory = async ({
 interface GetTopTickers {
   interval?: number;
   top_count?: number;
-  top_list?: 'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
+  top_name?: 'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
+  sort_field: string;
+  sort_order: 0 | 1;//'asc' | 'desc';
 }
 export const getTopTickers = async ({
   interval = 1,
   top_count = 20,
-  top_list = 'tx_amount',
+  top_name = 'recommend',
+  sort_field = '',
+  sort_order = 0,
 }: GetTopTickers) => {
   const _interval = interval === 0 ? undefined : interval;
   const res = await request('/ordx/GetTopTickers', {
-    data: { interval: _interval, top_count, top_list },
+    data: { interval: _interval, top_count, top_name, sort_field, sort_order },
   });
   return res;
 };
