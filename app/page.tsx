@@ -11,6 +11,7 @@ import {
   TableColumn,
   Spinner,
   getKeyValue,
+  SortDescriptor,
   Avatar,
 } from '@nextui-org/react';
 import { useMemo, useState } from 'react';
@@ -34,6 +35,10 @@ export default function Home() {
     ],
     [i18n.language],
   );
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'age',
+    direction: 'ascending',
+  });
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
     `/ordx/getTopTickers-${network}-${interval}`,
@@ -46,6 +51,48 @@ export default function Home() {
   const toDetail = (e) => {
     router.push(`/ordx/ticker?ticker=${e}`);
   };
+  const onTableSortChange = (e: any) => {
+    setSortDescriptor(e);
+  };
+  const columns = [
+    { key: 'ticker', label: t('common.tick'), allowsSorting: false },
+    {
+      key: 'lowest_price',
+      label: t('common.lowest_price'),
+      allowsSorting: true,
+    },
+    {
+      key: 'lowest_price_change',
+      label: t('common.price_change'),
+      allowsSorting: true,
+    },
+    {
+      key: 'tx_total_volume',
+      label: t('common.tx_total_volume'),
+      allowsSorting: true,
+    },
+    {
+      key: 'total_amount',
+      label: t('common.total_amount'),
+      allowsSorting: true,
+    },
+    {
+      key: 'tx_order_count',
+      label: t('common.tx_order_count'),
+      allowsSorting: true,
+    },
+    {
+      key: 'holder_count',
+      label: t('common.holder_count'),
+      allowsSorting: true,
+    },
+    {
+      key: 'onsell_order_count',
+      label: t('common.order_num'),
+      allowsSorting: true,
+    },
+  ];
+
   return (
     <div className="pt-4">
       <div className="mb-2 flex justify-end items-center">
@@ -59,60 +106,23 @@ export default function Home() {
       <Table
         isHeaderSticky
         isStriped
+        sortDescriptor={sortDescriptor}
+        onSortChange={onTableSortChange}
         color="primary"
         selectionMode="single"
         onRowAction={toDetail}
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
-          <TableColumn
-            key="ticker"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tick')}
-          </TableColumn>
-          <TableColumn
-            key="lowest_price"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.lowest_price')}
-          </TableColumn>
-          <TableColumn
-            key="lowest_price_change"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.price_change')}
-          </TableColumn>
-          <TableColumn
-            key="tx_total_volume"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tx_total_volume')}
-          </TableColumn>
-          <TableColumn
-            key="total_amount"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.total_amount')}
-          </TableColumn>
-          <TableColumn
-            key="tx_order_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tx_order_count')}
-          </TableColumn>
-          <TableColumn
-            key="holder_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.holder_count')}
-          </TableColumn>
-          <TableColumn
-            key="onsell_order_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.order_num')}
-          </TableColumn>
+          {columns.map((column) => (
+            <TableColumn
+              key={column.key}
+              allowsSorting={column.allowsSorting}
+              className="text-sm md:text-base font-extralight"
+            >
+              {column.label}
+            </TableColumn>
+          ))}
         </TableHeader>
         <TableBody
           isLoading={isLoading}
@@ -175,8 +185,9 @@ export default function Home() {
                           className="mr-1 mt-0.5"
                         />
                         {(
-                          getKeyValue(item, 'total_amount') *
-                          getKeyValue(item, 'lowest_price')/100000000
+                          (getKeyValue(item, 'total_amount') *
+                            getKeyValue(item, 'lowest_price')) /
+                          100000000
                         ).toFixed(4)}
                       </div>
                     </TableCell>
