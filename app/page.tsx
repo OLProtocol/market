@@ -45,7 +45,7 @@ export default function Home() {
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
     `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
-    () => getTopTickers({ interval, top_count: 20, top_name: 'recommend', 
+    () => getTopTickers({ interval, top_count: 20, top_name: '', 
       sort_field: sortField, 
       sort_order: sortOrder,
     }),
