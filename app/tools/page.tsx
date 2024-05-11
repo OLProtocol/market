@@ -2,9 +2,10 @@
 import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 import { Card, CardBody, CardHeader, Avatar, Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 export default function ToolsPage() {
-
+    const { t, i18n } = useTranslation();
     const router = useRouter();
 
     const toTransact = () => {
@@ -22,23 +23,22 @@ export default function ToolsPage() {
                     <div className="flex gap-5">
                         <Avatar name="T" />
                         <div className="flex flex-col gap-1 items-start justify-center">
-                            <h4 className="text-small font-semibold leading-none text-default-600">Transaction</h4>
+                            <h4 className="text-small font-semibold leading-none text-default-600">
+                                {t('pages.tools.transaction.title')}
+                            </h4>
                         </div>
                     </div>
+                </CardHeader>
+                <CardBody className="px-3 py-0 text-small justify-center items-center">
                     <WalletConnectBus className="mx-auto mt-20 block">
                         <Button
-                            radius="full" 
+                            radius="full"
                             className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
                             onClick={() => toTransact()}
                         >
-                            Split&Send
+                            {t('pages.tools.transaction.btn_split')}
                         </Button>
                     </WalletConnectBus>
-                </CardHeader>
-                <CardBody className="px-3 py-0 text-small justify-center items-center">
-                    <p>
-                        Split&Send
-                    </p>
                 </CardBody>
             </Card>
 
