@@ -1,5 +1,20 @@
 {
   "tick": "Ticker",
+  "deploy": "Deploy",
+  "mint": "Mint",
+  "file": "File",
+  "block": "Block",
+  "content": "Content",
+  "rarity": "Rarity",
+  "deploy_time": "Deploy Time",
+  "deploy_height": "Deploy Height",
+  "reg": "Regular Expression",
+  "cn": "Consecutive Numbers",
+  "trz": "Trailing Zeros",
+  "limit_per_mint": "Limit Per Mint",
+  "limit": "Limit",
+  "repeat_mint": "Repeat Mint",
+  "description": "Description",
   "price": "Price",
   "price_change": "Change",
   "tx_total_volume": "Volume",
@@ -64,5 +79,6 @@
   "sort": "Sort",
   "filter": "Filter",
   "filter_all": "All",
-  "split_dummy_hint": "If the number of virtual Utxo is not enough, it will be automatically divided."
+  "split_dummy_hint": "If the number of virtual Utxo is not enough, it will be automatically divided.",
+  "select_option": "Select Option"
 }

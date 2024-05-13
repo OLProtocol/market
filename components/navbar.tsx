@@ -33,7 +33,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef } from 'react';
 
 const WalletButton = dynamic(
-  () => import('../components/walllet/WalletConnectButton') as any,
+  () => import('../components/wallet/WalletConnectButton') as any,
   { ssr: false },
 );
 
