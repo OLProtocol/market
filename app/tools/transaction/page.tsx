@@ -732,7 +732,7 @@ export default function Transaction() {
               Send
             </Button>
           </WalletConnectBus>
-          <span className="text-gray-400 text-sm font-light">
+          <span className="text-gray-400 text-sm font-light pl-1">
             ({'Fee: ' + fee + ' sats'})
           </span>
         </CardFooter>
