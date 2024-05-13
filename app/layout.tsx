@@ -1,5 +1,6 @@
 'use client';
 import '@/styles/globals.css';
+import '@/styles/index.css';
 import { fontSans } from '@/config/fonts';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
@@ -7,6 +8,7 @@ import clsx from 'clsx';
 import '@/locales';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme } from 'antd';
+import { Avatar, Image, Link } from '@nextui-org/react';
 
 // export const metadata: Metadata = {
 //   title: {
@@ -58,6 +60,21 @@ export default function RootLayout({
             <main className="mx-auto w-screen px-2 md:px-4 flex-grow">
               {children}
             </main>
+            <footer id="footer">
+              <ul className="icons flex justify-center gap-4">
+                <li>
+                <Link href='https://twitter.com/sat20market/' target='_blank'>
+                  <Avatar showFallback fallback={
+                    <Image src='/twitter.png'/>
+                  } />
+                  </Link>
+                </li>
+
+              </ul>
+              <ul className="copyright">
+                <li>Copyrights&copy;2024</li>
+              </ul>
+            </footer>
           </div>
           {/* </ConfigProvider>
           </AntdRegistry> */}
