@@ -10,6 +10,7 @@
     "title": "Toolbox",
     "transaction": {
       "title": "Transaction",
+      "description": "Transfer assets to others",
       "btn_split": "Split",
       "input": "Input",
       "output": "Output",
