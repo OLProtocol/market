@@ -103,16 +103,20 @@ export const getHistory = async ({
 interface GetTopTickers {
   interval?: number;
   top_count?: number;
-  top_list?: 'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
+  top_name?: ''; //'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
+  sort_field: string;
+  sort_order: 0 | 1; //'asc' | 'desc';
 }
 export const getTopTickers = async ({
   interval = 1,
   top_count = 20,
-  top_list = 'tx_amount',
+  top_name = '',
+  sort_field = '',
+  sort_order = 0,
 }: GetTopTickers) => {
   const _interval = interval === 0 ? undefined : interval;
   const res = await request('/ordx/GetTopTickers', {
-    data: { interval: _interval, top_count, top_list },
+    data: { interval: _interval, top_count, top_name, sort_field, sort_order },
   });
   return res;
 };
@@ -172,7 +176,7 @@ export const getUtxoByValue = async ({
   value = 600,
   network,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/utxo/address/${address}/${value}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/utxo/address/${address}/${value}`;
   const res = await fetch(url);
   return res.json();
 };
@@ -193,7 +197,7 @@ export const getAppVersion = async () => {
 };
 
 export const getSats = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/exotic/address/${address}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/exotic/address/${address}`;
   const res = await fetch(url);
   return res.json();
 };
@@ -205,19 +209,19 @@ export const getOrdxAddressHolders = async ({
   start,
   limit,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
   const res = await fetch(url);
   return res.json();
 };
 
 export const getOrdxSummary = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/address/summary/${address}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/address/summary/${address}`;
   const res = await fetch(url);
   return res.json();
 };
 
 export const getSatsByAddress = async ({ address, sats, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : ''}/sat/FindSatsInAddress`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/sat/FindSatsInAddress`;
   const data = {
     address: address,
     sats: sats

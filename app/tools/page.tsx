@@ -2,9 +2,10 @@
 import { WalletConnectBus } from "@/components/walllet/WalletConnectBus";
 import { Card, CardBody, CardHeader, Avatar, Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 export default function ToolsPage() {
-
+    const { t, i18n } = useTranslation();
     const router = useRouter();
 
     const toTransact = () => {
@@ -20,25 +21,26 @@ export default function ToolsPage() {
             <Card className="max-w-[340px]">
                 <CardHeader className="justify-between">
                     <div className="flex gap-5">
-                        <Avatar name="T" />
+                        <Avatar name="T" className="text-2xl" />
                         <div className="flex flex-col gap-1 items-start justify-center">
-                            <h4 className="text-small font-semibold leading-none text-default-600">Transaction</h4>
+                            <h4 className="text-small font-semibold leading-none text-default-600">
+                                {t('pages.tools.transaction.title')}
+                            </h4>
                         </div>
                     </div>
-                    <WalletConnectBus className="mx-auto mt-20 block">
-                        <Button
-                            radius="full" 
-                            className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-                            onClick={() => toTransact()}
-                        >
-                            Split&Send
-                        </Button>
-                    </WalletConnectBus>
                 </CardHeader>
                 <CardBody className="px-3 py-0 text-small justify-center items-center">
-                    <p>
-                        Split&Send
-                    </p>
+                    <div className="flex flex-col gap-1 pt-0 items-start justify-center">
+                        <p className="text-gray-500 pb-4 tracking-[0.06em]">  {t('pages.tools.transaction.description')}</p >
+                    </div>
+                    <WalletConnectBus className="mx-auto mt-1 block">
+                        <Button
+                            className="inline-block  border-transparent h-7 tracking-[0.2em] text-small line-clamp-1 py-0 bg-primary-300 rounded-lg shadow-lg font-sans uppercase"
+                            onClick={() => toTransact()}
+                        >
+                            {t('pages.tools.transaction.btn_split')}
+                        </Button>
+                    </WalletConnectBus>
                 </CardBody>
             </Card>
 
