@@ -9,9 +9,9 @@
   "tools": {
     "title": "Toolbox",
     "transaction": {
-      "title": "Transaction",
-      "description": "Transfer assets to others",
-      "btn_split": "Split",
+      "title": "Split & Transfer",
+      "description": "Batch Split and Transfer Tool",
+      "btn_split": "Use Now",
       "input": "Input",
       "output": "Output",
       "available_utxo": "Plain UTXO",

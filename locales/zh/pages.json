@@ -9,9 +9,9 @@
   "tools": {
     "title": "工具箱",
     "transaction": {
-      "title": "交易",
-      "description": "将资产转移给他人",
-      "btn_split": "拆分",
+      "title": "拆分&转移",
+      "description": "提供批量分拆及转移功能。",
+      "btn_split": "马上使用",
       "input": "输入",
       "output": "输出",
       "available_utxo": "Plain UTXO",
