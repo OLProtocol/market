@@ -34,7 +34,7 @@ export default function RootLayout({
 }) {
   // const lang = i18nConfig.defaultLocale;
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Ordx Market</title>
       </head>
@@ -63,13 +63,14 @@ export default function RootLayout({
             <footer id="footer">
               <ul className="flex justify-center gap-4 text-gray-500">
                 <li>
-                  <Link href='https://twitter.com/sat20market/' target='_blank'>
-                    <Avatar showFallback fallback={
-                      <Image src='/twitter.png' />
-                    } />
+                  <Link href="https://twitter.com/sat20market/" target="_blank">
+                    <Avatar
+                      showFallback
+                      fallback={<Image src="/twitter.png" />}
+                    />
                   </Link>
                 </li>
-                <li className='pt-2 text-sm'>Copyrights&copy;2024</li>
+                <li className="pt-2 text-sm">Copyrights&copy;2024</li>
               </ul>
             </footer>
           </div>
