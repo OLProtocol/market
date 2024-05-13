@@ -11,7 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { Icon } from '@iconify/react';
 
 export default function Page() {

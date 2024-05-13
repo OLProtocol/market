@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
   Modal,
   ModalContent,
@@ -9,11 +9,11 @@ import {
   Card,
   CardBody,
   Image,
-} from "@nextui-org/react";
+} from '@nextui-org/react';
 
-import { notification } from "antd";
-import { useReactWalletStore } from "btc-connect/dist/react";
-import { useState } from "react";
+import { notification } from 'antd';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useState } from 'react';
 
 interface WalletSelectModalProps {
   visiable: boolean;
@@ -24,7 +24,7 @@ export const WalletSelectModal = ({
   onClose: onModalClose,
 }: WalletSelectModalProps) => {
   const { connect, connectors, localConnectorId, init, switchConnector } =
-  useReactWalletStore((state) => state);
+    useReactWalletStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -36,7 +36,7 @@ export const WalletSelectModal = ({
       onModalClose?.();
     } catch (error: any) {
       notification.error({
-        message: "Connect Wallet Failed",
+        message: 'Connect Wallet Failed',
         description: error.message,
       });
     } finally {
@@ -44,7 +44,7 @@ export const WalletSelectModal = ({
     }
   };
   useEffect(() => {
-    init({ defaultConnectorId: "okx", network: "livenet" });
+    init({ defaultConnectorId: 'okx', network: 'livenet' });
   }, []);
   useEffect(() => {
     if (visiable) {
@@ -86,7 +86,7 @@ export const WalletSelectModal = ({
                     />
                     <span className="text-lg md:text-2xl font-bold flex-1">
                       {item.name}
-                      {item.id === localConnectorId && " (Current)"}
+                      {item.id === localConnectorId && ' (Current)'}
                     </span>
                     {!item.installed && (
                       <span className="justify-self-end text-orange-400">

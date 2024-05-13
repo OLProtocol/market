@@ -9,5 +9,10 @@
   "update_now": "Update Now",
   "list_sale": "List for Sale",
   "remove_sale": "Unlist",
+  "next": "Next",
+  "pay_wallet": "Pay with Wallet",
+  "submit_payment": "Submit & Pay invoice",
+  "back": "Back",
+  "remove_all": "Remove All",
   "to_history": "Tx History"
 }
