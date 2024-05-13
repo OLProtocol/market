@@ -61,23 +61,18 @@ export default function RootLayout({
               {children}
             </main>
             <footer id="footer">
-              <ul className="icons flex justify-center gap-4">
+              <ul className="flex justify-center gap-4 text-gray-500">
                 <li>
-                <Link href='https://twitter.com/sat20market/' target='_blank'>
-                  <Avatar showFallback fallback={
-                    <Image src='/twitter.png'/>
-                  } />
+                  <Link href='https://twitter.com/sat20market/' target='_blank'>
+                    <Avatar showFallback fallback={
+                      <Image src='/twitter.png' />
+                    } />
                   </Link>
                 </li>
-
-              </ul>
-              <ul className="copyright">
-                <li>Copyrights&copy;2024</li>
+                <li className='pt-2 text-sm'>Copyrights&copy;2024</li>
               </ul>
             </footer>
           </div>
-          {/* </ConfigProvider>
-          </AntdRegistry> */}
         </Providers>
       </body>
     </html>
