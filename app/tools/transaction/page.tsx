@@ -5,7 +5,7 @@ import {
   getSats,
   getUtxoByValue,
 } from '@/api';
-import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import {
   buildTransaction,
   calcNetworkFee,
@@ -114,7 +114,7 @@ export default function Transaction() {
     if (utxoObj.assetamount) {
       description = utxoObj.assetamount + ' Asset/';
     }
-    description += utxoObj.value + ' sats'
+    description += utxoObj.value + ' sats';
     inputList.items[itemId - 1].value.description = description;
 
     setInputList('items', inputList.items);
@@ -373,8 +373,8 @@ export default function Transaction() {
                   (obj) =>
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                    '-' +
-                    item.sats[0].satributes[0],
+                      '-' +
+                      item.sats[0].satributes[0],
                 )
               ) {
                 // the type of rare sat already exists
@@ -382,8 +382,8 @@ export default function Transaction() {
                   if (
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                    '-' +
-                    item.sats[0].satributes[0]
+                      '-' +
+                      item.sats[0].satributes[0]
                   ) {
                     return {
                       ticker: obj['ticker'],
@@ -541,42 +541,40 @@ export default function Transaction() {
               {inputList.items.map((item, i) => (
                 <div className="flex gap-2 pb-2" key={i}>
                   <AntSelect
-                    placeholder='Select Ticker'
+                    placeholder="Select Ticker"
                     className={'w-[30%] h-10'}
                     value={item.value?.ticker ? item.value?.ticker : undefined}
                     options={
                       tickerList?.map((utxo) => ({
-                        label: (
-                          <div>
-                            { utxo.ticker }
-                          </div>
-                        ),
+                        label: <div>{utxo.ticker}</div>,
                         value: utxo.ticker,
                       })) || []
                     }
-                    onChange={(e) =>
-                      handleTickerSelectChange(item.id, e)
-                    }>
-                  </AntSelect>
+                    onChange={(e) => handleTickerSelectChange(item.id, e)}
+                  ></AntSelect>
                   <AntSelect
-                    placeholder='Select UTXO'
-                    className='w-[40%] h-10'
-                    value={inputList.items[i]?.value?.utxo ? inputList.items[i]?.value?.utxo: undefined}
+                    placeholder="Select UTXO"
+                    className="w-[40%] h-10"
+                    value={
+                      inputList.items[i]?.value?.utxo
+                        ? inputList.items[i]?.value?.utxo
+                        : undefined
+                    }
                     options={
                       inputList.items[i]?.options?.utxos.map((utxo) => ({
                         label: (
                           <div>
                             {utxo.assetamount && utxo.assetamount + ' Asset/'}
-                            {utxo.value + ' sats - ' + hideStr(utxo.txid + ':' + utxo.vout)}
+                            {utxo.value +
+                              ' sats - ' +
+                              hideStr(utxo.txid + ':' + utxo.vout)}
                           </div>
                         ),
                         value: utxo.txid + ':' + utxo.vout,
                       })) || []
                     }
-                    onChange={(e) =>
-                      handleUtxoSelectChange(item.id, e)
-                    }>
-                  </AntSelect>
+                    onChange={(e) => handleUtxoSelectChange(item.id, e)}
+                  ></AntSelect>
                   <Input
                     key={'input-sat-' + item.id}
                     className={'w-[20%]'}

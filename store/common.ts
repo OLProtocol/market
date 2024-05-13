@@ -1,11 +1,12 @@
-import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { devtools, persist } from 'zustand/middleware';
 
 interface CommonState {
   feeRate: {
     value: number;
     type?: string;
   };
+  btcHeight: number;
   appVersion: number;
   signature?: string;
   setSignature: (signature: string) => void;
@@ -19,10 +20,11 @@ export const useCommonStore = create<CommonState>()(
       (set) => ({
         feeRate: {
           value: 1,
-          type: "custom",
+          type: 'custom',
         },
+        btcHeight: 0,
         appVersion: 0,
-        signature: "",
+        signature: '',
         setSignature: (signature) => {
           set({
             signature,
@@ -35,21 +37,24 @@ export const useCommonStore = create<CommonState>()(
         },
         reset: () => {
           set({
+            btcHeight: 0,
             feeRate: {
               value: 1,
-              type: "custom",
+              type: 'custom',
             },
             appVersion: 0,
           });
         },
       }),
       {
-        name: "common-store",
+        name: 'common-store',
         partialize: (state) =>
           Object.fromEntries(
-            Object.entries(state).filter(([key]) => ["signature"].includes(key))
+            Object.entries(state).filter(([key]) =>
+              ['signature'].includes(key),
+            ),
           ),
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

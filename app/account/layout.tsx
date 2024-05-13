@@ -3,7 +3,7 @@
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { hideStr, satsToBitcoin } from '@/lib/utils';
 import { Divider, Snippet } from '@nextui-org/react';
-import { WalletConnectBus } from '@/components/walllet/WalletConnectBus';
+import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { Icon } from '@iconify/react';
 
 export default function AccountLayout({

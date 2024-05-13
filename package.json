@@ -14,6 +14,7 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
+    "@cmdcode/crypto-utils": "^2.4.6",
     "@cmdcode/tapscript": "^1.4.6",
     "@iconify/react": "^4.1.1",
     "@keystonehq/keystone-sdk": "^0.3.0",
@@ -28,8 +29,10 @@
     "@unisat/wallet-sdk": "^1.5.3",
     "antd": "^5.15.3",
     "autoprefixer": "10.4.16",
+    "axios": "^1.6.8",
     "bitcoinjs-lib": "^6.1.5",
     "btc-connect": "1.4.4",
+    "cbor-web": "^9.0.2",
     "clsx": "^2.0.0",
     "decimal.js": "^10.4.3",
     "eslint": "8.48.0",

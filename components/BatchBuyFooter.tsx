@@ -136,13 +136,22 @@ export const BatchBuyFooter = ({
     };
   };
   const calcFee = async () => {
-    if (calcLoading || !insufficientBalanceStatus || list.length === 0) {
+    console.log('calcFee', list.length, dummyLength, insufficientBalanceStatus);
+    if (calcLoading || list.length === 0) {
+      return;
+    }
+    if (!insufficientBalanceStatus) {
+      setNetworkFee(
+        (170 * (list.length + 1) +
+          34 * (list.length * 2 + dummyLength + 2) +
+          10) *
+          feeRate.value,
+      );
       return;
     }
     setCalcLoading(true);
     const newDummyUtxos = dummyUtxos?.slice(0, dummyLength);
-    const virtualFee =
-      (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
+    const virtualFee = (170 * 10 + 34 * (3 + dummyLength) + 10) * feeRate.value;
     const { utxos: filterConsumUtxos } = filterUtxosByValue(
       canSpendableUtxos,
       virtualFee +
@@ -163,9 +172,9 @@ export const BatchBuyFooter = ({
     setNetworkFee(networkFee);
   };
   useEffect(() => {
-    if (canSpendableUtxos.length && dummyLength) {
-      calcFee();
-    }
+    // if (canSpendableUtxos.length && dummyLength) {
+    calcFee();
+    // }
   }, [
     dummyLength,
     serviceFee,
