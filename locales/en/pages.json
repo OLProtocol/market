@@ -9,7 +9,9 @@
   "tools": {
     "title": "Toolbox",
     "transaction": {
-      "title": "Transaction",
+      "title": "Split & Transfer",
+      "description": "Batch Split and Transfer Tool",
+      "btn_split": "Use Now",
       "input": "Input",
       "output": "Output",
       "available_utxo": "Plain UTXO",

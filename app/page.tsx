@@ -11,6 +11,7 @@ import {
   TableColumn,
   Spinner,
   getKeyValue,
+  SortDescriptor,
   Avatar,
 } from '@nextui-org/react';
 import { useMemo, useState } from 'react';
@@ -25,6 +26,9 @@ export default function Home() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const [interval, setInterval] = useState<any>(1);
+  const [sortField, setSortField] = useState<any>('');
+  const [sortOrder, setSortOrder] = useState<any>(0);
+
   const sortList = useMemo(
     () => [
       { label: t('common.time_1D'), value: 1 },
@@ -34,10 +38,17 @@ export default function Home() {
     ],
     [i18n.language],
   );
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: '',
+    direction: 'ascending',
+  });
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}-${interval}`,
-    () => getTopTickers({ interval }),
+    `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
+    () => getTopTickers({ interval, top_count: 20, top_name: '', 
+      sort_field: sortField, 
+      sort_order: sortOrder,
+    }),
   );
   const onSortChange = (i?: number) => {
     setInterval(i);
@@ -46,6 +57,50 @@ export default function Home() {
   const toDetail = (e) => {
     router.push(`/ordx/ticker?ticker=${e}`);
   };
+  const onTableSortChange = (e: SortDescriptor) => {
+    setSortDescriptor(e);
+    setSortField(e.column);
+    setSortOrder(e.direction === 'ascending' ? 0 : 1);
+  };
+  const columns = [
+    { key: 'ticker', label: t('common.tick'), allowsSorting: true },
+    {
+      key: 'lowest_price',
+      label: t('common.lowest_price'),
+      allowsSorting: true,
+    },
+    {
+      key: 'lowest_price_change',
+      label: t('common.price_change'),
+      allowsSorting: true,
+    },
+    {
+      key: 'tx_total_volume',
+      label: t('common.tx_total_volume'),
+      allowsSorting: true,
+    },
+    {
+      key: 'market_cap',
+      label: t('common.total_amount'),
+      allowsSorting: true,
+    },
+    {
+      key: 'tx_order_count',
+      label: t('common.tx_order_count'),
+      allowsSorting: true,
+    },
+    {
+      key: 'holder_count',
+      label: t('common.holder_count'),
+      allowsSorting: true,
+    },
+    {
+      key: 'onsell_order_count',
+      label: t('common.order_num'),
+      allowsSorting: true,
+    },
+  ];
+
   return (
     <div className="pt-4">
       <div className="mb-2 flex justify-end items-center">
@@ -59,60 +114,23 @@ export default function Home() {
       <Table
         isHeaderSticky
         isStriped
+        sortDescriptor={sortDescriptor}
+        onSortChange={onTableSortChange}
         color="primary"
         selectionMode="single"
         onRowAction={toDetail}
         aria-label="Example table with infinite pagination"
       >
         <TableHeader>
-          <TableColumn
-            key="ticker"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tick')}
-          </TableColumn>
-          <TableColumn
-            key="lowest_price"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.lowest_price')}
-          </TableColumn>
-          <TableColumn
-            key="lowest_price_change"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.price_change')}
-          </TableColumn>
-          <TableColumn
-            key="tx_total_volume"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tx_total_volume')}
-          </TableColumn>
-          <TableColumn
-            key="total_amount"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.total_amount')}
-          </TableColumn>
-          <TableColumn
-            key="tx_order_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.tx_order_count')}
-          </TableColumn>
-          <TableColumn
-            key="holder_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.holder_count')}
-          </TableColumn>
-          <TableColumn
-            key="onsell_order_count"
-            className="text-sm md:text-base font-extralight"
-          >
-            {t('common.order_num')}
-          </TableColumn>
+          {columns.map((column) => (
+            <TableColumn
+              key={column.key}
+              allowsSorting={column.allowsSorting}
+              className="text-sm md:text-base font-extralight"
+            >
+              {column.label}
+            </TableColumn>
+          ))}
         </TableHeader>
         <TableBody
           isLoading={isLoading}
@@ -166,7 +184,7 @@ export default function Home() {
                       </div>
                     </TableCell>
                   );
-                } else if (columnKey === 'total_amount') {
+                } else if (columnKey === 'market_cap') {
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base">
@@ -175,8 +193,7 @@ export default function Home() {
                           className="mr-1 mt-0.5"
                         />
                         {(
-                          getKeyValue(item, 'total_amount') *
-                          getKeyValue(item, 'lowest_price')/100000000
+                          getKeyValue(item, 'market_cap')/100000000
                         ).toFixed(4)}
                       </div>
                     </TableCell>
