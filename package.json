@@ -14,6 +14,7 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
+    "@chakra-ui/react": "^2.8.2",
     "@cmdcode/crypto-tools": "^2.7.6",
     "@cmdcode/crypto-utils": "^2.4.6",
     "@cmdcode/tapscript": "^1.4.6",
