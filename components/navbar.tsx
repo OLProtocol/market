@@ -99,11 +99,10 @@ export const Navbar = () => {
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Image
               radius="none"
-              src="/logo.jpg"
+              src="/logo.png"
               alt="logo"
-              className="w-8 h-8"
+              className="w-14 h-14"
             />
-            <p className="font-bold text-inherit">OrdX</p>
           </NextLink>
         </NavbarBrand>
 
