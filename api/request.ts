@@ -8,7 +8,7 @@ export const request = async (path: string, options: any = {}) => {
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
-
+  console.log('url', url);
   if (location.hostname.indexOf('test') > -1) {
     url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
