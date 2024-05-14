@@ -80,22 +80,12 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       )}
-      <CardBody className="h-4/6">
+      <CardBody className="h-3/5">
         <div className="flex-1 text-sm md:text-base">
-          <Chip
-            variant="shadow"
-            size="lg"
-            radius="sm"
-            classNames={{
-              base: 'bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30',
-              content: 'drop-shadow shadow-black text-white',
-            }}
-          >
-            {item?.assets[0].ticker}
-          </Chip>
+          <span className='text-gray-500'>{item?.assets[0].ticker}</span>
           <div className="flex justify-center">
             <section className="text-center pt-8">
-              <p className="text-3xl font-medium">
+              <p className="text-xl font-medium">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
               <p className="pt-2">
@@ -112,7 +102,7 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       </CardBody>
-      <CardFooter className="block bg-gray-800 h-2/6">
+      <CardFooter className="block bg-gray-800 h-2/5">
         <div className="pb-2 flex">
           {item.currency === 'BTC' && (
             <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
