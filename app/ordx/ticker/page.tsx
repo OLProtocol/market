@@ -96,7 +96,7 @@ export default function Page() {
             className="w-16 h-16"
             classNames={{ name: 'text-4xl font-bold' }}
           />
-          <div className="flex-1 flex items-center flex-wrap  justify-center h-20">
+          <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
               <div className="text-2xl md:text-4xl font-bold">
                 {summary?.ticker}
@@ -109,8 +109,8 @@ export default function Page() {
             </WalletConnectBus>
           </div>
         </div>
-        <div className="flex-1 flex items-center mb-4 justify-between gap-4">
-          <div className="grid gap-2 grid-cols-3  lg:grid-cols-6">
+        <div className="flex-1 flex items-center justify-between gap-4">
+          <div className="grid gap-2 grid-cols-3 lg:grid-cols-6">
             {headList.map((item) => (
               <Card isHoverable key={item.label} className="px-2">
                 <CardBody className="text-center">
