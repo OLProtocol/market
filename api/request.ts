@@ -8,6 +8,12 @@ export const request = async (path: string, options: any = {}) => {
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
+
+  if (location.hostname.indexOf('test') > -1) {
+    url.replace('apiprd', 'apitest');
+  } else if (location.hostname.indexOf('dev') > -1) {
+    url.replace('apiprd', 'apidev');
+  }
   if (method === 'GET') {
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
@@ -224,8 +230,8 @@ export const getSatsByAddress = async ({ address, sats, network }: any) => {
   const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/sat/FindSatsInAddress`;
   const data = {
     address: address,
-    sats: sats
-  }
+    sats: sats,
+  };
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -234,4 +240,4 @@ export const getSatsByAddress = async ({ address, sats, network }: any) => {
     body: JSON.stringify(data),
   });
   return res.json();
-}
+};

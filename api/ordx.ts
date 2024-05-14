@@ -1,7 +1,13 @@
 import axios from 'axios';
 
 const generateUrl = (url: string, network?: string) => {
-  return `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
+  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
+  if (location.hostname.indexOf('test') > -1) {
+    url.replace('apiprd', 'apitest');
+  } else if (location.hostname.indexOf('dev') > -1) {
+    url.replace('apiprd', 'apidev');
+  }
+  return url;
 };
 const responseParse = async (response) => {
   const { code, msg, data } = response?.data || {};

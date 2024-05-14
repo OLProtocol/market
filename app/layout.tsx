@@ -34,7 +34,7 @@ export default function RootLayout({
 }) {
   // const lang = i18nConfig.defaultLocale;
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Ordx Market</title>
       </head>

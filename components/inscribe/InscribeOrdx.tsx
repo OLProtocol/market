@@ -330,13 +330,13 @@ export const InscribeOrdx = ({
   //   network,
   // });
   const onBlockBLur = async () => {
-    // const res = await calcTimeBetweenBlocks({
-    //   height: btcHeight,
-    //   start: data.block_start,
-    //   end: data.block_end,
-    //   network,
-    // });
-    // setTime(res);
+    const res = await calcTimeBetweenBlocks({
+      height: btcHeight,
+      start: data.block_start,
+      end: data.block_end,
+      network,
+    });
+    setTime(res);
   };
 
   const handleUtxoChange = (utxo: any) => {
