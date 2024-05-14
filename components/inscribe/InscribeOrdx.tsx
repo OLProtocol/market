@@ -19,7 +19,7 @@ import { useReactWalletStore } from 'btc-connect/dist/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-use';
-import { hideStr } from '@/lib/utils';
+import { hideStr, calcTimeBetweenBlocks } from '@/lib/utils';
 import {
   clacTextSize,
   encodeBase64,
