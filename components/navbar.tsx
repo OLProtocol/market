@@ -30,7 +30,11 @@ import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { usePathname } from 'next/navigation';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import useSWR from 'swr';
+import { getUtxoByValue, ordxSWR } from '@/api';
+import { useCommonStore, useUtxoStore } from '@/store';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 
 const WalletButton = dynamic(
   () => import('../components/wallet/WalletConnectButton') as any,
@@ -38,10 +42,36 @@ const WalletButton = dynamic(
 );
 
 export const Navbar = () => {
+  const { address, network } = useReactWalletStore();
+  const { setHeight } = useCommonStore();
+  const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const taggleRef = useRef<any>();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
+
+  const { data: heightData } = ordxSWR.useBtcHeight(network as any);
+  const { data, isLoading } = useSWR(
+    `getUtxoByValue-${address}-${network}`,
+    () => getUtxoByValue({ address, network, value: 500 }),
+  );
+
+  useEffect(() => {
+    if (data.data?.length) {
+      const list = data.data?.map((item: any) => ({
+        status: 'unspend',
+        location: 'remote',
+        utxo: `${item.txid}:${item.vout}`,
+        ...item,
+      }));
+      setList(list);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (heightData) {
+      setHeight(heightData);
+    }
+  }, [heightData]);
   const searchInput = (
     <Input
       aria-label="Search"
