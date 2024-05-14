@@ -493,6 +493,10 @@ export default function Transaction() {
   };
 
   useEffect(() => {
+    calculateBalance();
+  }, [feeRate, inputList, outputList]);
+
+  useEffect(() => {
     setTickerList([]);
     setInputList('items', [
       {
