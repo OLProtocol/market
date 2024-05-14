@@ -56,7 +56,7 @@ export const Navbar = () => {
   );
 
   useEffect(() => {
-    if (data.data?.length) {
+    if (data?.data?.length) {
       const list = data.data?.map((item: any) => ({
         status: 'unspend',
         location: 'remote',
