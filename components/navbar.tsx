@@ -168,7 +168,7 @@ export const Navbar = () => {
 						<GithubIcon className="text-default-500" />
 					</Link> */}
           <LanguageSelect />
-          <ThemeSwitch />
+          {/* <ThemeSwitch /> */}
         </NavbarItem>
         <NavbarItem className="">
           <WalletButton />

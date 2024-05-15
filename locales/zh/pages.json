@@ -17,7 +17,9 @@
       "available_utxo": "Plain UTXO",
       "rare_sats": "Rare Sats",
       "balance": "余额",
-      "balance_des": "余额小于546 sats时，会将余额转给矿工。"
+      "balance_des": "余额小于546 sats时，会将余额转给矿工。",
+      "network_fee": "网络费用",
+      "btn_send": "发送"
     },
     "search_sat": {
       "table_title": "搜索结果",
