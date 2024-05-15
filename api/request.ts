@@ -175,6 +175,10 @@ export const bulkBuyOrder = async ({ address, order_ids, raw }: any) => {
   });
   return res;
 };
+export const getBTCPrice = async () => {
+  const res = await request('/ordx/GetBTCPrice', {});
+  return res;
+};
 
 export const getUtxoByValue = async ({
   address,
