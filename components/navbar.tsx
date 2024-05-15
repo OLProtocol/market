@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
-import { getUtxoByValue, ordxSWR } from '@/api';
+import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
@@ -43,17 +43,17 @@ const WalletButton = dynamic(
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
-  const { setHeight } = useCommonStore();
+  const { setHeight, setBtcPrice } = useCommonStore();
   const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
 
   const { data: heightData } = ordxSWR.useBtcHeight(network as any);
-  const { data, isLoading } = useSWR(
-    `getUtxoByValue-${address}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 }),
+  const { data } = useSWR(`getUtxoByValue-${address}-${network}`, () =>
+    getUtxoByValue({ address, network, value: 500 }),
   );
+  const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 
   useEffect(() => {
     if (data?.data?.length) {
@@ -72,6 +72,11 @@ export const Navbar = () => {
       setHeight(heightData);
     }
   }, [heightData]);
+  useEffect(() => {
+    if (btcData?.data?.amount) {
+      setBtcPrice(btcData?.data?.amount);
+    }
+  }, [btcData]);
   const searchInput = (
     <Input
       aria-label="Search"
