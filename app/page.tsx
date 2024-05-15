@@ -45,10 +45,14 @@ export default function Home() {
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
     `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
-    () => getTopTickers({ interval, top_count: 20, top_name: '', 
-      sort_field: sortField, 
-      sort_order: sortOrder,
-    }),
+    () =>
+      getTopTickers({
+        interval,
+        top_count: 20,
+        top_name: '',
+        sort_field: sortField,
+        sort_order: sortOrder,
+      }),
   );
   const onSortChange = (i?: number) => {
     setInterval(i);
@@ -192,9 +196,9 @@ export default function Home() {
                           icon="cryptocurrency-color:btc"
                           className="mr-1 mt-0.5"
                         />
-                        {(
-                          getKeyValue(item, 'market_cap')/100000000
-                        ).toFixed(4)}
+                        {(getKeyValue(item, 'market_cap') / 100000000).toFixed(
+                          4,
+                        )}
                       </div>
                     </TableCell>
                   );

@@ -19,7 +19,7 @@ import {
   hexString,
 } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
-// import { OrderList } from '@/components/inscribe/OrderList';
+import { OrderList } from '@/components/inscribe/OrderList';
 // import { useCommonStore } from '@/store';
 type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
@@ -407,7 +407,7 @@ export default function Inscribe() {
             </ButtonGroup>
           </div>
 
-          <Card>
+          <Card className="mb-4">
             <CardBody>
               {step === 1 && (
                 <>
@@ -446,7 +446,9 @@ export default function Inscribe() {
               )}
             </CardBody>
           </Card>
-          <div>{/* <OrderList onOrderClick={onOrderClick} /> */}</div>
+          <div>
+            <OrderList onOrderClick={onOrderClick} />
+          </div>
         </div>
         {orderId && (
           <InscribingOrderModal
