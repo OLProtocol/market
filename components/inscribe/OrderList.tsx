@@ -25,11 +25,5 @@ export const OrderList = ({ onOrderClick }: OrderListProps) => {
   const clearOrderList = () => {
     reset();
   };
-  return (
-    <Card style={{ width: '100%' }} title={t('pages.inscribe.order.name')}>
-      <CardBody>
-        <LocalOrderList onOrderClick={onOrderClick} />
-      </CardBody>
-    </Card>
-  );
+  return <LocalOrderList onOrderClick={onOrderClick} />;
 };
