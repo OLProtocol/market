@@ -76,34 +76,34 @@ export default function AccountLayout({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <Card isHoverable className="px-2">
                 <CardHeader>
-                  <span className='text-base md:text-xl'>BTC balance</span>
+                  <span className='text-base md:text-md text-gray-200'>BTC balance</span>
                 </CardHeader>
                 <Divider />
-                <CardBody className="text-left">
+                <CardBody className="text-left text-md font-thin leading-8">
                   <div className="flex">
-                    <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-1" />
+                    <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
                     {satsToBitcoin(balance.total)}
                   </div>
                   <div className="flex">
-                    <span className="text-base text-red-500 w-5">$</span>
-                    <span className='text-yellow-500'><BtcPrice btc={balance.total / 100000000} /></span>
+                    <span className="text-xs text-red-500 w-5">$</span>
+                    <span className='text-yellow-500 text-xs h-5'><BtcPrice btc={balance.total / 100000000} /></span>
                   </div>
                 </CardBody>
               </Card>
 
               <Card isHoverable className="px-2">
                 <CardHeader>
-                  <span className='text-base md:text-xl'>Sat20 value</span>
+                <span className='text-base md:text-md text-gray-200'>Sat20 value</span>
                 </CardHeader>
                 <Divider />
-                <CardBody className="text-left">
+                <CardBody className="text-left text-md font-thin leading-8">
                   <div className="flex">
-                    <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-1" />
+                  <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
                     {(totalSatValue/100000000).toFixed(8)}
                   </div>
                   <div className="flex">
-                    <span className="text-base text-red-500 w-5">$</span>
-                    <span className="text-yellow-500">
+                    <span className="text-xs text-red-500 w-5">$</span>
+                    <span className='text-yellow-500 text-xs h-5'>
                       <BtcPrice btc={totalSatValue / 100000000} />
                     </span>
                   </div>
