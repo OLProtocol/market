@@ -15,6 +15,7 @@ import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
+import { BtcPrice } from '../BtcPrice';
 
 interface Props {
   item: any;
@@ -98,6 +99,11 @@ export const OrdxFtOrderItem = ({
                   &nbsp;sats/{item?.assets[0].ticker}
                 </span>
               </p>
+              <p>
+                <span className="font-thin text-gray-400">
+                  $<BtcPrice btc={(item?.assets[0].unit_price / item?.assets[0].unit_amount)/100000000} />
+                </span>
+              </p>
             </section>
           </div>
         </div>
@@ -108,6 +114,9 @@ export const OrdxFtOrderItem = ({
             <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
           )}
           <span className="text-sm text-amber-500">{item?.price}</span>
+          <span className="text-sm font-thin text-gray-400">
+            &nbsp;&nbsp;$<BtcPrice btc={item?.price} />
+          </span>
         </div>
         <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
