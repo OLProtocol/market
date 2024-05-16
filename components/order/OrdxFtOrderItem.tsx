@@ -91,9 +91,7 @@ export const OrdxFtOrderItem = ({
               </p>
               <p className="pt-2">
                 <span className="font-medium text-blue-400">
-                  {(
-                    item?.assets[0].unit_price / item?.assets[0].unit_amount
-                  ).toFixed(2)}
+                  {(item?.assets[0].unit_price / item?.assets[0].unit_amount).toFixed(2)}
                 </span>
                 <span className="font-thin text-gray-400">
                   &nbsp;sats/{item?.assets[0].ticker}
@@ -101,7 +99,7 @@ export const OrdxFtOrderItem = ({
               </p>
               <p>
                 <span className="font-thin text-gray-400">
-                  $<BtcPrice btc={(item?.assets[0].unit_price / item?.assets[0].unit_amount)/100000000} />
+                  $<BtcPrice btc={(item?.assets[0].unit_price / item?.assets[0].unit_amount) / 100000000} />/{item?.assets[0].ticker}
                 </span>
               </p>
             </section>
@@ -109,14 +107,18 @@ export const OrdxFtOrderItem = ({
         </div>
       </CardBody>
       <CardFooter className="block bg-gray-800 h-2/5">
-        <div className="pb-2 flex">
-          {item.currency === 'BTC' && (
-            <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
-          )}
-          <span className="text-sm text-amber-500">{item?.price}</span>
-          <span className="text-sm font-thin text-gray-400">
-            &nbsp;&nbsp;$<BtcPrice btc={item?.price} />
-          </span>
+        <div className="pb-2 flex-1 flex items-center justify-between gap-4">
+          <div className='flex'>
+            {item.currency === 'BTC' && (
+              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
+            )}
+            <span className="text-sm text-amber-500">{item?.price}</span>
+          </div>
+          <div className='flex'>
+            <span className="text-sm font-thin text-gray-400">
+              &nbsp;&nbsp;$<BtcPrice btc={item?.price} />
+            </span>
+          </div>
         </div>
         <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
