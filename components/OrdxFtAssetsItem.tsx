@@ -5,8 +5,6 @@ import {
   CardBody,
   Checkbox,
   Chip,
-  Listbox,
-  ListboxItem,
   Snippet,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';

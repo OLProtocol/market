@@ -2,24 +2,40 @@
 
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { hideStr, satsToBitcoin } from '@/lib/utils';
-import { Divider, Snippet } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Divider, Image, Snippet } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { Icon } from '@iconify/react';
 import { BtcPrice } from '@/components/BtcPrice';
-import { getAddressOrdxList } from '@/api';
-import { useEffect, useState } from 'react';
+import { getAddressOrdxList, getTickerSummary } from '@/api';
+import { useEffect, useMemo, useState } from 'react';
 import { notification } from 'antd';
+import useSWR from 'swr';
 
 export default function AccountLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { balance, address } = useReactWalletStore((state) => state);
-  const [sat20Balance, setSat20Balance] = useState(0);
-  
-  const getAssetAmount = async() => {
-    const resp = await getAddressOrdxList({ address, offset: 0, size: 1000 })
+  const { balance, address, network } = useReactWalletStore((state) => state);
+  const [totalSatValue, setTotalSatValue] = useState(0);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(1000);
+
+  const swrKey = useMemo(() => {
+    return `/ordx/getAddressOrdxList-${address}-${network}-${page}-${size}`;
+  }, [address, page, size, network]);
+
+  const { data: orderListResp, isLoading, mutate } = useSWR(
+    swrKey,
+    () => getAddressOrdxList({ address, offset: (page - 1) * size, size }),
+    {
+      revalidateOnMount: true,
+    },
+  );
+  const tickList = useMemo(() => orderListResp?.data || [], [orderListResp]);
+
+  const getPriceByTicker = async (ticker) => {
+    const resp = await getTickerSummary({ ticker })
     if (resp.code !== 200) {
       notification.error({
         message: 'Error',
@@ -27,18 +43,19 @@ export default function AccountLayout({
       });
       return
     }
-    if (resp.data && resp.data.length > 0) {
-      let tmpSat20Balance = 0;
-      resp.data.map((item: any) => {
-        tmpSat20Balance += item.balance;
-      })
-      setSat20Balance(tmpSat20Balance);
-    }
+    return resp.data.summary.lowest_price
   }
 
   useEffect(() => {
-    getAssetAmount();
-  }, [address])
+    setTotalSatValue(0)
+    let tmp = 0;
+    tickList.map(async (item: any) => {
+      const resp = await getTickerSummary({ ticker: item.ticker })
+      const price = resp.data.summary.lowest_price
+      tmp += Number(price) * item.balance
+      setTotalSatValue(totalSatValue + tmp)
+    })
+  }, [tickList])
 
   return (
     <section>
@@ -54,25 +71,47 @@ export default function AccountLayout({
               {hideStr(address, 6)}
             </span>
           </Snippet>
-          <div className="flex">
-            <div className="flex text-2xl">
-              <span>Balance:&nbsp;&nbsp;</span>
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-1" />
-              {satsToBitcoin(balance.total)}
-              <span className="text-gray-400">
-                &nbsp;&nbsp;$<BtcPrice btc={balance.total / 100000000} />
-              </span>
-            </div>
-            <div className="flex text-2xl">
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              <span>Sat20 Assets:&nbsp;&nbsp;</span>
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-1" />
-              {satsToBitcoin(sat20Balance)}
-              <span className="text-gray-400">
-                &nbsp;&nbsp;$<BtcPrice btc={sat20Balance / 100000000} />
-              </span>
+
+          <div className="flex-1 flex items-center justify-between gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card isHoverable className="px-2">
+                <CardHeader>
+                  <span className='text-base md:text-xl'>BTC balance</span>
+                </CardHeader>
+                <Divider />
+                <CardBody className="text-left">
+                  <div className="flex">
+                    <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-1" />
+                    {satsToBitcoin(balance.total)}
+                  </div>
+                  <div className="flex">
+                    <span className="text-base text-red-500 w-5">$</span>
+                    <span className='text-yellow-500'><BtcPrice btc={balance.total / 100000000} /></span>
+                  </div>
+                </CardBody>
+              </Card>
+
+              <Card isHoverable className="px-2">
+                <CardHeader>
+                  <span className='text-base md:text-xl'>Sat20 value</span>
+                </CardHeader>
+                <Divider />
+                <CardBody className="text-left">
+                  <div className="flex">
+                    <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-1" />
+                    {(totalSatValue/100000000).toFixed(8)}
+                  </div>
+                  <div className="flex">
+                    <span className="text-base text-red-500 w-5">$</span>
+                    <span className="text-yellow-500">
+                      <BtcPrice btc={totalSatValue / 100000000} />
+                    </span>
+                  </div>
+                </CardBody>
+              </Card>
             </div>
           </div>
+
         </div>
         <div className="">{children}</div>
       </WalletConnectBus>

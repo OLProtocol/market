@@ -34,7 +34,6 @@ export const OrdxUtxoList = () => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
   }, [address, page, size, ticker]);
 
-  console.log('swrKey', swrKey);
   const { data, isLoading, mutate } = useSWR(
     swrKey,
     () => getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
