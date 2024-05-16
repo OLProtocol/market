@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import { Card, CardBody, Button, Avatar } from '@nextui-org/react';
 import { getTickerSummary } from '@/api';
-import { Image, Divider, Tabs, Tab } from '@nextui-org/react';
+import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { useReactWalletStore } from 'btc-connect/dist/react';
