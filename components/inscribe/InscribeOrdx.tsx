@@ -67,6 +67,8 @@ export const InscribeOrdx = ({
     rarity: '',
     // cn: 0,
     trz: 0,
+    selfmint: '',
+    max: '',
     file: '',
     relateInscriptionId: '',
     fileName: '',
@@ -727,30 +729,60 @@ export const InscribeOrdx = ({
           </FormControl>
         )} */}
         {data.type === 'deploy' && (
-          <div>
-            <div className="flex items-center  mb-4">
-              <div className="w-52">{t('common.file')}</div>
-              <div className="flex-1">
-                <Dragger
-                  maxCount={1}
-                  onRemove={onFilesRemove}
-                  listType="picture"
-                  beforeUpload={() => false}
-                  onChange={filesChange}
-                >
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                  </p>
-                  <p className="ant-upload-text">
-                    {t('pages.inscribe.files.upload_des_1')}
-                  </p>
-                  <p className="ant-upload-hint">
-                    {t('pages.inscribe.files.upload_des_2')}
-                  </p>
-                </Dragger>
+          <>
+            <div className="flex items-center mb-4">
+              <div className="w-52">{t('common.selfmint')}</div>
+              <Input
+                type="number"
+                className="flex-1"
+                value={data.selfmint?.toString()}
+                isDisabled={tickLoading}
+                onChange={(e) => {
+                  set('selfmint', e.target.value);
+                }}
+                endContent="%"
+                max={100}
+                min={0}
+              ></Input>
+            </div>
+            <div className="flex items-center mb-4">
+              <div className="w-52">{t('common.max')}</div>
+              <Input
+                type="number"
+                className="flex-1"
+                value={data.max?.toString()}
+                isDisabled={tickLoading}
+                onChange={(e) => {
+                  set('max', e.target.value);
+                }}
+                min={0}
+              ></Input>
+            </div>
+            <div>
+              <div className="flex items-center  mb-4">
+                <div className="w-52">{t('common.file')}</div>
+                <div className="flex-1">
+                  <Dragger
+                    maxCount={1}
+                    onRemove={onFilesRemove}
+                    listType="picture"
+                    beforeUpload={() => false}
+                    onChange={filesChange}
+                  >
+                    <p className="ant-upload-drag-icon">
+                      <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">
+                      {t('pages.inscribe.files.upload_des_1')}
+                    </p>
+                    <p className="ant-upload-hint">
+                      {t('pages.inscribe.files.upload_des_2')}
+                    </p>
+                  </Dragger>
+                </div>
               </div>
             </div>
-          </div>
+          </>
         )}
         {data.type === 'mint' && tickChecked && !showSat && (
           <div>

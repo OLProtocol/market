@@ -38,6 +38,7 @@
   },
   "inscribe": {
     "title": "Inscribe",
+    "description": "Inscribe your text, images, or files to the OrdX blockchain.",
     "files": {
       "name": "Files",
       "upload_title": "Upload your files to begin",
