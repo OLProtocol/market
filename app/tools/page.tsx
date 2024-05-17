@@ -15,27 +15,33 @@ export default function ToolsPage() {
     }
   };
 
-  const toSearchRareSats = () => {
-    router.push(`/tools/sat`);
-  };
   const tools = [
     {
       name: 'T',
       icon: '',
       title: t('pages.tools.transaction.title'),
       desc: t('pages.tools.transaction.description'),
-      path: '/tools/sat',
+      path: '/tools/transaction',
       type: 'route',
       btnText: t('pages.tools.transaction.btn_split'),
     },
     {
-      name: 'T',
+      name: 'I',
       icon: '',
       title: t('pages.inscribe.title'),
       desc: t('pages.inscribe.description'),
       path: '/inscribe',
       type: 'route',
       btnText: t('pages.tools.transaction.btn_split'),
+    },
+    {
+      name: 'R',
+      icon: '',
+      title: t('pages.tools.search_sat.title'),
+      desc: t('pages.tools.search_sat.description'),
+      path: '/tools/sat',
+      type: 'route',
+      btnText: t('pages.tools.search_sat.btn_search'),
     },
   ];
   return (

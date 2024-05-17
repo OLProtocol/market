@@ -1,4 +1,6 @@
 {
+  "system_error": "System Error",
+  "insufficient_balance": "Insufficient balance",
   "list_failed_title": "Listed failed",
   "list_success_title": "Listed successfully",
   "list_success_description": "The order has been submitted successfully, please wait for the buyer to buy it.",

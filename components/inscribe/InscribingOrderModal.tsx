@@ -7,7 +7,7 @@ import {
   CardBody,
   CardHeader,
 } from '@nextui-org/react';
-import { Steps, Divider, Button, Tag, Progress } from 'antd';
+import { Steps, Divider, Button, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { ordx } from '@/api';
@@ -30,7 +30,6 @@ import { useTranslation } from 'react-i18next';
 interface InscribingOrderMdaolProps {
   show: boolean;
   orderId: string;
-  // order: OrderItemType;
   onFinished?: () => void;
   onClose?: () => void;
 }
@@ -50,7 +49,6 @@ export const InscribingOrderModal = ({
   ];
   const { address: currentAccount, publicKey } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
-  // const toast = useToast();
   const {
     changeStatus,
     setCommitTx,
@@ -152,14 +150,10 @@ export const InscribingOrderModal = ({
     } catch (error: any) {
       setLoading(false);
       console.error(error);
-      // toast({
-      //   title: 'Error',
-      //   description: error.message || JSON.stringify(error),
-      //   status: 'error',
-      //   duration: 2000,
-      //   isClosable: true,
-      //   position: 'top',
-      // });
+      notification.error({
+        message: 'Error',
+        description: error.message || JSON.stringify(error),
+      });
     }
   };
   const startInscribe = async () => {
@@ -217,14 +211,10 @@ export const InscribingOrderModal = ({
         }
         setLoading(false);
         changeStatus(orderId, 'commit_error');
-        // toast({
-        //   title: 'Error',
-        //   description: error.message || JSON.stringify(error),
-        //   status: 'error',
-        //   duration: 2000,
-        //   isClosable: true,
-        //   position: 'top',
-        // });
+        notification.error({
+          message: 'Error',
+          description: error.message || JSON.stringify(error),
+        });
       }
     } else {
       setLoading(true);
@@ -277,14 +267,10 @@ export const InscribingOrderModal = ({
         changeStatus(orderId, 'inscribe_success');
         setActiveStep(3);
         onFinished?.();
-        // toast({
-        //   title: 'Success',
-        //   description: 'Inscribe Success',
-        //   status: 'success',
-        //   duration: 2000,
-        //   isClosable: true,
-        //   position: 'top',
-        // });
+        notification.success({
+          message: 'Success',
+          description: 'Inscribe Success',
+        });
       } else {
         changeStatus(orderId, 'inscribe_fail');
       }
@@ -304,14 +290,10 @@ export const InscribingOrderModal = ({
 
       setLoading(false);
       changeStatus(orderId, 'inscribe_fail');
-      // toast({
-      //   title: 'Error',
-      //   description: error.message || 'error',
-      //   status: 'error',
-      //   duration: 2000,
-      //   isClosable: true,
-      //   position: 'top',
-      // });
+      notification.success({
+        message: 'Error',
+        description: error.message || 'error',
+      });
     }
   };
   const clacSuccessPercent = () => {

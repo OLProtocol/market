@@ -83,7 +83,7 @@ export const OrdxFtOrderItem = ({
       )}
       <CardBody className="h-3/5">
         <div className="flex-1 text-sm md:text-base">
-          <span className='text-gray-500'>{item?.assets[0].ticker}</span>
+          <span className="text-gray-500">{item?.assets[0].ticker}</span>
           <div className="flex justify-center">
             <section className="text-center pt-8">
               <p className="text-xl font-medium">
@@ -91,7 +91,9 @@ export const OrdxFtOrderItem = ({
               </p>
               <p className="pt-2">
                 <span className="font-medium text-blue-400">
-                  {(item?.assets[0].unit_price / item?.assets[0].unit_amount).toFixed(2)}
+                  {(
+                    item?.assets[0].unit_price / item?.assets[0].unit_amount
+                  ).toFixed(2)}
                 </span>
                 <span className="font-thin text-gray-400">
                   &nbsp;sats/{item?.assets[0].ticker}
@@ -99,7 +101,15 @@ export const OrdxFtOrderItem = ({
               </p>
               <p>
                 <span className="font-thin text-gray-400">
-                  $<BtcPrice btc={(item?.assets[0].unit_price / item?.assets[0].unit_amount) / 100000000} />/{item?.assets[0].ticker}
+                  $
+                  <BtcPrice
+                    btc={
+                      item?.assets[0].unit_price /
+                      item?.assets[0].unit_amount /
+                      100000000
+                    }
+                  />
+                  /{item?.assets[0].ticker}
                 </span>
               </p>
             </section>
@@ -108,15 +118,16 @@ export const OrdxFtOrderItem = ({
       </CardBody>
       <CardFooter className="block bg-gray-800 h-2/5">
         <div className="pb-2 flex-1 flex items-center justify-between gap-4">
-          <div className='flex'>
+          <div className="flex">
             {item.currency === 'BTC' && (
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
             )}
             <span className="text-sm text-amber-500">{item?.price}</span>
           </div>
-          <div className='flex'>
+          <div className="flex">
             <span className="text-sm font-thin text-gray-400">
-              &nbsp;&nbsp;$<BtcPrice btc={item?.price} />
+              &nbsp;&nbsp;$
+              <BtcPrice btc={item?.price} />
             </span>
           </div>
         </div>
@@ -146,7 +157,7 @@ export const OrdxFtOrderItem = ({
               isDisabled={!canBuy}
               isLoading={loading}
               color="primary"
-              radius="sm"
+              radius="lg"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />

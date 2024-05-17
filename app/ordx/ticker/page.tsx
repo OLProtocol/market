@@ -12,7 +12,6 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { useUtxoStore } from '@/store';
 import { Icon } from '@iconify/react';
 
 export default function Page() {
@@ -90,7 +89,7 @@ export default function Page() {
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">
-        <div className='flex-1 flex items-center mb-4 gap-4'>
+        <div className="flex-1 flex items-center mb-4 gap-4">
           <Avatar
             name={showTextIcon}
             size="lg"
