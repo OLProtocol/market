@@ -72,8 +72,7 @@ export default function AccountLayout({
             </span>
           </Snippet>
 
-          <div className="flex-1 flex items-center justify-between gap-4">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="min-h-[8rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-8 gap-2 sm:gap-4 mt-4 mb-4">
               <Card isHoverable className="px-2">
                 <CardHeader>
                   <span className='text-base md:text-md text-gray-200'>BTC balance</span>
@@ -109,7 +108,6 @@ export default function AccountLayout({
                   </div>
                 </CardBody>
               </Card>
-            </div>
           </div>
 
         </div>

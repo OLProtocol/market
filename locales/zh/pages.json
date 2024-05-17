@@ -22,6 +22,9 @@
       "btn_send": "发送"
     },
     "search_sat": {
+      "title": "稀有聪",
+      "description": "搜索稀有聪",
+      "btn_search": "搜索",
       "table_title": "搜索结果",
       "table_col1": "UTXO",
       "table_col2": "Sats/BTC",

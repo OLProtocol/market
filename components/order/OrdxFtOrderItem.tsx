@@ -146,7 +146,7 @@ export const OrdxFtOrderItem = ({
               isDisabled={!canBuy}
               isLoading={loading}
               color="primary"
-              radius="sm"
+              radius="lg"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
