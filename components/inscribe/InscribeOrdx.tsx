@@ -24,10 +24,13 @@ import {
   clacTextSize,
   encodeBase64,
   base64ToHex,
+  generateSeedByUtxos,
   serializeInscriptionId,
 } from '@/lib/inscribe';
+import { merge } from 'radash';
 import { useTranslation } from 'react-i18next';
 import { ordx, ordxSWR } from '@/api';
+import { useUtxoStore } from '@/store';
 // import toast from 'react-hot-toast';
 import { useCommonStore } from '@/store';
 import { ColumnsType } from 'antd/es/table';
@@ -50,6 +53,7 @@ export const InscribeOrdx = ({
   const { address: currentAccount, network } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
+  const { selectUtxosByAmount } = useUtxoStore();
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
   const [data, { set }] = useMap({
@@ -74,6 +78,7 @@ export const InscribeOrdx = ({
     des: '',
     mintRarity: '',
     sat: 0,
+    utxos: [],
   });
   const { data: satTypeData } = ordxSWR.useSatTypes({ network });
   const satTypeList = useMemo(() => {
@@ -134,9 +139,7 @@ export const InscribeOrdx = ({
     try {
       const key = `${network}_${tick}`;
       const cachedData = localStorage.getItem(key);
-      // if (cachedData) {
-      //   return JSON.parse(cachedData);
-      // }
+
       const info = await ordx.getOrdxInfo({ tick, network });
       if (info) {
         localStorage.setItem(key, JSON.stringify(info));
@@ -159,6 +162,9 @@ export const InscribeOrdx = ({
 
       setTickChecked(true);
     } else {
+      setLoading(true);
+
+      setLoading(false);
       onNext?.();
     }
   };
@@ -236,6 +242,19 @@ export const InscribeOrdx = ({
         }
         if (imgtype) {
           set('relateInscriptionId', inscriptionId);
+        }
+        if (!blur) {
+          const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
+          if (!utxos.length) {
+            console.log('缺少utxos');
+            return;
+          }
+          let utxosRanges = await Promise.all(
+            utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
+          );
+          utxosRanges = utxosRanges.map((v, i) => ({ ...v.data, ...utxos[i] }));
+          console.log(utxosRanges);
+          set('utxos', utxosRanges as any);
         }
         if (blur) {
           set('amount', Number(limit));
@@ -344,19 +363,11 @@ export const InscribeOrdx = ({
     setAllowSpecialBeyondStatus(false);
     const firstOffset = utxo.sats[0].offset;
     if (firstOffset >= 546) {
-      // toast.error('请先拆分，再铸造。');
       return;
     }
     setSelectedUtxo(utxo.utxo);
 
     const satData = utxoList.filter((item) => item.utxo === utxo.utxo)[0];
-    // satData.sats = satData.sats.sort((a, b) => {
-    //   return b.size - a.size;
-    // });
-    const satSize = satData.sats.reduce((acc, cur) => {
-      return acc + cur.size;
-    }, 0);
-    console.log('satSize', satSize);
     set('sat', satData?.sats?.[0].start);
     if (satData) {
       onUtxoChange?.(satData);
@@ -517,6 +528,7 @@ export const InscribeOrdx = ({
                     'amount',
                     isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
                   );
+                  setTickChecked(false);
                   setSelectedUtxo('');
                 }}
                 min={1}
@@ -625,34 +637,6 @@ export const InscribeOrdx = ({
                 </div>
               </div>
             </div>
-            {/* <FormControl>
-              <div className='flex items-center  mb-4'>
-                <FormLabel className='w-52' marginBottom={0}>
-                  {t('common.cn')}
-                  <Tooltip content={t('pages.inscribe.ordx.cn_placeholder')}>
-                    <span className='text-blue-500'>
-                      (sat
-                      <QuestionCircleOutlined />)
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <div className='flex-1 flex items-center'>
-                  <Checkbox
-                    checked={data.cnChecked}
-                    onChange={onCnChecked}></Checkbox>
-                  <div className='ml-2 flex-1'>
-                    <NumberInput
-                      value={data.cn}
-                      isDisabled={!data.cnChecked}
-                      placeholder={t('pages.inscribe.ordx.cn_placeholder')}
-                      onChange={(_, e) => set('cn', isNaN(e) ? 0 : e)}
-                      min={0}>
-                      <NumberInputField />
-                    </NumberInput>
-                  </div>
-                </div>
-              </div>
-            </FormControl> */}
             <div>
               <div className="flex items-center  mb-4">
                 <div className="w-52">
@@ -773,7 +757,7 @@ export const InscribeOrdx = ({
             <div className="flex items-center mb-4">
               <div className="w-52">{t('common.repeat_mint')}</div>
               <div className="flex-1">
-                <div className="flex">
+                <div className="flex gap-2 items-center">
                   <Input
                     type="number"
                     value={data.repeatMint.toString()}
@@ -789,7 +773,6 @@ export const InscribeOrdx = ({
                     max={10}
                   ></Input>
                   <Slider
-                    label="Temperature"
                     step={1}
                     maxValue={10}
                     minValue={1}

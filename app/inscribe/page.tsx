@@ -17,9 +17,10 @@ import {
   removeObjectEmptyValue,
   generteFiles,
   hexString,
+  generateSeedByUtxos,
 } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
-// import { OrderList } from '@/components/inscribe/OrderList';
+import { OrderList } from '@/components/inscribe/OrderList';
 // import { useCommonStore } from '@/store';
 type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
@@ -81,6 +82,7 @@ export default function Inscribe() {
     blockChecked: false,
     cnChecked: false,
     trzChecked: false,
+    utxos: [],
   });
   const [brc20Data, { set: setBrc20 }] = useMap({
     type: 'mint',
@@ -105,6 +107,8 @@ export default function Inscribe() {
   const ordxChange = (data: any) => {
     setOrd2Data('type', data.type);
     setOrd2Data('tick', data.tick);
+    setOrd2Data('utxos', data.utxos);
+    console.log(data.utxos);
     setOrd2Data('amount', data.amount);
     setOrd2Data('file', data.file);
     console.log(data.relateInscriptionId);
@@ -197,29 +201,31 @@ export default function Inscribe() {
             }),
           ),
         ];
-        if (ordxData.relateInscriptionId) {
-          ordxValue = [
-            JSON.stringify(
-              removeObjectEmptyValue({
-                p: 'ordx',
-                op: 'mint',
-                tick: ordxData.tick.toString().trim(),
-                amt: ordxData.amount.toString(),
-                sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
-                desc: `seed=${random(0, 1000)}`,
-              }),
-            ),
-            {
-              type: 'relateInscriptionId',
-              name: 'relateInscriptionId',
-              value: ordxData.relateInscriptionId,
-            },
-          ];
-        }
+        const seed = generateSeedByUtxos(ordxData.utxos, ordxData.amount);
+        // if (ordxData.relateInscriptionId) {
+        ordxValue = [
+          JSON.stringify(
+            removeObjectEmptyValue({
+              p: 'ordx',
+              op: 'mint',
+              tick: ordxData.tick.toString().trim(),
+              amt: ordxData.amount.toString(),
+              sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
+              desc: `seed=${seed}`,
+            }),
+          ),
+          {
+            type: 'relateInscriptionId',
+            name: 'relateInscriptionId',
+            value: ordxData.relateInscriptionId,
+          },
+        ];
+        // }
         list.push({
           type: 'ordx',
           name: `mint_${i}`,
           ordxType: 'mint',
+          utxos: ordxData.utxos,
           value: ordxValue,
         });
       }
@@ -300,7 +306,6 @@ export default function Inscribe() {
       value: file,
     }));
     const _files = await generteFiles(list);
-    console.log(_files);
     setList(_files);
     setStep(3);
   };
@@ -446,7 +451,10 @@ export default function Inscribe() {
               )}
             </CardBody>
           </Card>
-          <div>{/* <OrderList onOrderClick={onOrderClick} /> */}</div>
+          <div>
+            {' '}
+            <OrderList onOrderClick={onOrderClick} />{' '}
+          </div>
         </div>
         {orderId && (
           <InscribingOrderModal

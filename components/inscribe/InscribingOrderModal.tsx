@@ -71,8 +71,15 @@ export const InscribingOrderModal = ({
     setLoading(true);
 
     try {
-      const { inscriptions, feeRate, inscriptionSize, secret, network, fee } =
-        order;
+      const {
+        inscriptions,
+        feeRate,
+        inscriptionSize,
+        secret,
+        network,
+        fee,
+        files,
+      } = order;
       if (inscriptions.length === 1) {
         let txid;
         if (order.ordxUtxo) {
@@ -93,6 +100,7 @@ export const InscribingOrderModal = ({
             network: network,
             fromAddress: currentAccount,
             fromPubKey: publicKey,
+            utxos: files[0].utxos,
           });
         }
         const commitTx = {
@@ -117,13 +125,6 @@ export const InscribingOrderModal = ({
         let fundingTxid = funding?.txid || '';
         if (!funding) {
           const fundingData = getFundingAddress(secret, network);
-          // fundingTxid = await unisat.sendBitcoin(
-          //   fundingData.address,
-          //   fee.totalFee,
-          //   {
-          //     feeRate: feeRate,
-          //   },
-          // );
           fundingTxid = await sendBTC({
             toAddress: fundingData.address,
             value: fee.totalFee,
@@ -335,7 +336,7 @@ export const InscribingOrderModal = ({
       order?.status === 'inscribe_wait' ||
       order?.status === 'inscribe_fail'
     ) {
-      setActiveStep(2);
+      // setActiveStep(2);
     }
     if (order?.status === 'inscribe_success') {
       if (

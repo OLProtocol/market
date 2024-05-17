@@ -1,10 +1,18 @@
 import { Address, Signer, Tap, Tx, Script } from '@cmdcode/tapscript';
 import * as cbor from 'cbor-web';
-import { buildTransaction, filterUtxosByValue } from '@/lib/wallet';
+import {
+  buildTransaction,
+  filterUtxosByValue,
+  bitcoin,
+  toPsbtNetwork,
+  NetworkType,
+} from '@/lib/wallet';
 import { signAndPushPsbt } from '@/lib';
-import * as bitcoin from 'bitcoinjs-lib';
+import { flat, sum } from 'radash';
 import { keys } from '@cmdcode/crypto-utils';
 import i18n from '@/locales';
+import { Decimal } from 'decimal.js';
+const crypto = require('crypto');
 import {
   textToHex,
   encodeBase64,
@@ -14,6 +22,7 @@ import {
   serializeInscriptionId,
   createLittleEndianInteger,
 } from './index';
+import { useUtxoStore } from '@/store';
 import { getUtxoByValue, pushBTCpmt } from '@/api';
 import { addresToScriptPublicKey } from '@/lib/utils';
 interface FileItem {
@@ -48,16 +57,62 @@ interface InscriptionItem {
   file: FileItem;
 }
 
+export const generateSeed = (ranges) => {
+  const jsonString = JSON.stringify(ranges);
+  try {
+    const bytes = new TextEncoder().encode(jsonString);
+    const hash = crypto.createHash('sha256');
+    hash.update(bytes);
+    const hashResult = hash.digest('hex').slice(0, 16);
+    return hashResult;
+  } catch (error) {
+    console.error('json.Marshal failed. ' + error);
+    return '0';
+  }
+};
+export const selectAmountRangesByUtxos = (utxos: any[], amount) => {
+  const sats: any[] = flat(utxos.map((v) => v.sats));
+  const ranges: any[] = [];
+  let totalSize = 0;
+  for (let i = 0; i < sats.length; i++) {
+    const item = sats[i];
+    const { size, start } = item;
+    totalSize += size;
+
+    if (totalSize > amount) {
+      const dis = totalSize - amount;
+      ranges.push({
+        start,
+        size: size - dis,
+      });
+    } else {
+      ranges.push({
+        start,
+        size,
+      });
+    }
+  }
+  console.log('selectAmountRangesByUtxos');
+  console.log(utxos);
+  console.log(amount);
+  console.log(ranges);
+  return ranges;
+};
+export const generateSeedByUtxos = (utxos: any[], amount) => {
+  amount = Math.max(amount, 546);
+  return generateSeed(selectAmountRangesByUtxos(utxos, amount));
+};
 export const generteFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
-    const { type, value, name, ordxType } = item;
+    const { type, value, name, ordxType, utxos } = item;
     const file: any = {
       type,
       name,
       originValue: value,
       ordxType,
+      utxos,
     };
     if (type === 'text') {
       const _value = value?.trim();
@@ -554,6 +609,7 @@ interface SendBTCProps {
   fromPubKey: string;
   ordxUtxo?: any;
   specialAmt?: number;
+  utxos?: any[];
 }
 
 export const sendBTC = async ({
@@ -564,28 +620,46 @@ export const sendBTC = async ({
   fromAddress,
   fromPubKey,
   ordxUtxo,
+  utxos = [],
 }: SendBTCProps) => {
   const hasOrdxUtxo = !!ordxUtxo;
+  let totalAmountUtxo = 0;
+  if (utxos?.length) {
+    totalAmountUtxo = sum(utxos, (f) => f.value);
+  }
+  const {
+    getUnspendUtxos,
+    add: addUtxo,
+    removeUtxos,
+  } = useUtxoStore.getState();
+  const unspendUtxos = getUnspendUtxos();
+  console.log(unspendUtxos);
   console.log('hasOrdxUtxo', hasOrdxUtxo);
-  const data = await getUtxoByValue({
-    address: fromAddress,
-    value: 0,
-    network,
-  });
-  const consumUtxos = data?.data || [];
-  if (!consumUtxos.length) {
+
+  if (!unspendUtxos.length) {
     throw new Error(i18n.t('toast.insufficient_balance'));
   }
   console.log(value);
   console.log(hasOrdxUtxo);
   const fee = (148 * (hasOrdxUtxo ? 2 : 1) + 34 * 2 + 10) * feeRate;
-  console.log(fee);
-  const filterTotalValue = hasOrdxUtxo ? 546 + fee : value + 546 + fee;
-  console.log(consumUtxos);
-  const { utxos: avialableUtxos } = filterUtxosByValue(
-    consumUtxos,
-    filterTotalValue,
-  );
+  let filterTotalValue = hasOrdxUtxo ? 546 + fee : value + 546 + fee;
+  if (totalAmountUtxo) {
+    filterTotalValue = Math.max(filterTotalValue - totalAmountUtxo, 0);
+  }
+  let avialableUtxos: any[] = utxos.map((v) => ({
+    txid: v.txid,
+    vout: v.vout,
+    value: v.value,
+  }));
+  console.log(filterTotalValue);
+  if (filterTotalValue) {
+    const { utxos: filterUtxos } = filterUtxosByValue(
+      unspendUtxos,
+      filterTotalValue,
+    );
+    avialableUtxos.push(...filterUtxos);
+  }
+
   if (!avialableUtxos.length) {
     throw new Error(i18n.t('toast.insufficient_balance'));
   }
@@ -607,7 +681,6 @@ export const sendBTC = async ({
       value: toValue,
     },
   ];
-  console.log(avialableUtxos);
   const psbt = await buildTransaction({
     utxos: avialableUtxos,
     outputs,
@@ -616,6 +689,18 @@ export const sendBTC = async ({
     address: fromAddress,
     publicKey: fromPubKey,
   });
-  return await signAndPushPsbt(psbt);
-  // return await signAndPushPsbt(inputs, outputs, network);
+  console.log(psbt);
+  const txId = await signAndPushPsbt(psbt);
+  if (psbt.txOutputs.length > 1) {
+    addUtxo({
+      utxo: `${txId}:1`,
+      value: psbt.txOutputs[1].value,
+      status: 'unspend',
+      location: 'local',
+      txid: txId,
+      vout: 1,
+    });
+  }
+  removeUtxos(avialableUtxos);
+  return txId;
 };

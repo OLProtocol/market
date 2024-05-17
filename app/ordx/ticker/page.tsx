@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { useUtxoStore } from '@/store';
 import { Icon } from '@iconify/react';
 
 export default function Page() {
