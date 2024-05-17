@@ -493,6 +493,10 @@ export default function Transaction() {
   };
 
   useEffect(() => {
+    calculateBalance();
+  }, [feeRate, inputList, outputList]);
+
+  useEffect(() => {
     setTickerList([]);
     setInputList('items', [
       {
@@ -727,11 +731,11 @@ export default function Transaction() {
         <CardFooter>
           <WalletConnectBus className="mx-auto mt-20 block">
             <Button color="primary" onClick={splitHandler} isLoading={loading}>
-              Send
+            {t('pages.tools.transaction.btn_send')}
             </Button>
           </WalletConnectBus>
-          <span className="text-gray-400 text-sm font-light pl-1">
-            ({'Fee: ' + fee + ' sats'})
+          <span className="text-gray-400 text-sm font-light pl-4">
+            ({t('pages.tools.transaction.network_fee')}: {fee + ' sats'})
           </span>
         </CardFooter>
       </Card>
