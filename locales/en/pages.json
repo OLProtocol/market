@@ -22,6 +22,9 @@
       "btn_send": "Send"
     },
     "search_sat": {
+      "title": "Rare Sats",
+      "description": "Search Rare Sats",
+      "btn_search": "Search",
       "table_title": "Search Result",
       "table_col1": "UTXO",
       "table_col2": "Sats/BTC",
