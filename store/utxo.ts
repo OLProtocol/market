@@ -15,6 +15,7 @@ export interface UtxoItem {
 interface UtxoState {
   list: UtxoItem[];
   setList: (list: UtxoItem[]) => void;
+  getUnspendUtxos: () => UtxoItem[];
   selectUtxosByAmount: (amount: number) => UtxoItem[];
   add: (item: UtxoItem) => void;
   remove: (utxo: string) => void;
@@ -44,6 +45,9 @@ export const useUtxoStore = create<UtxoState>()(
         (item) => !utxos.find((u) => u === item.utxo),
       );
       set({ list });
+    },
+    getUnspendUtxos: () => {
+      return get().list.filter((v) => v.status === 'unspend') || [];
     },
     selectUtxosByAmount: (amount: number) => {
       const { list } = get();
