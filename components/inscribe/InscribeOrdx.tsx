@@ -14,7 +14,7 @@ import type { UploadProps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 // import { useLocation } from 'react-router-dom';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Upload, Modal, Table } from 'antd';
+import { Upload, Modal, Table, notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useEffect, useMemo, useState } from 'react';
@@ -31,7 +31,6 @@ import { merge } from 'radash';
 import { useTranslation } from 'react-i18next';
 import { ordx, ordxSWR } from '@/api';
 import { useUtxoStore } from '@/store';
-// import toast from 'react-hot-toast';
 import { useCommonStore } from '@/store';
 import { ColumnsType } from 'antd/es/table';
 // import { CopyButton } from '@/components/CopyButton';
@@ -131,7 +130,9 @@ export const InscribeOrdx = ({
       });
       return resp;
     } catch (error) {
-      // toast.error(t('toast.system_error'));
+      notification.error({
+        message: t('notification.system_error'),
+      });
       console.error('Failed to fetch ordxUTXO:', error);
       throw error;
     }
@@ -148,7 +149,9 @@ export const InscribeOrdx = ({
       }
       return info;
     } catch (error) {
-      // toast.error(t('toast.system_error'));
+      notification.error({
+        message: t('notification.system_error'),
+      });
       console.error('Failed to fetch ordXInfo:', error);
       throw error;
     }
@@ -710,24 +713,6 @@ export const InscribeOrdx = ({
             </div>
           </>
         )}
-        {/* {data.type === 'mint' && showSat && (
-          <FormControl>
-            <div className='flex items-center  mb-4'>
-              <FormLabel className='w-52' marginBottom={0}>
-                Sat
-              </FormLabel>
-              <div className='flex-1'>
-                <NumberInput
-                  value={data.sat}
-                  isDisabled={tickLoading}
-                  onChange={(_, e) => set('sat', e)}
-                  min={1}>
-                  <NumberInputField />
-                </NumberInput>
-              </div>
-            </div>
-          </FormControl>
-        )} */}
         {data.type === 'deploy' && (
           <>
             <div className="flex items-center mb-4">

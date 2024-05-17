@@ -58,29 +58,10 @@ export const OrdxFtAssetsItem = ({
       )}
       <CardBody className="h-4/5">
         <div className="flex-1 text-sm md:text-base">
-          <Chip
-            variant="shadow"
-            size="lg"
-            classNames={{
-              base: 'bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30',
-              content: 'drop-shadow shadow-black text-white',
-            }}
-          >
-            {item?.tickers[0].ticker}
-          </Chip>
-          {/* {item?.tickers?.map((v: any) => (
-            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
-              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
-                Inscription Num: {v.inscriptionnum}
-              </ListboxItem>
-              <ListboxItem key={v.ticker + '-' + v.amount}>
-                {t('common.asset_num')}: {v.amount}
-              </ListboxItem>
-            </Listbox>
-          ))} */}
+          <span className="text-gray-500">{item?.tickers[0].ticker}</span>
           <div className="flex justify-center">
-            <section className="text-center pt-10">
-              <p className="text-3xl font-medium text-white">
+            <section className="text-center pt-8">
+              <p className="text-xl font-medium text-white">
                 {thousandSeparator(item?.tickers[0].amount)}
               </p>
               <p className="pt-5">
@@ -100,7 +81,7 @@ export const OrdxFtAssetsItem = ({
       </CardBody>
 
       <CardFooter className="block bg-gray-800 h-1/5">
-        <div className="flex-1">
+        <div className="flex justify-center">
           {item.order_id === 0 ? (
             <Button
               // fullWidth
@@ -108,7 +89,7 @@ export const OrdxFtAssetsItem = ({
               size="md"
               isLoading={loading}
               color="primary"
-              radius="sm"
+              radius="lg"
               onClick={sellHandler}
               className="border"
             >

@@ -5,7 +5,6 @@ import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
-// import mempoolJS from '@mempool/mempool.js';
 import { generatePrivateKey, generateInscriptions } from '@/lib/inscribe';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useCalcFee } from '@/lib/hooks';
