@@ -1,6 +1,14 @@
 import { useMemo, useEffect } from 'react';
 import { useOrderStore, OrderItemType } from '@/store';
-import { Table } from 'antd';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+  getKeyValue,
+} from '@nextui-org/react';
 import type { ColumnsType } from 'antd/es/table';
 import { hideStr } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -55,21 +63,58 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
       })),
     [list],
   );
+  const onRowAction = (k: any) => {
+    const item = dataSource.find((v) => v.orderId === k);
+    item && clickHandler(item);
+  };
   useEffect(() => {
     checkAllList();
   }, []);
   return (
+    // <Table
+    //   columns={columns}
+    //   dataSource={dataSource}
+    //   pagination={{
+    //     position: ['bottomCenter'],
+    //   }}
+    //   onRow={(record) => {
+    //     return {
+    //       onClick: () => clickHandler(record), // 点击行
+    //     };
+    //   }}
+    // />
     <Table
-      columns={columns}
-      dataSource={dataSource}
-      pagination={{
-        position: ['bottomCenter'],
-      }}
-      onRow={(record) => {
-        return {
-          onClick: () => clickHandler(record), // 点击行
-        };
-      }}
-    />
+      aria-label="Example table with dynamic content"
+      onRowAction={onRowAction}
+    >
+      <TableHeader columns={columns}>
+        {(column) => <TableColumn key={column.key}>{column.key}</TableColumn>}
+      </TableHeader>
+      <TableBody items={dataSource}>
+        {(item) => (
+          <TableRow key={item.orderId}>
+            {(columnKey) => {
+              if (columnKey === 'orderId') {
+                return (
+                  <TableCell>
+                    {hideStr(getKeyValue(item, columnKey), 10)}
+                  </TableCell>
+                );
+              } else if (columnKey === 'created') {
+                return (
+                  <TableCell>
+                    {new Date(getKeyValue(item, columnKey)).toLocaleString(
+                      'af',
+                    )}
+                  </TableCell>
+                );
+              } else {
+                return <TableCell>{getKeyValue(item, columnKey)}</TableCell>;
+              }
+            }}
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 };

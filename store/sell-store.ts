@@ -57,25 +57,34 @@ export const useSellStore = create<SellState>()(
       // },
     ],
     changePrice(utxo, price) {
-      if (
-        price === undefined ||
-        isNaN(Number(price)) ||
-        Number(price) < 0 ||
-        price == ''
-      ) {
-        price = '0';
-      }
+      // if (
+      //   price === undefined ||
+      //   isNaN(Number(price)) ||
+      //   Number(price) < 0 ||
+      //   price == ''
+      // ) {
+      //   price = '0';
+      // }
       const { list, ticker, amountUnit, unit } = get();
       const newList = list.map((item) => {
         const tickerAmount =
           item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        if (price === '' || isNaN(Number(price))) {
+          return {
+            ...item,
+            unit_price: '',
+            price: '',
+          };
+        }
         const unitPrice = unit === 'btc' ? btcToSats(price).toString() : price;
-        let amountPrice = new Decimal(unitPrice)
+        console.log(unitPrice);
+        let amountPrice: any = new Decimal(unitPrice)
           .mul(new Decimal(tickerAmount))
-          .toString();
+          .toNumber();
+        amountPrice = Math.ceil(amountPrice).toString();
         amountPrice =
           amountUnit === 'btc'
-            ? satsToBitcoin(amountPrice).toString()
+            ? satsToBitcoin(amountPrice.toString()).toString()
             : amountPrice;
         if (item.utxo === utxo) {
           return {
