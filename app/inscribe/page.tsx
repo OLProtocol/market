@@ -412,7 +412,7 @@ export default function Inscribe() {
             </ButtonGroup>
           </div>
 
-          <Card>
+          <Card className="mb-4">
             <CardBody>
               {step === 1 && (
                 <>
@@ -452,8 +452,7 @@ export default function Inscribe() {
             </CardBody>
           </Card>
           <div>
-            {' '}
-            <OrderList onOrderClick={onOrderClick} />{' '}
+            <OrderList onOrderClick={onOrderClick} />
           </div>
         </div>
         {orderId && (

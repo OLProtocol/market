@@ -92,11 +92,14 @@ export const OrdxOrderList = ({
       });
       return;
     }
-    const res = await cancelOrder({ address, order_id: item.order_id });
+    const res = await cancelOrder({
+      address: address || storeAddress,
+      order_id: item.order_id,
+    });
     if (res.code === 200) {
       notification.success({
         message: t('notification.order_cancel_success_title'),
-        description: t('notinication.order_cancel_success_description_1'),
+        description: t('notification.order_cancel_success_description_1'),
       });
       const index = list.findIndex((i) => i.utxo === item.utxo);
       removeAt(index);

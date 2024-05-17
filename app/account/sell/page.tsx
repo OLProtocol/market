@@ -258,7 +258,7 @@ export default function SellPage() {
                       type="number"
                       placeholder="0.00"
                       value={list[i].unit_price}
-                      onChange={(e) => changePrice(item.utxo, e.target.value)}
+                      onValueChange={(e) => changePrice(item.utxo, e)}
                       onBlur={() => inputBlur(item.utxo)}
                     />
                   </TableCell>
