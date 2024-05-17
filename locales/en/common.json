@@ -5,6 +5,8 @@
   "file": "File",
   "block": "Block",
   "content": "Content",
+  "selfmint": "Self Mint",
+  "max": "Max",
   "rarity": "Rarity",
   "deploy_time": "Deploy Time",
   "deploy_height": "Deploy Height",

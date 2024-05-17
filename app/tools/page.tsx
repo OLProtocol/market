@@ -31,8 +31,8 @@ export default function ToolsPage() {
     {
       name: 'T',
       icon: '',
-      title: t('pages.tools.transaction.title'),
-      desc: t('pages.tools.transaction.description'),
+      title: t('pages.inscribe.title'),
+      desc: t('pages.inscribe.description'),
       path: '/inscribe',
       type: 'route',
       btnText: t('pages.tools.transaction.btn_split'),

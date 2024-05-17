@@ -74,6 +74,8 @@ export default function Inscribe() {
     sat: 0,
     rarity: '',
     mintRarity: '',
+    selfmint: '',
+    max: '',
     file: '',
     fileName: '',
     fileType: '',
@@ -108,10 +110,9 @@ export default function Inscribe() {
     setOrd2Data('type', data.type);
     setOrd2Data('tick', data.tick);
     setOrd2Data('utxos', data.utxos);
-    console.log(data.utxos);
     setOrd2Data('amount', data.amount);
-    setOrd2Data('file', data.file);
-    console.log(data.relateInscriptionId);
+    setOrd2Data('selfmint', data.selfmint);
+    setOrd2Data('max', data.max);
     setOrd2Data('relateInscriptionId', data.relateInscriptionId);
     setOrd2Data('fileName', data.fileName);
     setOrd2Data('fileType', data.fileType);
@@ -247,6 +248,8 @@ export default function Inscribe() {
             p: 'ordx',
             op: 'deploy',
             tick: ordxData.tick.toString().trim(),
+            max: !ordxData.max ? undefined : ordxData.max,
+            selfmint: !ordxData.selfmint ? undefined : `${ordxData.selfmint}%`,
             block: ordxData.blockChecked
               ? ordxData.block.toString()
               : undefined,
