@@ -36,7 +36,6 @@ export default function Inscribe() {
   //     isClosable: true,
   //   });
   // }, []);
-  console.log('hexstring:' + hexString('6f7264'));
   const { t } = useTranslation();
   const ordxUtxoRef = useRef<InscribeType>();
   const [step, setStep] = useState(1);
@@ -60,7 +59,7 @@ export default function Inscribe() {
     //   value: 'well4',
     // },
   ]);
-  const [ordxData, { set: setOrd2Data }] = useMap({
+  const [ordxData, { set: setOrd2Data }] = useMap<any>({
     type: 'mint',
     tick: '',
     amount: 1,
@@ -85,6 +84,7 @@ export default function Inscribe() {
     cnChecked: false,
     trzChecked: false,
     utxos: [],
+    isSpecial: false,
   });
   const [brc20Data, { set: setBrc20 }] = useMap({
     type: 'mint',
@@ -114,6 +114,8 @@ export default function Inscribe() {
     setOrd2Data('selfmint', data.selfmint);
     setOrd2Data('max', data.max);
     setOrd2Data('relateInscriptionId', data.relateInscriptionId);
+    setOrd2Data('isSpecial', data.isSpecial);
+    setOrd2Data('file', data.file);
     setOrd2Data('fileName', data.fileName);
     setOrd2Data('fileType', data.fileType);
     setOrd2Data('repeatMint', data.repeatMint);
@@ -175,6 +177,33 @@ export default function Inscribe() {
     setList(_files);
     setStep(2);
   };
+  const findSepiceAmt = () => {
+    const { utxos, amount } = ordxData;
+    const userAmt = amount || 0;
+    const realAmt = Math.max(userAmt, 546);
+    const findBetweenByValue = (userAmt: number, realAmt, ranges: any[]) => {
+      let outAmt = 0;
+      let outValue = 0;
+      let preTotalSize = 0;
+      for (let i = 0; i < ranges.length; i++) {
+        const range = ranges[i];
+        outValue += range.size;
+        if (userAmt > outValue) {
+          preTotalSize += range.size;
+        }
+        if (userAmt <= outValue) {
+          const dis = userAmt - preTotalSize;
+          outAmt = range.offset + dis;
+          break;
+        }
+      }
+      if (outAmt < realAmt) {
+        outAmt += realAmt - outAmt;
+      }
+      return outAmt;
+    };
+    return findBetweenByValue(userAmt, realAmt, ordxData.utxos[0].sats);
+  };
   const ordxNext = async () => {
     const list: any = [];
     if (ordxData.type === 'mint') {
@@ -202,35 +231,42 @@ export default function Inscribe() {
             }),
           ),
         ];
-        const seed = generateSeedByUtxos(ordxData.utxos, ordxData.amount);
-        // if (ordxData.relateInscriptionId) {
-        ordxValue = [
-          JSON.stringify(
-            removeObjectEmptyValue({
-              p: 'ordx',
-              op: 'mint',
-              tick: ordxData.tick.toString().trim(),
-              amt: ordxData.amount.toString(),
-              sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
-              desc: `seed=${seed}`,
-            }),
-          ),
-          {
-            type: 'relateInscriptionId',
-            name: 'relateInscriptionId',
-            value: ordxData.relateInscriptionId,
-          },
-        ];
-        // }
+        let amount = ordxData.amount;
+        if (ordxData.utxos.length && ordxData.isSpecial) {
+          amount = findSepiceAmt();
+        }
+        console.log(amount);
+        const seed = generateSeedByUtxos(ordxData.utxos, amount);
+        if (ordxData.relateInscriptionId) {
+          ordxValue = [
+            JSON.stringify(
+              removeObjectEmptyValue({
+                p: 'ordx',
+                op: 'mint',
+                tick: ordxData.tick.toString().trim(),
+                amt: ordxData.amount.toString(),
+                sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
+                desc: `seed=${seed}`,
+              }),
+            ),
+            {
+              type: 'relateInscriptionId',
+              name: 'relateInscriptionId',
+              value: ordxData.relateInscriptionId,
+            },
+          ];
+        }
         list.push({
           type: 'ordx',
           name: `mint_${i}`,
           ordxType: 'mint',
           utxos: ordxData.utxos,
+          isSpecial: ordxData.isSpecial,
           value: ordxValue,
         });
       }
     } else if (ordxData.type === 'deploy') {
+      console.log(ordxData);
       const attrArr: string[] = [];
       if (ordxData.rarityChecked && ordxData.rarity) {
         attrArr.push(`rar=${ordxData.rarity}`);

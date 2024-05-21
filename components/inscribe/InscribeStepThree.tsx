@@ -52,7 +52,7 @@ export const InscribeStepThree = ({
     } else if (type === 'brc100') {
       return 294;
     } else if (type === 'ordx' && list?.[0]?.op === 'mint') {
-      if (ordxUtxo) {
+      if (list?.[0]?.utxos?.length && list?.[0]?.isSpecial) {
         const userAmt = list?.[0]?.amt || 0;
         const realAmt = Math.max(userAmt, 546);
         const findBetweenByValue = (
@@ -80,7 +80,7 @@ export const InscribeStepThree = ({
           }
           return outAmt;
         };
-        return findBetweenByValue(userAmt, realAmt, ordxUtxo.sats);
+        return findBetweenByValue(userAmt, realAmt, list?.[0]?.utxos[0]?.sats);
       } else {
         return list?.[0]?.amt > 546 ? list?.[0]?.amt : 546;
       }
