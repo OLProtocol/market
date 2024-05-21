@@ -151,8 +151,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       console.error(error);
       notification.error({
-        message: 'Error',
-        description: error.message || JSON.stringify(error),
+        message: error.message || JSON.stringify(error),
       });
     }
   };
@@ -290,7 +289,7 @@ export const InscribingOrderModal = ({
 
       setLoading(false);
       changeStatus(orderId, 'inscribe_fail');
-      notification.success({
+      notification.error({
         message: 'Error',
         description: error.message || 'error',
       });

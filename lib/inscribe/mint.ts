@@ -658,9 +658,9 @@ export const sendBTC = async ({
     );
     avialableUtxos.push(...filterUtxos);
   }
-
-  if (!avialableUtxos.length) {
-    throw new Error(i18n.t('toast.insufficient_balance'));
+  const totalAviorable = sum(avialableUtxos, (f) => f.value);
+  if (!avialableUtxos.length || totalAviorable < filterTotalValue) {
+    throw new Error(i18n.t('notification.insufficient_balance'));
   }
 
   // if (hasOrdxUtxo) {
