@@ -55,7 +55,7 @@ export const InscribeOrdx = ({
   const { selectUtxosByAmount } = useUtxoStore();
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
-  const [data, { set }] = useMap({
+  const [data, { set }] = useMap<any>({
     type: 'mint',
     tick: '',
     amount: 1,
@@ -76,6 +76,7 @@ export const InscribeOrdx = ({
     rarityChecked: false,
     cnChecked: false,
     trzChecked: false,
+    isSpecial: false,
     des: '',
     mintRarity: '',
     sat: 0,
@@ -102,6 +103,7 @@ export const InscribeOrdx = ({
     const originFiles = fileList.map((f) => f.originFileObj);
     // onChange?.(originFiles);
     const file = originFiles[0];
+    console.log(file);
     if (file) {
       const b64 = (await encodeBase64(file as any)) as string;
       const base64 = b64.substring(b64.indexOf('base64,') + 7);
@@ -206,6 +208,7 @@ export const InscribeOrdx = ({
         inscriptionId,
       } = info.data || {};
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
+      set('isSpecial', isSpecial);
       let status = 'Completed';
       if (isSpecial) {
         status = 'Minting';
@@ -247,26 +250,33 @@ export const InscribeOrdx = ({
         }
         if (imgtype) {
           set('relateInscriptionId', inscriptionId);
-        }
-        if (!blur) {
-          const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
-          if (!utxos.length) {
-            console.log('缺少utxos');
-            return;
+
+          if (!blur && !isSpecial) {
+            const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
+            if (!utxos.length) {
+              console.log('缺少utxos');
+              return;
+            }
+            let utxosRanges = await Promise.all(
+              utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
+            );
+            utxosRanges = utxosRanges.map((v, i) => ({
+              ...v.data,
+              ...utxos[i],
+            }));
+            console.log(utxosRanges);
+            set('utxos', utxosRanges as any);
           }
-          let utxosRanges = await Promise.all(
-            utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
-          );
-          utxosRanges = utxosRanges.map((v, i) => ({ ...v.data, ...utxos[i] }));
-          console.log(utxosRanges);
-          set('utxos', utxosRanges as any);
         }
+        console.log('info', info);
+        console.log('iisSpecialnfo', isSpecial);
         if (blur) {
           set('amount', Number(limit));
           set('mintRarity', rarity);
         } else if (isSpecial) {
           setSpecialStatus(true);
-          const resp = await getOrdxUtxoByType(rarity, 1);
+          const resp = await getOrdxUtxoByType('customized', 1);
+          console.log('resp', resp);
           if (resp.code !== 0) {
             checkStatus = false;
             setErrorText(resp.msg);
@@ -375,7 +385,17 @@ export const InscribeOrdx = ({
     const satData = utxoList.filter((item) => item.utxo === utxo.utxo)[0];
     set('sat', satData?.sats?.[0].start);
     if (satData) {
-      onUtxoChange?.(satData);
+      // onUtxoChange?.(satData);
+      const utxo = satData.utxo;
+      const txid = utxo.split(':')[0];
+      const vout = Number(utxo.split(':')[1]);
+      set('utxos', [
+        {
+          ...satData,
+          txid,
+          vout,
+        },
+      ] as any[]);
       console.log('satData', satData);
       console.log('satData', data.amount);
       set('amount', satData.amount);
@@ -481,7 +501,7 @@ export const InscribeOrdx = ({
   // }, [state]);
   useEffect(() => {
     if (btcHeight) {
-      set('block_start', btcHeight);
+      set('block_start', btcHeight + network === 'testnet' ? 12 : 1010);
       set('block_end', btcHeight + 4320);
     }
   }, [btcHeight]);

@@ -92,10 +92,6 @@ export const selectAmountRangesByUtxos = (utxos: any[], amount) => {
       });
     }
   }
-  console.log('selectAmountRangesByUtxos');
-  console.log(utxos);
-  console.log(amount);
-  console.log(ranges);
   return ranges;
 };
 export const generateSeedByUtxos = (utxos: any[], amount) => {
@@ -106,12 +102,13 @@ export const generteFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
-    const { type, value, name, ordxType, utxos } = item;
+    const { type, value, name, ordxType, utxos, isSpecial } = item;
     const file: any = {
       type,
       name,
       originValue: value,
       ordxType,
+      isSpecial,
       utxos,
     };
     if (type === 'text') {
@@ -622,11 +619,12 @@ export const sendBTC = async ({
   ordxUtxo,
   utxos = [],
 }: SendBTCProps) => {
-  const hasOrdxUtxo = !!ordxUtxo;
+  const hasOrdxUtxo = !!utxos.length;
   let totalAmountUtxo = 0;
   if (utxos?.length) {
     totalAmountUtxo = sum(utxos, (f) => f.value);
   }
+  console.log('utxos', utxos);
   const {
     getUnspendUtxos,
     add: addUtxo,
@@ -642,7 +640,8 @@ export const sendBTC = async ({
   console.log(value);
   console.log(hasOrdxUtxo);
   const fee = (148 * (hasOrdxUtxo ? 2 : 1) + 34 * 2 + 10) * feeRate;
-  let filterTotalValue = hasOrdxUtxo ? 546 + fee : value + 546 + fee;
+  let filterTotalValue = value + 546 + fee;
+  console.log('filterTotalValue', filterTotalValue);
   if (totalAmountUtxo) {
     filterTotalValue = Math.max(filterTotalValue - totalAmountUtxo, 0);
   }
@@ -664,16 +663,16 @@ export const sendBTC = async ({
     throw new Error(i18n.t('toast.insufficient_balance'));
   }
 
-  if (hasOrdxUtxo) {
-    const { utxo, value } = ordxUtxo;
-    const ordxTxid = utxo.split(':')[0];
-    const ordxVout = utxo.split(':')[1];
-    avialableUtxos.unshift({
-      txid: ordxTxid,
-      vout: Number(ordxVout),
-      value: value,
-    });
-  }
+  // if (hasOrdxUtxo) {
+  //   const { utxo, value } = ordxUtxo;
+  //   const ordxTxid = utxo.split(':')[0];
+  //   const ordxVout = utxo.split(':')[1];
+  //   avialableUtxos.unshift({
+  //     txid: ordxTxid,
+  //     vout: Number(ordxVout),
+  //     value: value,
+  //   });
+  // }
   const toValue = value;
   const outputs = [
     {
@@ -681,6 +680,7 @@ export const sendBTC = async ({
       value: toValue,
     },
   ];
+  console.log('avialableUtxos', avialableUtxos);
   const psbt = await buildTransaction({
     utxos: avialableUtxos,
     outputs,
