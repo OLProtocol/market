@@ -18,7 +18,6 @@ export const BatchCart = ({
   networkFee,
   serviceFee,
 }: Props) => {
-  console.log(splitDummyBol);
   const { t } = useTranslation();
   const { list, remove } = useBuyStore();
   const totalPrice = useMemo(
@@ -79,7 +78,7 @@ export const BatchCart = ({
       <Divider className="my-2" />
       <div>
         <div className="flex justify-between items-center">
-          <span>network fee</span>
+          <span>{t('common.network_fee')}</span>
           {calcLoading ? (
             <Spinner size="sm" color="primary" />
           ) : (
@@ -87,7 +86,7 @@ export const BatchCart = ({
           )}
         </div>
         <div className="flex justify-between items-center">
-          <span>sercice fee</span>
+          <span>{t('common.service_fee')}</span>
           <span>{satsToBitcoin(serviceFee)} BTC</span>
         </div>
       </div>
