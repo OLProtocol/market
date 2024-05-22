@@ -23,7 +23,7 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
         <p>{t('pages.inscribe.text.single_des')}</p>
         <p>{t('pages.inscribe.text.bulk_des')}</p>
       </div>
-      <div className="mb-4 flex justify-center">
+      {/* <div className="mb-4 flex justify-center">
         <RadioGroup
           onValueChange={(e) => set('type', e)}
           value={data.type}
@@ -32,7 +32,7 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
           <Radio value="single">{t('pages.inscribe.text.single')}</Radio>
           <Radio value="bulk">{t('pages.inscribe.text.bulk')}</Radio>
         </RadioGroup>
-      </div>
+      </div> */}
       <div className="mb-2">
         <Textarea
           disableAutosize
