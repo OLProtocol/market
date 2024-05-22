@@ -6,8 +6,10 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Button,
+  Divider,
 } from '@nextui-org/react';
-import { Steps, Divider, Button, Tag, Progress, notification } from 'antd';
+import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { ordx } from '@/api';
@@ -42,10 +44,34 @@ export const InscribingOrderModal = ({
   const { t } = useTranslation();
   const [successPercent, setSuccessPercent] = useState(0);
   const steps = [
-    { title: t('pages.inscribe.pay.step_one.name') },
-    { title: t('pages.inscribe.pay.step_two.name') },
-    { title: t('pages.inscribe.pay.step_three.name') },
-    { title: t('pages.inscribe.pay.step_four.name') },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_one.name')}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_two.name')}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_three.name')}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_four.name')}
+        </div>
+      ),
+    },
   ];
   const { address: currentAccount, publicKey } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
@@ -365,7 +391,7 @@ export const InscribingOrderModal = ({
           <div>
             {activeStep > 0 && (
               <>
-                {/* <Divider children={'进度'} style={{ margin: '0 0' }} /> */}
+                <Divider />
                 <div>
                   <Progress percent={successPercent} status="active" />
                 </div>
@@ -378,7 +404,7 @@ export const InscribingOrderModal = ({
                   <WalletConnectBus>
                     <Button
                       color="primary"
-                      loading={loading}
+                      isLoading={loading}
                       onClick={payOrder}
                     >
                       {t('buttons.pay_wallet')}
@@ -407,7 +433,7 @@ export const InscribingOrderModal = ({
                 <div className="flex justify-center mt-4">
                   <Button
                     color="primary"
-                    loading={loading}
+                    isLoading={loading}
                     onClick={startInscribe}
                   >
                     {t('buttons.start_inscribe')}
@@ -431,8 +457,8 @@ export const InscribingOrderModal = ({
                 </div>
                 <div className="flex justify-center mt-4">
                   <Button
-                    type="primary"
-                    loading={loading}
+                    color="primary"
+                    isLoading={loading}
                     onClick={inscribeHandler}
                   >
                     {t('buttons.inscribe')}
@@ -474,9 +500,9 @@ export const InscribingOrderModal = ({
                 </div>
                 <div className="flex justify-center mt-4">
                   <Button
-                    type="primary"
-                    loading={loading}
-                    size="large"
+                    color="primary"
+                    isLoading={loading}
+                    size="lg"
                     onClick={closeHandler}
                   >
                     {t('buttons.close')}
@@ -495,7 +521,7 @@ export const InscribingOrderModal = ({
           />
 
           <>
-            {/* <Divider children={t('common.account')} /> */}
+            <Divider />
             <Card>
               <CardBody>
                 <CardHeader>Funding Account</CardHeader>
@@ -524,7 +550,7 @@ export const InscribingOrderModal = ({
               </CardBody>
             </Card>
           </>
-          {/* <Divider children={t('pages.inscribe.pay.files')} /> */}
+          <Divider />
           <div className="max-h-[20rem] overflow-y-auto">
             <div className="mb-2 flex-col gap-2">
               {order?.inscriptions?.map((item, index) => (

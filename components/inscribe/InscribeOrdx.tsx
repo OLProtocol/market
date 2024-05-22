@@ -319,11 +319,16 @@ export const InscribeOrdx = ({
     return checkStatus;
   };
   const tickChange = async (value: string) => {
-    const cleanValue = value.replace(/-/g, ''); // Remove all hyphens from the string
     setUtxoList([]);
+    set('tick', value.trim());
+  };
+  const ontickBlur = async () => {
+    const cleanValue = data.tick.replace(/[^\w\u4e00-\u9fa5]/g, '');
+    if (data.tick !== cleanValue) {
+      setUtxoList([]);
+    }
     set('tick', cleanValue);
   };
-
   const rarityChange = (value: string) => {
     set('rarity', value);
     if (value !== 'common' || !value) {
@@ -532,6 +537,9 @@ export const InscribeOrdx = ({
             className="flex-1"
             onChange={(e) => {
               tickChange(e.target.value);
+            }}
+            onBlur={() => {
+              ontickBlur();
             }}
             maxLength={32}
             type="text"
@@ -777,10 +785,10 @@ export const InscribeOrdx = ({
                     <p className="ant-upload-drag-icon">
                       <InboxOutlined />
                     </p>
-                    <p className="ant-upload-text">
+                    <p className="dark:text-white">
                       {t('pages.inscribe.files.upload_des_1')}
                     </p>
-                    <p className="ant-upload-hint">
+                    <p className="dark:text-white">
                       {t('pages.inscribe.files.upload_des_2')}
                     </p>
                   </Dragger>
