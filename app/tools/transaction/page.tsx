@@ -4,6 +4,7 @@ import {
   getOrdxSummary,
   getSats,
   getUtxoByValue,
+  addChargedTask,
 } from '@/api';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import {
@@ -476,14 +477,17 @@ export default function Transaction() {
         address: address,
         publicKey,
       });
-      await signAndPushPsbt(psbt);
+
+      const txid = await signAndPushPsbt(psbt);
+      const type = 'split_sats';
+      await addChargedTask({address, fee, txid, type}); // record fees charged
       setLoading(false);
       notification.error({
         message: t('notification.transaction_failed_title'),
         description: 'Split & Send success',
       });
     } catch (error: any) {
-      console.log('error = ', error);
+      console.log('error(transfer sats) = ', error);
       setLoading(false);
       notification.error({
         message: t('notification.transaction_failed_title'),

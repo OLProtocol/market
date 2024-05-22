@@ -175,8 +175,31 @@ export const bulkBuyOrder = async ({ address, order_ids, raw }: any) => {
   });
   return res;
 };
+
 export const getBTCPrice = async () => {
   const res = await request('/ordx/GetBTCPrice', {});
+  return res;
+};
+
+export const addChargedTask = async ({address, fee, txid, type}: any) => {
+  const res = await request('/ordx/AddChargedTask', {
+    method: 'POST',
+    data: {address, fees: fee, txid, type},
+  });
+  return res
+}
+
+export const getChargedTask = async (tx_id: string) => {
+  const res = await request('/ordx/getChargedTask', {
+    data: {tx_id}
+  });
+  return res;
+};
+
+export const getChargedTaskList = async ({address, offset, size, sort_field, sort_order}: any) => {
+  const res = await request('/ordx/getChargedTaskList', {
+    data: {address, offset, size, sort_field, sort_order}
+  });
   return res;
 };
 

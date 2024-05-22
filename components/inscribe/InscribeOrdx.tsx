@@ -103,7 +103,6 @@ export const InscribeOrdx = ({
     const originFiles = fileList.map((f) => f.originFileObj);
     // onChange?.(originFiles);
     const file = originFiles[0];
-    console.log(file);
     if (file) {
       const b64 = (await encodeBase64(file as any)) as string;
       const base64 = b64.substring(b64.indexOf('base64,') + 7);
@@ -268,8 +267,6 @@ export const InscribeOrdx = ({
             set('utxos', utxosRanges as any);
           }
         }
-        console.log('info', info);
-        console.log('iisSpecialnfo', isSpecial);
         if (blur) {
           set('amount', Number(limit));
           set('mintRarity', rarity);
@@ -329,6 +326,7 @@ export const InscribeOrdx = ({
     }
     set('tick', cleanValue);
   };
+
   const rarityChange = (value: string) => {
     set('rarity', value);
     if (value !== 'common' || !value) {
