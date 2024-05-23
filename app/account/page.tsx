@@ -6,6 +6,7 @@ import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { OrdxOrderList } from '@/components/account/OrdxOrderList';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
+import { OrdxBillList } from '@/components/account/OrdxBillList';
 
 export default function AccountPage() {
   const { t } = useTranslation();
@@ -33,6 +34,9 @@ export default function AccountPage() {
       </Tab>
       <Tab key="order" title={t('common.my_listings')}>
         <OrdxOrderList address={address} />
+      </Tab>
+      <Tab key="bill" title={t('common.my_biils')}>
+        <OrdxBillList address={address} />
       </Tab>
     </Tabs>
   );

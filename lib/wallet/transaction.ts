@@ -184,7 +184,7 @@ export class Transaction {
   async calNetworkFee() {
     const psbt = await this.createEstimatePsbt();
     const txSize = psbt.extractTransaction(true).virtualSize();
-    console.log(`txSize: ${txSize}`);
+    
     const fee = Math.ceil(txSize * this.feeRate);
     return fee;
   }
@@ -230,8 +230,7 @@ export class Transaction {
   toPsbt() {
     const network = toPsbtNetwork(this.networkType);
     const psbt = new bitcoin.Psbt({ network });
-    console.log(this.inputs);
-    console.log(this.outputs);
+    
     this.inputs.forEach((v, index) => {
       if (v.utxo.addressType === (AddressType as any).P2PKH) {
         //@ts-ignore

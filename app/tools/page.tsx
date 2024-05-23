@@ -1,6 +1,6 @@
 'use client';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { Card, CardBody, CardHeader, Avatar, Button } from '@nextui-org/react';
+import { Card, CardBody, CardHeader, Avatar, Button, CardFooter } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
@@ -47,8 +47,8 @@ export default function ToolsPage() {
   return (
     <div className="min-h-[10rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mt-4 mb-4">
       {tools.map((item, i) => (
-        <Card className="max-w-[340px]" key={i}>
-          <CardHeader className="justify-between">
+        <Card key={i}>
+          <CardHeader className="justify-between h-1/4">
             <div className="flex gap-5">
               <Avatar name={item.name} className="text-2xl" />
               <div className="flex flex-col gap-1 items-start justify-center">
@@ -64,6 +64,9 @@ export default function ToolsPage() {
                 {item.desc}
               </p>
             </div>
+
+          </CardBody>
+          <CardFooter className="px-3 py-0 text-small justify-center items-center h-1/4 pb-2">
             <WalletConnectBus className="mx-auto mt-1 block">
               <Button
                 className="inline-block  border-transparent h-7 tracking-[0.2em] text-small line-clamp-1 py-0 bg-primary-300 rounded-lg shadow-lg font-sans uppercase"
@@ -72,7 +75,7 @@ export default function ToolsPage() {
                 {item.btnText}
               </Button>
             </WalletConnectBus>
-          </CardBody>
+          </CardFooter>
         </Card>
       ))}
     </div>

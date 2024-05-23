@@ -624,7 +624,6 @@ export const sendBTC = async ({
   if (utxos?.length) {
     totalAmountUtxo = sum(utxos, (f) => f.value);
   }
-  console.log('utxos', utxos);
   const {
     getUnspendUtxos,
     add: addUtxo,
@@ -680,7 +679,6 @@ export const sendBTC = async ({
       value: toValue,
     },
   ];
-  console.log('avialableUtxos', avialableUtxos);
   const psbt = await buildTransaction({
     utxos: avialableUtxos,
     outputs,

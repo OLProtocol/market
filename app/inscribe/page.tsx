@@ -266,7 +266,6 @@ export default function Inscribe() {
         });
       }
     } else if (ordxData.type === 'deploy') {
-      console.log(ordxData);
       const attrArr: string[] = [];
       if (ordxData.rarityChecked && ordxData.rarity) {
         attrArr.push(`rar=${ordxData.rarity}`);
