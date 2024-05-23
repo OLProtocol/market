@@ -21,7 +21,7 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
     <div>
       <div className="mb-4 text-center">
         <p>{t('pages.inscribe.text.single_des')}</p>
-        <p>{t('pages.inscribe.text.bulk_des')}</p>
+        {/* <p>{t('pages.inscribe.text.bulk_des')}</p> */}
       </div>
       {/* <div className="mb-4 flex justify-center">
         <RadioGroup
