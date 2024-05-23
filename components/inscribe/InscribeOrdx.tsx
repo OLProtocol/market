@@ -57,6 +57,7 @@ export const InscribeOrdx = ({
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
   const [data, { set }] = useMap<any>({
     type: 'mint',
+    mode: 'fair',
     tick: '',
     amount: 1,
     limitPerMint: 10000,
@@ -308,6 +309,25 @@ export const InscribeOrdx = ({
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_3', { tick: data.tick }));
           return checkStatus;
+        } else {
+          if (data.mode === 'fair') {
+            if (!data.block_start || !data.block_end) {
+              checkStatus = false;
+              setErrorText('block必须设置');
+              return checkStatus;
+            }
+          } else if (data.mode === 'project') {
+            if (!data.max) {
+              checkStatus = false;
+              setErrorText('max必须设置');
+              return checkStatus;
+            }
+            // if (!data.selfmint) {
+            //   checkStatus = false;
+            //   setErrorText('max必须设置');
+            //   return checkStatus;
+            // }
+          }
         }
       }
     } catch (error) {
@@ -506,7 +526,7 @@ export const InscribeOrdx = ({
   // }, [state]);
   useEffect(() => {
     if (btcHeight) {
-      set('block_start', btcHeight + network === 'testnet' ? 12 : 1010);
+      set('block_start', btcHeight + network === 'testnet' ? 12 : 1110);
       set('block_end', btcHeight + 4320);
     }
   }, [btcHeight]);
@@ -528,7 +548,23 @@ export const InscribeOrdx = ({
       {errorText && (
         <div className="mb-2 text-xl text-center text-red-500">{errorText}</div>
       )}
-
+      {data.type === 'deploy' && (
+        <div className="flex items-center mb-4">
+          <div className="w-52">{t('pages.inscribe.ordx.deploy_mode')}</div>
+          <RadioGroup
+            orientation="horizontal"
+            onValueChange={(e) => set('mode', e)}
+            value={data.mode}
+          >
+            <Radio value="fair">
+              {t('pages.inscribe.ordx.deploy_mode_fair')}
+            </Radio>
+            <Radio value="project">
+              {t('pages.inscribe.ordx.deploy_mode_project')}
+            </Radio>
+          </RadioGroup>
+        </div>
+      )}
       <div className="mb-4">
         <div className="flex items-center mb-4">
           <div className="w-52">{t('common.tick')}</div>
@@ -546,8 +582,215 @@ export const InscribeOrdx = ({
             placeholder={t('pages.inscribe.ordx.tick_placeholder')}
           />
         </div>
-
-        {data.type !== 'deploy' && (
+        {data.type === 'deploy' && (
+          <>
+            <div className="flex items-center mb-4">
+              <div className="w-52">{t('common.max')}</div>
+              <Input
+                type="number"
+                className="flex-1"
+                value={data.max?.toString()}
+                isDisabled={tickLoading}
+                onChange={(e) => {
+                  set('max', e.target.value);
+                }}
+                min={0}
+              ></Input>
+            </div>
+            {data.mode === 'project' && (
+              <div className="flex items-center mb-4">
+                <div className="w-52">{t('common.selfmint')}</div>
+                <Input
+                  type="number"
+                  className="flex-1"
+                  value={data.selfmint?.toString()}
+                  isDisabled={tickLoading}
+                  onChange={(e) => {
+                    set('selfmint', e.target.value);
+                  }}
+                  endContent="%"
+                  max={100}
+                  min={0}
+                ></Input>
+              </div>
+            )}
+            <div className="mb-4">
+              <div className="flex items-center">
+                <div className="w-52">{t('common.block')}</div>
+                <div className="flex-1 flex items-center">
+                  <Checkbox
+                    isSelected={data.blockChecked}
+                    onChange={onBlockChecked}
+                  ></Checkbox>
+                  <div className="ml-2 flex-1 flex items-center">
+                    <Input
+                      type="number"
+                      value={data.block_start.toString()}
+                      className="flex-1"
+                      onBlur={onBlockBLur}
+                      isDisabled={!data.blockChecked}
+                      placeholder="Block start"
+                      onChange={(e) =>
+                        set(
+                          'block_start',
+                          isNaN(Number(e.target.value))
+                            ? 0
+                            : Number(e.target.value),
+                        )
+                      }
+                      min={1}
+                    ></Input>
+                    <Divider className="w-4 mx-4"></Divider>
+                    <Input
+                      type="number"
+                      value={data.block_end.toString()}
+                      isDisabled={!data.blockChecked}
+                      className="flex-1"
+                      onBlur={onBlockBLur}
+                      placeholder="Block End"
+                      onChange={(e) =>
+                        set(
+                          'block_end',
+                          isNaN(Number(e.target.value))
+                            ? 0
+                            : Number(e.target.value),
+                        )
+                      }
+                      min={1}
+                    ></Input>
+                  </div>
+                </div>
+              </div>
+              {time.start && time.end && (
+                <div className="ml-60 mb-2 text-xs text-gray-600">
+                  {t('pages.inscribe.ordx.block_helper', {
+                    start: time.start,
+                    end: time.end,
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">
+                {t('common.rarity')}
+                <Tooltip content={t('pages.inscribe.ordx.rarity_helper')}>
+                  <span className="text-blue-500">
+                    (sat
+                    <QuestionCircleOutlined />)
+                  </span>
+                </Tooltip>
+              </div>
+              <div className="flex-1 flex items-center">
+                <Checkbox
+                  isSelected={data.rarityChecked}
+                  onChange={onRarityChecked}
+                ></Checkbox>
+                <div className="ml-2 flex-1">
+                  <Select
+                    disabled={!data.rarityChecked}
+                    placeholder={t('common.select_option')}
+                    value={data.rarity}
+                    onChange={(e) => rarityChange(e.target.value)}
+                  >
+                    {satTypeList.map((item) => {
+                      return (
+                        <SelectItem value={item} key={item}>
+                          {item}
+                        </SelectItem>
+                      );
+                    })}
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">
+                {t('common.trz')}
+                <Tooltip content={t('pages.inscribe.ordx.trz_placeholder')}>
+                  <span className="text-blue-500">
+                    (sat
+                    <QuestionCircleOutlined />)
+                  </span>
+                </Tooltip>
+              </div>
+              <div className="flex-1 flex items-center">
+                <Checkbox
+                  isSelected={data.trzChecked}
+                  onChange={onTrzChecked}
+                ></Checkbox>
+                <div className="ml-2 flex-1">
+                  <Input
+                    type="number"
+                    value={data.trz.toString()}
+                    placeholder={t('pages.inscribe.ordx.trz_placeholder')}
+                    disabled={!data.trzChecked}
+                    onChange={(e) =>
+                      set(
+                        'trz',
+                        isNaN(Number(e.target.value))
+                          ? 0
+                          : Number(e.target.value),
+                      )
+                    }
+                    min={0}
+                  ></Input>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">{t('common.limit_per_mint')}</div>
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  value={data.limitPerMint.toString()}
+                  onChange={(e) =>
+                    set(
+                      'limitPerMint',
+                      isNaN(Number(e.target.value))
+                        ? 0
+                        : Number(e.target.value),
+                    )
+                  }
+                  min={1}
+                ></Input>
+              </div>
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">{t('common.description')}</div>
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  maxLength={128}
+                  value={data.des}
+                  onChange={(e) => set('des', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">{t('common.file')}</div>
+              <div className="flex-1">
+                <Dragger
+                  maxCount={1}
+                  onRemove={onFilesRemove}
+                  listType="picture"
+                  beforeUpload={() => false}
+                  onChange={filesChange}
+                >
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                  </p>
+                  <p className="dark:text-white">
+                    {t('pages.inscribe.files.upload_des_1')}
+                  </p>
+                  <p className="dark:text-white">
+                    {t('pages.inscribe.files.upload_des_2')}
+                  </p>
+                </Dragger>
+              </div>
+            </div>
+          </>
+        )}
+        {data.type == 'mint' && (
           <>
             <div className="flex items-center mb-4">
               <div className="w-52">{t('common.amount')}</div>
@@ -575,260 +818,40 @@ export const InscribeOrdx = ({
                 pagination={false}
               />
             )}
-          </>
-        )}
-
-        {data.type === 'deploy' && (
-          <>
-            <div className="flex items-center mb-4">
-              <div className="w-52">{t('common.block')}</div>
-              <div className="flex-1 flex items-center">
-                <Checkbox
-                  isSelected={data.blockChecked}
-                  onChange={onBlockChecked}
-                ></Checkbox>
-                <div className="ml-2 flex-1 flex items-center">
-                  <Input
-                    type="number"
-                    value={data.block_start.toString()}
-                    className="flex-1"
-                    onBlur={onBlockBLur}
-                    isDisabled={!data.blockChecked}
-                    placeholder="Block start"
-                    onChange={(e) =>
-                      set(
-                        'block_start',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Number(e.target.value),
-                      )
-                    }
-                    min={1}
-                  ></Input>
-                  <Divider className="w-4 mx-4"></Divider>
-                  <Input
-                    type="number"
-                    value={data.block_end.toString()}
-                    isDisabled={!data.blockChecked}
-                    className="flex-1"
-                    onBlur={onBlockBLur}
-                    placeholder="Block End"
-                    onChange={(e) =>
-                      set(
-                        'block_end',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Number(e.target.value),
-                      )
-                    }
-                    min={1}
-                  ></Input>
+            {tickChecked && !showSat && (
+              <div>
+                <div className="flex items-center mb-4">
+                  <div className="w-52">{t('common.repeat_mint')}</div>
+                  <div className="flex-1">
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        value={data.repeatMint.toString()}
+                        onChange={(e) =>
+                          set(
+                            'repeatMint',
+                            isNaN(Number(e.target.value))
+                              ? 0
+                              : Math.min(Number(e.target.value), 10),
+                          )
+                        }
+                        min={1}
+                        max={10}
+                      ></Input>
+                      <Slider
+                        step={1}
+                        maxValue={10}
+                        minValue={1}
+                        value={data.repeatMint}
+                        className="max-w-md"
+                        onChangeEnd={(e) => set('repeatMint', e[0])}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {time.start && time.end && (
-              <div className="ml-60 mb-2 text-xs text-gray-600">
-                {t('pages.inscribe.ordx.block_helper', {
-                  start: time.start,
-                  end: time.end,
-                })}
               </div>
             )}
-
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">
-                  {t('common.rarity')}
-                  <Tooltip content={t('pages.inscribe.ordx.rarity_helper')}>
-                    <span className="text-blue-500">
-                      (sat
-                      <QuestionCircleOutlined />)
-                    </span>
-                  </Tooltip>
-                </div>
-                <div className="flex-1 flex items-center">
-                  <Checkbox
-                    isSelected={data.rarityChecked}
-                    onChange={onRarityChecked}
-                  ></Checkbox>
-                  <div className="ml-2 flex-1">
-                    <Select
-                      disabled={!data.rarityChecked}
-                      placeholder={t('common.select_option')}
-                      value={data.rarity}
-                      onChange={(e) => rarityChange(e.target.value)}
-                    >
-                      {satTypeList.map((item) => {
-                        return (
-                          <SelectItem value={item} key={item}>
-                            {item}
-                          </SelectItem>
-                        );
-                      })}
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">
-                  {t('common.trz')}
-                  <Tooltip content={t('pages.inscribe.ordx.trz_placeholder')}>
-                    <span className="text-blue-500">
-                      (sat
-                      <QuestionCircleOutlined />)
-                    </span>
-                  </Tooltip>
-                </div>
-                <div className="flex-1 flex items-center">
-                  <Checkbox
-                    isSelected={data.trzChecked}
-                    onChange={onTrzChecked}
-                  ></Checkbox>
-                  <div className="ml-2 flex-1">
-                    <Input
-                      type="number"
-                      value={data.trz.toString()}
-                      placeholder={t('pages.inscribe.ordx.trz_placeholder')}
-                      disabled={!data.trzChecked}
-                      onChange={(e) =>
-                        set(
-                          'trz',
-                          isNaN(Number(e.target.value))
-                            ? 0
-                            : Number(e.target.value),
-                        )
-                      }
-                      min={0}
-                    ></Input>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">{t('common.limit_per_mint')}</div>
-                <div className="flex-1">
-                  <Input
-                    type="number"
-                    value={data.limitPerMint.toString()}
-                    onChange={(e) =>
-                      set(
-                        'limitPerMint',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Number(e.target.value),
-                      )
-                    }
-                    min={1}
-                  ></Input>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">{t('common.description')}</div>
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    maxLength={128}
-                    value={data.des}
-                    onChange={(e) => set('des', e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
           </>
-        )}
-        {data.type === 'deploy' && (
-          <>
-            <div className="flex items-center mb-4">
-              <div className="w-52">{t('common.selfmint')}</div>
-              <Input
-                type="number"
-                className="flex-1"
-                value={data.selfmint?.toString()}
-                isDisabled={tickLoading}
-                onChange={(e) => {
-                  set('selfmint', e.target.value);
-                }}
-                endContent="%"
-                max={100}
-                min={0}
-              ></Input>
-            </div>
-            <div className="flex items-center mb-4">
-              <div className="w-52">{t('common.max')}</div>
-              <Input
-                type="number"
-                className="flex-1"
-                value={data.max?.toString()}
-                isDisabled={tickLoading}
-                onChange={(e) => {
-                  set('max', e.target.value);
-                }}
-                min={0}
-              ></Input>
-            </div>
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">{t('common.file')}</div>
-                <div className="flex-1">
-                  <Dragger
-                    maxCount={1}
-                    onRemove={onFilesRemove}
-                    listType="picture"
-                    beforeUpload={() => false}
-                    onChange={filesChange}
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
-                    </p>
-                    <p className="dark:text-white">
-                      {t('pages.inscribe.files.upload_des_1')}
-                    </p>
-                    <p className="dark:text-white">
-                      {t('pages.inscribe.files.upload_des_2')}
-                    </p>
-                  </Dragger>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-        {data.type === 'mint' && tickChecked && !showSat && (
-          <div>
-            <div className="flex items-center mb-4">
-              <div className="w-52">{t('common.repeat_mint')}</div>
-              <div className="flex-1">
-                <div className="flex gap-2 items-center">
-                  <Input
-                    type="number"
-                    value={data.repeatMint.toString()}
-                    onChange={(e) =>
-                      set(
-                        'repeatMint',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Math.min(Number(e.target.value), 10),
-                      )
-                    }
-                    min={1}
-                    max={10}
-                  ></Input>
-                  <Slider
-                    step={1}
-                    maxValue={10}
-                    minValue={1}
-                    value={data.repeatMint}
-                    className="max-w-md"
-                    onChangeEnd={(e) => set('repeatMint', e[0])}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
         )}
       </div>
       <div className="w-60 mx-auto flex justify-center">
