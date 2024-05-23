@@ -63,15 +63,17 @@ export const BtcFeeRate = ({
       },
     ];
   }, [economyValue, normalValue, customValue, i18n.language]);
-  console.log(list);
+  
   useEffect(() => {
     setRecommendFee();
   }, [feeRateData]);
+  
   useEffect(() => {
     if (type === 'Custom') {
       onChange?.({ value: customValue, type: 'Custom' });
     }
   }, [customValue]);
+
   useEffect(() => {
     if (feeType === 'Custom' && value) {
       setCustomValue(value);
@@ -80,6 +82,7 @@ export const BtcFeeRate = ({
       setType(feeType);
     }
   }, [feeType, value]);
+
   return (
     <div>
       <div className="grid grid-cols-3 gap-3 mb-2">
