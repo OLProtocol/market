@@ -324,13 +324,13 @@ export const InscribeOrdx = ({
               return checkStatus;
             }
           }
-          if (data.cnChecked) {
-            if (data.cn < 1) {
-              checkStatus = false;
-              setErrorText(t('pages.inscribe.ordx.error_12'));
-              return checkStatus;
-            }
-          }
+          // if (data.cnChecked) {
+          //   if (data.cn < 1) {
+          //     checkStatus = false;
+          //     setErrorText(t('pages.inscribe.ordx.error_12'));
+          //     return checkStatus;
+          //   }
+          // }
           if (data.mode === 'fair') {
             if (!data.blockChecked || !data.rarityChecked || !data.cnChecked) {
               checkStatus = false;
@@ -623,7 +623,6 @@ export const InscribeOrdx = ({
                 type="number"
                 className="flex-1"
                 value={data.max?.toString()}
-                isDisabled={tickLoading}
                 onChange={(e) => {
                   set('max', e.target.value);
                 }}
@@ -637,9 +636,15 @@ export const InscribeOrdx = ({
                   type="number"
                   className="flex-1"
                   value={data.selfmint?.toString()}
-                  isDisabled={tickLoading}
                   onChange={(e) => {
-                    set('selfmint', e.target.value);
+                    let value: any = e.target.value;
+                    if (value) {
+                      value = value.replace('.', '');
+                      value = parseInt(value);
+                      value = Math.min(value, 100);
+                      value = Math.max(value, 0);
+                    }
+                    set('selfmint', value.toString());
                   }}
                   endContent="%"
                   max={100}
@@ -649,7 +654,16 @@ export const InscribeOrdx = ({
             )}
             <div className="mb-4">
               <div className="flex items-center mb-2">
-                <div className="w-52">{t('common.block')}</div>
+                <div className="w-52">
+                  {t('common.block')}{' '}
+                  <span className="text-xs">
+                    （
+                    {t('pages.inscribe.ordx.current_height', {
+                      height: btcHeight,
+                    })}
+                    ）
+                  </span>
+                </div>
                 <div className="flex-1 flex items-center">
                   <Checkbox
                     isSelected={data.blockChecked}
@@ -736,7 +750,7 @@ export const InscribeOrdx = ({
                 </div>
               </div>
             </div>
-            <div className="flex items-center  mb-4">
+            {/* <div className="flex items-center  mb-4">
               <div className="w-52">
                 {t('common.trz')}
                 <Tooltip content={t('pages.inscribe.ordx.trz_placeholder')}>
@@ -769,7 +783,7 @@ export const InscribeOrdx = ({
                   ></Input>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="flex items-center  mb-4">
               <div className="w-52">{t('common.limit_per_mint')}</div>
               <div className="flex-1">
@@ -800,7 +814,7 @@ export const InscribeOrdx = ({
               </div>
             </div>
             <div className="flex items-center  mb-4">
-              <div className="w-52">{t('common.file')}</div>
+              <div className="w-52">{t('pages.inscribe.ordx.deploy_file')}</div>
               <div className="flex-1">
                 <Dragger
                   maxCount={1}

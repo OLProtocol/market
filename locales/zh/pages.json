@@ -63,6 +63,8 @@
     },
     "ordx": {
       "name": "OrdX",
+      "current_height": "当前高度: {{height}}",
+      "deploy_file": "Ticker的显示资源文件",
       "deploy_mode": "Mode",
       "deploy_mode_fair": "公平发射",
       "deploy_mode_project": "项目主导",
