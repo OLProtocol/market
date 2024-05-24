@@ -83,7 +83,7 @@
       "error_10": "The starting height of the block must be less than the ending height",
       "error_11": "Rarity cannot be empty",
       "error_12": "Quantity cannot be empty",
-      "error_13": "Block, rarity, and quantity with zero tail must be set.",
+      "error_13": "Block, rarity, and Trailing Zeros must be set.",
       "error_14": "The Max must be set",
       "error_15": "The Block must be set",
       "rarity_helper": "Special sat attributes required for mint."
