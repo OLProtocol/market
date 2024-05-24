@@ -343,7 +343,6 @@ export const InscribeOrdx = ({
               setErrorText(t('pages.inscribe.ordx.error_14'));
               return checkStatus;
             }
-
             if (
               data.selfmint !== '100' &&
               !(data.block_start && data.block_end && data.blockChecked)

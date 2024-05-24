@@ -42,6 +42,11 @@
   "inscribe": {
     "title": "铭文",
     "description": "提供铭刻功能",
+    "name": {
+      "title": "名字服务",
+      "input_name": "名字",
+      "name_placeholder": "请输入您想要铭刻的名字"
+    },
     "files": {
       "name": "文件",
       "upload_title": "上传文件以开始",

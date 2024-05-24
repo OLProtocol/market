@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { InscribeOrdx } from '@/components/inscribe/InscribeOrdx';
 import { InscribeText } from '@/components/inscribe/InscribeText';
 import { InscribeFiles } from '@/components/inscribe/InscribeFiles';
+import { InscribeOrdxName } from '@/components/inscribe/InscribeOrdxName';
 import { InscribeStepTwo } from '@/components/inscribe/InscribeStepTwo';
 import { InscribeStepThree } from '@/components/inscribe/InscribeStepThree';
 import { useMap, useList } from 'react-use';
@@ -39,7 +40,7 @@ export default function Inscribe() {
   const { t } = useTranslation();
   const ordxUtxoRef = useRef<InscribeType>();
   const [step, setStep] = useState(1);
-  const [tab, setTab] = useState<any>('files');
+  const [tab, setTab] = useState<any>('ordx');
   const [files, setFiles] = useState<any[]>([]);
   const [orderId, setOrderId] = useState<string>();
   const [modalShow, setModalShow] = useState(false);
@@ -98,6 +99,10 @@ export default function Inscribe() {
     type: 'single',
     text: '',
   });
+  const [nameData, { set: setNameData, reset: resetName }] = useMap({
+    type: 'mint',
+    name: '',
+  });
   const brc20Change = (data: any) => {
     setBrc20('type', data.type);
     setBrc20('tick', data.tick);
@@ -105,6 +110,10 @@ export default function Inscribe() {
     setBrc20('repeatMint', data.repeatMint);
     setBrc20('limitPerMint', data.limitPerMint);
     setBrc20('totalSupply', data.totalSupply);
+  };
+  const ordxNameChange = (data: any) => {
+    setNameData('type', data.type);
+    setNameData('name', data.name);
   };
   const ordxChange = (data: any) => {
     setOrd2Data('type', data.type);
@@ -203,6 +212,23 @@ export default function Inscribe() {
       return outAmt;
     };
     return findBetweenByValue(userAmt, realAmt, ordxData.utxos[0].sats);
+  };
+  const ordxNameNext = async () => {
+    const list: any = [];
+    if (nameData.type === 'mint') {
+      list.push({
+        type: 'ordx_name',
+        name: `mint`,
+        value: JSON.stringify({
+          p: 'ordx',
+          op: 'reg',
+          name: nameData.name.toString().trim(),
+        }),
+      });
+    }
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(2);
   };
   const ordxNext = async () => {
     const list: any = [];
@@ -416,7 +442,7 @@ export default function Inscribe() {
     },
     {
       key: 'name',
-      label: 'Name',
+      label: t('pages.inscribe.name.title'),
     },
     {
       key: 'text',
@@ -470,6 +496,12 @@ export default function Inscribe() {
                       onChange={ordxChange}
                       onNext={ordxNext}
                       onUtxoChange={onOrdxUtxoChange}
+                    />
+                  )}
+                  {tab === 'name' && (
+                    <InscribeOrdxName
+                      onChange={ordxNameChange}
+                      onNext={ordxNameNext}
                     />
                   )}
                 </>
