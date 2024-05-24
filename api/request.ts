@@ -190,14 +190,36 @@ export const addChargedTask = async ({address, fee, txid, type}: any) => {
 }
 
 export const getChargedTask = async (tx_id: string) => {
-  const res = await request('/ordx/getChargedTask', {
+  const res = await request('/ordx/GetChargedTask', {
     data: {tx_id}
   });
   return res;
 };
 
 export const getChargedTaskList = async ({address, offset, size, sort_field, sort_order}: any) => {
-  const res = await request('/ordx/getChargedTaskList', {
+  const res = await request('/ordx/GetChargedTaskList', {
+    data: {address, offset, size, sort_field, sort_order}
+  });
+  return res;
+};
+
+export const addOrderTask = async ({address, fee, parameters, txid, type}: any) => {
+  const res = await request('/ordx/AddOrderTask', {
+    method: 'POST',
+    data: {address, fees: fee, parameters, txid, type},
+  });
+  return res
+}
+
+export const getOrderTask = async (tx_id: string) => {
+  const res = await request('/ordx/GetOrderTask', {
+    data: {tx_id}
+  });
+  return res;
+};
+
+export const getOrderTaskList = async ({address, offset, size, sort_field, sort_order}: any) => {
+  const res = await request('/ordx/GetOrderTaskList', {
     data: {address, offset, size, sort_field, sort_order}
   });
   return res;
