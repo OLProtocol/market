@@ -74,6 +74,13 @@
       "error_6": "{{tick}} has not started mint yet",
       "error_7": "{{tick}} has been minted",
       "error_8": "{{tick}} contains special sat and cannot be cast",
+      "error_9": "区块的最小高度小于{{block}}, 该ticker无效，不会被索引器索引",
+      "error_10": "区块的开始高度必须小于结束高度",
+      "error_11": "稀有度不能为空",
+      "error_12": "数量不能为空",
+      "error_13": "区块、稀有度、尾部为零的数量必须设置一项",
+      "error_14": "总量必须设置",
+      "error_15": "区块必须设置",
       "rarity_helper": "Special sat attributes required for mint."
     },
     "step_two": {
