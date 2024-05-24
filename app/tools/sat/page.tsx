@@ -1,26 +1,27 @@
 'use client';
 
-import { getSatsByAddress } from "@/api";
-import { Button, Card, CardBody, CardHeader, Divider, Input, Table, TableBody, TableColumn, TableHeader, Tooltip } from "@nextui-org/react";
+import { addOrderTask, getSatsByAddress } from "@/api";
+import { signAndPushPsbt } from "@/lib";
+import { useCommonStore } from "@/store";
+import { Button, Card, CardBody, CardHeader, Divider, Input, Switch, Table, TableBody, TableColumn, TableHeader } from "@nextui-org/react";
 import { notification } from "antd";
 import { useReactWalletStore } from "btc-connect/dist/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useList, useMap } from "react-use";
 
-
 export default function RareSats() {
     const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(false);
-    const { address: currentAccount, network } = useReactWalletStore((state) => state);
-    const [satList, { set: setSatList }] = useList<any>(
-        [],
-    );
-
+    const { feeRate } = useCommonStore((state) => state);
+    const { address: currentAccount, network, publicKey } = useReactWalletStore((state) => state);
+    const [utxoList, { set: setUtxoList }] = useList<any>([]);
     const [address, setAddress] = useState('');
     const [searchSatList, { set: setSearchSatList }] = useMap<any>({
         items: []
     });
+    const [selectGlobal, setSelectGlobal] = useState(false);
+    const serviceFee = 100000; // sats
 
     const addSat = () => {
         const newId = searchSatList.items.length + 1;
@@ -49,8 +50,48 @@ export default function RareSats() {
     }
 
     const doSearch = async () => {
+        if (selectGlobal) {
+            doSearchInGlobal();
+        } else {
+            doSearchByAddress();
+        }
+    }
+
+    const doSearchInGlobal = async () => {
         setLoading(true);
-        setSatList([]);
+        try {
+            const txid = '';
+            const parameters = {
+                sat_no: searchSatList.items[0].sat,
+            }
+            const type = 'search_rarity_sats';
+            const resp = await addOrderTask({ address, serviceFee, parameters, txid, type }); // 提交任务
+            setLoading(false);
+            if (resp.code !== 0) {
+                notification.error({
+                    message: t('notification.search_sats_title'),
+                    description: resp.msg || 'Search sats in global failed',
+                });
+            } else {
+                notification.success({
+                    message: t('notification.search_sats_title'),
+                    description: 'Split & Send success',
+                });
+            }
+
+        } catch (error: any) {
+            console.log('error(search sats) = ', error);
+            setLoading(false);
+            notification.error({
+                message: t('notification.search_sats_title'),
+                description: error.message || 'Search sats in global failed',
+            });
+        }
+    };
+
+    const doSearchByAddress = async () => {
+        setLoading(true);
+        setUtxoList([]);
         const res = await getSatsByAddress({
             address: address,
             sats: searchSatList.items.map(item => Number(item.sat)),
@@ -60,7 +101,7 @@ export default function RareSats() {
         if (res.code !== 0) {
             setLoading(false);
             notification.error({
-                message: t('notification.search_rare_sats_failed_title'),
+                message: t('notification.search_sats_title'),
                 description: res.msg,
             });
             return;
@@ -68,28 +109,32 @@ export default function RareSats() {
         if (res.data === null) {
             setLoading(false);
             notification.error({
-                message: t('notification.search_rare_sats_failed_title'),
+                message: t('notification.search_sats_title'),
                 description: 'No data',
             });
             return;
         }
         setLoading(false);
-        setSatList(res.data);
+        setUtxoList(res.data);
     };
+
+    const handleSelectAll = (flag) => {
+        console.log('flag = ', flag)
+        setSelectGlobal(flag);
+        setSearchSatList('items', [
+            {
+                id: 1,
+                sat: '',
+            },
+        ]);
+        setAddress('');
+    }
 
     useEffect(() => {
         setSearchSatList('items', [
             {
                 id: 1,
-                sat: '766947282572069',
-            },
-            {
-                id: 2,
-                sat: '623624999999999',
-            },
-            {
-                id: 3,
-                sat: '1832757499999999',
+                sat: '',
             },
         ]);
     }, [currentAccount]);
@@ -99,51 +144,54 @@ export default function RareSats() {
             <Card>
                 <CardBody>
                     {searchSatList.items.map((item, i) => (
-                        <div className="flex gap-2 pb-2" key={i}>
+                        <div className="flex w-full gap-2 pb-2" key={i}>
                             <Input
-                                width={'60%'}
+                                className='w-[90%]'
                                 value={item.sat}
                                 startContent={
-                                    <div className="pointer-events-none flex items-center w-3/12">
-                                        <span className="text-default-500 text-small">
+                                    <div className="pointer-events-none flex items-center w-[19%] bg-gray-500 justify-center h-full">
+                                        <span className="text-small txt-default-500">
                                             Sat
                                         </span>
                                     </div>
                                 }
                             />
-                            <Button radius="full" onClick={addSat}>
-                                +
-                            </Button>
-                            <Button radius="full" onClick={() => removeSat(item.id)}>
-                                -
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button radius="full" onClick={addSat}>
+                                    +
+                                </Button>
+                                <Button radius="full" onClick={() => removeSat(item.id)}>
+                                    -
+                                </Button>
+                            </div>
                         </div>
                     ))}
-
                     <Divider className="mt-4 mb-4" />
                     <div className="flex w-full">
                         <Input
-                            width={'60%'}
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
+                            isDisabled={selectGlobal}
                             startContent={
-                                <div className="pointer-events-none flex items-center w-3/12">
-                                    <span className="text-default-500 text-small">
+                                <div className="pointer-events-none flex items-center w-[16%] bg-gray-500 justify-center h-full">
+                                    <span className="text-small txt-default-500">
                                         BTC Address
                                     </span>
                                 </div>
                             }
                         />
-                        <Tooltip content="Fill the BTC address of the current account">
-                            <Button onClick={() => setAddress(currentAccount)}>
-                                +
-                            </Button>
-                        </Tooltip>
                     </div>
                     <Divider className="mt-4 mb-4" />
-                    <Button size='md' color="primary" variant="bordered" onKeyDown={handleKeyDown} isLoading={loading} onClick={doSearch}>
-                        Search
-                    </Button>
+                    <div className="flex gap-2 pb-2 justify-end">
+                        <Switch defaultSelected={selectGlobal} onValueChange={() => handleSelectAll(!selectGlobal)}>
+                            <p className="text-gray-400 font-thin">
+                                Search In Global(Fee: 100,000 Sats)
+                            </p>
+                        </Switch>
+                        <Button size='md' color="primary" onKeyDown={handleKeyDown} isLoading={loading} onClick={doSearch}>
+                            Search
+                        </Button>
+                    </div>
                 </CardBody>
             </Card>
             <Divider className="mt-4 mb-4" />
@@ -159,21 +207,21 @@ export default function RareSats() {
                         color="primary"
                         selectionMode="single">
                         <TableHeader>
-                            <TableColumn className="text-sm md:text-base">
+                            <TableColumn className="text-sm md:text-base font-thin">
                                 {t('pages.tools.search_sat.table_col1')}
                             </TableColumn>
-                            <TableColumn className="text-sm md:text-base">
+                            <TableColumn className="text-sm md:text-base font-thin">
                                 {t('pages.tools.search_sat.table_col2')}
                             </TableColumn>
-                            <TableColumn className="text-sm md:text-base">
+                            <TableColumn className="text-sm md:text-base font-thin">
                                 {t('pages.tools.search_sat.table_col3')}
                             </TableColumn>
-                            <TableColumn className="text-sm md:text-base">
+                            <TableColumn className="text-sm md:text-base font-thin">
                                 {t('pages.tools.search_sat.table_col4')}
                             </TableColumn>
                         </TableHeader>
                         <TableBody emptyContent={"No datas."}>
-                            {satList.map((item, i) => (
+                            {utxoList.map((item, i) => (
                                 <TableColumn
                                     key={i}
                                     className="text-sm md:text-base"
