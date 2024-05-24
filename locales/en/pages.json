@@ -63,6 +63,8 @@
     },
     "ordx": {
       "name": "OrdX",
+      "current_height": "Current Hieght: {{height}}",
+      "deploy_file": "Ticker display resource file",
       "deploy_mode": "Mode",
       "deploy_mode_fair": "Fair Launch",
       "deploy_mode_project": "Project-Led",
