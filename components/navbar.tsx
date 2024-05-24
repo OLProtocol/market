@@ -109,6 +109,11 @@ export const Navbar = () => {
         isActive: true,
       },
       {
+        label: t('pages.inscribe.title'),
+        href: '/inscribe',
+        isActive: true,
+      },
+      {
         label: t('pages.tools.title'),
         href: '/tools',
         isActive: false,

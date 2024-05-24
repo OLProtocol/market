@@ -36,7 +36,7 @@ export default function AccountPage() {
         <OrdxOrderList address={address} />
       </Tab>
       <Tab key="bill" title={t('common.my_biils')}>
-        <OrdxBillList address={address} />
+        <OrdxBillList />
       </Tab>
     </Tabs>
   );

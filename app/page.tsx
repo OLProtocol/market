@@ -49,7 +49,7 @@ export default function Home() {
     () =>
       getTopTickers({
         interval,
-        top_count: 20,
+        top_count: 200,
         top_name: '',
         sort_field: sortField,
         sort_order: sortOrder,

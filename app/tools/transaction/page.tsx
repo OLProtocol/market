@@ -22,10 +22,7 @@ import {
   CardFooter,
   CardHeader,
   Divider,
-  Image,
   Input,
-  Select,
-  SelectItem,
   Tooltip,
 } from '@nextui-org/react';
 import { notification } from 'antd';
@@ -265,7 +262,7 @@ export default function Transaction() {
 
     if (res.code !== 0) {
       notification.error({
-        message: t('notification.transaction_failed_title'),
+        message: t('notification.transaction_title'),
         description: res.msg,
       });
       return;
@@ -310,7 +307,7 @@ export default function Transaction() {
     });
     if (res.code !== 0) {
       notification.error({
-        message: t('notification.transaction_failed_title'),
+        message: t('notification.transaction_title'),
         description: res.msg,
       });
       return;
@@ -374,8 +371,8 @@ export default function Transaction() {
                   (obj) =>
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0],
+                    '-' +
+                    item.sats[0].satributes[0],
                 )
               ) {
                 // the type of rare sat already exists
@@ -383,8 +380,8 @@ export default function Transaction() {
                   if (
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0]
+                    '-' +
+                    item.sats[0].satributes[0]
                   ) {
                     return {
                       ticker: obj['ticker'],
@@ -460,7 +457,7 @@ export default function Transaction() {
       if (inTotal - outTotal - fee < 0) {
         setLoading(false);
         notification.error({
-          message: t('notification.transaction_failed_title'),
+          message: t('notification.transaction_title'),
           description: 'Not enough sats',
         });
         return;
@@ -480,17 +477,24 @@ export default function Transaction() {
 
       const txid = await signAndPushPsbt(psbt);
       const type = 'split_sats';
-      await addChargedTask({address, fee, txid, type}); // record fees charged
+      const resp = await addChargedTask({ address, fee, txid, type });
       setLoading(false);
-      notification.error({
-        message: t('notification.transaction_failed_title'),
-        description: 'Split & Send success',
-      });
+      if (resp.code !== 0) {
+        notification.error({
+          message: t('notification.transaction_title'),
+          description: resp.msg || 'Split & Send failed',
+        });
+      } else {
+        notification.success({
+          message: t('notification.transaction_title'),
+          description: 'Split & Send success',
+        });
+      }
     } catch (error: any) {
       console.log('error(transfer sats) = ', error);
       setLoading(false);
       notification.error({
-        message: t('notification.transaction_failed_title'),
+        message: t('notification.transaction_title'),
         description: error.message || 'Split & Send failed',
       });
     }
@@ -725,7 +729,6 @@ export default function Transaction() {
                     </div>
                   }
                 />
-
                 <ButtonGroup className={'w-[10%]'}>{/* 占位 */}</ButtonGroup>
               </div>
             </div>
@@ -735,7 +738,7 @@ export default function Transaction() {
         <CardFooter>
           <WalletConnectBus className="mx-auto mt-20 block">
             <Button color="primary" onClick={splitHandler} isLoading={loading}>
-            {t('pages.tools.transaction.btn_send')}
+              {t('pages.tools.transaction.btn_send')}
             </Button>
           </WalletConnectBus>
           <span className="text-gray-400 text-sm font-light pl-4">
