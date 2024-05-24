@@ -41,7 +41,6 @@
   },
   "inscribe": {
     "title": "铭文",
-    "description": "提供铭刻功能",
     "name": {
       "title": "名字服务",
       "input_name": "名字",

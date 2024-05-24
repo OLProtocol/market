@@ -25,15 +25,6 @@ export default function ToolsPage() {
       type: 'route',
       btnText: t('pages.tools.transaction.btn_split'),
     },
-    // {
-    //   name: 'I',
-    //   icon: '',
-    //   title: t('pages.inscribe.title'),
-    //   desc: t('pages.inscribe.description'),
-    //   path: '/inscribe',
-    //   type: 'route',
-    //   btnText: t('pages.tools.transaction.btn_split'),
-    // },
     {
       name: 'R',
       icon: '',
