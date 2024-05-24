@@ -411,16 +411,21 @@ export default function Inscribe() {
 
   const tabList = [
     {
-      key: 'files',
-      label: t('pages.inscribe.files.name'),
+      key: 'ordx',
+      label: 'Ticker',
+    },
+    {
+      key: 'name',
+      label: 'Name',
     },
     {
       key: 'text',
       label: t('pages.inscribe.text.name'),
     },
+
     {
-      key: 'ordx',
-      label: 'FT',
+      key: 'files',
+      label: t('pages.inscribe.files.name'),
     },
   ];
   // useEffect(() => {

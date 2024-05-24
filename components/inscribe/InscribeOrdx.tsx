@@ -67,7 +67,7 @@ export const InscribeOrdx = ({
     rarity: '',
     // cn: 0,
     trz: 0,
-    selfmint: '',
+    selfmint: '0',
     max: '',
     file: '',
     relateInscriptionId: '',
@@ -197,34 +197,30 @@ export const InscribeOrdx = ({
       const info = await getOrdXInfo(data.tick);
       setTickLoading(false);
 
-      const {
-        rarity,
-        trz,
-        cn,
-        startBlock,
-        endBlock,
-        limit,
-        imgtype,
-        inscriptionId,
-      } = info.data || {};
-      const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
-      set('isSpecial', isSpecial);
-      let status = 'Completed';
-      if (isSpecial) {
-        status = 'Minting';
-      } else if (
-        startBlock &&
-        endBlock &&
-        btcHeight <= endBlock &&
-        btcHeight >= startBlock
-      ) {
-        status = 'Minting';
-      } else if (btcHeight < startBlock) {
-        status = 'Pending';
-      } else {
-        status = 'Completed';
-      }
+      const { rarity, startBlock, endBlock, limit, imgtype, inscriptionId } =
+        info.data || {};
+
       if (data.type === 'mint') {
+        const isSpecial =
+          rarity !== 'unknow' && rarity !== 'common' && !!rarity;
+        if (data.isSpecial !== isSpecial) {
+          set('isSpecial', isSpecial);
+        }
+        let status = 'Completed';
+        if (isSpecial) {
+          status = 'Minting';
+        } else if (
+          startBlock &&
+          endBlock &&
+          btcHeight <= endBlock &&
+          btcHeight >= startBlock
+        ) {
+          status = 'Minting';
+        } else if (btcHeight < startBlock) {
+          status = 'Pending';
+        } else {
+          status = 'Completed';
+        }
         if (!info.data) {
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_4', { tick: data.tick }));
@@ -307,23 +303,55 @@ export const InscribeOrdx = ({
           setErrorText(t('pages.inscribe.ordx.error_3', { tick: data.tick }));
           return checkStatus;
         } else {
-          if (data.mode === 'fair') {
-            if (!data.block_start || !data.block_end) {
+          if (data.blockChecked) {
+            if (data.block_start < minBlockStart) {
               checkStatus = false;
-              setErrorText('block必须设置');
+              setErrorText(
+                t('pages.inscribe.ordx.error_9', { block: minBlockStart }),
+              );
+              return checkStatus;
+            }
+            if (data.block_start >= data.block_end) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_10'));
+              return checkStatus;
+            }
+          }
+          if (data.rarityChecked) {
+            if (!data.rarity) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_11'));
+              return checkStatus;
+            }
+          }
+          if (data.cnChecked) {
+            if (data.cn < 1) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_12'));
+              return checkStatus;
+            }
+          }
+          if (data.mode === 'fair') {
+            if (!data.blockChecked || !data.rarityChecked || !data.cnChecked) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_13'));
               return checkStatus;
             }
           } else if (data.mode === 'project') {
             if (!data.max) {
               checkStatus = false;
-              setErrorText('max必须设置');
+              setErrorText(t('pages.inscribe.ordx.error_14'));
               return checkStatus;
             }
-            // if (!data.selfmint) {
-            //   checkStatus = false;
-            //   setErrorText('max必须设置');
-            //   return checkStatus;
-            // }
+
+            if (
+              data.selfmint !== '100' &&
+              !(data.block_start && data.block_end && data.blockChecked)
+            ) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_15'));
+              return checkStatus;
+            }
           }
         }
       }
@@ -522,17 +550,25 @@ export const InscribeOrdx = ({
   //     set('mintRarity', item.rarity);
   //   }
   // }, [state]);
+  const minBlockStart = useMemo(() => {
+    return btcHeight + (network === 'testnet' ? 10 : 1010);
+  }, [btcHeight]);
   useEffect(() => {
     if (btcHeight) {
-      set('block_start', btcHeight + network === 'testnet' ? 12 : 1110);
+      console.log();
+      set('block_start', btcHeight + (network === 'testnet' ? 10 : 1010));
       set('block_end', btcHeight + 4320);
     }
   }, [btcHeight]);
   useEffect(() => {
+    console.log('data chagne');
+    if (data.type === 'deploy') {
+      setTickChecked(false);
+    }
     onChange?.(data);
   }, [data]);
   return (
-    <div>
+    <div className="p-4">
       <div className="mb-4 flex justify-center">
         <RadioGroup
           orientation="horizontal"
@@ -613,7 +649,7 @@ export const InscribeOrdx = ({
               </div>
             )}
             <div className="mb-4">
-              <div className="flex items-center">
+              <div className="flex items-center mb-2">
                 <div className="w-52">{t('common.block')}</div>
                 <div className="flex-1 flex items-center">
                   <Checkbox
@@ -636,7 +672,7 @@ export const InscribeOrdx = ({
                             : Number(e.target.value),
                         )
                       }
-                      min={1}
+                      min={minBlockStart}
                     ></Input>
                     <Divider className="w-4 mx-4"></Divider>
                     <Input
@@ -654,7 +690,7 @@ export const InscribeOrdx = ({
                             : Number(e.target.value),
                         )
                       }
-                      min={1}
+                      min={minBlockStart}
                     ></Input>
                   </div>
                 </div>
