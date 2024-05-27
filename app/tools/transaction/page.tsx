@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useList, useMap } from 'react-use';
 import { Select as AntSelect } from 'antd';
 
-export default function Transaction() {
+export default function TransferTool() {
   const { t, i18n } = useTranslation();
   const [fee, setFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
