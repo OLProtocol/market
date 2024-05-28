@@ -75,14 +75,22 @@ const WalletConnectButton = () => {
   const accountAndNetworkChange = async () => {
     console.log('accountAndNetworkChange');
     console.log('connected', connected);
+    const windowState =
+      document.visibilityState === 'visible' || !document.hidden;
     try {
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
         try {
-          const _s = await btcWallet?.signMessage(
-            process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-          );
-          if (_s) {
-            setSignature(_s);
+          console.log('checkSignature');
+          console.log(windowState);
+          if (windowState) {
+            const _s = await btcWallet?.signMessage(
+              process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+            );
+            if (_s) {
+              setSignature(_s);
+            }
+          } else {
+            handlerDisconnect();
           }
         } catch (error) {
           await handlerDisconnect();
