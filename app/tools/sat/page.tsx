@@ -1,6 +1,6 @@
 'use client';
 
-import { addOrderTask, getSatsByAddress } from "@/api";
+import { addOrderTask, getSatsByAddress, getUtxoByValue } from "@/api";
 import { signAndPushPsbt } from "@/lib";
 import { useCommonStore } from "@/store";
 import { Button, Card, CardBody, CardHeader, Divider, Input, Switch, Table, TableBody, TableColumn, TableHeader } from "@nextui-org/react";
@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useList, useMap } from "react-use";
 
-export default function RareSats() {
+export default function HuntSatTool() {
     const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(false);
     const { feeRate } = useCommonStore((state) => state);
@@ -117,6 +117,27 @@ export default function RareSats() {
         setLoading(false);
         setUtxoList(res.data);
     };
+
+    const getAvialableUtxos = async () => {
+        let data = await getUtxoByValue({
+          address: currentAccount,
+          value: 0,
+          network,
+        });
+        if (data.code !== 0) {
+          setLoading(false);
+          notification.error({
+            message: t('notification.search_sats_title'),
+            description: data.msg,
+        });
+          return;
+        }
+    
+        return {
+          ticker: t('pages.tools.transaction.available_utxo'),
+          utxos: data.data,
+        };
+      };
 
     const handleSelectAll = (flag) => {
         console.log('flag = ', flag)
