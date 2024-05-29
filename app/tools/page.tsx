@@ -38,7 +38,7 @@ export default function ToolsPage() {
   return (
     <div className="min-h-[10rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mt-4 mb-4">
       {tools.map((item, i) => (
-        <Card key={i}>
+        <Card key={i} className="mb-4 ml-4">
           <CardHeader className="justify-between h-1/4">
             <div className="flex gap-5">
               <Avatar name={item.name} className="text-2xl" />
@@ -50,7 +50,7 @@ export default function ToolsPage() {
             </div>
           </CardHeader>
           <CardBody className="px-3 py-0 text-small justify-center items-center">
-            <div className="flex flex-col gap-1 pt-0 items-start justify-center">
+            <div className="flex flex-col gap-1 pt-0 items-start justify-center h-30 md:h-20">
               <p className="text-gray-500 pb-4 tracking-[0.06em]">
                 {item.desc}
               </p>
@@ -60,7 +60,9 @@ export default function ToolsPage() {
           <CardFooter className="px-3 py-0 text-small justify-center items-center h-1/4 pb-2">
             <WalletConnectBus className="mx-auto mt-1 block">
               <Button
-                className="inline-block  border-transparent h-7 tracking-[0.2em] text-small line-clamp-1 py-0 bg-primary-300 rounded-lg shadow-lg font-sans uppercase"
+                //className="inline-block  border-transparent h-7 tracking-[0.2em] text-small line-clamp-1 py-0 bg-primary-300 rounded-lg shadow-lg font-sans uppercase"
+                className="text-tiny md:text-small tracking-[0.25em]  w-35 lg:w-60 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 
+                hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` "
                 onClick={() => clickHandler(item)}
               >
                 {item.btnText}
