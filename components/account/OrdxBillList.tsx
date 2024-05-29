@@ -12,18 +12,20 @@ import {
     getKeyValue,
     Select,
     SelectItem,
+    Tooltip,
 } from '@nextui-org/react';
 import { Pagination } from '@/components/Pagination';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useReactWalletStore } from 'btc-connect/dist/react';
+import { hideStr } from '@/lib';
 
 export const OrdxBillList = () => {
     const { t, i18n } = useTranslation();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const { address } = useReactWalletStore(
+    const { address, network } = useReactWalletStore(
         (state) => state,
     );
 
@@ -58,7 +60,7 @@ export const OrdxBillList = () => {
         });
 
         setLoading(false);
-        if (resp.code === 0) {
+        if (resp.code === 200) {
             tasks = resp.data.tasks;
         }
         setDataSource(tasks);
@@ -78,7 +80,7 @@ export const OrdxBillList = () => {
         });
 
         setLoading(false);
-        if (resp.code === 0) {
+        if (resp.code === 200) {
             tasks = resp.data.tasks;
         }
         setDataSource(tasks);
@@ -86,23 +88,22 @@ export const OrdxBillList = () => {
     };
 
     const toDetail = (e) => {
-        router.push(`/ordx/bill?tx_id=${e}`);
+        const item = dataSource.find((v: any) => v?.txid === e);
+        // if (item?.type === 'search_rarity_sats' && item?.status === 2){ // status=2为成功
+        if (item?.type === 'search_rarity_sats') {
+            router.push(`/tools/sat?txid=${e}`);
+        }
     };
 
     const columns = [
         {
+            key: 'txid',
+            label: 'Tx',
+            allowsSorting: true,
+        },
+        {
             key: 'fees',
             label: 'Fee',
-            allowsSorting: true,
-        },
-        {
-            key: 'status',
-            label: 'Status',
-            allowsSorting: true,
-        },
-        {
-            key: 'txId',
-            label: 'Tx',
             allowsSorting: true,
         },
         {
@@ -111,13 +112,18 @@ export const OrdxBillList = () => {
             allowsSorting: true,
         },
         {
-            key: 'createdAt',
+            key: 'created_at',
             label: 'Create Date',
             allowsSorting: true,
         },
         {
-            key: 'updatedAt',
+            key: 'updated_at',
             label: 'Update Date',
+            allowsSorting: true,
+        },
+        {
+            key: 'status',
+            label: 'Status',
             allowsSorting: true,
         },
     ];
@@ -157,19 +163,19 @@ export const OrdxBillList = () => {
                 onRowAction={toDetail}
                 bottomContent={
                     total > 1 ? (
-                      <div className="flex justify-center">
-                        <Pagination
-                          total={total}
-                          page={page}
-                          size={size}
-                          onChange={(offset, size) => {
-                            setPage(offset);
-                            // setSize(size);
-                          }}
-                        />
-                      </div>
+                        <div className="flex justify-center">
+                            <Pagination
+                                total={total}
+                                page={page}
+                                size={size}
+                                onChange={(offset, size) => {
+                                    setPage(offset);
+                                    // setSize(size);
+                                }}
+                            />
+                        </div>
                     ) : null
-                  }
+                }
             >
                 <TableHeader>
                     {columns.map((column) => (
@@ -194,11 +200,46 @@ export const OrdxBillList = () => {
                             className="cursor-pointer text-sm md:text-base"
                         >
                             {(columnKey) => {
-                                return (
-                                    <TableCell className="font-light text-sm md:text-base">
-                                        {getKeyValue(item, columnKey)}
-                                    </TableCell>
-                                );
+                                if (columnKey === 'txid') {
+                                    const txid = item.txid;
+                                    const href =
+                                        network === 'testnet'
+                                            ? `https://mempool.space/testnet/tx/${txid}`
+                                            : `https://mempool.space/tx/${txid}`;
+
+                                    return (
+                                        <TableCell className="font-light text-sm md:text-base">
+                                            <Tooltip content={txid}>
+                                                <a
+                                                    className="text-blue-500 cursor-pointer mr-2"
+                                                    href={href}
+                                                    target="_blank"
+                                                >
+                                                    {hideStr(txid)}
+                                                </a>
+                                            </Tooltip>
+                                            {/* <CopyButton text={t} tooltip="Copy Tick" /> */}
+                                        </TableCell>
+                                    );
+                                } else if (columnKey === 'created_at') {
+                                    return (
+                                        <TableCell className="font-light text-sm md:text-base">
+                                            {new Date(getKeyValue(item, columnKey)).toLocaleString('af')}
+                                        </TableCell>
+                                    );
+                                } else if (columnKey === 'updated_at') {
+                                    return (
+                                        <TableCell className="font-light text-sm md:text-base">
+                                            {new Date(getKeyValue(item, columnKey)).toLocaleString('af')}
+                                        </TableCell>
+                                    );
+                                } else {
+                                    return (
+                                        <TableCell className="font-light text-sm md:text-base">
+                                            {getKeyValue(item, columnKey)}
+                                        </TableCell>
+                                    );
+                                }
                             }}
                         </TableRow>
                     )}
