@@ -1,16 +1,22 @@
-import { useBuyStore } from '@/store';
+import { useBuyStore, useCommonStore } from '@/store';
 import { Divider, Spinner, Button } from '@nextui-org/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Decimal } from 'decimal.js';
 import { Icon } from '@iconify/react';
 import { satsToBitcoin } from '@/lib';
 import { useTranslation } from 'react-i18next';
+import { BtcFeeRate } from './fee/BtcFeeRate';
+import useSWR from 'swr';
+import { useReactWalletStore } from 'btc-connect/dist/react';
+import { fetchChainFeeRate } from '@/api';
+
 interface Props {
   splitDummyBol: boolean;
   calcLoading: boolean;
   networkFee: number;
   dummyNetworkFee?: number;
   serviceFee: number;
+  feeRate: any;
 }
 export const BatchCart = ({
   splitDummyBol,
@@ -19,7 +25,17 @@ export const BatchCart = ({
   serviceFee,
 }: Props) => {
   const { t } = useTranslation();
+  const { network } = useReactWalletStore((state) => state);
   const { list, remove } = useBuyStore();
+  const [fee, setFee] = useState({ value: 1, type: 'Normal' });
+
+  const { data: feeRateData, isLoading } = useSWR(
+    `fetchChainFeeRate-${network}`,
+    () => fetchChainFeeRate(network as any),
+  );
+
+  const { setFeeRate, feeRate } = useCommonStore((state) => state);
+
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
@@ -29,9 +45,16 @@ export const BatchCart = ({
       }, 0) || 0,
     [list],
   );
+
+  const feeChange = (fee: any) => {
+    setFee(fee);
+    setFeeRate(fee);
+  };
+
   const removeHandler = (u: string) => {
     remove(u);
   };
+
   return (
     <div className="fixed max-w-screen w-96 bottom-20 right-0 bg-gray-100 dark:bg-slate-900 rounded-t-lg px-4 z-10">
       <div className="h-10 flex items-center justify-between font-bold">
@@ -77,6 +100,14 @@ export const BatchCart = ({
       )}
       <Divider className="my-2" />
       <div>
+        <div>
+          <BtcFeeRate
+            onChange={feeChange}
+            value={feeRate.value}
+            feeType={feeRate.type}
+            feeRateData={feeRateData}
+          />
+        </div>
         <div className="flex justify-between items-center">
           <span>{t('common.network_fee')}</span>
           {calcLoading ? (

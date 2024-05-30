@@ -211,14 +211,14 @@ export const getChargedTaskList = async ({
 
 export const addOrderTask = async ({
   address,
-  fee,
+  fees,
   parameters,
   txid,
   type,
 }: any) => {
   const res = await request('/ordx/AddOrderTask', {
     method: 'POST',
-    data: { address, fees: fee, parameters, txid, type },
+    data: { address, fees, parameters, txid, type },
   });
   return res;
 };
@@ -226,6 +226,18 @@ export const addOrderTask = async ({
 export const getOrderTask = async (tx_id: string) => {
   const res = await request('/ordx/GetOrderTask', {
     data: { tx_id },
+  });
+  return res;
+};
+
+export const getLastOrderTaskByParameters = async ({
+  address,
+  parameters,
+  type,
+}: any) => {
+  const res = await request('/ordx/GetLastOrderTaskByParameters', {
+    method: 'POST',
+    data: { address, parameters, type },
   });
   return res;
 };
