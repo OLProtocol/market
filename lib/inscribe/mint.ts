@@ -24,7 +24,6 @@ import {
 } from './index';
 import { useUtxoStore } from '@/store';
 import { getUtxoByValue, pushBTCpmt } from '@/api';
-import { addresToScriptPublicKey } from '@/lib/utils';
 interface FileItem {
   mimetype: string;
   show: string;

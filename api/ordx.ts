@@ -54,6 +54,16 @@ const exoticUtxo = async ({ utxo, network }: any) => {
   );
   return data;
 };
+const getNsListByAddress = async ({ address, network }: any) => {
+  const { data } = await axios.get(
+    // generateUrl(`v1/indexer/ordx/${tick}/info`, network),
+    generateUrl(`/ns/address/${address}`, network),
+    {
+      timeout: 10000,
+    },
+  );
+  return data;
+};
 
 const getOrdxSummary = async ({ address, network }: any) => {
   const { data } = await axios.get(
@@ -275,4 +285,5 @@ export const ordx = {
   getUtxo,
   pollGetTxStatus,
   exoticUtxo,
+  getNsListByAddress,
 };

@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { notification, Empty } from 'antd';
-import { getOrdxAssets, cancelOrder } from '@/api';
+import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSellStore } from '@/store';
@@ -18,7 +19,7 @@ import { Decimal } from 'decimal.js';
 export const OrdxUtxoList = () => {
   const router = useRouter();
   const [ticker, setTicker] = useState<string>('');
-  const { address } = useReactWalletStore((state) => state);
+  const { address, network } = useReactWalletStore((state) => state);
   const {
     add: addSell,
     changeTicker,
@@ -34,12 +35,23 @@ export const OrdxUtxoList = () => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
   }, [address, page, size, ticker]);
 
-  const { data, isLoading, mutate } = useSWR(
-    swrKey,
-    () => getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
-    {
-      revalidateOnMount: true,
-    },
+  const {
+    data,
+    isMutating: isLoading,
+    trigger,
+  } = useSWRMutation(swrKey, () =>
+    getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
+  );
+  const swrNsKey = useMemo(() => {
+    return `/ordx/getNsListByAddress-${address}-${network}`;
+  }, [address, network]);
+
+  const {
+    data: nsData,
+    isMutating: isNsLoading,
+    trigger: getNsList,
+  } = useSWRMutation(swrNsKey, () =>
+    ordx.getNsListByAddress({ address, network }),
   );
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
@@ -113,8 +125,12 @@ export const OrdxUtxoList = () => {
     if (ticker === t) {
       return;
     }
-    setTicker(t);
-    reset();
+    if (ticker === 'Name') {
+    } else {
+      setTicker(t);
+      reset();
+    }
+
     resetList();
     setCanSelect(false);
     setPage(1);
@@ -123,6 +139,14 @@ export const OrdxUtxoList = () => {
   useEffect(() => {
     reset();
   }, []);
+  useEffect(() => {
+    if (ticker && ticker !== 'Name') {
+      trigger();
+    } else if (ticker && ticker === 'Name') {
+      console.log('ticker', ticker);
+      getNsList();
+    }
+  }, [ticker]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <div>

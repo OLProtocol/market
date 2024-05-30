@@ -32,7 +32,10 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     },
   );
 
-  const list = useMemo(() => data?.data || [], [data]);
+  const list = useMemo(
+    () => [{ ticker: 'Name' }, ...(data?.data || [])] || [{ ticker: 'Name' }],
+    [data],
+  );
   useEffect(() => {
     if (list.length > 0) {
       onChange?.(list[0].ticker);
