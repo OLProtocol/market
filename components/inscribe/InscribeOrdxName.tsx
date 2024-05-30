@@ -23,7 +23,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   return (
     <div>
       <div className="mb-4 text-center">
-        <p>{t('pages.inscribe.text.single_des')}</p>
+        <p>{t('pages.inscribe.name.name_placeholder')}</p>
         {/* <p>{t('pages.inscribe.text.bulk_des')}</p> */}
       </div>
       <RadioGroup

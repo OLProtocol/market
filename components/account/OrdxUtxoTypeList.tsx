@@ -65,7 +65,10 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
         onSelectionChange={changeHandler}
       >
         {list?.map((item: any) => (
-          <Tab key={item.ticker} title={`${item.ticker}(${item.balance})`} />
+          <Tab
+            key={item.ticker}
+            title={`${item.ticker}${!!item.balance ? `(${item.balance})` : ''}`}
+          />
         ))}
       </Tabs>
     </div>
