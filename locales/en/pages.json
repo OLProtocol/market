@@ -44,7 +44,7 @@
     "name": {
       "title": "Name",
       "input_name": "Name",
-      "name_placeholder": "Give your inscription a name"
+      "name_placeholder": "Register a name on BTC"
     },
     "files": {
       "name": "Files",
