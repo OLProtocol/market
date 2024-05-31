@@ -44,7 +44,9 @@
     "name": {
       "title": "名字服务",
       "input_name": "名字",
-      "name_placeholder": "在BTC上注册一个名字"
+      "name_placeholder": "在BTC上注册一个名字",
+      "error_1": "名字必须是3、5-16字节长",
+      "error_2": "{{name}} 已被铸造"
     },
     "files": {
       "name": "文件",
@@ -72,7 +74,7 @@
       "cn_placeholder": "如cn=1000，1000个连续编号的sat",
       "trz_placeholder": "如trz=8，说明该sat的编号的尾部有8个零",
       "block_helper": "铸造的有效时间大致为{{start}}至{{end}}。",
-      "error_1": "Tick必必须是3、5-16字节长",
+      "error_1": "Tick必须是3、5-16字节长",
       "error_2": "部署必须有区块、稀有度或正则表达式",
       "error_3": "{{tick}} 已被部署",
       "error_4": "{{tick}} 未被部署",

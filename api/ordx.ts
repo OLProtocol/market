@@ -221,7 +221,10 @@ const getUtxo = async ({ utxo, network }: any) => {
   const { data } = await axios.get(generateUrl(`utxo/assets/${utxo}`, network));
   return data;
 };
-
+export const getNsName = async ({ name, network }: any) => {
+  const { data } = await axios.get(generateUrl(`ns/name/${name}`, network));
+  return data;
+};
 async function pollGetTxStatus(
   txid: string,
   network: string,
@@ -286,4 +289,5 @@ export const ordx = {
   pollGetTxStatus,
   exoticUtxo,
   getNsListByAddress,
+  getNsName,
 };
