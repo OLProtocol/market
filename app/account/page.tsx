@@ -14,11 +14,7 @@ import { OrdxUtxoList } from '@/components/account/OrdxUtxoList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { OrdxOrderList } from '@/components/account/OrdxOrderList';
 import { notification } from 'antd';
-import {
-  getAddressOrdxList,
-  getTickerSummary,
-  getNsListByAddress,
-} from '@/api';
+import { getAddressOrdxList } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
