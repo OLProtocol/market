@@ -78,6 +78,7 @@ const WalletConnectButton = () => {
     const windowState =
       document.visibilityState === 'visible' || !document.hidden;
     try {
+      await check();
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
         try {
           console.log('checkSignature');
@@ -96,7 +97,6 @@ const WalletConnectButton = () => {
           await handlerDisconnect();
         }
       }
-      await check();
     } catch (error) {
       console.log(error);
     }
