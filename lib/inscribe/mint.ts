@@ -123,7 +123,12 @@ export const generteFiles = async (list: any[]) => {
       file.sha256 = '';
     } else if (type === 'ordx_name') {
       file.mimetype = 'text/plain;charset=utf-8';
-      file.show = value;
+      try {
+        const parseData = JSON.parse(value);
+        file.show = parseData.name || value;
+      } catch (error) {
+        file.show = value;
+      }
       file.hex = textToHex(value);
       file.sha256 = '';
     } else if (type === 'ordx') {

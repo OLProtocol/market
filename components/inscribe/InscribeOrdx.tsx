@@ -27,7 +27,6 @@ import {
   generateSeedByUtxos,
   serializeInscriptionId,
 } from '@/lib/inscribe';
-import { merge } from 'radash';
 import { useTranslation } from 'react-i18next';
 import { ordx, ordxSWR } from '@/api';
 import { useUtxoStore } from '@/store';

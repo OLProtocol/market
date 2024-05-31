@@ -14,7 +14,7 @@ import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { ordx } from '@/api';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { useOrderStore, OrderItemType } from '@/store';
+import { useOrderStore, OrderItemType, useCommonStore } from '@/store';
 import {
   inscribe,
   pushCommitTx,
@@ -42,6 +42,7 @@ export const InscribingOrderModal = ({
   onFinished,
 }: InscribingOrderMdaolProps) => {
   const { t } = useTranslation();
+  const { feeRate } = useCommonStore();
   const [successPercent, setSuccessPercent] = useState(0);
   const steps = [
     {
@@ -512,12 +513,12 @@ export const InscribingOrderModal = ({
             )}
           </div>
           <FeeShow
-            feeRate={order?.feeRate}
-            inscriptionSize={order?.inscriptionSize}
+            feeRate={feeRate.value}
+            // inscriptionSize={order?.inscriptionSize}
             serviceFee={order?.fee.serviceFee}
-            filesLength={order?.inscriptions.length}
+            // filesLength={order?.inscriptions.length}
             totalFee={order?.fee.totalFee}
-            networkFee={order?.fee.networkFee}
+            // networkFee={order?.fee.networkFee}
           />
 
           <>
