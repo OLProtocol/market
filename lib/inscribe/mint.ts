@@ -640,9 +640,8 @@ export const sendBTC = async ({
   if (!unspendUtxos.length) {
     throw new Error(i18n.t('toast.insufficient_balance'));
   }
-  console.log(value);
-  console.log(hasOrdxUtxo);
-  const fee = (148 * (hasOrdxUtxo ? 2 : 1) + 34 * 2 + 10) * feeRate;
+
+  const fee = (168 * 10 + 34 * 2 + 10) * feeRate;
   let filterTotalValue = value + 546 + fee;
   console.log('filterTotalValue', filterTotalValue);
   if (totalAmountUtxo) {
@@ -661,21 +660,11 @@ export const sendBTC = async ({
     );
     avialableUtxos.push(...filterUtxos);
   }
-  const totalAviorable = sum(avialableUtxos, (f) => f.value);
-  if (!avialableUtxos.length || totalAviorable < filterTotalValue) {
+  const totalAvialable = sum(avialableUtxos, (f) => f.value);
+  if (!avialableUtxos.length || totalAvialable < filterTotalValue) {
     throw new Error(i18n.t('notification.insufficient_balance'));
   }
 
-  // if (hasOrdxUtxo) {
-  //   const { utxo, value } = ordxUtxo;
-  //   const ordxTxid = utxo.split(':')[0];
-  //   const ordxVout = utxo.split(':')[1];
-  //   avialableUtxos.unshift({
-  //     txid: ordxTxid,
-  //     vout: Number(ordxVout),
-  //     value: value,
-  //   });
-  // }
   const toValue = value;
   const outputs = [
     {
@@ -691,7 +680,7 @@ export const sendBTC = async ({
     address: fromAddress,
     publicKey: fromPubKey,
   });
-  console.log(psbt);
+
   const txId = await signAndPushPsbt(psbt);
   if (psbt.txOutputs.length > 1) {
     addUtxo({
