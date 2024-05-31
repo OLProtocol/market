@@ -219,11 +219,7 @@ export default function Inscribe() {
       list.push({
         type: 'ordx_name',
         name: `mint`,
-        value: JSON.stringify({
-          p: 'ordx',
-          op: 'reg',
-          name: nameData.name.toString().trim(),
-        }),
+        value: nameData.name.toString().trim(),
       });
     }
     const _files = await generteFiles(list);
@@ -261,7 +257,6 @@ export default function Inscribe() {
         if (ordxData.utxos.length && ordxData.isSpecial) {
           amount = findSepiceAmt();
         }
-        console.log(amount);
         const seed = generateSeedByUtxos(ordxData.utxos, amount);
         if (ordxData.relateInscriptionId) {
           ordxValue = [
