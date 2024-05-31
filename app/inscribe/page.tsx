@@ -310,7 +310,10 @@ export default function Inscribe() {
             op: 'deploy',
             tick: ordxData.tick.toString().trim(),
             max: !ordxData.max ? undefined : ordxData.max,
-            selfmint: !ordxData.selfmint ? undefined : `${ordxData.selfmint}%`,
+            selfmint:
+              !ordxData.selfmint || ordxData.selfmint === '0'
+                ? undefined
+                : `${ordxData.selfmint}%`,
             block: ordxData.blockChecked
               ? ordxData.block.toString()
               : undefined,
