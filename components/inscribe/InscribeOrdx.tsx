@@ -331,8 +331,16 @@ export const InscribeOrdx = ({
           //     return checkStatus;
           //   }
           // }
+          console.log(data.max, data.limitPerMint);
+          if (data.max && data.max < data.limitPerMint) {
+            checkStatus = false;
+            setErrorText(t('pages.inscribe.ordx.error_16'));
+            return checkStatus;
+          }
           if (data.mode === 'fair') {
-            if (!data.blockChecked || !data.rarityChecked || !data.cnChecked) {
+            console.log(data.blockChecked);
+            console.log(data.rarityChecked);
+            if (!(data.blockChecked || data.rarityChecked)) {
               checkStatus = false;
               setErrorText(t('pages.inscribe.ordx.error_13'));
               return checkStatus;
