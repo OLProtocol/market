@@ -60,8 +60,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   return (
     <div>
       <div className="mb-4 text-center">
-        <p>{t('pages.inscribe.name.name_placeholder')}</p>
-        {/* <p>{t('pages.inscribe.text.bulk_des')}</p> */}
+        <p>{t('pages.inscribe.name.description')}</p>
       </div>
       <RadioGroup
         orientation="horizontal"
@@ -87,7 +86,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             }}
             maxLength={32}
             type="text"
-            placeholder={t('pages.inscribe.ordx.tick_placeholder')}
+            placeholder={t('pages.inscribe.name.name_placeholder')}
           />
         </div>
       </div>
