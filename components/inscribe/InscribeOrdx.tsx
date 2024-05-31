@@ -375,6 +375,7 @@ export const InscribeOrdx = ({
     set('tick', value.trim());
   };
   const ontickBlur = async () => {
+    await checkTick(true);
     const cleanValue = data.tick.replace(/[^\w\u4e00-\u9fa5]/g, '');
     if (data.tick !== cleanValue) {
       setUtxoList([]);
