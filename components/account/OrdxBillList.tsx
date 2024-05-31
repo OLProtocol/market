@@ -86,7 +86,7 @@ export const OrdxBillList = () => {
   };
 
   const toDetail = (e) => {
-    const item = dataSource.find((v: any) => v?.txid === e);
+    const item: any = dataSource.find((v: any) => v?.txid === e);
     // if (item?.type === 'search_rarity_sats' && item?.status === 2){ // status=2为成功
     if (item?.type === 'search_rarity_sats') {
       router.push(`/tools/sat?txid=${e}`);
