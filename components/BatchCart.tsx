@@ -16,7 +16,6 @@ interface Props {
   networkFee: number;
   dummyNetworkFee?: number;
   serviceFee: number;
-  feeRate: any;
 }
 export const BatchCart = ({
   splitDummyBol,
