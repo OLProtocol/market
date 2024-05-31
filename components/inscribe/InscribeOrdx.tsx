@@ -675,6 +675,7 @@ export const InscribeOrdx = ({
                 </div>
                 <div className="flex-1 flex items-center">
                   <Checkbox
+                    isDisabled={data.mode === 'fair'}
                     isSelected={data.blockChecked}
                     onChange={onBlockChecked}
                   ></Checkbox>
