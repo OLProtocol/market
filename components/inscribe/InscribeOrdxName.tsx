@@ -1,5 +1,11 @@
-import { Radio, RadioGroup, Input, Button } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
+import {
+  Select,
+  SelectItem,
+  RadioGroup,
+  Input,
+  Button,
+} from '@nextui-org/react';
+import { useEffect, useState, useMemo } from 'react';
 import { useMap } from 'react-use';
 import { ordx } from '@/api';
 import { tryit } from 'radash';
@@ -20,6 +26,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   const [data, { set }] = useMap({
     type: 'mint',
     name: '',
+    suffix: '',
   });
   const checkName = async () => {
     let checkStatus = true;
@@ -43,6 +50,17 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     }
     return checkStatus;
   };
+  const nameSuffixs = [
+    { label: '', key: '.ordx' },
+    { label: '.x', key: '.x' },
+    { label: '.btc', key: '.btc' },
+    { label: '.sats', key: '.sats' },
+    { label: '.pizza', key: '.pizza' },
+  ];
+  const selectedKeys = useMemo(
+    () => (data.suffix ? [data.suffix] : []),
+    [data.suffix],
+  );
   const nextHanlder = async () => {
     const status = await checkName();
     if (status) {
@@ -50,7 +68,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     }
   };
   const nameChange = (name: string) => {
-    set('name', name);
+    set('name', name?.replace('.', '').trim());
   };
   useEffect(() => {
     setChecked(false);
@@ -61,6 +79,9 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     <div>
       <div className="mb-4 text-center">
         <p>{t('pages.inscribe.name.description')}</p>
+        <p className="text-gray-500">
+          {t('pages.inscribe.name.description_1')}
+        </p>
       </div>
       <RadioGroup
         orientation="horizontal"
@@ -87,6 +108,20 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             maxLength={32}
             type="text"
             placeholder={t('pages.inscribe.name.name_placeholder')}
+            endContent={
+              <Select
+                size="sm"
+                placeholder={t('pages.inscribe.name.select_placeholder')}
+                color="primary"
+                className="w-48"
+                selectedKeys={selectedKeys}
+                onChange={(e) => set('suffix', e.target.value as any)}
+              >
+                {nameSuffixs.map((v) => (
+                  <SelectItem key={v.key}>{v.label}</SelectItem>
+                ))}
+              </Select>
+            }
           />
         </div>
       </div>

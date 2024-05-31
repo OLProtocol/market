@@ -45,7 +45,9 @@
       "title": "Name",
       "input_name": "Name",
       "description": "Register a name on BTC",
+      "description_1": "Support .x, .btc, .sats, .pizza。",
       "name_placeholder": "Name must be 3, 5-32 byte long",
+      "select_placeholder": "Select Suffix",
       "error_1": "Tick must be 3, 5-32 byte long",
       "error_2": "{{name}} has been minted"
     },

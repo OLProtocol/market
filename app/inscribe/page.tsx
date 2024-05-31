@@ -102,6 +102,7 @@ export default function Inscribe() {
   const [nameData, { set: setNameData, reset: resetName }] = useMap({
     type: 'mint',
     name: '',
+    suffix: '.ordx',
   });
   const brc20Change = (data: any) => {
     setBrc20('type', data.type);
@@ -114,6 +115,7 @@ export default function Inscribe() {
   const ordxNameChange = (data: any) => {
     setNameData('type', data.type);
     setNameData('name', data.name);
+    setNameData('suffix', data.suffix);
   };
   const ordxChange = (data: any) => {
     setOrd2Data('type', data.type);
@@ -215,11 +217,19 @@ export default function Inscribe() {
   };
   const ordxNameNext = async () => {
     const list: any = [];
+    const { suffix, name } = nameData;
     if (nameData.type === 'mint') {
+      let value;
+      const _name = name.toString().trim();
+      if (!suffix || suffix === '.ordx') {
+        value = _name;
+      } else {
+        value = JSON.stringify({ p: 'sns', op: 'reg', name: _name + suffix });
+      }
       list.push({
         type: 'ordx_name',
         name: `mint`,
-        value: nameData.name.toString().trim(),
+        value: value,
       });
     }
     const _files = await generteFiles(list);

@@ -48,31 +48,40 @@ export const FeeShow = ({
           <Divider style={{ margin: '10px 0' }} />
         </>
       )}
-      <div className="flex justify-between mb-2">
-        <div>{t('pages.inscribe.fee.inscription_size')}</div>
-        <div>
-          <span>
-            {filesLength} x {inscriptionSize}
-          </span>{' '}
-          <span> sats</span>
+      {!!inscriptionSize && (
+        <div className="flex justify-between mb-2">
+          <div>{t('pages.inscribe.fee.inscription_size')}</div>
+          <div>
+            <span>
+              {filesLength} x {inscriptionSize}
+            </span>{' '}
+            <span> sats</span>
+          </div>
         </div>
-      </div>
-      <div className="flex justify-between">
-        <div>{t('pages.inscribe.fee.network_fee')}</div>
-        <div>
-          <span>{networkFee}</span> <span> sats</span>
+      )}
+
+      {!!networkFee && (
+        <div className="flex justify-between">
+          <div>{t('pages.inscribe.fee.network_fee')}</div>
+          <div>
+            <span>{networkFee}</span> <span> sats</span>
+          </div>
         </div>
-      </div>
+      )}
+
       <Divider style={{ margin: '10px 0' }} />
-      <div className="flex justify-between mb-2">
-        <div>
-          {t('pages.inscribe.fee.service_fee')}
-          <span className="text-blue-400">({serviceText})</span>
+      {!!serviceFee && (
+        <div className="flex justify-between mb-2">
+          <div>
+            {t('pages.inscribe.fee.service_fee')}
+            <span className="text-blue-400">({serviceText})</span>
+          </div>
+          <div>
+            <span>{serviceFee}</span> <span> sats</span>
+          </div>
         </div>
-        <div>
-          <span>{serviceFee}</span> <span> sats</span>
-        </div>
-      </div>
+      )}
+
       <div className="flex justify-between">
         <div>{t('pages.inscribe.fee.total_fee')}</div>
         <div>
