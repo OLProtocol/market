@@ -44,7 +44,8 @@
     "name": {
       "title": "名字服务",
       "input_name": "名字",
-      "name_placeholder": "在BTC上注册一个名字",
+      "description": "在BTC上注册一个名字",
+      "name_placeholder": "名字必须是3、5-16字节长",
       "error_1": "名字必须是3、5-16字节长",
       "error_2": "{{name}} 已被铸造"
     },

@@ -44,7 +44,8 @@
     "name": {
       "title": "Name",
       "input_name": "Name",
-      "name_placeholder": "Register a name on BTC",
+      "description": "Register a name on BTC",
+      "name_placeholder": "Name must be 3, 5-32 byte long",
       "error_1": "Tick must be 3, 5-32 byte long",
       "error_2": "{{name}} has been minted"
     },
