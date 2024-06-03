@@ -1,170 +1,552 @@
 'use client';
-
-import useSWR from 'swr';
-import { Card, CardBody, Button, Avatar } from '@nextui-org/react';
-import { getTickerSummary } from '@/api';
-import { Tabs, Tab } from '@nextui-org/react';
-import { OrdxOrderList } from '@/components/order/OrdxOrderList';
-import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
-import { useReactWalletStore } from 'btc-connect/dist/react';
-import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { Button, ButtonGroup, Card, CardBody } from '@nextui-org/react';
+// import { useLocation } from 'react-router-dom';
+// import { useToast } from '@chakra-ui/react';
+import { random } from 'radash';
+import { useEffect, useMemo, useRef, useState } from 'react';
+// import { BtcHeightAlert } from '@/components/BtcHeightAlert';
+// import { InscribeBrc20 } from './components/InscribeBrc20';
+import { InscribeOrdx } from '@/components/inscribe/InscribeOrdx';
+import { InscribeText } from '@/components/inscribe/InscribeText';
+import { InscribeFiles } from '@/components/inscribe/InscribeFiles';
+import { InscribeOrdxName } from '@/components/inscribe/InscribeOrdxName';
+import { InscribeStepTwo } from '@/components/inscribe/InscribeStepTwo';
+import { InscribeStepThree } from '@/components/inscribe/InscribeStepThree';
+import { useMap, useList } from 'react-use';
+import { InscribingOrderModal } from '@/components/inscribe/InscribingOrderModal';
+import {
+  removeObjectEmptyValue,
+  generteFiles,
+  hexString,
+  generateSeedByUtxos,
+} from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
-import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { Icon } from '@iconify/react';
+import { OrderList } from '@/components/inscribe/OrderList';
+// import { useCommonStore } from '@/store';
+type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
-export default function Page() {
-  const { t, i18n } = useTranslation();
-  const router = useRouter();
-  const params = useSearchParams();
-  const { address } = useReactWalletStore((state) => state);
-  const ticker = params.get('ticker') as string;
-  const { data } = useSWR(`getTickerSummary`, () =>
-    getTickerSummary({ ticker }),
-  );
-  const toAccount = () => {
-    router.push(`/account`);
+export default function Inscribe() {
+  // const { state } = useLocation();
+  // const toast = useToast();
+  // useEffect(() => {
+  //   toast({
+  //     title: '网维护中',
+  //     status: 'warning',
+  //     position: 'top',
+  //     duration: 100000,
+  //     isClosable: true,
+  //   });
+  // }, []);
+  const { t } = useTranslation();
+  const ordxUtxoRef = useRef<InscribeType>();
+  const [step, setStep] = useState(1);
+  const [tab, setTab] = useState<any>('ordx');
+  const [files, setFiles] = useState<any[]>([]);
+  const [orderId, setOrderId] = useState<string>();
+  const [modalShow, setModalShow] = useState(false);
+  const [list, { set: setList, clear: clearList, removeAt }] = useList<any>([
+    // {
+    //   type: 'brc20_transfer',
+    //   name: 'well_0',
+    //   value: JSON.stringify({
+    //     p: 'brc-20',
+    //     op: 'transfer',
+    //     tick: 'well',
+    //     amt: '10000',
+    //   }),
+    // },
+    // {
+    //   type: 'text',
+    //   value: 'well4',
+    // },
+  ]);
+  const [ordxData, { set: setOrd2Data }] = useMap<any>({
+    type: 'mint',
+    tick: '',
+    amount: 1,
+    repeatMint: 1,
+    limitPerMint: 10000,
+    block: '',
+    relateInscriptionId: '',
+    // cn: 0,
+    trz: 0,
+    des: '',
+    sat: 0,
+    rarity: '',
+    mintRarity: '',
+    selfmint: '',
+    max: '',
+    file: '',
+    fileName: '',
+    fileType: '',
+    rarityChecked: false,
+    regChecked: false,
+    blockChecked: false,
+    cnChecked: false,
+    trzChecked: false,
+    utxos: [],
+    isSpecial: false,
+  });
+  const [brc20Data, { set: setBrc20 }] = useMap({
+    type: 'mint',
+    tick: '',
+    amount: 1,
+    repeatMint: 1,
+    limitPerMint: 1,
+    totalSupply: 21000000,
+  });
+  const [textData, { set: setTextData, reset: resetText }] = useMap({
+    type: 'single',
+    text: '',
+  });
+  const [nameData, { set: setNameData, reset: resetName }] = useMap({
+    type: 'mint',
+    name: '',
+    suffix: '.ordx',
+  });
+  const brc20Change = (data: any) => {
+    setBrc20('type', data.type);
+    setBrc20('tick', data.tick);
+    setBrc20('amount', data.amount);
+    setBrc20('repeatMint', data.repeatMint);
+    setBrc20('limitPerMint', data.limitPerMint);
+    setBrc20('totalSupply', data.totalSupply);
   };
-  const showTextIcon = useMemo(() => {
-    return ticker?.slice(0, 1)?.toUpperCase();
-  }, [ticker]);
-  const summary = useMemo(() => data?.data?.summary || {}, [data]);
-  const headList = useMemo(() => {
-    return [
-      {
-        value: Number(summary.lowest_price).toFixed(2),
-        label: t('common.lowest_price'),
-        unit: 'sats',
-      },
-      {
-        value: summary.tx_total_volume,
-        label: t('common.tx_total_volume'),
-        unit: 'BTC',
-      },
+  const ordxNameChange = (data: any) => {
+    setNameData('type', data.type);
+    setNameData('name', data.name);
+    setNameData('suffix', data.suffix);
+  };
+  const ordxChange = (data: any) => {
+    setOrd2Data('type', data.type);
+    setOrd2Data('tick', data.tick);
+    setOrd2Data('utxos', data.utxos);
+    setOrd2Data('amount', data.amount);
+    setOrd2Data('selfmint', data.selfmint);
+    setOrd2Data('max', data.max);
+    setOrd2Data('relateInscriptionId', data.relateInscriptionId);
+    setOrd2Data('isSpecial', data.isSpecial);
+    setOrd2Data('file', data.file);
+    setOrd2Data('fileName', data.fileName);
+    setOrd2Data('fileType', data.fileType);
+    setOrd2Data('repeatMint', data.repeatMint);
+    setOrd2Data('limitPerMint', data.limitPerMint);
+    setOrd2Data('block', `${data.block_start}-${data.block_end}`);
+    // setOrd2Data('cn', data.cn);
+    setOrd2Data('trz', data.trz);
+    setOrd2Data('rarity', data.rarity);
+    setOrd2Data('des', data.des);
+    setOrd2Data('sat', data.sat);
+    setOrd2Data('rarityChecked', data.rarityChecked);
+    // setOrd2Data('cnChecked', data.cnChecked);
+    setOrd2Data('trzChecked', data.trzChecked);
+    setOrd2Data('blockChecked', data.blockChecked);
+  };
+  const onOrdxUtxoChange = (utxo: any) => {
+    ordxUtxoRef.current = utxo;
+  };
+  const brc20Next = async () => {
+    const list: any = [];
+    if (brc20Data.type === 'mint') {
+      for (let i = 0; i < brc20Data.repeatMint; i++) {
+        list.push({
+          type: 'brc20',
+          name: `mint_${i}`,
+          value: JSON.stringify({
+            p: 'brc-20',
+            op: 'mint',
+            tick: brc20Data.tick.toString(),
+            amt: brc20Data.amount.toString(),
+          }),
+        });
+      }
+    } else if (brc20Data.type === 'deploy') {
+      list.push({
+        type: 'brc20',
+        name: 'deploy_0',
+        value: JSON.stringify({
+          p: 'brc-20',
+          op: 'deploy',
+          tick: brc20Data.tick.toString(),
+          max: brc20Data.totalSupply.toString(),
+          lim: brc20Data.limitPerMint.toString(),
+        }),
+      });
+    } else if (brc20Data.type === 'transfer') {
+      list.push({
+        type: 'brc20',
+        name: 'transfer_0',
+        value: JSON.stringify({
+          p: 'brc-20',
+          op: 'transfer',
+          tick: brc20Data.tick.toString(),
+          amt: brc20Data.amount.toString(),
+        }),
+      });
+    }
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(2);
+  };
+  const findSepiceAmt = () => {
+    const { utxos, amount } = ordxData;
+    const userAmt = amount || 0;
+    const realAmt = Math.max(userAmt, 546);
+    const findBetweenByValue = (userAmt: number, realAmt, ranges: any[]) => {
+      let outAmt = 0;
+      let outValue = 0;
+      let preTotalSize = 0;
+      for (let i = 0; i < ranges.length; i++) {
+        const range = ranges[i];
+        outValue += range.size;
+        if (userAmt > outValue) {
+          preTotalSize += range.size;
+        }
+        if (userAmt <= outValue) {
+          const dis = userAmt - preTotalSize;
+          outAmt = range.offset + dis;
+          break;
+        }
+      }
+      if (outAmt < realAmt) {
+        outAmt += realAmt - outAmt;
+      }
+      return outAmt;
+    };
+    return findBetweenByValue(userAmt, realAmt, ordxData.utxos[0].sats);
+  };
+  const ordxNameNext = async () => {
+    const list: any = [];
+    const { suffix, name } = nameData;
+    if (nameData.type === 'mint') {
+      let value;
+      const _name = name.toString().trim();
+      if (!suffix || suffix === '.ordx') {
+        value = _name;
+      } else {
+        value = JSON.stringify({ p: 'sns', op: 'reg', name: _name + suffix });
+      }
+      list.push({
+        type: 'ordx_name',
+        name: `mint`,
+        value: value,
+      });
+    }
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(2);
+  };
+  const ordxNext = async () => {
+    const list: any = [];
+    if (ordxData.type === 'mint') {
+      for (let i = 0; i < ordxData.repeatMint; i++) {
+        console.log(ordxData);
+        const attrArr: string[] = [];
+        if (ordxData.rarity && ordxData.rarity !== 'common') {
+          attrArr.push(`rar=${ordxData.rarity}`);
+        }
+        if (ordxData.trz > 0) {
+          attrArr.push(`trz=${ordxData.trz}`);
+        }
+        let attr;
+        if (attrArr.length) {
+          attr = attrArr.join(';');
+        }
+        let ordxValue: any[] = [
+          JSON.stringify(
+            removeObjectEmptyValue({
+              p: 'ordx',
+              op: 'mint',
+              tick: ordxData.tick.toString().trim(),
+              amt: ordxData.amount.toString(),
+              sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
+            }),
+          ),
+        ];
+        let amount = ordxData.amount;
+        if (ordxData.utxos.length && ordxData.isSpecial) {
+          amount = findSepiceAmt();
+        }
+        const seed = generateSeedByUtxos(ordxData.utxos, amount);
+        if (ordxData.relateInscriptionId) {
+          ordxValue = [
+            JSON.stringify(
+              removeObjectEmptyValue({
+                p: 'ordx',
+                op: 'mint',
+                tick: ordxData.tick.toString().trim(),
+                amt: ordxData.amount.toString(),
+                sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
+                desc: `seed=${seed}`,
+              }),
+            ),
+            {
+              type: 'relateInscriptionId',
+              name: 'relateInscriptionId',
+              value: ordxData.relateInscriptionId,
+            },
+          ];
+        }
+        list.push({
+          type: 'ordx',
+          name: `mint_${i}`,
+          ordxType: 'mint',
+          utxos: ordxData.utxos,
+          isSpecial: ordxData.isSpecial,
+          value: ordxValue,
+        });
+      }
+    } else if (ordxData.type === 'deploy') {
+      const attrArr: string[] = [];
+      if (ordxData.rarityChecked && ordxData.rarity) {
+        attrArr.push(`rar=${ordxData.rarity}`);
+      }
+      if (ordxData.trzChecked && ordxData.trz) {
+        attrArr.push(`trz=${ordxData.trz}`);
+      }
+      let attr;
+      if (attrArr.length) {
+        attr = attrArr.join(';');
+      }
+      const value: any[] = [
+        JSON.stringify(
+          removeObjectEmptyValue({
+            p: 'ordx',
+            op: 'deploy',
+            tick: ordxData.tick.toString().trim(),
+            max: !ordxData.max ? undefined : ordxData.max,
+            selfmint:
+              !ordxData.selfmint || ordxData.selfmint === '0'
+                ? undefined
+                : `${ordxData.selfmint}%`,
+            block: ordxData.blockChecked
+              ? ordxData.block.toString()
+              : undefined,
+            lim: ordxData.limitPerMint.toString(),
+            attr,
+            des: ordxData.des.toString(),
+          }),
+        ),
+      ];
+      if (ordxData.file) {
+        value.push({
+          type: 'file',
+          name: ordxData.fileName,
+          value: ordxData.file,
+          mimeType: ordxData.fileType,
+        });
+      }
+      list.push({
+        type: 'ordx',
+        name: 'deploy_0',
+        ordxType: 'deploy',
+        value,
+      });
+    }
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(2);
+  };
+  const textNext = async () => {
+    const list: any = [];
+    if (textData.type === 'single') {
+      list.push({
+        type: 'text',
+        value: textData.text,
+      });
+    } else {
+      const lines = textData.text.split('\n');
+      lines.forEach((line: string) => {
+        list.push({
+          type: 'text',
+          value: line,
+        });
+      });
+    }
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(2);
+  };
+  const textChange = (type: string, value: string) => {
+    setTextData('type', type);
+    setTextData('text', value);
+  };
+  const filesChange = async (files: any[]) => {
+    const list = files.map((file) => ({
+      type: 'file',
+      name: file.name,
+      value: file,
+    }));
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(3);
+  };
+  const filesNext = () => {
+    const list: any = [];
+    files.forEach((file) => {
+      list.push({
+        type: 'file',
+        name: file.name,
+        value: file,
+      });
+    });
+    console.log(list);
+    // setList(list);
+    // setStep(2);
+  };
+  const stepTwoNext = () => {
+    setStep(3);
+  };
+  const stepTwoBack = () => {
+    setStep(1);
+  };
+  const handleTabsChange = (e: any) => {
+    const value = e.target.value;
+    if (tab !== value) {
+      console.log(history);
+      history.replaceState(undefined, '');
+      setTab(value);
+      clearList();
+    }
+  };
+  const onItemRemove = async (index: number) => {
+    await removeAt(index);
+  };
+  const onOrderClick = (item) => {
+    // if (['pending', 'paid'].includes(item.status)) {
+    setOrderId(item.orderId);
+    setModalShow(true);
+    // }
+  };
+  const onAddOrder = (item) => {
+    setOrderId(item.orderId);
+    setModalShow(true);
+  };
+  const onModalClose = () => {
+    setOrderId(undefined);
+    setModalShow(false);
+  };
+  const onFinished = () => {
+    clear();
+  };
+  const onRemoveAll = () => {
+    clear();
+  };
+  const clear = () => {
+    clearList();
+    resetText();
+  };
+  useEffect(() => {
+    if (list.length === 0) {
+      setStep(1);
+      resetText();
+    }
+  }, [list]);
 
-      {
-        value: summary.tx_order_count,
-        label: t('common.tx_order_count'),
-        unit: '',
-      },
+  const tabList = [
+    {
+      key: 'ordx',
+      label: 'Ticker',
+    },
+    {
+      key: 'name',
+      label: t('pages.inscribe.name.title'),
+    },
+    {
+      key: 'text',
+      label: t('pages.inscribe.text.name'),
+    },
 
-      // {
-      //   value: summary.tx_total_amount,
-      //   label: t('common.tx_total_asset'),
-      //   unit: '',
-      // },
-      {
-        value: (
-          (summary.total_amount * summary.lowest_price) /
-          100000000
-        )?.toFixed(4),
-        label: t('common.total_amount'),
-        unit: 'BTC',
-      },
-      {
-        value: summary.onsell_order_count,
-        label: t('common.onsell_order_count'),
-        unit: '',
-      },
-      // {
-      //   value: summary.onsell_total_amount,
-      //   label: t('common.onsell_total_amount'),
-      //   unit: '',
-      // },
-
-      // {
-      //   value: summary.highest_price,
-      //   label: t('common.highest_price'),
-      //   unit: 'BTC',
-      // },
-      {
-        value: summary.holder_count,
-        label: i18n.t('common.holder_count'),
-        unit: '',
-      },
-    ];
-  }, [summary, i18n.language]);
-  
+    {
+      key: 'files',
+      label: t('pages.inscribe.files.name'),
+    },
+  ];
+  // useEffect(() => {
+  //   if (state?.type) {
+  //     setTab(state.type);
+  //   }
+  // }, [state]);
   return (
-    <div>
-      <div className="min-h-40 flex flex-col py-2">
-        <div className="flex-1 flex items-center mb-4 gap-4">
-          <Avatar
-            name={showTextIcon}
-            size="lg"
-            className="w-16 h-16"
-            classNames={{ name: 'text-4xl font-bold' }}
-          />
-          <div className="flex-1 flex items-center flex-wrap justify-center h-20">
-            <div className="flex-1">
-              <div className="text-2xl md:text-4xl font-bold">
-                {summary?.ticker}
-              </div>
-            </div>
-            <WalletConnectBus text={t('buttons.list_sale')}>
-              <Button onClick={toAccount} color="primary">
-                {t('buttons.list_sale')}
-              </Button>
-            </WalletConnectBus>
+    <>
+      {/* <BtcHeightAlert /> */}
+      <div className="flex flex-col max-w-[48rem] mx-auto pt-8">
+        <h1 className="text-lg font-bold text-center mb-4">
+          {t('pages.inscribe.title')}
+        </h1>
+        <div className="">
+          <div className="flex justify-center mb-4">
+            <ButtonGroup>
+              {tabList.map((item) => (
+                <Button
+                  key={item.key}
+                  color={tab === item.key ? 'primary' : 'default'}
+                  onClick={() => setTab(item.key)}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </ButtonGroup>
           </div>
-        </div>
-        <div className="flex-1 flex items-center justify-between gap-4">
-          <div className="grid gap-2 grid-cols-3 lg:grid-cols-6">
-            {headList.map((item) => (
-              <Card isHoverable key={item.label} className="px-2">
-                <CardBody className="text-center">
-                  <div className="flex text-base md:text-2xl text-center justify-center">
-                    {item.unit === 'BTC' && (
-                      <Icon
-                        icon="cryptocurrency-color:btc"
-                        className="mr-1 mt-0.5"
-                      />
-                    )}
-                    <span>{item.value === undefined ? '-' : item.value}</span>
-                    {item.unit === 'sats' && (
-                      <span className="text-base self-end ml-2">Sats</span>
-                    )}
-                  </div>
-                  <div className="text-sm lg:text-md text-gray-400">
-                    {item.label}
-                  </div>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      <div className="pt-4">
-        {/* <Tabs aria-label="Options" size="lg" color="primary"> */}
-        <Tabs
-          aria-label="Options"
-          color="primary"
-          size="lg"
-          variant="underlined"
-          classNames={{
-            tabList:
-              'gap-6 w-full relative rounded-none p-0 border-b border-divider',
-            cursor: 'w-full bg-blue-500',
-            tab: 'max-w-fit px-0 h-12',
-            tabContent: 'group-data-[selected=true]:text-blue-400',
-          }}
-          style={{ width: '100%' }}
-        >
-          <Tab key="market" title={t('pages.market.title')}>
-            <OrdxOrderList ticker={ticker} showResale />
-          </Tab>
-          <Tab key="history" title={t('common.tx_history')}>
-            <OrdxOrderHistoryList ticker={ticker} />
-          </Tab>
-          <Tab key="my" title={t('common.my_listings')}>
-            <WalletConnectBus className="mx-auto mt-20 block">
-              <OrdxOrderList ticker={ticker} address={address} />
-            </WalletConnectBus>
-          </Tab>
-        </Tabs>
+          <Card className="mb-4">
+            <CardBody>
+              {step === 1 && (
+                <>
+                  {tab === 'files' && (
+                    <InscribeFiles onNext={filesNext} onChange={filesChange} />
+                  )}
+                  {tab === 'text' && (
+                    <InscribeText onNext={textNext} onChange={textChange} />
+                  )}
+                  {tab === 'ordx' && (
+                    <InscribeOrdx
+                      onChange={ordxChange}
+                      onNext={ordxNext}
+                      onUtxoChange={onOrdxUtxoChange}
+                    />
+                  )}
+                  {tab === 'name' && (
+                    <InscribeOrdxName
+                      onChange={ordxNameChange}
+                      onNext={ordxNameNext}
+                    />
+                  )}
+                </>
+              )}
+              {step === 2 && (
+                <InscribeStepTwo
+                  list={list}
+                  type={tab}
+                  onBack={stepTwoBack}
+                  onNext={stepTwoNext}
+                />
+              )}
+              {step === 3 && (
+                <InscribeStepThree
+                  ordxUtxo={ordxUtxoRef.current}
+                  onItemRemove={onItemRemove}
+                  onRemoveAll={onRemoveAll}
+                  onAddOrder={onAddOrder}
+                  list={list}
+                  type={tab}
+                />
+              )}
+            </CardBody>
+          </Card>
+          <div>
+            <OrderList onOrderClick={onOrderClick} />
+          </div>
+        </div>
+        {orderId && (
+          <InscribingOrderModal
+            show={modalShow}
+            orderId={orderId}
+            onFinished={onFinished}
+            onClose={onModalClose}
+          />
+        )}
       </div>
-    </div>
+    </>
   );
 }
