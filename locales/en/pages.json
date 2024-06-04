@@ -1,10 +1,10 @@
 {
   "app": {
-    "title": "OrdX Market",
+    "title": "SAT20 Market",
     "version_update_title": "There is a new version, do you want to update it?"
   },
   "market": {
-    "title": "Market"
+    "title": "MarketPlace"
   },
   "tools": {
     "title": "Toolbox",

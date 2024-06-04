@@ -143,6 +143,7 @@ export const Navbar = () => {
               alt="logo"
               className="w-14 h-14"
             />
+             <p className='font-bold text-purple-500/90'>SAT20Market</p>
           </NextLink>
         </NavbarBrand>
 

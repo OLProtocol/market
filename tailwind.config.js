@@ -10,7 +10,17 @@ module.exports = {
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        '3xl': '1920px',
+        // => @media (min-width: 1920px) { ... }
+        '4xl': '2048px',
+        // => @media (min-width: 2048px) { ... }
+      },
+      backdropOpacity: {
+        15: '.15',
+      }
+    },
   },
   darkMode: 'class',
   plugins: [nextui()],
