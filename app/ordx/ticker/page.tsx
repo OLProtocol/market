@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { Card, CardBody, Button, Avatar } from '@nextui-org/react';
+import { Card, CardBody, Button, Avatar,Image } from '@nextui-org/react';
 import { getTickerSummary } from '@/api';
 import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
@@ -89,16 +89,20 @@ export default function Page() {
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">
-        <div className="flex-1 flex items-center mb-4 gap-4">
-          <Avatar
-            name={showTextIcon}
-            size="lg"
-            className="w-16 h-16"
-            classNames={{ name: 'text-4xl font-bold' }}
-          />
+      <div className="flex-1 flex items-center mb-4 gap-4">
+        {/^[a-zA-Z]$/.test(ticker.slice(0, 1)) ? (
+            <Image
+                radius="full"
+                src={`/tick-ico/${ticker.slice(0, 1).toUpperCase()}.png`}
+                alt="logo"
+                className="w-20 h-20 p-2 rounded-full bg-gray-900"
+              />
+            ) : (
+              <Avatar name={ticker.slice(0, 1).toUpperCase()}  className='text-3xl text-gray-200 font-black w-20 h-20 bg-gray-900'/>
+            )}
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
-              <div className="text-2xl md:text-4xl font-bold">
+            <div className="text-2xl md:text-3xl font-medium text-gary-500">
                 {summary?.ticker}
               </div>
             </div>

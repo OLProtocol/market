@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
 import { BtcPrice } from '../BtcPrice';
+import styles from '/styles/Orderitem.module.css';
 
 interface Props {
   item: any;
@@ -38,6 +39,7 @@ export const OrdxFtOrderItem = ({
 }: Props) => {
   const { address: currentAddress } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { t } = useTranslation();
   const buyHandler = async () => {
     setLoading(true);
@@ -63,7 +65,8 @@ export const OrdxFtOrderItem = ({
     <Card
       isPressable
       radius="lg"
-      className="border-none w-full h-[14rem] md:h-[18rem] relative"
+      // className="border-none w-full h-[14rem] md:h-[18rem] relative"
+      className="forced-colors:hidden border-none w-full h-[14rem] md:h-[18rem] relative hover:border-1 hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
     >
       {canSelect && (
         <div
@@ -82,25 +85,29 @@ export const OrdxFtOrderItem = ({
         </div>
       )}
       <CardBody className="h-3/5">
-        <div className="flex-1 text-sm md:text-base">
-          <span className="text-gray-500">{item?.assets[0].ticker}</span>
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
+          <div className={`${styles.label} ${isHovered ? styles['label-hover'] : ''}`}>
+            <span className="flex absolute top-2 left-2 text-center text-gray-500">
+              {item?.assets[0].ticker}
+            </span>
+          </div>
           <div className="flex justify-center">
-            <section className="text-center pt-8">
-              <p className="text-xl font-medium">
+          <section className="text-center pt-4 font-mono md:pt-8">
+              <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
-              <p className="pt-2">
-                <span className="font-medium text-blue-400">
+              <p className="pt-2 md:pb-2 md:text-sm">
+                <span className="font-bold text-amber-400">
                   {(
-                    item?.assets[0].unit_price / item?.assets[0].unit_amount
+                    item?.assets[0].unit_price/item?.assets[0].unit_amount
                   ).toFixed(2)}
                 </span>
-                <span className="font-thin text-gray-400">
+                <span className="font-mono text-gray-500">
                   &nbsp;sats/{item?.assets[0].ticker}
                 </span>
               </p>
-              <p>
-                <span className="font-thin text-gray-400">
+              <p className='md:text-sm'>
+                <span className="font-mono text-gray-400">
                   $
                   <BtcPrice
                     btc={
@@ -109,7 +116,7 @@ export const OrdxFtOrderItem = ({
                       100000000
                     }
                   />
-                  /{item?.assets[0].ticker}
+                  &nbsp; /{item?.assets[0].ticker}
                 </span>
               </p>
             </section>
@@ -117,15 +124,15 @@ export const OrdxFtOrderItem = ({
         </div>
       </CardBody>
       <CardFooter className="block bg-gray-800 h-2/5">
-        <div className="pb-2 flex-1 flex items-center justify-between gap-4">
+        <div className="pb-2 flex-1 flex items-center justify-between gap-4 font-bold md:pb-5">
           <div className="flex">
             {item.currency === 'BTC' && (
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
             )}
-            <span className="text-sm text-amber-500">{item?.price}</span>
+            <span className="text-sm text-gray-400">{item?.price}</span>
           </div>
           <div className="flex">
-            <span className="text-sm font-thin text-gray-400">
+            <span className="text-sm text-gray-500">
               &nbsp;&nbsp;$
               <BtcPrice btc={item?.price} />
             </span>
@@ -134,11 +141,9 @@ export const OrdxFtOrderItem = ({
         <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
             <Button
-              className="text-tiny"
-              // fullWidth
-              variant="flat"
-              color="danger"
-              radius="lg"
+            className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+            variant="flat"             
+            radius="sm"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
@@ -150,14 +155,12 @@ export const OrdxFtOrderItem = ({
             </Button>
           ) : (
             <Button
-              className="flex-1 border"
-              // fullWidth
-              variant="ghost"
-              size="md"
-              isDisabled={!canBuy}
-              isLoading={loading}
-              color="primary"
-              radius="lg"
+            className="flex-1 border-none h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+            variant="ghost"
+            size="md"
+            isDisabled={!canBuy}
+            isLoading={loading}             
+            radius="sm"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />

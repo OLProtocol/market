@@ -9,6 +9,7 @@ import '@/locales';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, theme } from 'antd';
 import { Avatar, Image, Link } from '@nextui-org/react';
+import ParticleEffect from '@/components/ParticleEffect'; 
 
 // export const metadata: Metadata = {
 //   title: {
@@ -56,6 +57,7 @@ export default function RootLayout({
               }}
             > */}
           <div className="relative flex flex-col h-screen">
+            <ParticleEffect /> {/* Add the ParticleEffect component here */}
             <Navbar />
             <main className="mx-auto w-screen px-2 md:px-4 flex-grow">
               {children}
