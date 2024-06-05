@@ -14,7 +14,7 @@ import {
   PsbtInput,
 } from '../wallet';
 import { UtxoAssetItem } from '@/store';
-import { getTxHex, lockOrder, unlockOrder } from '@/api';
+import mempool from '@/api/mempool';
 interface SellOrderProps {
   inscriptionUtxo: {
     txid: string;
@@ -46,7 +46,7 @@ export const buildSellOrder = async ({
     address,
   );
   const { btcWallet } = useReactWalletStore.getState();
-  const rawTx = await getTxHex(inscriptionUtxo.txid, network);
+  const rawTx = await mempool.getTxHex(inscriptionUtxo.txid, network);
   const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx);
   console.log(ordinalPreTx);
   const utxoInput = {
@@ -107,7 +107,7 @@ export const buildBatchSellOrder = async ({
     const { utxo, price } = inscriptionUtxos[i];
     console.log(utxo, price);
     const { txid, vout } = parseUtxo(utxo);
-    const rawTx = await getTxHex(txid, network);
+    const rawTx = await mempool.getTxHex(txid, network);
     console.log(rawTx);
     const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx);
     console.log(ordinalPreTx);
@@ -379,14 +379,14 @@ export const calcBuyOrderFee = async ({
     const sellPsbt = bitcoin.Psbt.fromHex(raw, {
       network: psbtNetwork,
     });
-    
+
     const sellerInput = {
       hash: sellPsbt.txInputs[0].hash as any,
       index: sellPsbt.txInputs[0].index,
       witnessUtxo: sellPsbt.data.inputs[0].witnessUtxo as any,
       finalScriptWitness: sellPsbt.data.inputs[0].finalScriptWitness,
     };
-    
+
     sellInputs.push(sellerInput);
     const ordValue = sellPsbt.data.inputs[0].witnessUtxo!.value;
     const ordOutput = {
@@ -421,6 +421,6 @@ export const calcBuyOrderFee = async ({
   await psbtTx.addSufficientUtxosForFee(btcUtxos, {
     suitable: false,
   });
-  
+
   return await psbtTx.calNetworkFee();
 };
