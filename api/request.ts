@@ -260,7 +260,7 @@ export const getUtxoByValue = async ({
   value = 600,
   network,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/utxo/address/${address}/${value}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/utxo/address/${address}/${value}`;
   const res = await fetch(url);
   return res.json();
 };
@@ -268,7 +268,7 @@ export const getUtxoByValue = async ({
 export const fetchChainFeeRate = async (network: 'main' | 'testnet') => {
   const url =
     network === 'testnet'
-      ? 'https://mempool.space/testnet/api/v1/fees/recommended'
+      ? 'https://mempool.space/testnet4/api/v1/fees/recommended'
       : 'https://mempool.space/api/v1/fees/recommended';
   const resp = await fetch(url);
   const data = await resp.json();
@@ -281,7 +281,7 @@ export const getAppVersion = async () => {
 };
 
 export const getSats = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/exotic/address/${address}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/exotic/address/${address}`;
   const res = await fetch(url);
   return res.json();
 };
@@ -293,19 +293,19 @@ export const getOrdxAddressHolders = async ({
   start,
   limit,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
   const res = await fetch(url);
   return res.json();
 };
 
 export const getOrdxSummary = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/address/summary/${address}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/summary/${address}`;
   const res = await fetch(url);
   return res.json();
 };
 
 export const getSatsByAddress = async ({ address, sats, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/sat/FindSatsInAddress`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/sat/FindSatsInAddress`;
   const data = {
     address: address,
     sats: sats,

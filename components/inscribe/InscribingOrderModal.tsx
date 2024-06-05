@@ -13,6 +13,7 @@ import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { ordx } from '@/api';
+import mempool from '@/api/mempool';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useOrderStore, OrderItemType, useCommonStore } from '@/store';
 import {
@@ -363,7 +364,7 @@ export const InscribingOrderModal = ({
       return '';
     }
     return `https://mempool.space${
-      order?.network === 'testnet' ? '/testnet' : ''
+      order?.network === 'testnet' ? '/testnet4' : ''
     }/address/${address}`;
   };
   useEffect(() => {

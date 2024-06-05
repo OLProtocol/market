@@ -1,7 +1,8 @@
 import axios from 'axios';
-
+import mempool from './mempool';
 const generateUrl = (url: string, network?: string) => {
-  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
+  console.log(123123);
+  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/${url}`;
   if (location.hostname.indexOf('test') > -1) {
     url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
@@ -232,8 +233,8 @@ async function pollGetTxStatus(
   retryCount = 30,
 ) {
   try {
-    const result = await getTxStatus({ txid, network });
-    if (result?.status) {
+    const result = await mempool.getTxHex(txid, network);
+    if (result) {
       console.log('getTxStatus succeeded, stopping poll.');
       console.log(result);
       return result;
