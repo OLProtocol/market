@@ -16,7 +16,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
 import { BtcPrice } from '../BtcPrice';
-import styles from '/styles/Orderitem.module.css';
+import styles from '@/styles/Orderitem.module.css';
 
 interface Props {
   item: any;
@@ -86,27 +86,29 @@ export const OrdxFtOrderItem = ({
       )}
       <CardBody className="h-3/5">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
-          <div className={`${styles.label} ${isHovered ? styles['label-hover'] : ''}`}>
+          <div
+            className={`${styles.label} ${isHovered ? styles['label-hover'] : ''}`}
+          >
             <span className="flex absolute top-2 left-2 text-center text-gray-500">
               {item?.assets[0].ticker}
             </span>
           </div>
           <div className="flex justify-center">
-          <section className="text-center pt-4 font-mono md:pt-8">
+            <section className="text-center pt-4 font-mono md:pt-8">
               <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
               <p className="pt-2 md:pb-2 md:text-sm">
                 <span className="font-bold text-amber-400">
                   {(
-                    item?.assets[0].unit_price/item?.assets[0].unit_amount
+                    item?.assets[0].unit_price / item?.assets[0].unit_amount
                   ).toFixed(2)}
                 </span>
                 <span className="font-mono text-gray-500">
                   &nbsp;sats/{item?.assets[0].ticker}
                 </span>
               </p>
-              <p className='md:text-sm'>
+              <p className="md:text-sm">
                 <span className="font-mono text-gray-400">
                   $
                   <BtcPrice
@@ -141,9 +143,9 @@ export const OrdxFtOrderItem = ({
         <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
             <Button
-            className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
-            variant="flat"             
-            radius="sm"
+              className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+              variant="flat"
+              radius="sm"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
@@ -155,12 +157,12 @@ export const OrdxFtOrderItem = ({
             </Button>
           ) : (
             <Button
-            className="flex-1 border-none h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
-            variant="ghost"
-            size="md"
-            isDisabled={!canBuy}
-            isLoading={loading}             
-            radius="sm"
+              className="flex-1 border-none h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+              variant="ghost"
+              size="md"
+              isDisabled={!canBuy}
+              isLoading={loading}
+              radius="sm"
               startContent={
                 item.locker == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
