@@ -222,6 +222,17 @@ const getUtxo = async ({ utxo, network }: any) => {
   const { data } = await axios.get(generateUrl(`utxo/assets/${utxo}`, network));
   return data;
 };
+
+const pushTx = async ({ hex, network }: any) => {
+  const { data } = await axios.post(generateUrl(`btc/tx`, network), {
+    SignedTxHex: hex,
+  });
+  if (data.code === 0) {
+    return JSON.parse(data.data);
+  } else {
+    throw new Error(data.msg);
+  }
+};
 export const getNsName = async ({ name, network }: any) => {
   const { data } = await axios.get(generateUrl(`ns/name/${name}`, network));
   return data;
@@ -291,4 +302,5 @@ export const ordx = {
   exoticUtxo,
   getNsListByAddress,
   getNsName,
+  pushTx,
 };
