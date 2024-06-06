@@ -62,9 +62,7 @@ export const OrdxFtAssetsItem = ({
       )}
       <CardBody className="h-7/10">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
-          <div
-            className={`${styles.label} ${isHovered ? styles['label-hover'] : ''}`}
-          >
+          <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-200">
               {item?.tickers[0].ticker}
             </span>
