@@ -16,7 +16,6 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
 import { BtcPrice } from '../BtcPrice';
-import styles from '@/styles/Orderitem.module.css';
 
 interface Props {
   item: any;
