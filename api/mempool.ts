@@ -29,11 +29,8 @@ const pushTx = async (txHex: string, network: string) => {
     },
     body: JSON.stringify({ hex: txHex }),
   });
-  const data = await response.json();
-  if (data.error) {
-    throw new Error(data.error);
-  }
-  return data.txid;
+  const data = await response.text();
+  return data;
 };
 
 export default { getTxHex, pushTx };

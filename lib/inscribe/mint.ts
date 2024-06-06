@@ -23,6 +23,7 @@ import {
   createLittleEndianInteger,
 } from './index';
 import { useUtxoStore } from '@/store';
+import { ordx } from '@/api';
 import mempool from '@/api/mempool';
 interface FileItem {
   mimetype: string;
@@ -533,7 +534,7 @@ export const inscribe = async ({
   const isValid = Signer.taproot.verify(txdata, 0, { pubkey, throws: true });
   console.log('isValid', isValid);
   console.log('Your txhex:', Tx.encode(txdata).hex);
-  const result = await mempool.pushTx(Tx.encode(txdata).hex, network);
+  const result = await ordx.pushTx({ hex: Tx.encode(txdata).hex, network });
   return result;
 };
 
@@ -593,7 +594,7 @@ export const pushCommitTx = async ({
   console.log('commit Tx isValid', isValid);
   const rawtx = Tx.encode(commitTxData).hex;
   console.log('Your Commit Tx txhex:', rawtx);
-  const txid = await mempool.pushTx(rawtx, network);
+  const txid = await ordx.pushTx({ hex: rawtx, network });
   const result = {
     txid,
     outputs: outputs.map((item, i) => {
@@ -685,7 +686,7 @@ export const sendBTC = async ({
     address: fromAddress,
     publicKey: fromPubKey,
   });
-
+  const psbtNetwork = network === 'testnet' ? 'testnet' : 'mainnet';
   const txId = await signAndPushPsbt(psbt);
   if (psbt.txOutputs.length > 1) {
     addUtxo({

@@ -199,5 +199,10 @@ export const signAndPushPsbt = async (psbt) => {
   }
   const signed = await btcWallet.signPsbt(psbt.toHex());
   const pushedTxId = await btcWallet.pushPsbt(signed);
-  return pushedTxId;
+  console.log('pushedTxId', pushedTxId);
+  try {
+    return JSON.parse(pushedTxId);
+  } catch (error) {
+    return pushedTxId;
+  }
 };
