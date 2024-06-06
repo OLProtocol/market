@@ -73,6 +73,11 @@ const getOrdxSummary = async ({ address, network }: any) => {
   );
   return data;
 };
+const getBestHeight = async ({ network }: any) => {
+  const { data } = await axios.get(generateUrl(`bestheight`, network));
+  return data;
+};
+
 const getOrdxTickHolders = async ({ tick, network, start, limit }) => {
   const { data } = await axios.get(
     generateUrl(`tick/holders/${tick}?start=${start}&limit=${limit}`, network),
@@ -302,5 +307,6 @@ export const ordx = {
   exoticUtxo,
   getNsListByAddress,
   getNsName,
+  getBestHeight,
   pushTx,
 };

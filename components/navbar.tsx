@@ -68,8 +68,9 @@ export const Navbar = () => {
   }, [data]);
 
   useEffect(() => {
-    if (heightData) {
-      setHeight(heightData);
+    const height = heightData?.data?.height;
+    if (height) {
+      setHeight(height);
     }
   }, [heightData]);
   useEffect(() => {
@@ -143,7 +144,7 @@ export const Navbar = () => {
               alt="logo"
               className="w-14 h-14"
             />
-             <p className='font-bold text-purple-500/90'>SAT20Market</p>
+            <p className="font-bold text-purple-500/90">SAT20Market</p>
           </NextLink>
         </NavbarBrand>
 
