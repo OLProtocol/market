@@ -415,22 +415,14 @@ export const InscribeOrdx = ({
     return !data.tick;
   }, [data]);
 
-  // const time = useBlockHeightTime({
-  //   height: btcHeight,
-  //   start: data.block_start,
-  //   end: data.block_end,
-  //   network,
-  // });
-  const onBlockBLur = async () => {
-    const res = await calcTimeBetweenBlocks({
+  const onBlockBLur = () => {
+    calcTimeBetweenBlocks({
       height: btcHeight,
       start: data.block_start,
       end: data.block_end,
       network,
-    });
-    setTime(res);
+    }).then(setTime);
   };
-
   const handleUtxoChange = (utxo: any) => {
     setTickChecked(false);
     setAllowSpecialBeyondStatus(false);
@@ -562,9 +554,16 @@ export const InscribeOrdx = ({
   }, [btcHeight]);
   useEffect(() => {
     if (btcHeight) {
-      console.log();
-      set('block_start', btcHeight + (network === 'testnet' ? 10 : 1010));
-      set('block_end', btcHeight + 4320);
+      const block_start = btcHeight + (network === 'testnet' ? 10 : 1010);
+      const block_end = btcHeight + 4320;
+      set('block_start', block_start);
+      set('block_end', block_end);
+      calcTimeBetweenBlocks({
+        height: btcHeight,
+        start: block_start,
+        end: block_end,
+        network,
+      }).then(setTime);
     }
   }, [btcHeight]);
   useEffect(() => {
