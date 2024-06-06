@@ -11,7 +11,7 @@ import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
-import styles from '/styles/Orderitem.module.css';
+import styles from '@/styles/Orderitem.module.css';
 interface Props {
   item: any;
   onSell?: (item: any) => void;
@@ -62,7 +62,13 @@ export const OrdxFtAssetsItem = ({
       )}
       <CardBody className="h-7/10">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
-        <div className={`${styles.label} ${isHovered ? styles['label-hover'] : ''}`}><span className="flex absolute top-2 left-2 text-center text-gray-200">{item?.tickers[0].ticker}</span></div>
+          <div
+            className={`${styles.label} ${isHovered ? styles['label-hover'] : ''}`}
+          >
+            <span className="flex absolute top-2 left-2 text-center text-gray-200">
+              {item?.tickers[0].ticker}
+            </span>
+          </div>
           <div className="flex justify-center">
             <section className="text-center pt-8">
               <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
@@ -76,7 +82,9 @@ export const OrdxFtAssetsItem = ({
                   size="sm"
                   variant="flat"
                 >
-                  <span className="font-thin md:pl-8">{hideStr(item?.utxo, 6)}</span>
+                  <span className="font-thin md:pl-8">
+                    {hideStr(item?.utxo, 6)}
+                  </span>
                 </Snippet>
               </p>
             </section>

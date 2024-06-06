@@ -1,7 +1,6 @@
 import axios from 'axios';
 import mempool from './mempool';
 const generateUrl = (url: string, network?: string) => {
-  console.log(123123);
   url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/${url}`;
   if (location.hostname.indexOf('test') > -1) {
     url.replace('apiprd', 'apitest');
@@ -21,7 +20,6 @@ const responseParse = async (response) => {
 const getOrdxStatusList = async (params: any): Promise<any> => {
   const { data } = await axios.get(
     generateUrl(
-      // `status?start=${params.start}&limit=${params.limit}`,
       `tick/status?start=${params.start}&limit=${params.limit}`,
       params.network,
     ),
@@ -35,19 +33,14 @@ const health = async ({ network }) => {
 };
 
 const getOrdxInfo = async ({ tick, network }: any) => {
-  const { data } = await axios.get(
-    // generateUrl(`v1/indexer/ordx/${tick}/info`, network),
-    generateUrl(`tick/info/${tick}`, network),
-    {
-      timeout: 10000,
-    },
-  );
+  const { data } = await axios.get(generateUrl(`tick/info/${tick}`, network), {
+    timeout: 10000,
+  });
   return data;
 };
 
 const exoticUtxo = async ({ utxo, network }: any) => {
   const { data } = await axios.get(
-    // generateUrl(`v1/indexer/ordx/${tick}/info`, network),
     generateUrl(`exotic/utxo/${utxo}`, network),
     {
       timeout: 10000,
@@ -57,8 +50,7 @@ const exoticUtxo = async ({ utxo, network }: any) => {
 };
 const getNsListByAddress = async ({ address, network }: any) => {
   const { data } = await axios.get(
-    // generateUrl(`v1/indexer/ordx/${tick}/info`, network),
-    generateUrl(`/ns/address/${address}`, network),
+    generateUrl(`ns/address/${address}`, network),
     {
       timeout: 10000,
     },
@@ -68,7 +60,6 @@ const getNsListByAddress = async ({ address, network }: any) => {
 
 const getOrdxSummary = async ({ address, network }: any) => {
   const { data } = await axios.get(
-    // generateUrl(`query-v4/address/${address}/ordx/summary`, network),
     generateUrl(`address/summary/${address}`, network),
   );
   return data;
@@ -77,7 +68,10 @@ const getBestHeight = async ({ network }: any) => {
   const { data } = await axios.get(generateUrl(`bestheight`, network));
   return data;
 };
-
+const getHeightInfo = async ({ height, network }: any) => {
+  const { data } = await axios.get(generateUrl(`height/${height}`, network));
+  return data;
+};
 const getOrdxTickHolders = async ({ tick, network, start, limit }) => {
   const { data } = await axios.get(
     generateUrl(`tick/holders/${tick}?start=${start}&limit=${limit}`, network),
@@ -94,7 +88,6 @@ const getOrdxAddressHistory = async ({
 }: any) => {
   const { data } = await axios.get(
     generateUrl(
-      // `query-v4/address/${address}/ordx/${ticker}/history?start=${start}&limit=${limit}`,
       `address/history/${address}/${ticker}?start=${start}&limit=${limit}`,
       network,
     ),
@@ -111,7 +104,6 @@ const getOrdxAddressHolders = async ({
 }: any) => {
   const { data } = await axios.get(
     generateUrl(
-      // `query-v4/address/${address}/ordx/${ticker}/holderlist?start=${start}&limit=${limit}`,
       `address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`,
       network,
     ),
@@ -121,7 +113,6 @@ const getOrdxAddressHolders = async ({
 const getOrdxTickHistory = async ({ start, limit, ticker, network }: any) => {
   const { data } = await axios.get(
     generateUrl(
-      // `query-v4/ordx/${ticker}?start=${start}&limit=${limit}`,
       `tick/history/${ticker}?start=${start}&limit=${limit}`,
       network,
     ),
@@ -305,6 +296,7 @@ export const ordx = {
   getUtxo,
   pollGetTxStatus,
   exoticUtxo,
+  getHeightInfo,
   getNsListByAddress,
   getNsName,
   getBestHeight,
