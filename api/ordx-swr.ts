@@ -19,7 +19,7 @@ const useSatTypes = ({ network }: any) => {
 export const useBtcHeight = (network: string) => {
   const { data, error, isLoading } = useSWR(
     `height-${network}`,
-    () => blockStream.getTipBlockHeight({ network }),
+    () => ordx.getBestHeight({ network }),
     {
       refreshInterval: 1000 * 60 * 5,
     },
