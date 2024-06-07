@@ -1,5 +1,6 @@
 export * from './order';
 export * from './btc';
+export * from './url';
 import { ordx } from '@/api';
 import { add, format } from 'date-fns';
 
@@ -31,14 +32,6 @@ export const removeObjectEmptyValue = (obj: any) => {
     }
   });
   return _obj;
-};
-
-export const resolveMempoolTxLink = (txid: string, network: string) => {
-  const href =
-    network === 'testnet'
-      ? `https://mempool.space/testnet/tx/${txid}`
-      : `https://mempool.space/tx/${txid}`;
-  return href;
 };
 
 export const thousandSeparator = (num: number) => {
