@@ -23,7 +23,7 @@ import {
   waitSomeSeconds,
   sendBTC,
 } from '@/lib/inscribe';
-// import { savePaidOrder } from '@/api';
+import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { _0n } from '@cmdcode/crypto-utils/dist/const';
 import { hideStr } from '@/lib/utils';
@@ -360,12 +360,13 @@ export const InscribingOrderModal = ({
   };
 
   const fundingAddressHref = (address?: string) => {
-    if (!address) {
+    if (!address || !order?.network) {
       return '';
     }
-    return `https://mempool.space${
-      order?.network === 'testnet' ? '/testnet4' : ''
-    }/address/${address}`;
+    return generateMempoolUrl({
+      network: order?.network,
+      path: `address/${address}`,
+    });
   };
   useEffect(() => {
     checkStatus();
@@ -490,9 +491,10 @@ export const InscribingOrderModal = ({
                       </div>
                       <a
                         className="text-blue-500 underline"
-                        href={`https://mempool.space${
-                          order.network === 'testnet' ? '/testnet' : ''
-                        }/tx/${item.txid}`}
+                        href={generateMempoolUrl({
+                          network: order.network,
+                          path: `tx/${item.txid}`,
+                        })}
                         target="_blank"
                       >
                         {hideStr(item.txid, 10)}

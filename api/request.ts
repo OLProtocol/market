@@ -1,6 +1,7 @@
 import { removeObjectEmptyValue } from '@/lib/utils';
 import { useCommonStore } from '@/store';
 import { useReactWalletStore } from 'btc-connect/dist/react';
+import { generateMempoolUrl } from '@/lib/utils';
 
 export const request = async (path: string, options: any = {}) => {
   const { publicKey, connected, network, disconnect } =
@@ -266,10 +267,7 @@ export const getUtxoByValue = async ({
 };
 
 export const fetchChainFeeRate = async (network: 'main' | 'testnet') => {
-  const url =
-    network === 'testnet'
-      ? 'https://mempool.space/testnet4/api/v1/fees/recommended'
-      : 'https://mempool.space/api/v1/fees/recommended';
+  const url = generateMempoolUrl({ network, path: 'api/v1/fees/recommended' });
   const resp = await fetch(url);
   const data = await resp.json();
   return data;

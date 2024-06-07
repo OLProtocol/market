@@ -19,6 +19,7 @@ import { message } from '@/lib/wallet-sdk';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
+import { generateMempoolUrl } from '@/lib/utils';
 
 const WalletConnectButton = () => {
   const { t } = useTranslation();
@@ -62,9 +63,10 @@ const WalletConnectButton = () => {
     });
   };
   const toHistory = () => {
-    const url = `https://mempool.space${
-      network === 'testnet' ? '/testnet' : ''
-    }/address/${address}`;
+    const url = generateMempoolUrl({
+      network,
+      path: `address/${address}`,
+    });
     window.open(url, '_blank');
   };
   const handlerDisconnect = async () => {

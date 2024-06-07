@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { hideStr } from '@/lib';
+import { generateMempoolUrl } from '@/lib/utils';
 
 export const OrdxBillList = () => {
   const { t, i18n } = useTranslation();
@@ -200,10 +201,10 @@ export const OrdxBillList = () => {
               {(columnKey) => {
                 if (columnKey === 'txid') {
                   const txid = item.txid;
-                  const href =
-                    network === 'testnet'
-                      ? `https://mempool.space/testnet/tx/${txid}`
-                      : `https://mempool.space/tx/${txid}`;
+                  const href = generateMempoolUrl({
+                    network,
+                    path: `tx/${txid}`,
+                  });
 
                   return (
                     <TableCell className="font-light text-sm md:text-base">
