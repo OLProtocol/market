@@ -197,8 +197,17 @@ export const InscribeOrdx = ({
       const info = await getOrdXInfo(data.tick);
       setTickLoading(false);
 
-      const { rarity, startBlock, endBlock, limit, imgtype, inscriptionId } =
-        info.data || {};
+      const {
+        rarity,
+        startBlock,
+        endBlock,
+        limit,
+        imgtype,
+        inscriptionId,
+        max,
+        totalMinted,
+        selfmint,
+      } = info.data || {};
 
       if (data.type === 'mint') {
         const isSpecial =
@@ -206,9 +215,21 @@ export const InscribeOrdx = ({
         if (data.isSpecial !== isSpecial) {
           set('isSpecial', isSpecial);
         }
+
         let status = 'Completed';
         if (isSpecial) {
           status = 'Minting';
+        } else if (max) {
+          if (selfmint === 100) {
+            const inscriptionInfo = await ordx.getInscriptiontInfo({
+              inscriptionId,
+              network,
+            });
+            console.log('inscriptionInfo', inscriptionInfo);
+          }
+          if (totalMinted < max) {
+            status = 'Minting';
+          }
         } else if (
           startBlock &&
           endBlock &&
