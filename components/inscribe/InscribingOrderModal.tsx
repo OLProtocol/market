@@ -6,13 +6,16 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Button,
+  Divider,
 } from '@nextui-org/react';
-import { Steps, Divider, Button, Tag, Progress } from 'antd';
+import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { ordx } from '@/api';
+import mempool from '@/api/mempool';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { useOrderStore, OrderItemType } from '@/store';
+import { useOrderStore, OrderItemType, useCommonStore } from '@/store';
 import {
   inscribe,
   pushCommitTx,
@@ -20,7 +23,7 @@ import {
   waitSomeSeconds,
   sendBTC,
 } from '@/lib/inscribe';
-// import { savePaidOrder } from '@/api';
+import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { _0n } from '@cmdcode/crypto-utils/dist/const';
 import { hideStr } from '@/lib/utils';
@@ -30,7 +33,6 @@ import { useTranslation } from 'react-i18next';
 interface InscribingOrderMdaolProps {
   show: boolean;
   orderId: string;
-  // order: OrderItemType;
   onFinished?: () => void;
   onClose?: () => void;
 }
@@ -41,16 +43,40 @@ export const InscribingOrderModal = ({
   onFinished,
 }: InscribingOrderMdaolProps) => {
   const { t } = useTranslation();
+  const { feeRate } = useCommonStore();
   const [successPercent, setSuccessPercent] = useState(0);
   const steps = [
-    { title: t('pages.inscribe.pay.step_one.name') },
-    { title: t('pages.inscribe.pay.step_two.name') },
-    { title: t('pages.inscribe.pay.step_three.name') },
-    { title: t('pages.inscribe.pay.step_four.name') },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_one.name')}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_two.name')}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_three.name')}
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="dark:text-white">
+          {t('pages.inscribe.pay.step_four.name')}
+        </div>
+      ),
+    },
   ];
   const { address: currentAccount, publicKey } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
-  // const toast = useToast();
   const {
     changeStatus,
     setCommitTx,
@@ -71,8 +97,15 @@ export const InscribingOrderModal = ({
     setLoading(true);
 
     try {
-      const { inscriptions, feeRate, inscriptionSize, secret, network, fee } =
-        order;
+      const {
+        inscriptions,
+        feeRate,
+        inscriptionSize,
+        secret,
+        network,
+        fee,
+        files,
+      } = order;
       if (inscriptions.length === 1) {
         let txid;
         if (order.ordxUtxo) {
@@ -93,6 +126,7 @@ export const InscribingOrderModal = ({
             network: network,
             fromAddress: currentAccount,
             fromPubKey: publicKey,
+            utxos: files[0].utxos,
           });
         }
         const commitTx = {
@@ -117,13 +151,6 @@ export const InscribingOrderModal = ({
         let fundingTxid = funding?.txid || '';
         if (!funding) {
           const fundingData = getFundingAddress(secret, network);
-          // fundingTxid = await unisat.sendBitcoin(
-          //   fundingData.address,
-          //   fee.totalFee,
-          //   {
-          //     feeRate: feeRate,
-          //   },
-          // );
           fundingTxid = await sendBTC({
             toAddress: fundingData.address,
             value: fee.totalFee,
@@ -151,14 +178,9 @@ export const InscribingOrderModal = ({
     } catch (error: any) {
       setLoading(false);
       console.error(error);
-      // toast({
-      //   title: 'Error',
-      //   description: error.message || JSON.stringify(error),
-      //   status: 'error',
-      //   duration: 2000,
-      //   isClosable: true,
-      //   position: 'top',
-      // });
+      notification.error({
+        message: error.message || JSON.stringify(error),
+      });
     }
   };
   const startInscribe = async () => {
@@ -216,14 +238,10 @@ export const InscribingOrderModal = ({
         }
         setLoading(false);
         changeStatus(orderId, 'commit_error');
-        // toast({
-        //   title: 'Error',
-        //   description: error.message || JSON.stringify(error),
-        //   status: 'error',
-        //   duration: 2000,
-        //   isClosable: true,
-        //   position: 'top',
-        // });
+        notification.error({
+          message: 'Error',
+          description: error.message || JSON.stringify(error),
+        });
       }
     } else {
       setLoading(true);
@@ -276,14 +294,10 @@ export const InscribingOrderModal = ({
         changeStatus(orderId, 'inscribe_success');
         setActiveStep(3);
         onFinished?.();
-        // toast({
-        //   title: 'Success',
-        //   description: 'Inscribe Success',
-        //   status: 'success',
-        //   duration: 2000,
-        //   isClosable: true,
-        //   position: 'top',
-        // });
+        notification.success({
+          message: 'Success',
+          description: 'Inscribe Success',
+        });
       } else {
         changeStatus(orderId, 'inscribe_fail');
       }
@@ -303,14 +317,10 @@ export const InscribingOrderModal = ({
 
       setLoading(false);
       changeStatus(orderId, 'inscribe_fail');
-      // toast({
-      //   title: 'Error',
-      //   description: error.message || 'error',
-      //   status: 'error',
-      //   duration: 2000,
-      //   isClosable: true,
-      //   position: 'top',
-      // });
+      notification.error({
+        message: 'Error',
+        description: error.message || 'error',
+      });
     }
   };
   const clacSuccessPercent = () => {
@@ -335,7 +345,7 @@ export const InscribingOrderModal = ({
       order?.status === 'inscribe_wait' ||
       order?.status === 'inscribe_fail'
     ) {
-      setActiveStep(2);
+      // setActiveStep(2);
     }
     if (order?.status === 'inscribe_success') {
       if (
@@ -350,12 +360,13 @@ export const InscribingOrderModal = ({
   };
 
   const fundingAddressHref = (address?: string) => {
-    if (!address) {
+    if (!address || !order?.network) {
       return '';
     }
-    return `https://mempool.space${
-      order?.network === 'testnet' ? '/testnet' : ''
-    }/address/${address}`;
+    return generateMempoolUrl({
+      network: order?.network,
+      path: `address/${address}`,
+    });
   };
   useEffect(() => {
     checkStatus();
@@ -383,7 +394,7 @@ export const InscribingOrderModal = ({
           <div>
             {activeStep > 0 && (
               <>
-                {/* <Divider children={'进度'} style={{ margin: '0 0' }} /> */}
+                <Divider />
                 <div>
                   <Progress percent={successPercent} status="active" />
                 </div>
@@ -396,7 +407,7 @@ export const InscribingOrderModal = ({
                   <WalletConnectBus>
                     <Button
                       color="primary"
-                      loading={loading}
+                      isLoading={loading}
                       onClick={payOrder}
                     >
                       {t('buttons.pay_wallet')}
@@ -425,7 +436,7 @@ export const InscribingOrderModal = ({
                 <div className="flex justify-center mt-4">
                   <Button
                     color="primary"
-                    loading={loading}
+                    isLoading={loading}
                     onClick={startInscribe}
                   >
                     {t('buttons.start_inscribe')}
@@ -449,8 +460,8 @@ export const InscribingOrderModal = ({
                 </div>
                 <div className="flex justify-center mt-4">
                   <Button
-                    type="primary"
-                    loading={loading}
+                    color="primary"
+                    isLoading={loading}
                     onClick={inscribeHandler}
                   >
                     {t('buttons.inscribe')}
@@ -480,9 +491,10 @@ export const InscribingOrderModal = ({
                       </div>
                       <a
                         className="text-blue-500 underline"
-                        href={`https://mempool.space${
-                          order.network === 'testnet' ? '/testnet' : ''
-                        }/tx/${item.txid}`}
+                        href={generateMempoolUrl({
+                          network: order.network,
+                          path: `tx/${item.txid}`,
+                        })}
                         target="_blank"
                       >
                         {hideStr(item.txid, 10)}
@@ -492,9 +504,9 @@ export const InscribingOrderModal = ({
                 </div>
                 <div className="flex justify-center mt-4">
                   <Button
-                    type="primary"
-                    loading={loading}
-                    size="large"
+                    color="primary"
+                    isLoading={loading}
+                    size="lg"
                     onClick={closeHandler}
                   >
                     {t('buttons.close')}
@@ -504,16 +516,16 @@ export const InscribingOrderModal = ({
             )}
           </div>
           <FeeShow
-            feeRate={order?.feeRate}
-            inscriptionSize={order?.inscriptionSize}
+            feeRate={feeRate.value}
+            // inscriptionSize={order?.inscriptionSize}
             serviceFee={order?.fee.serviceFee}
-            filesLength={order?.inscriptions.length}
+            // filesLength={order?.inscriptions.length}
             totalFee={order?.fee.totalFee}
-            networkFee={order?.fee.networkFee}
+            // networkFee={order?.fee.networkFee}
           />
 
           <>
-            {/* <Divider children={t('common.account')} /> */}
+            <Divider />
             <Card>
               <CardBody>
                 <CardHeader>Funding Account</CardHeader>
@@ -542,7 +554,7 @@ export const InscribingOrderModal = ({
               </CardBody>
             </Card>
           </>
-          {/* <Divider children={t('pages.inscribe.pay.files')} /> */}
+          <Divider />
           <div className="max-h-[20rem] overflow-y-auto">
             <div className="mb-2 flex-col gap-2">
               {order?.inscriptions?.map((item, index) => (

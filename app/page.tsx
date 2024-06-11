@@ -13,6 +13,7 @@ import {
   getKeyValue,
   SortDescriptor,
   Avatar,
+  Image,
 } from '@nextui-org/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,7 @@ import { Icon } from '@iconify/react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { thousandSeparator } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
+import { BtcPrice } from '@/components/BtcPrice';
 
 export default function Home() {
   const { t, i18n } = useTranslation();
@@ -45,10 +47,14 @@ export default function Home() {
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
     `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
-    () => getTopTickers({ interval, top_count: 20, top_name: '', 
-      sort_field: sortField, 
-      sort_order: sortOrder,
-    }),
+    () =>
+      getTopTickers({
+        interval,
+        top_count: 200,
+        top_name: '',
+        sort_field: sortField,
+        sort_order: sortOrder,
+      }),
   );
   const onSortChange = (i?: number) => {
     setInterval(i);
@@ -126,7 +132,8 @@ export default function Home() {
             <TableColumn
               key={column.key}
               allowsSorting={column.allowsSorting}
-              className="text-sm md:text-base font-extralight"
+              // className="text-sm md:text-base font-extralight"
+              className="text-sm md:text-xl md:font-extrablod font-extralight md:pb-3 md:pt-3"
             >
               {column.label}
             </TableColumn>
@@ -148,10 +155,22 @@ export default function Home() {
                   const tick = getKeyValue(item, columnKey);
                   return (
                     <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        <Avatar name={tick.slice(0, 1)?.toUpperCase()} />
-                        &nbsp;
-                        <span className="pt-2">{tick}</span>
+                      <div className="flex text-sm md:text-base items-left">
+                        {/^[a-zA-Z]$/.test(tick.slice(0, 1)) ? (
+                          <Image
+                            radius="full"
+                            src={`/tick-ico/${tick.slice(0, 1).toUpperCase()}.png`}
+                            alt="logo"
+                            className="w-14 h-14 p-2 rounded-full bg-gray-950"
+                          />
+                        ) : (
+                          <Avatar
+                            name={tick.slice(0, 1).toUpperCase()}
+                            className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
+                          />
+                        )}
+                        &nbsp;&nbsp;
+                        <span className="pt-4">{tick}</span>
                       </div>
                     </TableCell>
                   );
@@ -192,9 +211,9 @@ export default function Home() {
                           icon="cryptocurrency-color:btc"
                           className="mr-1 mt-0.5"
                         />
-                        {(
-                          getKeyValue(item, 'market_cap')/100000000
-                        ).toFixed(4)}
+                        {(getKeyValue(item, 'market_cap') / 100000000).toFixed(
+                          4,
+                        )}
                       </div>
                     </TableCell>
                   );
@@ -207,6 +226,7 @@ export default function Home() {
                           className="mr-1 mt-0.5"
                         />
                         {getKeyValue(item, columnKey)}
+                        {/* <BtcPrice btc={getKeyValue(item, columnKey)} /> */}
                       </div>
                     </TableCell>
                   );

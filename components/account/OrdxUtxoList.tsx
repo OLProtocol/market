@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { notification, Empty } from 'antd';
-import { getOrdxAssets, cancelOrder } from '@/api';
+import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSellStore } from '@/store';
@@ -11,14 +12,15 @@ import { Content } from '@/components/Content';
 import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
-import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
-export const OrdxUtxoList = () => {
+interface Props {
+  ticker: string;
+}
+export const OrdxUtxoList = ({ ticker }: Props) => {
   const router = useRouter();
-  const [ticker, setTicker] = useState<string>('');
-  const { address } = useReactWalletStore((state) => state);
+  const { address, network } = useReactWalletStore((state) => state);
   const {
     add: addSell,
     changeTicker,
@@ -34,14 +36,14 @@ export const OrdxUtxoList = () => {
     return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
   }, [address, page, size, ticker]);
 
-  console.log('swrKey', swrKey);
-  const { data, isLoading, mutate } = useSWR(
-    swrKey,
-    () => getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
-    {
-      revalidateOnMount: true,
-    },
+  const {
+    data,
+    isMutating: isLoading,
+    trigger,
+  } = useSWRMutation(swrKey, () =>
+    getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
   );
+
   const total = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data],
@@ -110,25 +112,20 @@ export const OrdxUtxoList = () => {
       });
     }
   };
-  const onTickerChange = (t: string) => {
-    if (ticker === t) {
-      return;
-    }
-    setTicker(t);
-    reset();
-    resetList();
-    setCanSelect(false);
-    setPage(1);
-  };
 
   useEffect(() => {
     reset();
   }, []);
+  useEffect(() => {
+    if (ticker) {
+      resetList();
+      setCanSelect(false);
+      setPage(1);
+      trigger();
+    }
+  }, [ticker]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
-      <div>
-        <OrdxUtxoTypeList onChange={onTickerChange} />
-      </div>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">

@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Radio,
   RadioGroup,
@@ -14,21 +16,17 @@ import type { UploadProps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 // import { useLocation } from 'react-router-dom';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Upload, Modal, Table } from 'antd';
+import { Upload, Modal, Table, notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-use';
-import { hideStr } from '@/lib/utils';
-import {
-  clacTextSize,
-  encodeBase64,
-  base64ToHex,
-  serializeInscriptionId,
-} from '@/lib/inscribe';
+import { hideStr, calcTimeBetweenBlocks } from '@/lib/utils';
+import { clacTextSize, encodeBase64, base64ToHex } from '@/lib/inscribe';
+import { generateMempoolUrl } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { ordx, ordxSWR } from '@/api';
-// import toast from 'react-hot-toast';
+import { useUtxoStore } from '@/store';
 import { useCommonStore } from '@/store';
 import { ColumnsType } from 'antd/es/table';
 // import { CopyButton } from '@/components/CopyButton';
@@ -40,7 +38,6 @@ interface InscribeOrdxProps {
   onChange?: (data: any) => void;
   onUtxoChange?: (data: any) => void;
 }
-// const satTypeList = [
 
 export const InscribeOrdx = ({
   onNext,
@@ -50,10 +47,12 @@ export const InscribeOrdx = ({
   const { address: currentAccount, network } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
+  const { selectUtxosByAmount } = useUtxoStore();
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
-  const [data, { set }] = useMap({
+  const [data, { set }] = useMap<any>({
     type: 'mint',
+    mode: 'fair',
     tick: '',
     amount: 1,
     limitPerMint: 10000,
@@ -63,6 +62,8 @@ export const InscribeOrdx = ({
     rarity: '',
     // cn: 0,
     trz: 0,
+    selfmint: '0',
+    max: '',
     file: '',
     relateInscriptionId: '',
     fileName: '',
@@ -71,9 +72,11 @@ export const InscribeOrdx = ({
     rarityChecked: false,
     cnChecked: false,
     trzChecked: false,
+    isSpecial: false,
     des: '',
     mintRarity: '',
     sat: 0,
+    utxos: [],
   });
   const { data: satTypeData } = ordxSWR.useSatTypes({ network });
   const satTypeList = useMemo(() => {
@@ -124,7 +127,9 @@ export const InscribeOrdx = ({
       });
       return resp;
     } catch (error) {
-      // toast.error(t('toast.system_error'));
+      notification.error({
+        message: t('notification.system_error'),
+      });
       console.error('Failed to fetch ordxUTXO:', error);
       throw error;
     }
@@ -134,16 +139,16 @@ export const InscribeOrdx = ({
     try {
       const key = `${network}_${tick}`;
       const cachedData = localStorage.getItem(key);
-      // if (cachedData) {
-      //   return JSON.parse(cachedData);
-      // }
+
       const info = await ordx.getOrdxInfo({ tick, network });
       if (info) {
         localStorage.setItem(key, JSON.stringify(info));
       }
       return info;
     } catch (error) {
-      // toast.error(t('toast.system_error'));
+      notification.error({
+        message: t('notification.system_error'),
+      });
       console.error('Failed to fetch ordXInfo:', error);
       throw error;
     }
@@ -159,6 +164,9 @@ export const InscribeOrdx = ({
 
       setTickChecked(true);
     } else {
+      setLoading(true);
+
+      setLoading(false);
       onNext?.();
     }
   };
@@ -186,31 +194,49 @@ export const InscribeOrdx = ({
 
       const {
         rarity,
-        trz,
-        cn,
         startBlock,
         endBlock,
         limit,
         imgtype,
         inscriptionId,
+        max,
+        totalMinted,
+        selfmint,
       } = info.data || {};
-      const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
-      let status = 'Completed';
-      if (isSpecial) {
-        status = 'Minting';
-      } else if (
-        startBlock &&
-        endBlock &&
-        btcHeight <= endBlock &&
-        btcHeight >= startBlock
-      ) {
-        status = 'Minting';
-      } else if (btcHeight < startBlock) {
-        status = 'Pending';
-      } else {
-        status = 'Completed';
-      }
+
       if (data.type === 'mint') {
+        const isSpecial =
+          rarity !== 'unknow' && rarity !== 'common' && !!rarity;
+        if (data.isSpecial !== isSpecial) {
+          set('isSpecial', isSpecial);
+        }
+
+        let status = 'Completed';
+        if (isSpecial) {
+          status = 'Minting';
+        } else if (max) {
+          if (selfmint === 100) {
+            const inscriptionInfo = await ordx.getInscriptiontInfo({
+              inscriptionId,
+              network,
+            });
+            console.log('inscriptionInfo', inscriptionInfo);
+          }
+          if (totalMinted < max) {
+            status = 'Minting';
+          }
+        } else if (
+          startBlock &&
+          endBlock &&
+          btcHeight <= endBlock &&
+          btcHeight >= startBlock
+        ) {
+          status = 'Minting';
+        } else if (btcHeight < startBlock) {
+          status = 'Pending';
+        } else {
+          status = 'Completed';
+        }
         if (!info.data) {
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_4', { tick: data.tick }));
@@ -236,13 +262,31 @@ export const InscribeOrdx = ({
         }
         if (imgtype) {
           set('relateInscriptionId', inscriptionId);
+
+          if (!blur && !isSpecial) {
+            const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
+            if (!utxos.length) {
+              console.log('缺少utxos');
+              return;
+            }
+            let utxosRanges = await Promise.all(
+              utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
+            );
+            utxosRanges = utxosRanges.map((v, i) => ({
+              ...v.data,
+              ...utxos[i],
+            }));
+            console.log(utxosRanges);
+            set('utxos', utxosRanges as any);
+          }
         }
         if (blur) {
           set('amount', Number(limit));
           set('mintRarity', rarity);
         } else if (isSpecial) {
           setSpecialStatus(true);
-          const resp = await getOrdxUtxoByType(rarity, 1);
+          const resp = await getOrdxUtxoByType('customized', 1);
+          console.log('resp', resp);
           if (resp.code !== 0) {
             checkStatus = false;
             setErrorText(resp.msg);
@@ -274,6 +318,64 @@ export const InscribeOrdx = ({
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_3', { tick: data.tick }));
           return checkStatus;
+        } else {
+          if (data.blockChecked) {
+            if (data.block_start < minBlockStart) {
+              checkStatus = false;
+              setErrorText(
+                t('pages.inscribe.ordx.error_9', { block: minBlockStart }),
+              );
+              return checkStatus;
+            }
+            if (data.block_start >= data.block_end) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_10'));
+              return checkStatus;
+            }
+          }
+          if (data.rarityChecked) {
+            if (!data.rarity) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_11'));
+              return checkStatus;
+            }
+          }
+          // if (data.cnChecked) {
+          //   if (data.cn < 1) {
+          //     checkStatus = false;
+          //     setErrorText(t('pages.inscribe.ordx.error_12'));
+          //     return checkStatus;
+          //   }
+          // }
+          console.log(data.max, data.limitPerMint);
+          if (data.max && data.max < data.limitPerMint) {
+            checkStatus = false;
+            setErrorText(t('pages.inscribe.ordx.error_16'));
+            return checkStatus;
+          }
+          if (data.mode === 'fair') {
+            console.log(data.blockChecked);
+            console.log(data.rarityChecked);
+            if (!(data.blockChecked || data.rarityChecked)) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_13'));
+              return checkStatus;
+            }
+          } else if (data.mode === 'project') {
+            if (!data.max) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_14'));
+              return checkStatus;
+            }
+            if (
+              data.selfmint !== '100' &&
+              !(data.block_start && data.block_end && data.blockChecked)
+            ) {
+              checkStatus = false;
+              setErrorText(t('pages.inscribe.ordx.error_15'));
+              return checkStatus;
+            }
+          }
         }
       }
     } catch (error) {
@@ -285,8 +387,15 @@ export const InscribeOrdx = ({
     return checkStatus;
   };
   const tickChange = async (value: string) => {
-    const cleanValue = value.replace(/-/g, ''); // Remove all hyphens from the string
     setUtxoList([]);
+    set('tick', value.trim());
+  };
+  const ontickBlur = async () => {
+    await checkTick(true);
+    const cleanValue = data.tick.replace(/[^\w\u4e00-\u9fa5]/g, '');
+    if (data.tick !== cleanValue) {
+      setUtxoList([]);
+    }
     set('tick', cleanValue);
   };
 
@@ -323,43 +432,37 @@ export const InscribeOrdx = ({
     return !data.tick;
   }, [data]);
 
-  // const time = useBlockHeightTime({
-  //   height: btcHeight,
-  //   start: data.block_start,
-  //   end: data.block_end,
-  //   network,
-  // });
-  const onBlockBLur = async () => {
-    // const res = await calcTimeBetweenBlocks({
-    //   height: btcHeight,
-    //   start: data.block_start,
-    //   end: data.block_end,
-    //   network,
-    // });
-    // setTime(res);
+  const onBlockBLur = () => {
+    calcTimeBetweenBlocks({
+      height: btcHeight,
+      start: data.block_start,
+      end: data.block_end,
+      network,
+    }).then(setTime);
   };
-
   const handleUtxoChange = (utxo: any) => {
     setTickChecked(false);
     setAllowSpecialBeyondStatus(false);
     const firstOffset = utxo.sats[0].offset;
     if (firstOffset >= 546) {
-      // toast.error('请先拆分，再铸造。');
       return;
     }
     setSelectedUtxo(utxo.utxo);
 
     const satData = utxoList.filter((item) => item.utxo === utxo.utxo)[0];
-    // satData.sats = satData.sats.sort((a, b) => {
-    //   return b.size - a.size;
-    // });
-    const satSize = satData.sats.reduce((acc, cur) => {
-      return acc + cur.size;
-    }, 0);
-    console.log('satSize', satSize);
     set('sat', satData?.sats?.[0].start);
     if (satData) {
-      onUtxoChange?.(satData);
+      // onUtxoChange?.(satData);
+      const utxo = satData.utxo;
+      const txid = utxo.split(':')[0];
+      const vout = Number(utxo.split(':')[1]);
+      set('utxos', [
+        {
+          ...satData,
+          txid,
+          vout,
+        },
+      ] as any[]);
       console.log('satData', satData);
       console.log('satData', data.amount);
       set('amount', satData.amount);
@@ -397,10 +500,10 @@ export const InscribeOrdx = ({
       width: '40%',
       render: (t) => {
         const txid = t.replace(/:0$/m, '');
-        const href =
-          network === 'testnet'
-            ? `https://mempool.space/testnet/tx/${txid}`
-            : `https://mempool.space/tx/${txid}`;
+        const href = generateMempoolUrl({
+          network,
+          path: `tx/${txid}`,
+        });
         return (
           <div className="flex item-center justify-center">
             <Tooltip content={t}>
@@ -463,17 +566,32 @@ export const InscribeOrdx = ({
   //     set('mintRarity', item.rarity);
   //   }
   // }, [state]);
+  const minBlockStart = useMemo(() => {
+    return btcHeight + (network === 'testnet' ? 10 : 1010);
+  }, [btcHeight]);
   useEffect(() => {
     if (btcHeight) {
-      set('block_start', btcHeight);
-      set('block_end', btcHeight + 4320);
+      const block_start = btcHeight + (network === 'testnet' ? 10 : 1010);
+      const block_end = btcHeight + 4320;
+      set('block_start', block_start);
+      set('block_end', block_end);
+      calcTimeBetweenBlocks({
+        height: btcHeight,
+        start: block_start,
+        end: block_end,
+        network,
+      }).then(setTime);
     }
   }, [btcHeight]);
   useEffect(() => {
+    console.log('data chagne');
+    if (data.type === 'deploy') {
+      setTickChecked(false);
+    }
     onChange?.(data);
   }, [data]);
   return (
-    <div>
+    <div className="p-4">
       <div className="mb-4 flex justify-center">
         <RadioGroup
           orientation="horizontal"
@@ -487,7 +605,23 @@ export const InscribeOrdx = ({
       {errorText && (
         <div className="mb-2 text-xl text-center text-red-500">{errorText}</div>
       )}
-
+      {data.type === 'deploy' && (
+        <div className="flex items-center mb-4">
+          <div className="w-52">{t('pages.inscribe.ordx.deploy_mode')}</div>
+          <RadioGroup
+            orientation="horizontal"
+            onValueChange={(e) => set('mode', e)}
+            value={data.mode}
+          >
+            <Radio value="fair">
+              {t('pages.inscribe.ordx.deploy_mode_fair')}
+            </Radio>
+            <Radio value="project">
+              {t('pages.inscribe.ordx.deploy_mode_project')}
+            </Radio>
+          </RadioGroup>
+        </div>
+      )}
       <div className="mb-4">
         <div className="flex items-center mb-4">
           <div className="w-52">{t('common.tick')}</div>
@@ -497,13 +631,238 @@ export const InscribeOrdx = ({
             onChange={(e) => {
               tickChange(e.target.value);
             }}
+            onBlur={() => {
+              ontickBlur();
+            }}
             maxLength={32}
             type="text"
             placeholder={t('pages.inscribe.ordx.tick_placeholder')}
           />
         </div>
-
-        {data.type !== 'deploy' && (
+        {data.type === 'deploy' && (
+          <>
+            <div className="flex items-center mb-4">
+              <div className="w-52">{t('common.max')}</div>
+              <Input
+                type="number"
+                className="flex-1"
+                value={data.max?.toString()}
+                onChange={(e) => {
+                  set('max', e.target.value);
+                }}
+                min={0}
+              ></Input>
+            </div>
+            {data.mode === 'project' && (
+              <div className="flex items-center mb-4">
+                <div className="w-52">{t('common.selfmint')}</div>
+                <Input
+                  type="number"
+                  className="flex-1"
+                  value={data.selfmint?.toString()}
+                  onChange={(e) => {
+                    let value: any = e.target.value;
+                    if (value) {
+                      value = value.replace('.', '');
+                      value = parseInt(value);
+                      value = Math.min(value, 100);
+                      value = Math.max(value, 0);
+                    }
+                    set('selfmint', value.toString());
+                  }}
+                  endContent="%"
+                  max={100}
+                  min={0}
+                ></Input>
+              </div>
+            )}
+            <div className="mb-4">
+              <div className="flex items-center mb-2">
+                <div className="w-52">
+                  {t('common.block')}{' '}
+                  <span className="text-xs">
+                    （
+                    {t('pages.inscribe.ordx.current_height', {
+                      height: btcHeight,
+                    })}
+                    ）
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center">
+                  <Checkbox
+                    isDisabled={data.mode === 'fair'}
+                    isSelected={data.blockChecked}
+                    onChange={onBlockChecked}
+                  ></Checkbox>
+                  <div className="ml-2 flex-1 flex items-center">
+                    <Input
+                      type="number"
+                      value={data.block_start.toString()}
+                      className="flex-1"
+                      onBlur={onBlockBLur}
+                      isDisabled={!data.blockChecked}
+                      placeholder="Block start"
+                      onChange={(e) =>
+                        set(
+                          'block_start',
+                          isNaN(Number(e.target.value))
+                            ? 0
+                            : Number(e.target.value),
+                        )
+                      }
+                      min={minBlockStart}
+                    ></Input>
+                    <Divider className="w-4 mx-4"></Divider>
+                    <Input
+                      type="number"
+                      value={data.block_end.toString()}
+                      isDisabled={!data.blockChecked}
+                      className="flex-1"
+                      onBlur={onBlockBLur}
+                      placeholder="Block End"
+                      onChange={(e) =>
+                        set(
+                          'block_end',
+                          isNaN(Number(e.target.value))
+                            ? 0
+                            : Number(e.target.value),
+                        )
+                      }
+                      min={minBlockStart}
+                    ></Input>
+                  </div>
+                </div>
+              </div>
+              {time.start && time.end && (
+                <div className="ml-60 mb-2 text-xs text-gray-600">
+                  {t('pages.inscribe.ordx.block_helper', {
+                    start: time.start,
+                    end: time.end,
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">
+                {t('common.rarity')}
+                <Tooltip content={t('pages.inscribe.ordx.rarity_helper')}>
+                  <span className="text-blue-500">
+                    (sat
+                    <QuestionCircleOutlined />)
+                  </span>
+                </Tooltip>
+              </div>
+              <div className="flex-1 flex items-center">
+                <Checkbox
+                  isSelected={data.rarityChecked}
+                  onChange={onRarityChecked}
+                ></Checkbox>
+                <div className="ml-2 flex-1">
+                  <Select
+                    disabled={!data.rarityChecked}
+                    placeholder={t('common.select_option')}
+                    value={data.rarity}
+                    onChange={(e) => rarityChange(e.target.value)}
+                  >
+                    {satTypeList.map((item) => {
+                      return (
+                        <SelectItem value={item} key={item}>
+                          {item}
+                        </SelectItem>
+                      );
+                    })}
+                  </Select>
+                </div>
+              </div>
+            </div>
+            {/* <div className="flex items-center  mb-4">
+              <div className="w-52">
+                {t('common.trz')}
+                <Tooltip content={t('pages.inscribe.ordx.trz_placeholder')}>
+                  <span className="text-blue-500">
+                    (sat
+                    <QuestionCircleOutlined />)
+                  </span>
+                </Tooltip>
+              </div>
+              <div className="flex-1 flex items-center">
+                <Checkbox
+                  isSelected={data.trzChecked}
+                  onChange={onTrzChecked}
+                ></Checkbox>
+                <div className="ml-2 flex-1">
+                  <Input
+                    type="number"
+                    value={data.trz.toString()}
+                    placeholder={t('pages.inscribe.ordx.trz_placeholder')}
+                    disabled={!data.trzChecked}
+                    onChange={(e) =>
+                      set(
+                        'trz',
+                        isNaN(Number(e.target.value))
+                          ? 0
+                          : Number(e.target.value),
+                      )
+                    }
+                    min={0}
+                  ></Input>
+                </div>
+              </div>
+            </div> */}
+            <div className="flex items-center  mb-4">
+              <div className="w-52">{t('common.limit_per_mint')}</div>
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  value={data.limitPerMint.toString()}
+                  onChange={(e) =>
+                    set(
+                      'limitPerMint',
+                      isNaN(Number(e.target.value))
+                        ? 0
+                        : Number(e.target.value),
+                    )
+                  }
+                  min={1}
+                ></Input>
+              </div>
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">{t('common.description')}</div>
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  maxLength={128}
+                  value={data.des}
+                  onChange={(e) => set('des', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center  mb-4">
+              <div className="w-52">{t('pages.inscribe.ordx.deploy_file')}</div>
+              <div className="flex-1">
+                <Dragger
+                  maxCount={1}
+                  onRemove={onFilesRemove}
+                  listType="picture"
+                  beforeUpload={() => false}
+                  onChange={filesChange}
+                >
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined />
+                  </p>
+                  <p className="dark:text-white">
+                    {t('pages.inscribe.files.upload_des_1')}
+                  </p>
+                  <p className="dark:text-white">
+                    {t('pages.inscribe.files.upload_des_2')}
+                  </p>
+                </Dragger>
+              </div>
+            </div>
+          </>
+        )}
+        {data.type == 'mint' && (
           <>
             <div className="flex items-center mb-4">
               <div className="w-52">{t('common.amount')}</div>
@@ -517,6 +876,7 @@ export const InscribeOrdx = ({
                     'amount',
                     isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
                   );
+                  setTickChecked(false);
                   setSelectedUtxo('');
                 }}
                 min={1}
@@ -530,277 +890,40 @@ export const InscribeOrdx = ({
                 pagination={false}
               />
             )}
-          </>
-        )}
-
-        {data.type === 'deploy' && (
-          <>
-            <div className="flex items-center mb-4">
-              <div className="w-52">{t('common.block')}</div>
-              <div className="flex-1 flex items-center">
-                <Checkbox
-                  isSelected={data.blockChecked}
-                  onChange={onBlockChecked}
-                ></Checkbox>
-                <div className="ml-2 flex-1 flex items-center">
-                  <Input
-                    type="number"
-                    value={data.block_start.toString()}
-                    className="flex-1"
-                    onBlur={onBlockBLur}
-                    isDisabled={!data.blockChecked}
-                    placeholder="Block start"
-                    onChange={(e) =>
-                      set(
-                        'block_start',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Number(e.target.value),
-                      )
-                    }
-                    min={1}
-                  ></Input>
-                  <Divider className="w-4 mx-4"></Divider>
-                  <Input
-                    type="number"
-                    value={data.block_end.toString()}
-                    isDisabled={!data.blockChecked}
-                    className="flex-1"
-                    onBlur={onBlockBLur}
-                    placeholder="Block End"
-                    onChange={(e) =>
-                      set(
-                        'block_end',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Number(e.target.value),
-                      )
-                    }
-                    min={1}
-                  ></Input>
+            {tickChecked && !showSat && (
+              <div>
+                <div className="flex items-center mb-4">
+                  <div className="w-52">{t('common.repeat_mint')}</div>
+                  <div className="flex-1">
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        value={data.repeatMint.toString()}
+                        onChange={(e) =>
+                          set(
+                            'repeatMint',
+                            isNaN(Number(e.target.value))
+                              ? 0
+                              : Math.min(Number(e.target.value), 10),
+                          )
+                        }
+                        min={1}
+                        max={10}
+                      ></Input>
+                      <Slider
+                        step={1}
+                        maxValue={10}
+                        minValue={1}
+                        value={data.repeatMint}
+                        className="max-w-md"
+                        onChangeEnd={(e) => set('repeatMint', e[0])}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {time.start && time.end && (
-              <div className="ml-60 mb-2 text-xs text-gray-600">
-                {t('pages.inscribe.ordx.block_helper', {
-                  start: time.start,
-                  end: time.end,
-                })}
               </div>
             )}
-
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">
-                  {t('common.rarity')}
-                  <Tooltip content={t('pages.inscribe.ordx.rarity_helper')}>
-                    <span className="text-blue-500">
-                      (sat
-                      <QuestionCircleOutlined />)
-                    </span>
-                  </Tooltip>
-                </div>
-                <div className="flex-1 flex items-center">
-                  <Checkbox
-                    isSelected={data.rarityChecked}
-                    onChange={onRarityChecked}
-                  ></Checkbox>
-                  <div className="ml-2 flex-1">
-                    <Select
-                      disabled={!data.rarityChecked}
-                      placeholder={t('common.select_option')}
-                      value={data.rarity}
-                      onChange={(e) => rarityChange(e.target.value)}
-                    >
-                      {satTypeList.map((item) => {
-                        return (
-                          <SelectItem value={item} key={item}>
-                            {item}
-                          </SelectItem>
-                        );
-                      })}
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* <FormControl>
-              <div className='flex items-center  mb-4'>
-                <FormLabel className='w-52' marginBottom={0}>
-                  {t('common.cn')}
-                  <Tooltip content={t('pages.inscribe.ordx.cn_placeholder')}>
-                    <span className='text-blue-500'>
-                      (sat
-                      <QuestionCircleOutlined />)
-                    </span>
-                  </Tooltip>
-                </FormLabel>
-                <div className='flex-1 flex items-center'>
-                  <Checkbox
-                    checked={data.cnChecked}
-                    onChange={onCnChecked}></Checkbox>
-                  <div className='ml-2 flex-1'>
-                    <NumberInput
-                      value={data.cn}
-                      isDisabled={!data.cnChecked}
-                      placeholder={t('pages.inscribe.ordx.cn_placeholder')}
-                      onChange={(_, e) => set('cn', isNaN(e) ? 0 : e)}
-                      min={0}>
-                      <NumberInputField />
-                    </NumberInput>
-                  </div>
-                </div>
-              </div>
-            </FormControl> */}
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">
-                  {t('common.trz')}
-                  <Tooltip content={t('pages.inscribe.ordx.trz_placeholder')}>
-                    <span className="text-blue-500">
-                      (sat
-                      <QuestionCircleOutlined />)
-                    </span>
-                  </Tooltip>
-                </div>
-                <div className="flex-1 flex items-center">
-                  <Checkbox
-                    isSelected={data.trzChecked}
-                    onChange={onTrzChecked}
-                  ></Checkbox>
-                  <div className="ml-2 flex-1">
-                    <Input
-                      type="number"
-                      value={data.trz.toString()}
-                      placeholder={t('pages.inscribe.ordx.trz_placeholder')}
-                      disabled={!data.trzChecked}
-                      onChange={(e) =>
-                        set(
-                          'trz',
-                          isNaN(Number(e.target.value))
-                            ? 0
-                            : Number(e.target.value),
-                        )
-                      }
-                      min={0}
-                    ></Input>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">{t('common.limit_per_mint')}</div>
-                <div className="flex-1">
-                  <Input
-                    type="number"
-                    value={data.limitPerMint.toString()}
-                    onChange={(e) =>
-                      set(
-                        'limitPerMint',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Number(e.target.value),
-                      )
-                    }
-                    min={1}
-                  ></Input>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center  mb-4">
-                <div className="w-52">{t('common.description')}</div>
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    maxLength={128}
-                    value={data.des}
-                    onChange={(e) => set('des', e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
           </>
-        )}
-        {/* {data.type === 'mint' && showSat && (
-          <FormControl>
-            <div className='flex items-center  mb-4'>
-              <FormLabel className='w-52' marginBottom={0}>
-                Sat
-              </FormLabel>
-              <div className='flex-1'>
-                <NumberInput
-                  value={data.sat}
-                  isDisabled={tickLoading}
-                  onChange={(_, e) => set('sat', e)}
-                  min={1}>
-                  <NumberInputField />
-                </NumberInput>
-              </div>
-            </div>
-          </FormControl>
-        )} */}
-        {data.type === 'deploy' && (
-          <div>
-            <div className="flex items-center  mb-4">
-              <div className="w-52">{t('common.file')}</div>
-              <div className="flex-1">
-                <Dragger
-                  maxCount={1}
-                  onRemove={onFilesRemove}
-                  listType="picture"
-                  beforeUpload={() => false}
-                  onChange={filesChange}
-                >
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                  </p>
-                  <p className="ant-upload-text">
-                    {t('pages.inscribe.files.upload_des_1')}
-                  </p>
-                  <p className="ant-upload-hint">
-                    {t('pages.inscribe.files.upload_des_2')}
-                  </p>
-                </Dragger>
-              </div>
-            </div>
-          </div>
-        )}
-        {data.type === 'mint' && tickChecked && !showSat && (
-          <div>
-            <div className="flex items-center mb-4">
-              <div className="w-52">{t('common.repeat_mint')}</div>
-              <div className="flex-1">
-                <div className="flex">
-                  <Input
-                    type="number"
-                    value={data.repeatMint.toString()}
-                    onChange={(e) =>
-                      set(
-                        'repeatMint',
-                        isNaN(Number(e.target.value))
-                          ? 0
-                          : Math.min(Number(e.target.value), 10),
-                      )
-                    }
-                    min={1}
-                    max={10}
-                  ></Input>
-                  <Slider
-                    label="Temperature"
-                    step={1}
-                    maxValue={10}
-                    minValue={1}
-                    value={data.repeatMint}
-                    className="max-w-md"
-                    onChangeEnd={(e) => set('repeatMint', e[0])}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
         )}
       </div>
       <div className="w-60 mx-auto flex justify-center">
