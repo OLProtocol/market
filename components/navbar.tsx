@@ -30,7 +30,11 @@ import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { usePathname } from 'next/navigation';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import useSWR from 'swr';
+import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
+import { useCommonStore, useUtxoStore } from '@/store';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 
 const WalletButton = dynamic(
   () => import('../components/wallet/WalletConnectButton') as any,
@@ -38,10 +42,42 @@ const WalletButton = dynamic(
 );
 
 export const Navbar = () => {
+  const { address, network } = useReactWalletStore();
+  const { setHeight, setBtcPrice } = useCommonStore();
+  const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const taggleRef = useRef<any>();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
+
+  const { data: heightData } = ordxSWR.useBtcHeight(network as any);
+  const { data } = useSWR(`getUtxoByValue-${address}-${network}`, () =>
+    getUtxoByValue({ address, network, value: 500 }),
+  );
+  const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
+
+  useEffect(() => {
+    if (data?.data?.length) {
+      const list = data.data?.map((item: any) => ({
+        status: 'unspend',
+        location: 'remote',
+        utxo: `${item.txid}:${item.vout}`,
+        ...item,
+      }));
+      setList(list);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const height = heightData?.data?.height;
+    if (height) {
+      setHeight(height);
+    }
+  }, [heightData]);
+  useEffect(() => {
+    if (btcData?.data?.amount) {
+      setBtcPrice(btcData?.data?.amount);
+    }
+  }, [btcData]);
   const searchInput = (
     <Input
       aria-label="Search"
@@ -74,6 +110,11 @@ export const Navbar = () => {
         isActive: true,
       },
       {
+        label: t('pages.inscribe.title'),
+        href: '/inscribe',
+        isActive: true,
+      },
+      {
         label: t('pages.tools.title'),
         href: '/tools',
         isActive: false,
@@ -103,6 +144,7 @@ export const Navbar = () => {
               alt="logo"
               className="w-14 h-14"
             />
+            <p className="font-bold text-purple-500/90">SAT20Market</p>
           </NextLink>
         </NavbarBrand>
 
@@ -133,7 +175,7 @@ export const Navbar = () => {
 						<GithubIcon className="text-default-500" />
 					</Link> */}
           <LanguageSelect />
-          <ThemeSwitch />
+          {/* <ThemeSwitch /> */}
         </NavbarItem>
         <NavbarItem className="">
           <WalletButton />

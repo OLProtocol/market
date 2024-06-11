@@ -92,11 +92,14 @@ export const OrdxOrderList = ({
       });
       return;
     }
-    const res = await cancelOrder({ address, order_id: item.order_id });
+    const res = await cancelOrder({
+      address: address || storeAddress,
+      order_id: item.order_id,
+    });
     if (res.code === 200) {
       notification.success({
         message: t('notification.order_cancel_success_title'),
-        description: t('notinication.order_cancel_success_description_1'),
+        description: t('notification.order_cancel_success_description_1'),
       });
       const index = list.findIndex((i) => i.utxo === item.utxo);
       removeAt(index);
@@ -214,7 +217,7 @@ export const OrdxOrderList = ({
             ></SortDropdown>
           </div>
         )}
-        <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
+        <div className="min-h-[30rem] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-8 sm:gap-8 mb-4">
           {list.map((item: any, i) => (
             <OrdxFtOrderItem
               showResale={showResale}

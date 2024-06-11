@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
+import * as blockStream from './blockStream';
 import { ordx } from './ordx';
 const useSatTypes = ({ network }: any) => {
   const { data, error, isLoading } = useSWR(
@@ -15,7 +16,22 @@ const useSatTypes = ({ network }: any) => {
     isLoading: isLoading,
   };
 };
+export const useBtcHeight = (network: string) => {
+  const { data, error, isLoading } = useSWR(
+    `height-${network}`,
+    () => ordx.getBestHeight({ network }),
+    {
+      refreshInterval: 1000 * 60 * 5,
+    },
+  );
+  return {
+    data,
+    error,
+    isLoading,
+  };
+};
 
 export const ordxSWR = {
   useSatTypes,
+  useBtcHeight,
 };

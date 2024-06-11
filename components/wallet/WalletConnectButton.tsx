@@ -19,6 +19,7 @@ import { message } from '@/lib/wallet-sdk';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
+import { generateMempoolUrl } from '@/lib/utils';
 
 const WalletConnectButton = () => {
   const { t } = useTranslation();
@@ -62,9 +63,10 @@ const WalletConnectButton = () => {
     });
   };
   const toHistory = () => {
-    const url = `https://mempool.space${
-      network === 'testnet' ? '/testnet' : ''
-    }/address/${address}`;
+    const url = generateMempoolUrl({
+      network,
+      path: `address/${address}`,
+    });
     window.open(url, '_blank');
   };
   const handlerDisconnect = async () => {
@@ -75,14 +77,22 @@ const WalletConnectButton = () => {
   const accountAndNetworkChange = async () => {
     console.log('accountAndNetworkChange');
     console.log('connected', connected);
+    const windowState =
+      document.visibilityState === 'visible' || !document.hidden;
     try {
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
         try {
-          const _s = await btcWallet?.signMessage(
-            process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-          );
-          if (_s) {
-            setSignature(_s);
+          console.log('checkSignature');
+          console.log(windowState);
+          if (windowState) {
+            const _s = await btcWallet?.signMessage(
+              process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+            );
+            if (_s) {
+              setSignature(_s);
+            }
+          } else {
+            handlerDisconnect();
           }
         } catch (error) {
           await handlerDisconnect();
