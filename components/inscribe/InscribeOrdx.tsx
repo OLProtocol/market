@@ -202,7 +202,7 @@ export const InscribeOrdx = ({
         startBlock,
         endBlock,
         limit,
-        imgtype,
+        contentType,
         inscriptionId,
         max,
         totalMinted,
@@ -265,7 +265,7 @@ export const InscribeOrdx = ({
           );
           return checkStatus;
         }
-        if (imgtype) {
+        if (contentType === 'text/html') {
           set('relateInscriptionId', inscriptionId);
 
           if (!blur && !isSpecial) {
