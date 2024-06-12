@@ -3,6 +3,7 @@
   "deploy": "Deploy",
   "mint": "Mint",
   "file": "File",
+  "address": "Address",
   "block": "Block",
   "content": "Content",
   "selfmint": "Self Mint",
