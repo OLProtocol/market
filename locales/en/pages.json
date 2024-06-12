@@ -93,6 +93,7 @@
       "error_14": "The Max must be set",
       "error_15": "The Block must be set",
       "error_16": "The Max must must greater than limit",
+      "error_17": "{{tick}} cannot minted",
       "rarity_helper": "Special sat attributes required for mint."
     },
     "step_two": {

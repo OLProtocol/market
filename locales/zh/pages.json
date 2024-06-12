@@ -93,6 +93,7 @@
       "error_14": "总量必须设置",
       "error_15": "区块必须设置",
       "error_16": "总量必须大于每次铸造限制",
+      "error_17": "{{tick}} 无法铸造",
       "rarity_helper": "铸造需要特殊的 sat 属性。"
     },
     "step_two": {

@@ -195,6 +195,7 @@ export const InscribeOrdx = ({
         network,
         address: currentAccount,
       });
+      const selfMintAmount = permissionInfo?.data?.amount || 0;
       setTickLoading(false);
 
       const {
@@ -220,14 +221,9 @@ export const InscribeOrdx = ({
         if (isSpecial) {
           status = 'Minting';
         } else if (max) {
-          if (selfmint === 100) {
-            const inscriptionInfo = await ordx.getInscriptiontInfo({
-              inscriptionId,
-              network,
-            });
-            console.log('inscriptionInfo', inscriptionInfo);
-          }
-          if (totalMinted < max) {
+          if (selfmint > 0) {
+            status = permissionInfo?.data?.amount > 0 ? 'Minting' : 'Project';
+          } else if (totalMinted < max) {
             status = 'Minting';
           }
         } else if (
@@ -242,6 +238,7 @@ export const InscribeOrdx = ({
         } else {
           status = 'Completed';
         }
+        console.log('status', status);
         if (!info.data) {
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_4', { tick: data.tick }));
@@ -252,7 +249,11 @@ export const InscribeOrdx = ({
           setErrorText(t('pages.inscribe.ordx.error_6', { tick: data.tick }));
           return checkStatus;
         }
-
+        if (status === 'Project') {
+          checkStatus = false;
+          setErrorText(t('pages.inscribe.ordx.error_17', { tick: data.tick }));
+          return checkStatus;
+        }
         if (status === 'Completed') {
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_7', { tick: data.tick }));
@@ -286,7 +287,8 @@ export const InscribeOrdx = ({
           }
         }
         if (blur) {
-          set('amount', Number(limit));
+          const maxAmount = Math.min(selfMintAmount, Number(limit));
+          set('amount', maxAmount);
           set('mintRarity', rarity);
         } else if (isSpecial) {
           setSpecialStatus(true);
