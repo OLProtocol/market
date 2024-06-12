@@ -147,7 +147,7 @@ const getInscriptiontInfo = async ({ inscriptionId, network }: any) => {
 };
 const getTickerPermission = async ({ address, ticker, network }: any) => {
   const { data } = await axios.get(
-    generateUrl(`/mint/permission/${ticker}/${address}`, network),
+    generateUrl(`mint/permission/${ticker}/${address}`, network),
   );
   return data;
 };
