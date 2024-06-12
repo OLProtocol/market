@@ -20,7 +20,7 @@ import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
 import { generateMempoolUrl } from '@/lib/utils';
-
+import { useUtxoStore } from '@/store';
 const WalletConnectButton = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -34,6 +34,7 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
+  const { reset } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const toMyAssets = () => {
     router.push('/account');
@@ -77,6 +78,7 @@ const WalletConnectButton = () => {
   const accountAndNetworkChange = async () => {
     console.log('accountAndNetworkChange');
     console.log('connected', connected);
+    reset();
     const windowState =
       document.visibilityState === 'visible' || !document.hidden;
     try {

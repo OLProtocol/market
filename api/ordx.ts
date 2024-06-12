@@ -145,6 +145,12 @@ const getInscriptiontInfo = async ({ inscriptionId, network }: any) => {
   );
   return data;
 };
+const getTickerPermission = async ({ address, ticker, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`/mint/permission/${ticker}/${address}`, network),
+  );
+  return data;
+};
 
 const getAppVersion = async () => {
   const { data } = await axios.get(`/version.txt`);
@@ -300,5 +306,6 @@ export const ordx = {
   getNsListByAddress,
   getNsName,
   getBestHeight,
+  getTickerPermission,
   pushTx,
 };

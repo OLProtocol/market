@@ -190,6 +190,11 @@ export const InscribeOrdx = ({
     try {
       setTickLoading(true);
       const info = await getOrdXInfo(data.tick);
+      const permissionInfo = await ordx.getTickerPermission({
+        ticker: data.tick,
+        network,
+        address: currentAccount,
+      });
       setTickLoading(false);
 
       const {

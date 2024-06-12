@@ -84,7 +84,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     <div>
       <div className="mb-4 text-center">
         <p>{t('pages.inscribe.name.description')}</p>
-        <p className="text-gray-500">
+        <p className="text-gray-500 whitespace-pre-line">
           {t('pages.inscribe.name.description_1')}
         </p>
       </div>

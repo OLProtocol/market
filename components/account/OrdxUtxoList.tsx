@@ -24,6 +24,7 @@ export const OrdxUtxoList = ({ ticker }: Props) => {
   const {
     add: addSell,
     changeTicker,
+    changeType,
     reset,
     list: sellList,
     remove: removeSell,
@@ -65,7 +66,8 @@ export const OrdxUtxoList = ({ ticker }: Props) => {
     console.log(satsToBitcoin(item.value));
     const tickerAmount =
       item.tickers.find((v) => v.ticker === ticker)?.amount || 0;
-    changeTicker(ticker);
+    changeType('ft');
+    changeTicker('Name');
     addSell({
       ...item,
       unit_price: '2',

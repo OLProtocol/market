@@ -65,7 +65,7 @@ export const OrdxAssetNameItem = ({
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
           <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-200">
-              {item?.nslist[0]?.ticker}
+              {item?.nslist[0]?.name}
             </span>
           </div>
           <div className="flex justify-center">
