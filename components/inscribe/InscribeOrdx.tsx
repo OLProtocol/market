@@ -44,7 +44,7 @@ export const InscribeOrdx = ({
   onChange,
   onUtxoChange,
 }: InscribeOrdxProps) => {
-  const { address: currentAccount, network } = useReactWalletStore();
+  const { address: currentAccount, network, connected } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
   const { selectUtxosByAmount } = useUtxoStore();
@@ -171,6 +171,9 @@ export const InscribeOrdx = ({
     }
   };
   const checkTick = async (blur: boolean = false) => {
+    if (blur && !connected) {
+      return;
+    }
     setErrorText('');
     setSpecialStatus(false);
     setUtxoList([]);
@@ -287,7 +290,10 @@ export const InscribeOrdx = ({
           }
         }
         if (blur) {
-          const maxAmount = Math.min(selfMintAmount, Number(limit));
+          let maxAmount = Number(limit);
+          if (selfmint > 0) {
+            maxAmount = Math.min(selfMintAmount, maxAmount);
+          }
           set('amount', maxAmount);
           set('mintRarity', rarity);
         } else if (isSpecial) {
