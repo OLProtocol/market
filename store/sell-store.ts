@@ -16,6 +16,7 @@ export interface UtxoAssetItem {
     inscriptionnum: number;
   }[];
   nslist: {
+    name: string;
     utxo: string;
   }[];
 }
@@ -23,6 +24,7 @@ export interface UtxoAssetItem {
 interface SellState {
   unit: 'btc' | 'sats';
   ticker: string;
+  type: 'ft' | 'name';
   amountUnit: 'btc' | 'sats';
   list: UtxoAssetItem[];
   add: (item: UtxoAssetItem) => void;
@@ -33,6 +35,7 @@ interface SellState {
   changePrice: (utxo: string, price: string) => void;
   changeUnit: (unit: 'btc' | 'sats') => void;
   changeTicker: (ticker: string) => void;
+  changeType: (t: 'ft' | 'name') => void;
   changeAmountUnit: (unit: 'btc' | 'sats') => void;
   remove: (utxo: string) => void;
   reset: () => void;
@@ -42,7 +45,8 @@ export const useSellStore = create<SellState>()(
   devtools((set, get) => ({
     unit: 'sats',
     amountUnit: 'btc',
-    ticker: '123123123123',
+    ticker: '',
+    type: 'ft',
     list: [
       // {
       //   utxo: 'c1751e4beb5472305875f2b7ed30f8805c5f8027c393e884fad86be2fc6bc00c:0',
@@ -60,18 +64,14 @@ export const useSellStore = create<SellState>()(
       // },
     ],
     changePrice(utxo, price) {
-      // if (
-      //   price === undefined ||
-      //   isNaN(Number(price)) ||
-      //   Number(price) < 0 ||
-      //   price == ''
-      // ) {
-      //   price = '0';
-      // }
-      const { list, ticker, amountUnit, unit } = get();
+      const { list, ticker, amountUnit, unit, type } = get();
       const newList = list.map((item) => {
-        const tickerAmount =
-          item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        let amount = 0;
+        if (type === 'ft') {
+          amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        } else if (type === 'name') {
+          amount = 1;
+        }
         if (price === '' || isNaN(Number(price))) {
           return {
             ...item,
@@ -80,9 +80,8 @@ export const useSellStore = create<SellState>()(
           };
         }
         const unitPrice = unit === 'btc' ? btcToSats(price).toString() : price;
-        console.log(unitPrice);
         let amountPrice: any = new Decimal(unitPrice)
-          .mul(new Decimal(tickerAmount))
+          .mul(new Decimal(amount))
           .toNumber();
         amountPrice = Math.ceil(amountPrice).toString();
         amountPrice =
@@ -108,6 +107,11 @@ export const useSellStore = create<SellState>()(
         ticker,
       });
     },
+    changeType(t) {
+      set({
+        type: t,
+      });
+    },
     changeStatus(utxo, status) {
       const { list } = get();
       const newList = list.map((item) => {
@@ -125,19 +129,23 @@ export const useSellStore = create<SellState>()(
       });
     },
     changeUnit(unit) {
-      const { list, ticker, amountUnit } = get();
+      const { list, ticker, amountUnit, type } = get();
       const newList = list.map((item) => {
         const unitPrice =
           unit === 'btc'
             ? satsToBitcoin(item.unit_price).toString()
             : btcToSats(item.unit_price).toString();
-        const tickerAmount =
-          item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        let amount = 0;
+        if (type === 'ft') {
+          amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        } else if (type === 'name') {
+          amount = 1;
+        }
 
         const satsPrice =
           unit === 'btc' ? btcToSats(unitPrice).toString() : unitPrice;
         let amountPrice = new Decimal(satsPrice)
-          .mul(new Decimal(tickerAmount))
+          .mul(new Decimal(amount))
           .toString();
         amountPrice =
           amountUnit === 'btc'
@@ -171,14 +179,17 @@ export const useSellStore = create<SellState>()(
       });
     },
     add: (item) => {
-      const { list, ticker } = get();
+      const { list, ticker, type } = get();
       if (!list.find((i) => i.utxo === item.utxo)) {
-        const tickerAmount =
-          item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        let amount = 0;
+        if (type === 'ft') {
+          amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        } else if (type === 'name') {
+          amount = 1;
+        }
         let amountPrice = new Decimal(item.unit_price)
-          .mul(new Decimal(tickerAmount))
+          .mul(new Decimal(amount))
           .toString();
-        console.log(amountPrice);
         amountPrice = satsToBitcoin(amountPrice).toString();
         set((state) => {
           return {

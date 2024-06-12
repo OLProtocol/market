@@ -45,7 +45,7 @@
       "title": "Name",
       "input_name": "Name",
       "description": "Register a name on BTC",
-      "description_1": "Supports.x,.btc,.stats,. pizza, and no suffix. For example： abcd.x,  abcd.btc,  abcd.stats,  abcd.pizza,  and abcd .",
+      "description_1": "Supports.x,.btc,.sats,.pizza, and no suffix. \n For example： abcd.x,  abcd.btc,  abcd.sats,  abcd.pizza,  and abcd .",
       "name_placeholder": "Name must be 3, 5-32 byte long",
       "select_placeholder": "Select Suffix",
       "error_1": "Tick must be 3, 5-32 byte long",

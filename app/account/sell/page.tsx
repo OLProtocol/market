@@ -161,8 +161,8 @@ export default function SellPage() {
           ) : (
             <div className="mb-2 flex items-center gap-6">
               <div className="flex items-center gap-4">
-                <span>{t('common.tick')}:</span>
-                <span>{ticker}</span>
+                {/* <span>{t('common.tick')}:</span>
+                <span>{ticker}</span> */}
               </div>
               <div className="flex items-center gap-4">
                 <span>{t('common.lowest_price')}:</span>
@@ -233,9 +233,17 @@ export default function SellPage() {
                           </div>
                         </div>
                       ))}
+                      {item.nslist?.map((v) => (
+                        <div key={v.name}>
+                          <div>
+                            <span className="text-gray-400">Name：</span>
+                            <span>{v.name}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <div>
-                      <span className="text-gray-400">Sats:</span>
+                      <span className="text-gray-400 mr-4">Sats:</span>
                       {item.value}
                     </div>
                     <div className="flex items-center">

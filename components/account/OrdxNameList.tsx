@@ -24,6 +24,7 @@ export const OrdxNameList = () => {
   const {
     add: addSell,
     changeTicker,
+    changeType,
     reset,
     list: sellList,
     remove: removeSell,
@@ -61,11 +62,10 @@ export const OrdxNameList = () => {
     setCanSelect(true);
   };
   const addHandler = (item: any) => {
-    console.log(item);
-    console.log(satsToBitcoin(item.value));
     const tickerAmount = 1;
+    changeType('name');
+    changeTicker(item.ticker);
     addSell({
-      type: 'name',
       ...item,
       unit_price: '2',
       status: 'pending',

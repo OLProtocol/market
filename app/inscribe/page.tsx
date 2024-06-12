@@ -219,13 +219,13 @@ export default function Inscribe() {
     const list: any = [];
     const { suffix, name } = nameData;
     if (nameData.type === 'mint') {
-      let value;
-      const _name = name.toString().trim();
-      if (!suffix || suffix === '.ordx') {
-        value = _name;
-      } else {
-        value = JSON.stringify({ p: 'sns', op: 'reg', name: _name + suffix });
-      }
+      // let value;
+      const value = name.toString().trim();
+      // if (!suffix || suffix === '.ordx') {
+      //   value = _name;
+      // } else {
+      //   value = JSON.stringify({ p: 'sns', op: 'reg', name: _name + suffix });
+      // }
       list.push({
         type: 'ordx_name',
         name: `mint`,
