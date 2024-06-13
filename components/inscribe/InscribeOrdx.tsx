@@ -306,7 +306,7 @@ export const InscribeOrdx = ({
           set('mintRarity', rarity);
         } else if (isSpecial) {
           setSpecialStatus(true);
-          const resp = await getOrdxUtxoByType('customized', 1);
+          const resp = await getOrdxUtxoByType(rarity, 1);
           if (resp.code !== 0) {
             checkStatus = false;
             setErrorText(resp.msg);
@@ -507,7 +507,8 @@ export const InscribeOrdx = ({
         });
         return (
           <div className="flex item-center justify-center">
-            <Tooltip content={t}>
+            {hideStr(t)}
+            {/* <Tooltip content={t}>
               <a
                 className="text-blue-500 cursor-pointer mr-2"
                 href={href}
@@ -515,7 +516,7 @@ export const InscribeOrdx = ({
               >
                 {hideStr(t)}
               </a>
-            </Tooltip>
+            </Tooltip> */}
             {/* <CopyButton text={t} tooltip="Copy Tick" /> */}
           </div>
         );
