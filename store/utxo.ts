@@ -59,11 +59,11 @@ export const useUtxoStore = create<UtxoState>()(
       } else {
         selectUtxos = filterUtxosByValue(unspendList, amount).utxos;
       }
-      list.forEach((v) => {
-        if (!!selectUtxos.find((u) => u.utxo === v.utxo)) {
-          v.status = 'locked';
-        }
-      });
+      // list.forEach((v) => {
+      //   if (!!selectUtxos.find((u) => u.utxo === v.utxo)) {
+      //     v.status = 'locked';
+      //   }
+      // });
       set({ list });
       return selectUtxos;
     },

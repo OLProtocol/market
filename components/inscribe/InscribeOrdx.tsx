@@ -51,6 +51,8 @@ export const InscribeOrdx = ({
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
   const [showRepeat, setShowRepeat] = useState(false);
+  const [tickBlurLoading, setTickBlurLoading] = useState(false);
+  const [tickBlurChecked, setTickBlurChecked] = useState(false);
   const [contentType, setContentType] = useState('');
   const [data, { set }] = useMap<any>({
     type: 'mint',
@@ -167,24 +169,7 @@ export const InscribeOrdx = ({
       setTickChecked(true);
     } else {
       setLoading(true);
-      console.log('data', data);
-      console.log(contentType);
-      if (contentType === 'text/html' && !data.isSpecial) {
-        const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
-        console.log('utxos', utxos);
-        if (!utxos.length) {
-          console.log('缺少utxos');
-          return;
-        }
-        let utxosRanges = await Promise.all(
-          utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
-        );
-        utxosRanges = utxosRanges.map((v, i) => ({
-          ...v.data,
-          ...utxos[i],
-        }));
-        set('utxos', utxosRanges as any);
-      }
+
       setLoading(false);
       onNext?.();
     }
@@ -262,7 +247,6 @@ export const InscribeOrdx = ({
         } else {
           status = 'Completed';
         }
-        console.log('status', status);
         if (!info.data) {
           checkStatus = false;
           setErrorText(t('pages.inscribe.ordx.error_4', { tick: data.tick }));
@@ -293,7 +277,25 @@ export const InscribeOrdx = ({
         if (contenttype === 'text/html') {
           set('relateInscriptionId', inscriptionId);
           setContentType(contenttype);
-          setShowRepeat(false);
+          if (!isSpecial) {
+            setShowRepeat(false);
+          }
+          if (!blur && !isSpecial) {
+            const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
+            console.log('utxos', utxos);
+            if (!utxos.length) {
+              console.log('缺少utxos');
+              return;
+            }
+            let utxosRanges = await Promise.all(
+              utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
+            );
+            utxosRanges = utxosRanges.map((v, i) => ({
+              ...v.data,
+              ...utxos[i],
+            }));
+            set('utxos', utxosRanges as any);
+          }
         }
         if (blur) {
           let maxAmount = Number(limit);
@@ -305,7 +307,6 @@ export const InscribeOrdx = ({
         } else if (isSpecial) {
           setSpecialStatus(true);
           const resp = await getOrdxUtxoByType('customized', 1);
-          console.log('resp', resp);
           if (resp.code !== 0) {
             checkStatus = false;
             setErrorText(resp.msg);
@@ -359,14 +360,6 @@ export const InscribeOrdx = ({
               return checkStatus;
             }
           }
-          // if (data.cnChecked) {
-          //   if (data.cn < 1) {
-          //     checkStatus = false;
-          //     setErrorText(t('pages.inscribe.ordx.error_12'));
-          //     return checkStatus;
-          //   }
-          // }
-          console.log(data.max, data.limitPerMint);
           if (data.max && data.max < data.limitPerMint) {
             checkStatus = false;
             setErrorText(t('pages.inscribe.ordx.error_16'));
@@ -410,12 +403,15 @@ export const InscribeOrdx = ({
     set('tick', value.trim());
   };
   const ontickBlur = async () => {
-    await checkTick(true);
+    setTickBlurLoading(true);
+    const checkStatus = await checkTick(true);
+    setTickBlurChecked(!!checkStatus);
     const cleanValue = data.tick.replace(/[^\w\u4e00-\u9fa5]/g, '');
     if (data.tick !== cleanValue) {
       setUtxoList([]);
     }
     set('tick', cleanValue);
+    setTickBlurLoading(false);
   };
 
   const rarityChange = (value: string) => {
@@ -434,8 +430,8 @@ export const InscribeOrdx = ({
   };
 
   const buttonDisabled = useMemo(() => {
-    return !data.tick;
-  }, [data]);
+    return !data.tick || (data.type === 'mint' && !tickBlurChecked);
+  }, [data, tickBlurChecked]);
 
   const onBlockBLur = () => {
     calcTimeBetweenBlocks({
@@ -881,6 +877,7 @@ export const InscribeOrdx = ({
                     'amount',
                     isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
                   );
+                  setTickBlurChecked(false);
                   setTickChecked(false);
                   setSelectedUtxo('');
                 }}
@@ -904,14 +901,16 @@ export const InscribeOrdx = ({
                       <Input
                         type="number"
                         value={data.repeatMint.toString()}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           set(
                             'repeatMint',
                             isNaN(Number(e.target.value))
                               ? 0
                               : Math.min(Number(e.target.value), 10),
-                          )
-                        }
+                          );
+                          setTickBlurChecked(false);
+                          setTickChecked(false);
+                        }}
                         min={1}
                         max={10}
                       ></Input>
@@ -934,7 +933,7 @@ export const InscribeOrdx = ({
       <div className="w-60 mx-auto flex justify-center">
         <WalletConnectBus>
           <Button
-            isLoading={loading}
+            isLoading={loading || tickBlurLoading}
             isDisabled={buttonDisabled}
             color="primary"
             className="w-60"
