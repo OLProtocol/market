@@ -141,6 +141,7 @@ export default function Inscribe() {
     // setOrd2Data('cnChecked', data.cnChecked);
     setOrd2Data('trzChecked', data.trzChecked);
     setOrd2Data('blockChecked', data.blockChecked);
+    console.log('change ', data.utxos);
   };
   const onOrdxUtxoChange = (utxo: any) => {
     ordxUtxoRef.current = utxo;
