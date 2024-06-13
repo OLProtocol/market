@@ -50,6 +50,8 @@ export const InscribeOrdx = ({
   const { selectUtxosByAmount } = useUtxoStore();
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
+  const [showRepeat, setShowRepeat] = useState(false);
+  const [contentType, setContentType] = useState('');
   const [data, { set }] = useMap<any>({
     type: 'mint',
     mode: 'fair',
@@ -165,7 +167,24 @@ export const InscribeOrdx = ({
       setTickChecked(true);
     } else {
       setLoading(true);
-
+      console.log('data', data);
+      console.log(contentType);
+      if (contentType === 'text/html' && !data.isSpecial) {
+        const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
+        console.log('utxos', utxos);
+        if (!utxos.length) {
+          console.log('缺少utxos');
+          return;
+        }
+        let utxosRanges = await Promise.all(
+          utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
+        );
+        utxosRanges = utxosRanges.map((v, i) => ({
+          ...v.data,
+          ...utxos[i],
+        }));
+        set('utxos', utxosRanges as any);
+      }
       setLoading(false);
       onNext?.();
     }
@@ -219,12 +238,14 @@ export const InscribeOrdx = ({
         if (data.isSpecial !== isSpecial) {
           set('isSpecial', isSpecial);
         }
-
+        setShowRepeat(true);
         let status = 'Completed';
         if (isSpecial) {
+          setShowRepeat(false);
           status = 'Minting';
         } else if (max) {
           if (selfmint > 0) {
+            setShowRepeat(false);
             status = permissionInfo?.data?.amount > 0 ? 'Minting' : 'Project';
           } else if (totalMinted < max) {
             status = 'Minting';
@@ -271,23 +292,8 @@ export const InscribeOrdx = ({
         }
         if (contenttype === 'text/html') {
           set('relateInscriptionId', inscriptionId);
-
-          if (!blur && !isSpecial) {
-            const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
-            if (!utxos.length) {
-              console.log('缺少utxos');
-              return;
-            }
-            let utxosRanges = await Promise.all(
-              utxos.map((v) => ordx.exoticUtxo({ utxo: v.utxo, network })),
-            );
-            utxosRanges = utxosRanges.map((v, i) => ({
-              ...v.data,
-              ...utxos[i],
-            }));
-            console.log(utxosRanges);
-            set('utxos', utxosRanges as any);
-          }
+          setContentType(contenttype);
+          setShowRepeat(false);
         }
         if (blur) {
           let maxAmount = Number(limit);
@@ -426,20 +432,6 @@ export const InscribeOrdx = ({
   const onRarityChecked = (e: any) => {
     set('rarityChecked', e.target.checked);
   };
-  const onCnChecked = (e: any) => {
-    set('cnChecked', e.target.checked);
-  };
-  const onTrzChecked = (e: any) => {
-    set('trzChecked', e.target.checked);
-  };
-
-  const showSat = useMemo(() => {
-    return (
-      data.mintRarity !== 'common' &&
-      data.mintRarity !== 'unknow' &&
-      data.mintRarity
-    );
-  }, [data.mintRarity]);
 
   const buttonDisabled = useMemo(() => {
     return !data.tick;
@@ -903,7 +895,7 @@ export const InscribeOrdx = ({
                 pagination={false}
               />
             )}
-            {tickChecked && !showSat && (
+            {tickChecked && showRepeat && (
               <div>
                 <div className="flex items-center mb-4">
                   <div className="w-52">{t('common.repeat_mint')}</div>
@@ -927,9 +919,9 @@ export const InscribeOrdx = ({
                         step={1}
                         maxValue={10}
                         minValue={1}
-                        value={data.repeatMint}
+                        value={[data.repeatMint]}
                         className="max-w-md"
-                        onChangeEnd={(e) => set('repeatMint', e[0])}
+                        onChange={(e) => set('repeatMint', e[0])}
                       />
                     </div>
                   </div>
