@@ -16,7 +16,7 @@ import type { UploadProps } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 // import { useLocation } from 'react-router-dom';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Upload, Modal, Table, notification } from 'antd';
+import { Upload, Table, notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useEffect, useMemo, useState } from 'react';
@@ -29,6 +29,7 @@ import { ordx, ordxSWR } from '@/api';
 import { useUtxoStore } from '@/store';
 import { useCommonStore } from '@/store';
 import { ColumnsType } from 'antd/es/table';
+import { UtxoSelectTable } from './UtxoSelectTable';
 // import { CopyButton } from '@/components/CopyButton';
 
 const { Dragger } = Upload;
@@ -889,12 +890,7 @@ export const InscribeOrdx = ({
               ></Input>
             </div>
             {specialStatus && utxoList.length > 0 && (
-              <Table
-                bordered
-                columns={utxoColumns}
-                dataSource={utxoList}
-                pagination={false}
-              />
+              <UtxoSelectTable utxos={utxoList} onChange={handleUtxoChange} />
             )}
             {tickChecked && showRepeat && (
               <div>
