@@ -476,20 +476,20 @@ export default function TransferTool() {
       });
 
       const txid = await signAndPushPsbt(psbt);
-      const type = 'split_sats';
-      const resp = await addChargedTask({ address, fee, txid, type });
-      setLoading(false);
-      if (resp.code !== 0) {
-        notification.error({
-          message: t('notification.transaction_title'),
-          description: resp.msg || 'Split & Send failed',
-        });
-      } else {
-        notification.success({
-          message: t('notification.transaction_title'),
-          description: 'Split & Send success',
-        });
-      }
+      // const type = 'split_sats';
+      // const resp = await addChargedTask({ address, fee, txid, type });
+      // setLoading(false);
+      // if (resp.code !== 0) {
+      //   notification.error({
+      //     message: t('notification.transaction_title'),
+      //     description: resp.msg || 'Split & Send failed',
+      //   });
+      // } else {
+      //   notification.success({
+      //     message: t('notification.transaction_title'),
+      //     description: 'Split & Send success',
+      //   });
+      // }
     } catch (error: any) {
       console.log('error(transfer sats) = ', error);
       setLoading(false);

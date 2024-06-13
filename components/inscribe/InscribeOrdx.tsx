@@ -507,8 +507,7 @@ export const InscribeOrdx = ({
         });
         return (
           <div className="flex item-center justify-center">
-            {hideStr(t)}
-            {/* <Tooltip content={t}>
+            {/* <Tooltip content={t}  triggerScaleOnOpen={false}>
               <a
                 className="text-blue-500 cursor-pointer mr-2"
                 href={href}
@@ -517,6 +516,7 @@ export const InscribeOrdx = ({
                 {hideStr(t)}
               </a>
             </Tooltip> */}
+            {hideStr(t)}
             {/* <CopyButton text={t} tooltip="Copy Tick" /> */}
           </div>
         );
@@ -747,7 +747,10 @@ export const InscribeOrdx = ({
             <div className="flex items-center  mb-4">
               <div className="w-52">
                 {t('common.rarity')}
-                <Tooltip content={t('pages.inscribe.ordx.rarity_helper')}>
+                <Tooltip
+                  content={t('pages.inscribe.ordx.rarity_helper')}
+                  triggerScaleOnOpen={false}
+                >
                   <span className="text-blue-500">
                     (sat
                     <QuestionCircleOutlined />)
