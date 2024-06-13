@@ -7,16 +7,25 @@ import {
   TableCell,
   getKeyValue,
   Snippet,
+  Card,
+  CardBody,
+  Checkbox,
+  Radio,
 } from '@nextui-org/react';
 import { hideStr } from '@/lib/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   utxos: any[];
+  onChange: (utxo: any) => void;
 }
-export const UtxoSelectTable = ({ utxos }: Props) => {
-  const [selectedKeys, setSelectedKeys] = useState(new Set(['2']));
+export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
+  const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
   const columns = [
+    {
+      key: 'radio',
+      label: '',
+    },
     {
       key: 'utxo',
       label: 'UTXO',
@@ -34,144 +43,87 @@ export const UtxoSelectTable = ({ utxos }: Props) => {
       label: 'Offset',
     },
   ];
-  // const utxoColumns: ColumnsType<any> = [
-  //   {
-  //     title: '',
-  //     dataIndex: '',
-  //     key: '',
-  //     align: 'center',
-  //     render: (t) => {
-  //       return (
-  //         <div className="flex item-center justify-center">
-  //           <input
-  //             type="radio"
-  //             id={t.utxo}
-  //             name="utxo-select"
-  //             value={t.utxo}
-  //             checked={selectedUtxo === t.utxo}
-  //             onChange={() => handleUtxoChange(t)}
-  //           />
-  //         </div>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: 'UTXO',
-  //     dataIndex: 'utxo',
-  //     key: 'utxo',
-  //     align: 'center',
-  //     width: '40%',
-  //     render: (t) => {
-  //       const txid = t.replace(/:0$/m, '');
-  //       const href = generateMempoolUrl({
-  //         network,
-  //         path: `tx/${txid}`,
-  //       });
-  //       return (
-  //         <div className="flex item-center justify-center">
-  //           {/* <Tooltip content={t}  triggerScaleOnOpen={false}>
-  //             <a
-  //               className="text-blue-500 cursor-pointer mr-2"
-  //               href={href}
-  //               target="_blank"
-  //             >
-  //               {hideStr(t)}
-  //             </a>
-  //           </Tooltip> */}
-  //           {hideStr(t)}
-  //           {/* <CopyButton text={t} tooltip="Copy Tick" /> */}
-  //         </div>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     title: 'Sats',
-  //     dataIndex: 'value',
-  //     key: 'value',
-  //     align: 'center',
-  //     render: (r) => {
-  //       return <div className="cursor-pointer">{r}</div>;
-  //     },
-  //   },
-  //   {
-  //     title: 'Rare Sats',
-  //     key: 'rareSatSize',
-  //     align: 'center',
-  //     render: (r) => {
-  //       let size = 0;
-  //       if (r !== undefined) {
-  //         size = r.sats.reduce((acc, cur) => {
-  //           return acc + cur.size;
-  //         }, 0);
-  //       }
-  //       return <div className="cursor-pointer">{size}</div>;
-  //     },
-  //   },
-  //   {
-  //     title: 'Offset',
-  //     key: 'offset',
-  //     align: 'center',
-  //     render: (r) => {
-  //       let offset = 0;
-  //       if (r) {
-  //         offset = r.sats[0].offset;
-  //       }
-  //       return <div className="cursor-pointer">{offset}</div>;
-  //     },
-  //   },
-  // ];
+  const selectChange = () => {
+    const utxo = Array.from(selectedKeys.values())?.[0];
+    if (utxo) {
+      const findUtxo = utxos.find((utxo) => utxo.utxo === utxo.utxo);
+      findUtxo && onChange?.(findUtxo);
+    }
+  };
+  const onSelectionChange = (keys: any) => {
+    console.log(keys);
+    setSelectedKeys(keys);
+  };
+  useEffect(() => {
+    selectChange();
+  }, [selectedKeys]);
   return (
-    <Table
-      aria-label="Controlled table example with dynamic content"
-      selectionMode="single"
-      selectedKeys={selectedKeys}
-      // onSelectionChange={setSelectedKeys}
-    >
-      <TableHeader columns={columns}>
-        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-      </TableHeader>
-      <TableBody items={utxos}>
-        {(item) => (
-          <TableRow key={item.utxo}>
-            {(columnKey) => {
-              const value = getKeyValue(item, columnKey);
-              if (columnKey === 'utxo') {
-                return (
-                  <TableCell>
-                    <Snippet
-                      codeString={value}
-                      className="bg-transparent text-gray-500"
-                      symbol=""
-                      size="lg"
-                      variant="flat"
-                    >
-                      <span className="font-thin">{hideStr(value, 6)}</span>
-                    </Snippet>
-                  </TableCell>
-                );
-              } else if (columnKey === 'sats') {
-                let size = 0;
-                if (value !== undefined) {
-                  size = value.reduce((acc, cur) => {
-                    return acc + cur.size;
-                  }, 0);
-                }
-                return <TableCell>{size}</TableCell>;
-              } else if (columnKey === 'offset') {
-                let size = 0;
-                if (value !== undefined) {
-                  size = value.reduce((acc, cur) => {
-                    return acc + cur.size;
-                  }, 0);
-                }
-                return <TableCell>{size}</TableCell>;
-              } else {
-                return <TableCell>{value}</TableCell>;
-              }
-            }}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <Card shadow="none">
+      <CardBody>
+        <Table
+          aria-label="Select Utoxs"
+          selectionMode="single"
+          color="primary"
+          selectedKeys={selectedKeys}
+          onSelectionChange={onSelectionChange}
+        >
+          <TableHeader columns={columns}>
+            {(column) => (
+              <TableColumn key={column.key}>{column.label}</TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={utxos}>
+            {(item) => (
+              <TableRow key={item.utxo}>
+                {(columnKey) => {
+                  const value = getKeyValue(item, columnKey);
+                  if (columnKey === 'radio') {
+                    return (
+                      <TableCell>
+                        <Checkbox
+                          isReadOnly
+                          value={item.utxo}
+                          checked={selectedKeys.has(item.utxo)}
+                        />
+                      </TableCell>
+                    );
+                  } else if (columnKey === 'utxo') {
+                    return (
+                      <TableCell>
+                        <Snippet
+                          codeString={value}
+                          className="bg-transparent text-inherit"
+                          symbol=""
+                          size="lg"
+                          variant="flat"
+                        >
+                          <span className="font-thin">{hideStr(value, 6)}</span>
+                        </Snippet>
+                      </TableCell>
+                    );
+                  } else if (columnKey === 'sats') {
+                    let size = 0;
+                    if (value !== undefined) {
+                      size = value.reduce((acc, cur) => {
+                        return acc + cur.size;
+                      }, 0);
+                    }
+                    return <TableCell>{size}</TableCell>;
+                  } else if (columnKey === 'offset') {
+                    let offset = 0;
+                    if (item.sats) {
+                      offset = item.sats[0].offset;
+                    }
+                    return <TableCell>{offset}</TableCell>;
+                  } else {
+                    return <TableCell>{value}</TableCell>;
+                  }
+                }}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardBody>
+    </Card>
   );
 };
