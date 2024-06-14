@@ -16,7 +16,7 @@ import { hideStr } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 interface Props {
-  utxos?: any[];
+  utxos: any[];
   onChange: (utxo: any) => void;
 }
 export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
