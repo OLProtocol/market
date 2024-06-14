@@ -71,7 +71,6 @@ export default function Inscribe() {
     // cn: 0,
     trz: 0,
     des: '',
-    sat: 0,
     rarity: '',
     mintRarity: '',
     selfmint: '',
@@ -136,7 +135,6 @@ export default function Inscribe() {
     setOrd2Data('trz', data.trz);
     setOrd2Data('rarity', data.rarity);
     setOrd2Data('des', data.des);
-    setOrd2Data('sat', data.sat);
     setOrd2Data('rarityChecked', data.rarityChecked);
     // setOrd2Data('cnChecked', data.cnChecked);
     setOrd2Data('trzChecked', data.trzChecked);
