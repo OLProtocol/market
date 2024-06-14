@@ -19,74 +19,7 @@ interface Props {
   utxos?: any[];
   onChange: (utxo: any) => void;
 }
-export const UtxoSelectTable = ({ onChange }: Props) => {
-  const utxos = [
-    {
-      utxo: '4a8533b4323bea013ee43b250a142e00b1e022e2f7a0d5c7b5579ce93ae40e06:1',
-      value: 900000,
-      type: 'vintage',
-      amount: 900000,
-      sats: [
-        {
-          start: 714919783763,
-          size: 500000,
-          offset: 0,
-        },
-      ],
-    },
-    {
-      utxo: '3ef22ae3084ecc47edcf580b079a942b4b841bb50658ca4de707949b446fd5a7:1',
-      value: 500000,
-      type: 'vintage',
-      amount: 500000,
-      sats: [
-        {
-          start: 816208088604,
-          size: 500000,
-          offset: 0,
-        },
-      ],
-    },
-    {
-      utxo: 'c62b18cf7c616a7907e13e6fb84677c89fe24640174a3246dddc7fc05fb125b0:1',
-      value: 800000,
-      type: 'vintage',
-      amount: 800000,
-      sats: [
-        {
-          start: 2602623807828,
-          size: 500000,
-          offset: 0,
-        },
-      ],
-    },
-    {
-      utxo: '5f4b29c2c800709505d2fb3fc68182c98b061baf0f9b5c0467dc76c89310b7c1:1',
-      value: 500000,
-      type: 'vintage',
-      amount: 500000,
-      sats: [
-        {
-          start: 816212589780,
-          size: 500000,
-          offset: 0,
-        },
-      ],
-    },
-    {
-      utxo: '0ccc999a088c3852a79f3957deab58b2291231f951fef2c169e13315239c5172:1',
-      value: 500000,
-      type: 'vintage',
-      amount: 500000,
-      sats: [
-        {
-          start: 2602608793629,
-          size: 500000,
-          offset: 0,
-        },
-      ],
-    },
-  ];
+export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
   const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
   const columns = [
     {
