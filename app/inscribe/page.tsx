@@ -260,7 +260,6 @@ export default function Inscribe() {
               op: 'mint',
               tick: ordxData.tick.toString().trim(),
               amt: ordxData.amount.toString(),
-              sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
             }),
           ),
         ];
@@ -277,7 +276,6 @@ export default function Inscribe() {
                 op: 'mint',
                 tick: ordxData.tick.toString().trim(),
                 amt: ordxData.amount.toString(),
-                sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
                 desc: `seed=${seed}`,
               }),
             ),
