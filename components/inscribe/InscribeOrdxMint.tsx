@@ -197,7 +197,7 @@ export const InscribeOrdxMint = ({
       let status = 'Completed';
       if (max > 0) {
         if (selfmint > 0) {
-          status = permissionInfo?.data?.amount > 0 ? 'Minting' : 'Project';
+          status = selfMintAmount > 0 ? 'Minting' : 'Project';
         } else if (totalMinted < max) {
           status = 'Minting';
         }
