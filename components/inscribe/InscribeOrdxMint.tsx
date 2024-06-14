@@ -32,7 +32,6 @@ export const InscribeOrdxMint = ({
   const [showRepeat, setShowRepeat] = useState(false);
   const [tickBlurLoading, setTickBlurLoading] = useState(false);
   const [tickBlurChecked, setTickBlurChecked] = useState(false);
-  const [maxAmount, setMaxAmount] = useState(0);
   const [contentType, setContentType] = useState('');
   const [data, { set }] = useMap<any>({
     type: 'mint',
@@ -86,49 +85,60 @@ export const InscribeOrdxMint = ({
       setLoading(false);
       throw err;
     }
-    const { limit = 0, max = 0, rarity, selfmint = 0 } = info.data || {};
-    const { amount = 0 } = permissionInfo.data || {};
-    let _max = limit;
-    if (max) {
-      _max = min([_max, max]);
-    }
-    if (selfmint > 0) {
-      _max = min([_max, amount]);
-    }
-    set('rarity', rarity);
-    set('mintRarity', rarity);
-    const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
-    setMaxAmount(_max);
-    set('isSpecial', isSpecial);
-    console.log('amount', _max);
-
-    if (blur) {
-      set('amount', _max);
-    }
+    setShowRepeat(true);
+    const {
+      ticker,
+      limit = 0,
+      max = 0,
+      contenttype,
+      rarity,
+      selfmint = 0,
+    } = info.data || {};
     let utxos: any = [];
-    if (isSpecial) {
-      const [rarityError, rarityData] = await tryit(ordx.getUtxoByType)({
-        address: currentAccount,
-        type: rarity,
-        amount,
-        network,
-      });
-      if (rarityError) {
-        notification.error({
-          message: t('notification.system_error'),
-        });
-        throw rarityError;
+    if (ticker) {
+      const { amount = 0 } = permissionInfo.data || {};
+      let _max = limit;
+      if (max) {
+        _max = min([_max, max]);
       }
-      utxos = rarityData.data || [];
-      utxos?.sort(
-        (a, b) =>
-          b?.sats?.reduce((acc, cur) => {
-            return acc + cur.size;
-          }, 0) -
-          a?.sats?.reduce((acc, cur) => {
-            return acc + cur.size;
-          }, 0),
-      );
+      if (selfmint > 0) {
+        _max = min([_max, amount]);
+      }
+      set('rarity', rarity);
+      set('mintRarity', rarity);
+      const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
+      set('isSpecial', isSpecial);
+      console.log('amount', _max);
+      if (isSpecial || contenttype === 'text/html') {
+        setShowRepeat(false);
+      }
+      if (blur) {
+        set('amount', _max);
+      }
+      if (isSpecial) {
+        const [rarityError, rarityData] = await tryit(ordx.getUtxoByType)({
+          address: currentAccount,
+          type: rarity,
+          amount,
+          network,
+        });
+        if (rarityError) {
+          notification.error({
+            message: t('notification.system_error'),
+          });
+          throw rarityError;
+        }
+        utxos = rarityData.data || [];
+        utxos?.sort(
+          (a, b) =>
+            b?.sats?.reduce((acc, cur) => {
+              return acc + cur.size;
+            }, 0) -
+            a?.sats?.reduce((acc, cur) => {
+              return acc + cur.size;
+            }, 0),
+        );
+      }
       setUtxoList(utxos);
     }
     setLoading(false);
@@ -170,7 +180,7 @@ export const InscribeOrdxMint = ({
       } = info || {};
       const selfMintAmount = permissionInfo?.amount || 0;
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
-      let _maxAmount = limit;
+      let _maxAmount;
       if (max) {
         _maxAmount = min([_maxAmount, max]);
       }
@@ -183,18 +193,16 @@ export const InscribeOrdxMint = ({
         btcHeight <= endBlock &&
         btcHeight >= startBlock;
       setTickLoading(false);
-      setShowRepeat(true);
+
       let status = 'Completed';
       if (isSpecial) {
         if (!specialUtxos.length) {
           setErrorText(`${rarity}类型的特殊聪数量不够`);
           return false;
         }
-        setShowRepeat(false);
         status = 'Minting';
       } else if (max > 0) {
         if (selfmint > 0) {
-          setShowRepeat(false);
           status = permissionInfo?.data?.amount > 0 ? 'Minting' : 'Project';
         } else if (totalMinted < max) {
           status = 'Minting';
@@ -219,7 +227,10 @@ export const InscribeOrdxMint = ({
         setErrorText(t('pages.inscribe.ordx.error_7', { tick: data.tick }));
         return false;
       }
-      if (data.amount > _maxAmount) {
+      if (
+        _maxAmount !== undefined &&
+        Math.ceil(data.amount * data.repeatMint) > _maxAmount
+      ) {
         setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
         return false;
       }
@@ -227,7 +238,6 @@ export const InscribeOrdxMint = ({
       if (contenttype === 'text/html') {
         set('relateInscriptionId', inscriptionId);
         if (!isSpecial) {
-          setShowRepeat(false);
           const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
           console.log('utxos', utxos);
           if (!utxos.length) {
@@ -305,7 +315,9 @@ export const InscribeOrdxMint = ({
     ] as any[]);
     set('amount', utxoData.amount);
   };
-
+  useEffect(() => {
+    setTickChecked(false);
+  }, [data.repeatMint]);
   useEffect(() => {
     onChange?.(data);
   }, [data]);
@@ -348,7 +360,7 @@ export const InscribeOrdxMint = ({
         {data.isSpecial && utxoList.length > 0 && (
           <UtxoSelectTable utxos={utxoList} onChange={handleUtxoChange} />
         )}
-        {tickChecked && showRepeat && (
+        {showRepeat && (
           <div>
             <div className="flex items-center mb-4">
               <div className="w-52">{t('common.repeat_mint')}</div>
@@ -364,8 +376,6 @@ export const InscribeOrdxMint = ({
                           ? 0
                           : Math.min(Number(e.target.value), 10),
                       );
-                      setTickBlurChecked(false);
-                      setTickChecked(false);
                     }}
                     min={1}
                     max={10}
