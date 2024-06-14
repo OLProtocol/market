@@ -195,13 +195,7 @@ export const InscribeOrdxMint = ({
       setTickLoading(false);
 
       let status = 'Completed';
-      if (isSpecial) {
-        if (!specialUtxos.length) {
-          setErrorText(`${rarity}类型的特殊聪数量不够`);
-          return false;
-        }
-        status = 'Minting';
-      } else if (max > 0) {
+      if (max > 0) {
         if (selfmint > 0) {
           status = permissionInfo?.data?.amount > 0 ? 'Minting' : 'Project';
         } else if (totalMinted < max) {
@@ -214,7 +208,10 @@ export const InscribeOrdxMint = ({
       } else {
         status = 'Completed';
       }
-
+      if (isSpecial && !specialUtxos.length) {
+        setErrorText(`${rarity}类型的特殊聪数量不够`);
+        return false;
+      }
       if (status === 'Pending') {
         setErrorText(t('pages.inscribe.ordx.error_6', { tick: data.tick }));
         return false;
