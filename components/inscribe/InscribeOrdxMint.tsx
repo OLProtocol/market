@@ -180,8 +180,10 @@ export const InscribeOrdxMint = ({
       console.log(max);
       console.log(selfMintAmount);
       let _maxAmount;
+      let _singleMaxAmount = limit || 0;
       if (max) {
-        _maxAmount = min([_maxAmount, max, selfMintAmount]);
+        _maxAmount = min([max, selfMintAmount]);
+        _singleMaxAmount = min([_singleMaxAmount, max, selfMintAmount]);
       }
       const isRightBlock =
         startBlock &&
@@ -218,6 +220,19 @@ export const InscribeOrdxMint = ({
       }
       if (status === 'Completed') {
         setErrorText(t('pages.inscribe.ordx.error_7', { tick: data.tick }));
+        return false;
+      }
+      if (data.amount > _singleMaxAmount) {
+        setErrorText(
+          t('pages.inscribe.ordx.error_5', { limit: _singleMaxAmount }),
+        );
+        return false;
+      }
+      if (
+        _maxAmount !== undefined &&
+        Math.ceil(data.amount * data.repeatMint) > _maxAmount
+      ) {
+        setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
         return false;
       }
       if (

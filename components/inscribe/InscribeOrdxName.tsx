@@ -41,8 +41,11 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     if (data.suffix) {
       const textSize = clacTextSize(data.name + data.suffix);
       checkStatus = false;
-      setErrorText(t('pages.inscribe.name.error_1'));
-      return checkStatus;
+      console.log(textSize);
+      if (textSize > 32) {
+        setErrorText(t('pages.inscribe.name.error_1'));
+        return checkStatus;
+      }
     }
     const textSize = clacTextSize(data.name);
     if (!data.suffix && (textSize < 3 || textSize == 4 || textSize > 32)) {
