@@ -46,9 +46,9 @@
       "input_name": "Name",
       "description": "Register a name on BTC",
       "description_1": "Supports.x,.btc,.sats,.pizza, and no suffix. \n For example： abcd.x,  abcd.btc,  abcd.sats,  abcd.pizza,  and abcd .",
-      "name_placeholder": "Name must be 3, 5-32 byte long",
+      "name_placeholder": "Name must be 3, 5-32 bytes long",
       "select_placeholder": "Select Suffix",
-      "error_1": "Tick must be 3, 5-32 byte long",
+      "error_1": "Name must be 3, 5-32 bytes long",
       "error_2": "{{name}} has been minted"
     },
     "files": {
