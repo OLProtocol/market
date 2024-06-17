@@ -99,10 +99,7 @@ export const InscribeOrdxMint = ({
       const { amount = 0 } = permissionInfo.data || {};
       let _max = limit;
       if (max) {
-        _max = min([_max, max]);
-      }
-      if (selfmint > 0) {
-        _max = min([_max, amount]);
+        _max = min([_max, max, amount]);
       }
       set('rarity', rarity);
       set('mintRarity', rarity);
@@ -180,12 +177,11 @@ export const InscribeOrdxMint = ({
       } = info || {};
       const selfMintAmount = permissionInfo?.amount || 0;
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
+      console.log(max);
+      console.log(selfMintAmount);
       let _maxAmount;
       if (max) {
-        _maxAmount = min([_maxAmount, max]);
-      }
-      if (selfmint > 0) {
-        _maxAmount = min([_maxAmount, selfMintAmount]);
+        _maxAmount = min([_maxAmount, max, selfMintAmount]);
       }
       const isRightBlock =
         startBlock &&
