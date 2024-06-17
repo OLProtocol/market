@@ -21,6 +21,7 @@ interface Props {
 }
 export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
   const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+  console.log(utxos);
   const columns = [
     {
       key: 'radio',
@@ -41,6 +42,10 @@ export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
     {
       key: 'offset',
       label: 'Offset',
+    },
+    {
+      key: 'type',
+      label: 'Type',
     },
   ];
   const selectChange = () => {

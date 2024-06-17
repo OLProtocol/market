@@ -644,7 +644,7 @@ export const sendBTC = async ({
   console.log('hasOrdxUtxo', hasOrdxUtxo);
 
   if (!unspendUtxos.length) {
-    throw new Error(i18n.t('toast.insufficient_balance'));
+    throw new Error(i18n.t('notification.insufficient_balance'));
   }
 
   const fee = (168 * 10 + 34 * 2 + 10) * feeRate;
