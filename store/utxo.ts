@@ -20,7 +20,7 @@ interface UtxoState {
   selectUtxosByAmount: (amount: number) => UtxoItem[];
   add: (item: UtxoItem) => void;
   remove: (utxo: string) => void;
-  removeUtxos: (utxos: string[]) => void;
+  removeUtxos: (utxos: UtxoItem[]) => void;
   reset: () => void;
 }
 
@@ -42,8 +42,9 @@ export const useUtxoStore = create<UtxoState>()(
       set({ list });
     },
     removeUtxos: (utxos) => {
+      console.log('source Utxos', utxos);
       const list = get().list.filter(
-        (item) => !utxos.find((u) => u === item.utxo),
+        (item) => !utxos.find((u) => u.utxo === item.utxo),
       );
       console.log('removeUtxos', list);
       set({ list });
