@@ -686,7 +686,6 @@ export const sendBTC = async ({
     address: fromAddress,
     publicKey: fromPubKey,
   });
-  const psbtNetwork = network === 'testnet' ? 'testnet' : 'mainnet';
   const txId = await signAndPushPsbt(psbt);
   if (psbt.txOutputs.length > 1) {
     addUtxo({
