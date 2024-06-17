@@ -90,6 +90,8 @@ export const useOrderStore = create<OrderState>()(
               const dis = Date.now() - item.createAt;
               if (dis > 1000 * 60 * 5) {
                 item.status = 'timeout';
+                item.files = [];
+                item.inscriptions = [];
               }
             }
             return item;
