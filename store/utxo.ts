@@ -5,7 +5,7 @@ import { filterUtxosByValue } from '@/lib';
 import { last, sort } from 'radash';
 
 export interface UtxoItem {
-  status: 'unspend' | 'locked';
+  status: 'unspend' | 'spended';
   location: 'remote' | 'local';
   utxo: string;
   txid: string;
@@ -16,6 +16,7 @@ interface UtxoState {
   list: UtxoItem[];
   setList: (list: UtxoItem[]) => void;
   getUnspendUtxos: () => UtxoItem[];
+  changeUtxosStatus: (utxos: UtxoItem[], status: 'unspend' | 'spended') => void;
   selectUtxosByAmount: (amount: number) => UtxoItem[];
   add: (item: UtxoItem) => void;
   remove: (utxo: string) => void;
@@ -44,10 +45,20 @@ export const useUtxoStore = create<UtxoState>()(
       const list = get().list.filter(
         (item) => !utxos.find((u) => u === item.utxo),
       );
+      console.log('removeUtxos', list);
       set({ list });
     },
     getUnspendUtxos: () => {
       return get().list.filter((v) => v.status === 'unspend') || [];
+    },
+    changeUtxosStatus: (utxos, status) => {
+      const list = get().list.map((v) => {
+        if (utxos.find((u) => u.utxo === v.utxo)) {
+          v.status = status;
+        }
+        return v;
+      });
+      set({ list });
     },
     selectUtxosByAmount: (amount: number) => {
       const { list } = get();
