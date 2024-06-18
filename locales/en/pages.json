@@ -9,7 +9,7 @@
   "tools": {
     "title": "Toolbox",
     "transaction": {
-      "title": "Split & Transfer",
+      "title": "Split, Merge & Transfer",
       "description": "Batch Split and Transfer Tool",
       "btn_split": "Use Now",
       "input": "Input",
@@ -23,7 +23,7 @@
     },
     "search_sat": {
       "title": "Sat Hunting",
-      "description": "Search Sats",
+      "description": "Search Rare Sats",
       "btn_search": "Search",
       "table_title": "Search Result",
       "table_col1": "UTXO",
