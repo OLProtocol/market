@@ -24,6 +24,7 @@ import {
   Divider,
   Input,
   Tooltip,
+  Image,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -38,7 +39,15 @@ export default function TransferTool() {
   const { feeRate } = useCommonStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { address, network, publicKey } = useReactWalletStore((state) => state);
+  const dropdownStyle = {
+    backgroundColor: '#2f2f2f',
+    color: '#353535',
+  };
 
+  const optionStyle = {
+    backgroundColor: '#2f2f2f',
+    color: '#353535',
+  };
   const [inputList, { set: setInputList }] = useMap<any>({
     items: [
       {
@@ -554,11 +563,12 @@ export default function TransferTool() {
                 <div className="flex gap-2 pb-2" key={i}>
                   <AntSelect
                     placeholder="Select Ticker"
-                    className={'w-[30%] h-10'}
+                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"    
+                    dropdownStyle = {dropdownStyle}
                     value={item.value?.ticker ? item.value?.ticker : undefined}
                     options={
                       tickerList?.map((utxo) => ({
-                        label: <div>{utxo.ticker}</div>,
+                        label: <div className='w-full p-0 m-0 text-gray-400 hover:text-blue-600'>{utxo.ticker}</div>,
                         value: utxo.ticker,
                       })) || []
                     }
@@ -566,7 +576,8 @@ export default function TransferTool() {
                   ></AntSelect>
                   <AntSelect
                     placeholder="Select UTXO"
-                    className="w-[40%] h-10"
+                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"    
+                    dropdownStyle = {dropdownStyle}
                     value={
                       inputList.items[i]?.value?.utxo
                         ? inputList.items[i]?.value?.utxo
@@ -575,7 +586,7 @@ export default function TransferTool() {
                     options={
                       inputList.items[i]?.options?.utxos.map((utxo) => ({
                         label: (
-                          <div>
+                          <div className='w-full p-0 m-0 text-gray-400 hover:text-blue-600'>
                             {utxo.assetamount && utxo.assetamount + ' Asset/'}
                             {utxo.value +
                               ' sats - ' +
@@ -611,14 +622,24 @@ export default function TransferTool() {
                       </div>
                     }
                   />
-                  <Button radius="full" onClick={addInputItem}>
-                    +
+                   <Button radius="full" onClick={addInputItem}>
+                    <Image
+                        radius="full"
+                        src="../icon/add.svg"
+                        alt="logo"
+                        className="w-10 h-10 p-1 rounded-full "
+                      />
                   </Button>
                   <Button
                     radius="full"
                     onClick={() => removeInputItem(item.id)}
                   >
-                    -
+                    <Image
+                        radius="full"
+                        src="../icon/del.svg"
+                        alt="logo"
+                        className="w-10 h-10 p-1 rounded-full"
+                      />
                   </Button>
                 </div>
               ))}
@@ -640,7 +661,12 @@ export default function TransferTool() {
                     />
                     <Tooltip content="Fill the BTC address of the current account">
                       <Button onClick={() => setBtcAddress(item.id, address)}>
-                        +
+                         <Image
+                          radius="full"
+                          src="../icon/copy.svg"
+                          alt="logo"
+                          className="w-10 h-10 p-1 rounded-full "
+                         />
                       </Button>
                     </Tooltip>
                   </div>
