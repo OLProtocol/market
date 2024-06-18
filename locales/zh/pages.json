@@ -9,8 +9,8 @@
   "tools": {
     "title": "工具箱",
     "transaction": {
-      "title": "拆分&转移",
-      "description": "提供批量拆分及转移功能。",
+      "title": "拆分、合并 & 转移",
+      "description": "提供批量拆分、合并及转移功能。",
       "btn_split": "马上使用",
       "input": "输入",
       "output": "输出",
