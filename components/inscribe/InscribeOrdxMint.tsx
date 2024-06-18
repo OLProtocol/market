@@ -193,19 +193,33 @@ export const InscribeOrdxMint = ({
       setTickLoading(false);
 
       let status = 'Completed';
-      if (max > 0) {
-        if (selfmint > 0) {
-          status = selfMintAmount > 0 ? 'Minting' : 'Project';
-        } else if (totalMinted < max) {
+      if (isSpecial && startBlock < 0) {
+        if (max > 0) {
+          if (selfmint > 0) {
+            status = selfMintAmount > 0 ? 'Minting' : 'Project';
+          } else if (totalMinted < max) {
+            status = 'Minting';
+          }
+        } else {
           status = 'Minting';
         }
       } else if (isRightBlock) {
-        status = 'Minting';
+        if (max > 0) {
+          if (selfmint > 0) {
+            status = selfMintAmount > 0 ? 'Minting' : 'Project';
+          } else if (totalMinted < max) {
+            status = 'Minting';
+          }
+        } else {
+          status = 'Minting';
+        }
       } else if (btcHeight < startBlock) {
         status = 'Pending';
       } else {
         status = 'Completed';
       }
+      console.log('status', status);
+
       if (isSpecial && !specialUtxos.length) {
         setErrorText(`${rarity}类型的特殊聪数量不够`);
         return false;
