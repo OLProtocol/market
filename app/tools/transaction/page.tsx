@@ -655,11 +655,12 @@ export default function TransferTool() {
                         : item.value.sats / 100000000
                     }
                     onChange={(e) => {
-                      // setOutputSats(item.id, e.target.value);
+                      setOutputSats(item.id, e.target.value);
+                      // debugger
                       console.log('onBlur is skipped');
                     }}
                     onBlur={(e) => {
-                      setOutputSats(item.id, e.target.value);
+                      // setOutputSats(item.id, e.target.value);
                       outputSatsOnBlur(e);
                     }}
                     endContent={
