@@ -705,13 +705,23 @@ export default function TransferTool() {
                     }
                   />
                   <Button radius="full" onClick={addOuputItem}>
-                    +
+                    <Image
+                          radius="full"
+                          src="../icon/add.svg"
+                          alt="logo"
+                          className="w-10 h-10 p-1 rounded-full "
+                         />
                   </Button>
                   <Button
                     radius="full"
                     onClick={() => removeOutputItem(item.id)}
                   >
-                    -
+                    <Image
+                          radius="full"
+                          src="../icon/del.svg"
+                          alt="logo"
+                          className="w-10 h-10 p-1 rounded-full "
+                         />
                   </Button>
                 </div>
               ))}
