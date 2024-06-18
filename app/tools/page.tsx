@@ -7,6 +7,7 @@ import {
   Avatar,
   Button,
   CardFooter,
+  Image,
 } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +26,7 @@ export default function ToolsPage() {
   const tools = [
     {
       name: 'T',
-      icon: '',
+      icon: '/icon/t1.png',
       title: t('pages.tools.transaction.title'),
       desc: t('pages.tools.transaction.description'),
       path: '/tools/transaction',
@@ -34,7 +35,7 @@ export default function ToolsPage() {
     },
     {
       name: 'R',
-      icon: '',
+      icon: '/icon/t3.png',
       title: t('pages.tools.search_sat.title'),
       desc: t('pages.tools.search_sat.description'),
       path: '/tools/sat',
@@ -48,7 +49,13 @@ export default function ToolsPage() {
         <Card className="max-w-[340px] mb-4 ml-4" key={i}>
           <CardHeader className="justify-between">
             <div className="flex gap-5">
-              <Avatar name={item.name} className="text-2xl" />
+{/*               <Avatar name={item.name} className="text-2xl" /> */}
+               <Image
+                radius="full"
+                src={item.icon}
+                alt="logo"
+                className="w-20 h-20 p-1 rounded-full bg-gray-950"
+              />
               <div className="flex flex-col gap-1 items-start justify-center">
                 <h4 className="text-small font-semibold leading-none text-default-600">
                   {item.title}
