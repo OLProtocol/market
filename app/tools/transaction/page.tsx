@@ -655,12 +655,12 @@ export default function TransferTool() {
                         : item.value.sats / 100000000
                     }
                     onChange={(e) => {
-                      setOutputSats(item.id, e.target.value);
-                      outputSatsOnBlur(e);
+                      // setOutputSats(item.id, e.target.value);
+                      console.log('onBlur is skipped');
                     }}
                     onBlur={(e) => {
-                      // outputSatsOnBlur(e)
-                      console.log('onBlur is skipped');
+                      setOutputSats(item.id, e.target.value);
+                      outputSatsOnBlur(e);
                     }}
                     endContent={
                       <div className="flex items-center">
