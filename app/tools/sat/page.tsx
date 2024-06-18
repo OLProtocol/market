@@ -20,6 +20,7 @@ import {
   TableBody,
   TableColumn,
   TableHeader,
+  Image,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -352,11 +353,21 @@ export default function HuntSatTool() {
                 onChange={(e) => setSat(item.id, e.target.value)}
               />
               <div className="flex gap-2">
-                <Button radius="full" onClick={addSat}>
-                  +
+                 <Button radius="full" onClick={addSat}>
+                  <Image
+                        radius="full"
+                        src="../icon/add.svg"
+                        alt="logo"
+                        className="w-10 h-10 p-1 rounded-full "
+                      />
                 </Button>
                 <Button radius="full" onClick={() => removeSat(item.id)}>
-                  -
+                  <Image
+                        radius="full"
+                        src="../icon/del.svg"
+                        alt="logo"
+                        className="w-10 h-10 p-1 rounded-full "
+                      />
                 </Button>
               </div>
             </div>
