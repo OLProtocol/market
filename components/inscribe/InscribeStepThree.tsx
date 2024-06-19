@@ -53,34 +53,7 @@ export const InscribeStepThree = ({
       return 294;
     } else if (type === 'ordx' && list?.[0]?.op === 'mint') {
       if (list?.[0]?.utxos?.length && list?.[0]?.isSpecial) {
-        const userAmt = list?.[0]?.amt || 0;
-        const realAmt = Math.max(userAmt, 546);
-        const findBetweenByValue = (
-          userAmt: number,
-          realAmt,
-          ranges: any[],
-        ) => {
-          let outAmt = 0;
-          let outValue = 0;
-          let preTotalSize = 0;
-          for (let i = 0; i < ranges.length; i++) {
-            const range = ranges[i];
-            outValue += range.size;
-            if (userAmt > outValue) {
-              preTotalSize += range.size;
-            }
-            if (userAmt <= outValue) {
-              const dis = userAmt - preTotalSize;
-              outAmt = range.offset + dis;
-              break;
-            }
-          }
-          if (outAmt < realAmt) {
-            outAmt += realAmt - outAmt;
-          }
-          return outAmt;
-        };
-        return findBetweenByValue(userAmt, realAmt, list?.[0]?.utxos[0]?.sats);
+        return list?.[0]?.amount;
       } else {
         return list?.[0]?.amt > 546 ? list?.[0]?.amt : 546;
       }

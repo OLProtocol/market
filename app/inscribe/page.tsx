@@ -261,6 +261,7 @@ export default function Inscribe() {
           amount = findSepiceAmt();
         }
         const seed = generateSeedByUtxos(ordxData.utxos, amount);
+        console.log(amount, seed);
         if (ordxData.relateInscriptionId) {
           ordxValue = [
             JSON.stringify(
@@ -283,6 +284,7 @@ export default function Inscribe() {
           type: 'ordx',
           name: `mint_${i}`,
           ordxType: 'mint',
+          amount,
           utxos: ordxData.utxos,
           isSpecial: ordxData.isSpecial,
           value: ordxValue,
