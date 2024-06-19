@@ -11,6 +11,7 @@ import { ordx } from '@/api';
 import { tryit } from 'radash';
 import { clacTextSize } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
+import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
 interface InscribeTextProps {
@@ -40,7 +41,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
 
     if (data.suffix) {
       const textSize = clacTextSize(data.name + data.suffix);
-      console.log(textSize);
+
       if (textSize > 32) {
         checkStatus = false;
         setErrorText(t('pages.inscribe.name.error_1'));
@@ -94,14 +95,6 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
           {t('pages.inscribe.name.description_1')}
         </p>
       </div>
-      <RadioGroup
-        orientation="horizontal"
-        onValueChange={(e) => set('type', e)}
-        value={data.type}
-      >
-        {/* <Radio value="mint">{t('common.mint')}</Radio> */}
-        {/* <Radio value="update">{t('common.deploy')}</Radio> */}
-      </RadioGroup>
       <div className="mb-2">
         {errorText && (
           <div className="mb-2 text-xl text-center text-red-500">
@@ -136,14 +129,18 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
           />
         </div>
       </div>
-      <Button
-        className="mx-auto block"
-        color="primary"
-        isDisabled={!data.name || loading}
-        onClick={nextHanlder}
-      >
-        {checked ? t('buttons.next') : 'Check'}
-      </Button>
+      <div className="w-60 mx-auto flex justify-center">
+        <WalletConnectBus>
+          <Button
+            className="mx-auto block"
+            color="primary"
+            isDisabled={!data.name || loading}
+            onClick={nextHanlder}
+          >
+            {checked ? t('buttons.next') : 'Check'}
+          </Button>
+        </WalletConnectBus>
+      </div>
     </div>
   );
 };
