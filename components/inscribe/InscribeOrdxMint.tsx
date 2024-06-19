@@ -69,10 +69,6 @@ export const InscribeOrdxMint = ({
 
   const getOrdXInfo = async (tick: string, blur = false) => {
     setLoading(true);
-    const [error, res] = await tryit(ordx.getNsName)({
-      name: tick,
-      network,
-    });
     const [err, info] = await tryit(ordx.getOrdxInfo)({
       tick,
       network,

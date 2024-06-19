@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -50,8 +51,9 @@ export const Navbar = () => {
   const pathname = usePathname();
 
   const { data: heightData } = ordxSWR.useBtcHeight(network as any);
-  const { data } = useSWR(`getUtxoByValue-${address}-${network}`, () =>
-    getUtxoByValue({ address, network, value: 500 }),
+  const { data, trigger: getUtxos } = useSWRMutation(
+    `getUtxoByValue-${address}-${network}`,
+    () => getUtxoByValue({ address, network, value: 500 }),
   );
   const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 
@@ -78,6 +80,11 @@ export const Navbar = () => {
       setBtcPrice(btcData?.data?.amount);
     }
   }, [btcData]);
+  useEffect(() => {
+    if (address && network) {
+      getUtxos();
+    }
+  }, [address, network]);
   const searchInput = (
     <Input
       aria-label="Search"

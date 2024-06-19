@@ -38,6 +38,15 @@ const getOrdxInfo = async ({ tick, network }: any) => {
   });
   return data;
 };
+const getTickDeploy = async ({ tick, address, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`deploy/${tick}/${address}`, network),
+    {
+      timeout: 10000,
+    },
+  );
+  return data;
+};
 
 const exoticUtxo = async ({ utxo, network }: any) => {
   const { data } = await axios.get(
@@ -308,4 +317,5 @@ export const ordx = {
   getBestHeight,
   getTickerPermission,
   pushTx,
+  getTickDeploy,
 };
