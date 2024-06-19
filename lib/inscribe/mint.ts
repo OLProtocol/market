@@ -102,13 +102,14 @@ export const generteFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
-    const { type, value, name, ordxType, utxos, isSpecial } = item;
+    const { type, value, name, ordxType, utxos, isSpecial, amount } = item;
     const file: any = {
       type,
       name,
       originValue: value,
       ordxType,
       isSpecial,
+      amount,
       utxos,
     };
     if (type === 'text') {
