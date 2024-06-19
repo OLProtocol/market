@@ -108,8 +108,9 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
   };
   const getOrdXInfo = async (tick: string) => {
     setLoading(true);
-    const [err, info] = await tryit(ordx.getOrdxInfo)({
+    const [err, info] = await tryit(ordx.getTickDeploy)({
       tick,
+      address: currentAccount,
       network,
     });
 
@@ -121,7 +122,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
       throw err;
     }
     setLoading(false);
-    return info.data;
+    return info;
   };
   const nextHandler = async () => {
     setErrorText('');
@@ -153,14 +154,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
     }
     try {
       const info = await getOrdXInfo(data.tick);
-      const permissionInfo = await ordx.getTickerPermission({
-        ticker: data.tick,
-        network,
-        address: currentAccount,
-      });
-      const selfMintAmount = permissionInfo?.data?.amount || 0;
 
-      if (info) {
+      if (info.code !== 0) {
         setErrorText(t('pages.inscribe.ordx.error_3', { tick: data.tick }));
         return false;
       }
