@@ -5,7 +5,7 @@ import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
-import { generatePrivateKey, generateInscriptions } from '@/lib/inscribe';
+import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useCalcFee } from '@/lib/hooks';
 import { OrderItemType, useCommonStore, useOrderStore } from '@/store';
@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 interface Brc20SetpOneProps {
   list: any[];
   type: any;
+  metadata: any;
   ordxUtxo?: any;
   onItemRemove?: (index: number) => void;
   onRemoveAll?: () => void;
@@ -25,6 +26,7 @@ export const InscribeStepThree = ({
   type,
   ordxUtxo,
   onItemRemove,
+  metadata,
   onAddOrder,
   onRemoveAll,
 }: Brc20SetpOneProps) => {
@@ -60,7 +62,7 @@ export const InscribeStepThree = ({
     } else {
       return 546;
     }
-  }, [type, list, ordxUtxo]);
+  }, [type, list]);
   const clacFee = useCalcFee({
     feeRate: feeRate.value,
     inscriptionSize,
@@ -71,25 +73,25 @@ export const InscribeStepThree = ({
     if (loading) return;
     setLoading(true);
     const secret = generatePrivateKey();
-    const inscriptions = generateInscriptions({
+    const inscription = generateInscription({
+      metadata,
       secret,
       files,
       network,
       feeRate: feeRate.value,
-      ordxUtxo,
     });
     const orderId = uuidV4();
     const order: OrderItemType = {
       orderId,
       type,
-      inscriptions,
+      inscription,
       secret,
       fee: clacFee,
+      metadata,
       toAddress: [data.toSingleAddress],
       feeRate: feeRate.value,
       files,
       network,
-      ordxUtxo,
       inscriptionSize: inscriptionSize,
       status: 'pending',
       createAt: Date.now().valueOf(),
