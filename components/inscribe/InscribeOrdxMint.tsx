@@ -18,9 +18,9 @@ import { UtxoSelectTable } from './UtxoSelectTable';
 interface InscribeOrdxMintProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
-  onUtxoChange?: (data: any) => void;
 }
 
+const MAX_REPEAT = 1000;
 export const InscribeOrdxMint = ({
   onNext,
   onChange,
@@ -98,7 +98,7 @@ export const InscribeOrdxMint = ({
     if (ticker) {
       const { amount = 0 } = permissionInfo.data || {};
       let _max = limit;
-      if (max) {
+      if (max > 0) {
         _max = min([_max, max, amount]);
       }
       set('rarity', rarity);
@@ -177,11 +177,9 @@ export const InscribeOrdxMint = ({
       } = info || {};
       const selfMintAmount = permissionInfo?.amount || 0;
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
-      console.log(max);
-      console.log(selfMintAmount);
       let _maxAmount;
       let _singleMaxAmount = limit || 0;
-      if (max) {
+      if (max > 0) {
         _maxAmount = min([max, selfMintAmount]);
         _singleMaxAmount = min([_singleMaxAmount, max, selfMintAmount]);
       }
@@ -396,15 +394,15 @@ export const InscribeOrdxMint = ({
                         'repeatMint',
                         isNaN(Number(e.target.value))
                           ? 0
-                          : Math.min(Number(e.target.value), 10),
+                          : Math.min(Number(e.target.value), MAX_REPEAT),
                       );
                     }}
                     min={1}
-                    max={10}
+                    max={MAX_REPEAT}
                   ></Input>
                   <Slider
                     step={1}
-                    maxValue={10}
+                    maxValue={MAX_REPEAT}
                     minValue={1}
                     value={[data.repeatMint]}
                     className="max-w-md"

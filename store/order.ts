@@ -17,32 +17,23 @@ type OrderStatus =
 export interface OrderItemType {
   orderId: string;
   type: any;
-  inscriptions: any[];
+  inscription: any;
   secret: string;
   txid?: string;
   inscriptionSize: number;
   toAddress: string[];
   network: string;
   files: any[];
-  ordxUtxo: any;
+  metadata: any;
   fee: {
     serviceFee: number;
     totalFee: number;
     networkFee: number;
   };
-  funding?: {
-    script: any;
-    leaf: string;
-    cblock: string;
-    tapkey: string;
-    address: string;
-    txid: string;
-    vout: number;
-    amount: number;
-  };
   commitTx?: {
     txid: string;
-    outputs: any[];
+    amount: number;
+    vout: number;
   };
   feeRate: number;
   status: OrderStatus;
@@ -53,16 +44,9 @@ interface OrderState {
   saveLength: number;
   setList: (l: OrderItemType[]) => void;
   add: (item: OrderItemType) => void;
-  addTxidToInscription: (orderId: string, index: number, txid: string) => void;
-  changeInscriptionStatus: (
-    orderId: string,
-    index: number,
-    status: OrderStatus,
-  ) => void;
   changeStatus: (orderId: string, status: OrderStatus) => void;
   checkAllList: () => void;
-  // savePaidOrder: (address: string, network: string) => void;
-  setFunding: (orderId: string, funding: any) => void;
+  addSucccessTxid: (orderId: string, txid: string) => void;
   setCommitTx: (orderId: string, tx: any) => void;
   findOrder: (orderId: string) => OrderItemType | undefined;
   reset: () => void;
@@ -91,8 +75,19 @@ export const useOrderStore = create<OrderState>()(
               if (dis > 1000 * 60 * 5) {
                 item.status = 'timeout';
                 item.files = [];
-                item.inscriptions = [];
+                item.inscription = {};
               }
+            }
+            return item;
+          });
+          set({
+            list,
+          });
+        },
+        addSucccessTxid: (orderId, txid) => {
+          const list = get().list.map((item) => {
+            if (item.orderId === orderId) {
+              item.txid = txid;
             }
             return item;
           });
@@ -103,18 +98,7 @@ export const useOrderStore = create<OrderState>()(
         addTxidToInscription: (orderId, index, txid) => {
           const list = get().list.map((item) => {
             if (item.orderId === orderId) {
-              item.inscriptions[index].txid = txid;
-            }
-            return item;
-          });
-          set({
-            list,
-          });
-        },
-        setFunding: (orderId, funding) => {
-          const list = get().list.map((item) => {
-            if (item.orderId === orderId) {
-              item.funding = funding;
+              item.inscription.txid = txid;
             }
             return item;
           });
@@ -136,7 +120,7 @@ export const useOrderStore = create<OrderState>()(
         changeInscriptionStatus: (orderId, index, status: OrderStatus) => {
           const list = get().list.map((item) => {
             if (item.orderId === orderId) {
-              item.inscriptions[index].status = status;
+              item.inscription.status = status;
             }
             return item;
           });
