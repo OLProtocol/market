@@ -18,5 +18,7 @@
   "order_buy_failed_description_3": "dummyUtxos lack of two utxos",
   "order_buy_failed_description_4": "Insufficient btc utxo",
   "transaction_title": "Transaction",
+  "transaction_spilt_success": "Split & Send success",
+  "transaction_spilt_fail": "Split & Send failed",
   "search_sats_title": "Search sats"
 }
