@@ -33,7 +33,6 @@ export const OrdxAssetNameItem = ({
   const [isHovered, setIsHovered] = useState(false);
   const sellHandler = async () => {
     setLoading(true);
-    debugger;
     await onSell?.(item);
     setLoading(false);
   };

@@ -26,19 +26,35 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
 
   const { data, isLoading, mutate } = useSWR(
     swrKey,
-    () => getAddressOrdxList({ address, offset: (page - 1) * size, size }),
+    () => getAddressOrdxList({ address }),
     {
       revalidateOnMount: true,
     },
   );
+  const NsAssetTitle = 'ns';
+  const list = useMemo(() => {
+    let ret = [{ assert: 'Name', balance: 0 }];
+    if (!data) {
+      return ret;
+    }
 
-  const list = useMemo(
-    () => [{ ticker: 'Name' }, ...(data?.data || [])] || [{ ticker: 'Name' }],
-    [data],
-  );
+    for (let i = 0; i < data?.data?.length; i++) {
+      const item = data?.data[i];
+      const assert =
+        item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
+      if (assert === NsAssetTitle) {
+        ret[0].balance = item?.balance;
+        continue;
+      } else {
+        ret.push({ assert: assert, balance: item?.balance });
+      }
+    }
+
+    return ret;
+  }, [data]);
   useEffect(() => {
     if (list.length > 0) {
-      onChange?.(list[0].ticker);
+      onChange?.(list[0].assert);
     }
   }, [list]);
 
@@ -64,10 +80,10 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
         }}
         onSelectionChange={changeHandler}
       >
-        {list?.map((item: any) => (
+        {list?.map((item) => (
           <Tab
-            key={item.ticker}
-            title={`${item.ticker}${!!item.balance ? `(${item.balance})` : ''}`}
+            key={item.assert}
+            title={`${item.assert}${!!item.balance ? `(${item.balance})` : ''}`}
           />
         ))}
       </Tabs>

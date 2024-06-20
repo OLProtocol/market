@@ -16,9 +16,13 @@ import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
 interface Props {
-  ticker: string;
+  assetsName: string;
+  assetsType: string;
 }
-export const OrdxUtxoList = ({ ticker }: Props) => {
+export const OrdxUtxoList = ({
+  assetsName: assets_name,
+  assetsType: assets_type,
+}: Props) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
   const {
@@ -34,23 +38,32 @@ export const OrdxUtxoList = ({ ticker }: Props) => {
   const [size, setSize] = useState(12);
   const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
-    return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
-  }, [address, page, size, ticker]);
+    return `/ordx/GetAddressOrdxAssets-${address}${assets_type}-${assets_name}-${page}-${size}`;
+  }, [address, page, size, assets_name, assets_type]);
 
   const {
     data,
     isMutating: isLoading,
     trigger,
-  } = useSWRMutation(swrKey, () =>
-    getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
-  );
+  } = useSWRMutation(swrKey, () => {
+    return getOrdxAssets({
+      address,
+      assets_name,
+      assets_type: assets_type,
+      offset: (page - 1) * size,
+      size,
+    });
+  });
 
-  const total = useMemo(
-    () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
-    [data],
-  );
+  const total = useMemo(() => {
+    // if (data) {
+    //   console.log("OrdxUtxoList: data, total", data, data?.data?.total);
+    // }
+    return data?.data?.total ? Math.ceil(data?.data?.total / size) : 0;
+  }, [data]);
   useEffect(() => {
     if (data) {
+      console.log('OrdxUtxoList: data', data);
       set(data?.data?.assets || []);
     }
   }, [data, set]);
@@ -65,7 +78,7 @@ export const OrdxUtxoList = ({ ticker }: Props) => {
   const addHandler = (item: any) => {
     console.log(satsToBitcoin(item.value));
     const tickerAmount =
-      item.tickers.find((v) => v.ticker === ticker)?.amount || 0;
+      item.tickers.find((v) => v.ticker === assets_name)?.amount || 0;
     changeType('ft');
     changeTicker('Name');
     addSell({
@@ -119,13 +132,13 @@ export const OrdxUtxoList = ({ ticker }: Props) => {
     reset();
   }, []);
   useEffect(() => {
-    if (ticker) {
+    if (assets_name) {
       resetList();
       setCanSelect(false);
       setPage(1);
       trigger();
     }
-  }, [ticker]);
+  }, [assets_name]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
@@ -133,13 +146,13 @@ export const OrdxUtxoList = ({ ticker }: Props) => {
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
           {list.map((item: any) => (
             <OrdxFtAssetsItem
-              selected={!!sellList.find((i) => i.utxo === item.utxo)}
-              canSelect={canSelect}
-              onSelect={(bol) => selectHandler(bol, item)}
+              // selected={!!sellList.find((i) => i.utxo === item.utxo)}
+              // canSelect={canSelect}
+              // onSelect={(bol) => selectHandler(bol, item)}
               key={item.utxo + item.locked}
               item={item}
-              onSell={() => sellHandler(item)}
-              onCancelOrder={() => onCancelOrder(item)}
+              // onSell={() => sellHandler(item)}
+              // onCancelOrder={() => onCancelOrder(item)}
             />
           ))}
         </div>

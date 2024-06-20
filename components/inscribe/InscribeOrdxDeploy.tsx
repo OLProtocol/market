@@ -252,6 +252,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
       const block_end = btcHeight + 4320;
       set('block_start', block_start);
       set('block_end', block_end);
+
       calcTimeBetweenBlocks({
         height: btcHeight,
         start: block_start,

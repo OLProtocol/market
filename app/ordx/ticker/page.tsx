@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { Card, CardBody, Button, Avatar, Image } from '@nextui-org/react';
-import { getTickerSummary } from '@/api';
+import { getAssetsSummary } from '@/api';
 import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
@@ -20,8 +20,9 @@ export default function Page() {
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
-  const { data } = useSWR(`getTickerSummary`, () =>
-    getTickerSummary({ ticker }),
+  const assets_type = 'ticker';
+  const { data } = useSWR(`getAssetsSummary`, () =>
+    getAssetsSummary({ ticker }),
   );
   const toAccount = () => {
     router.push(`/account`);
@@ -31,6 +32,7 @@ export default function Page() {
   }, [ticker]);
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
+    debugger;
     return [
       {
         value: Number(summary.lowest_price).toFixed(2),
@@ -160,14 +162,17 @@ export default function Page() {
           style={{ width: '100%' }}
         >
           <Tab key="market" title={t('pages.market.title')}>
-            <OrdxOrderList ticker={ticker} showResale />
+            <OrdxOrderList assets_name={ticker} showResale />
           </Tab>
           <Tab key="history" title={t('common.tx_history')}>
-            <OrdxOrderHistoryList ticker={ticker} />
+            <OrdxOrderHistoryList
+              assets_name={ticker}
+              assets_type={assets_type}
+            />
           </Tab>
           <Tab key="my" title={t('common.my_listings')}>
             <WalletConnectBus className="mx-auto mt-20 block">
-              <OrdxOrderList ticker={ticker} address={address} />
+              <OrdxOrderList assets_name={ticker} address={address} />
             </WalletConnectBus>
           </Tab>
         </Tabs>

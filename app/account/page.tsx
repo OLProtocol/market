@@ -20,7 +20,7 @@ import { OrdxBillList } from '@/components/account/OrdxBillList';
 import { btcToSats, satsToBitcoin } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 import { BtcPrice } from '@/components/BtcPrice';
-import { getAddressOrdxList, getTickerSummary } from '@/api';
+import { getAddressOrdxList, getAssetsSummary } from '@/api';
 import useSWR from 'swr';
 
 export default function AccountPage() {
@@ -48,7 +48,7 @@ export default function AccountPage() {
   const tickList = useMemo(() => orderListResp?.data || [], [orderListResp]);
 
   const getPriceByTicker = async (ticker) => {
-    const resp = await getTickerSummary({ ticker });
+    const resp = await getAssetsSummary({ ticker });
     if (resp.code !== 200) {
       notification.error({
         message: 'Error',
@@ -61,8 +61,8 @@ export default function AccountPage() {
   useEffect(() => {
     setTotalSatValue(0);
     let tmp = 0;
-    tickList.map(async (item: any) => {
-      const resp = await getTickerSummary({ ticker: item.ticker });
+    tickList.map(async (item) => {
+      const resp = await getAssetsSummary({ ticker: item.assets_name });
       const price = resp.data.summary.lowest_price;
       tmp += Number(price) * item.balance;
       setTotalSatValue(totalSatValue + tmp);

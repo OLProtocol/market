@@ -5,7 +5,7 @@ import { hideStr, satsToBitcoin } from '@/lib/utils';
 import { Snippet } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 
-import { getAddressOrdxList, getTickerSummary } from '@/api';
+import { getAddressOrdxList, getAssetsSummary } from '@/api';
 import { useEffect, useMemo, useState } from 'react';
 import { notification } from 'antd';
 import useSWR from 'swr';
