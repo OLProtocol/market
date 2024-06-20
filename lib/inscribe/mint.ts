@@ -24,7 +24,7 @@ import {
 } from './index';
 import { useUtxoStore } from '@/store';
 import { ordx } from '@/api';
-import mempool from '@/api/mempool';
+
 interface FileItem {
   mimetype: string;
   show: string;
@@ -32,6 +32,7 @@ interface FileItem {
   originValue: string;
   hex: string;
   amt?: number;
+  offset?: number;
   op?: string;
   relateInscriptionId?: string;
   type: string;
@@ -102,7 +103,8 @@ export const generteFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
-    const { type, value, name, ordxType, utxos, isSpecial, amount } = item;
+    const { type, value, name, ordxType, utxos, isSpecial, amount, offset } =
+      item;
     const file: any = {
       type,
       name,
@@ -110,6 +112,7 @@ export const generteFiles = async (list: any[]) => {
       ordxType,
       isSpecial,
       amount,
+      offset,
       utxos,
     };
     if (type === 'text') {
@@ -232,209 +235,142 @@ export const getAddressBySescet = (sescet: string, network: string) => {
   const pubkey = keys.get_pubkey(seckey, true);
   return Address.p2tr.fromPubKey(pubkey, network as any);
 };
-const generateScript = (secret: string, file: FileItem, ordxUtxo?: any) => {
+
+const generateMultiScript = (secret: string, files: FileItem[], meta: any) => {
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const ec = new TextEncoder();
-  const content = hexToBytes(file.hex);
-  const mimetype = ec.encode(file.mimetype);
-  let script: any;
-  if (file.type === 'ordx' && file.ordxType === 'deploy' && file.fileHex) {
-    const fileContent = hexToBytes(file.fileHex);
-    const fileMimeType = ec.encode(file.fileMimeType);
-    const metaData = cbor.encode(JSON.parse(file.originValue));
-    console.log(metaData);
-    script = [
-      pubkey,
-      'OP_CHECKSIG',
-      'OP_0',
-      'OP_IF',
-      ec.encode('ord'),
-      '01',
-      fileMimeType,
-      '07',
-      ec.encode('ordx'),
-      '05',
-      metaData,
-      'OP_0',
-      fileContent,
-      // '01',
-      // mimetype,
-      // 'OP_0',
-      // content,
-      'OP_ENDIF',
-    ];
-  } else if (file.type === 'ordx' && file.ordxType === 'mint') {
-    if (file.parent) {
-      const parentMimeType = ec.encode(file.parentMimeType);
-      const parentConent = hexToBytes(file.parentHex);
+  // const content = hexToBytes(file.hex);
+  // const mimetype = ec.encode(file.mimetype);
+  let script: any = [];
+  const startScript = [pubkey, 'OP_CHECKSIG'];
+  if (
+    meta.type === 'ordx' &&
+    meta.ordxType === 'deploy' &&
+    meta.hasDeployFile
+  ) {
+    files.forEach((file) => {
+      const fileContent = hexToBytes(file.fileHex);
+      const fileMimeType = ec.encode(file.fileMimeType);
       const metaData = cbor.encode(JSON.parse(file.originValue));
-      const offset = ordxUtxo?.sats?.[0]?.offset || 0;
-      console.log('offset', offset);
-      if (ordxUtxo && offset > 0) {
-        script = [
-          pubkey,
-          'P_CHECKSIG',
+      script.push(
+        ...[
           'OP_0',
           'OP_IF',
           ec.encode('ord'),
           '01',
-          parentMimeType,
-          '02',
-          createLittleEndianInteger(offset),
+          fileMimeType,
           '07',
           ec.encode('ordx'),
           '05',
           metaData,
           'OP_0',
-          parentConent,
+          fileContent,
           'OP_ENDIF',
-        ];
+        ],
+      );
+    });
+  } else if (meta.type === 'ordx' && meta.ordxType === 'mint') {
+    files.forEach((file) => {
+      const content = hexToBytes(file.hex);
+      const mimetype = ec.encode(file.mimetype);
+      if (file.parent) {
+        const parentMimeType = ec.encode(file.parentMimeType);
+        const parentConent = hexToBytes(file.parentHex);
+        const metaData = cbor.encode(JSON.parse(file.originValue));
+        const offset = file.offset || 0;
+        script.push(
+          ...['OP_0', 'OP_IF', ec.encode('ord'), '01', parentMimeType],
+        );
+        if (offset > 0) {
+          script.push(...['02', createLittleEndianInteger(offset)]);
+        }
+        script.push(
+          ...[
+            '07',
+            ec.encode('ordx'),
+            '05',
+            metaData,
+            'OP_0',
+            parentConent,
+            'OP_ENDIF',
+          ],
+        );
+      } else if (file.relateInscriptionId) {
+        const offset = file.offset || 0;
+        const detaConent = serializeInscriptionId(file.relateInscriptionId);
+        const originValue: any = JSON.parse(file.originValue);
+        const meteData: any = originValue;
+        const edcodeMetaData = cbor.encode(meteData);
+        script.push(...['OP_0', 'OP_IF', ec.encode('ord')]);
+        if (offset > 0) {
+          script.push(...['02', createLittleEndianInteger(offset)]);
+        }
+        script.push(
+          ...[
+            '07',
+            ec.encode('ordx'),
+            '05',
+            edcodeMetaData,
+            '0B',
+            detaConent,
+            'OP_ENDIF',
+          ],
+        );
       } else {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '01',
-          parentMimeType,
-          '07',
-          ec.encode('ordx'),
-          '05',
-          metaData,
-          'OP_0',
-          parentConent,
-          'OP_ENDIF',
-        ];
+        const offset = file?.offset || 0;
+        script.push(...['OP_0', 'OP_IF', ec.encode('ord'), '01', mimetype]);
+        if (offset > 0) {
+          script.push(...['02', createLittleEndianInteger(offset)]);
+        }
+        script.push(...['OP_0', content, 'OP_ENDIF']);
       }
-    } else if (file.relateInscriptionId) {
-      const offset = ordxUtxo?.sats?.[0]?.offset || 0;
-      const detaConent = serializeInscriptionId(file.relateInscriptionId);
-      const originValue: any = JSON.parse(file.originValue);
-      const meteData: any = originValue;
-      // if (file.seed !== undefined && file.seed !== null) {
-      //   meteData.seed = file.seed;
-      // }
-      const edcodeMetaData = cbor.encode(meteData);
-      console.log('detaConent', detaConent);
-      if (ordxUtxo && offset > 0) {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '02',
-          createLittleEndianInteger(offset),
-          '07',
-          ec.encode('ordx'),
-          '05',
-          edcodeMetaData,
-          '0B',
-          detaConent,
-          // 'OP_0',
-          // content,
-          'OP_ENDIF',
-        ];
-      } else {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '07',
-          ec.encode('ordx'),
-          '05',
-          edcodeMetaData,
-          '0B',
-          detaConent,
-          // 'OP_0',
-          // content,
-          'OP_ENDIF',
-        ];
-      }
-    } else {
-      const offset = ordxUtxo?.sats?.[0]?.offset || 0;
-      if (ordxUtxo && offset > 0) {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '01',
-          mimetype,
-          '02',
-          createLittleEndianInteger(offset),
-          'OP_0',
-          content,
-          'OP_ENDIF',
-        ];
-      } else {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '01',
-          mimetype,
-          'OP_0',
-          content,
-          'OP_ENDIF',
-        ];
-      }
-    }
+    });
   } else {
-    script = [
-      pubkey,
-      'OP_CHECKSIG',
-      'OP_0',
-      'OP_IF',
-      ec.encode('ord'),
-      '01',
-      mimetype,
-      'OP_0',
-      content,
-      'OP_ENDIF',
-    ];
+    files.forEach((file) => {
+      const content = hexToBytes(file.hex);
+      const mimetype = ec.encode(file.mimetype);
+      const offset = file.offset || 0;
+      script.push(...['OP_0', 'OP_IF', ec.encode('ord'), '01', mimetype]);
+      if (offset > 0) {
+        script.push(...['02', createLittleEndianInteger(offset)]);
+      }
+      script.push(...['OP_0', content, 'OP_ENDIF']);
+    });
   }
+  script = [...startScript, ...script];
   console.log('script', script);
   return script;
 };
 /*
 铭刻过程
 */
-export const generateInscriptions = ({
+export const generateInscription = ({
   files,
   feeRate,
   secret,
   network = 'main',
-  ordxUtxo,
+  metadata,
 }: {
   files: FileItem[];
   feeRate: number;
   secret: string;
   network: any;
-  ordxUtxo: any;
+  metadata: any;
 }) => {
-  const inscriptions: InscriptionItem[] = [];
-
+  let inscription: any;
+  const seckey = keys.get_seckey(secret);
+  const pubkey = keys.get_pubkey(seckey, true);
+  const script = generateMultiScript(secret, files, metadata);
+  const leaf = Tap.encodeScript(script);
+  const [tapkey, cblock] = Tap.getPubKey(pubkey, { target: leaf });
+  const inscriptionAddress = Address.p2tr.fromPubKey(tapkey, network);
+  console.log('network:', network);
+  console.log('Inscription address: ', inscriptionAddress);
+  console.log('Tapkey:', tapkey);
+  let txsize = 0;
   for (let i = 0; i < files.length; i++) {
-    const seckey = keys.get_seckey(secret);
-    const pubkey = keys.get_pubkey(seckey, true);
     const content = hexToBytes(files[i].hex);
-    const script = generateScript(secret, files[i], ordxUtxo);
-
-    const leaf = Tap.encodeScript(script);
-    const [tapkey, cblock] = Tap.getPubKey(pubkey, { target: leaf });
-    const inscriptionAddress = Address.p2tr.fromPubKey(tapkey, network);
-
-    console.log('network:', network);
-    console.log('Inscription address: ', inscriptionAddress);
-    console.log('Tapkey:', tapkey);
 
     let prefix = 160;
 
@@ -442,48 +378,46 @@ export const generateInscriptions = ({
       prefix = feeRate > 1 ? 546 : 700;
     }
 
-    const txsize = prefix + Math.floor(content.length / 4);
+    txsize = prefix + Math.floor(content.length / 4);
 
     console.log('TXSIZE', txsize);
-    inscriptions.push({
-      file: files[i],
-      script: script,
-      leaf: leaf,
-      tapkey: tapkey,
-      cblock: cblock,
-      inscriptionAddress: inscriptionAddress,
-      txsize: txsize,
-      status: 'pending',
-      txid: '',
-    });
   }
-  return inscriptions;
+  inscription = {
+    script: script,
+    leaf: leaf,
+    tapkey: tapkey,
+    cblock: cblock,
+    inscriptionAddress: inscriptionAddress,
+    txsize: txsize,
+    status: 'pending',
+    txid: '',
+  };
+  return inscription;
 };
 interface InscribeParams {
   inscription: InscriptionItem;
   txid: string;
   vout: number;
   amount: number;
-  file: any;
+  files: any[];
   inscribeFee: number;
   serviceFee?: number;
   secret: any;
+  metadata: any;
   toAddress: string;
-  ordxUtxo?: any;
   network: 'main' | 'testnet';
 }
 export const inscribe = async ({
   inscription,
   network,
-  file,
   txid,
   vout,
   amount,
   serviceFee,
-  inscribeFee = 546,
   toAddress,
   secret,
-  ordxUtxo,
+  files,
+  metadata,
 }: InscribeParams) => {
   const tipAddress =
     network === 'testnet'
@@ -492,14 +426,13 @@ export const inscribe = async ({
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
-  const outputs = [
-    {
-      // We are leaving behind 1000 sats as a fee to the miners.
-      value: inscribeFee,
-      // This is the new script that we are locking our funds to.
-      scriptPubKey: Address.toScriptPubKey(toAddress),
-    },
-  ];
+
+  const outputs = files.map((f) => ({
+    // We are leaving behind 1000 sats as a fee to the miners.
+    value: f.amount || 546,
+    // This is the new script that we are locking our funds to.
+    scriptPubKey: Address.toScriptPubKey(toAddress),
+  }));
   if (serviceFee && tipAddress) {
     outputs.push({
       value: serviceFee,
@@ -525,8 +458,7 @@ export const inscribe = async ({
     vout: outputs,
   });
   const sig = Signer.taproot.sign(seckey, txdata, 0, { extension: leaf });
-
-  const script = generateScript(secret, file, ordxUtxo);
+  const script = generateMultiScript(secret, files, metadata);
 
   // Add the signature to our witness data for input 0, along with the script
   // and merkle proof (cblock) for the script.
