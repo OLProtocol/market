@@ -56,13 +56,6 @@ export const InscribingOrderModal = ({
     {
       title: (
         <div className="dark:text-white">
-          {t('pages.inscribe.pay.step_two.name')}
-        </div>
-      ),
-    },
-    {
-      title: (
-        <div className="dark:text-white">
           {t('pages.inscribe.pay.step_three.name')}
         </div>
       ),
@@ -77,18 +70,12 @@ export const InscribingOrderModal = ({
   ];
   const { address: currentAccount, publicKey } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
-  const {
-    changeStatus,
-    setCommitTx,
-    addTxidToInscription,
-    findOrder,
-    changeInscriptionStatus,
-    setFunding,
-  } = useOrderStore((state) => state);
+  const { changeStatus, setCommitTx, addSucccessTxid, findOrder } =
+    useOrderStore((state) => state);
 
   const [activeStep, setActiveStep] = useState(0);
   const order = useMemo(() => {
-    return findOrder(orderId);
+    return findOrder(orderId) as OrderItemType;
   }, [orderId]);
   const payOrder = async () => {
     if (!order) {
@@ -97,84 +84,30 @@ export const InscribingOrderModal = ({
     setLoading(true);
 
     try {
-      const {
-        inscriptions,
-        feeRate,
-        inscriptionSize,
-        secret,
-        network,
-        fee,
-        files,
-      } = order;
-      if (inscriptions.length === 1) {
-        let txid;
-        if (order.ordxUtxo) {
-          txid = await sendBTC({
-            toAddress: inscriptions[0].inscriptionAddress,
-            value: fee.totalFee,
-            feeRate: feeRate,
-            network: network,
-            fromAddress: currentAccount,
-            fromPubKey: publicKey,
-            ordxUtxo: order.ordxUtxo,
-          });
-        } else {
-          txid = await sendBTC({
-            toAddress: inscriptions[0].inscriptionAddress,
-            value: fee.totalFee,
-            feeRate: feeRate,
-            network: network,
-            fromAddress: currentAccount,
-            fromPubKey: publicKey,
-            utxos: files[0].utxos,
-          });
-        }
-        const commitTx = {
-          txid,
-          outputs: [
-            {
-              vout: 0,
-              amount: fee.totalFee,
-            },
-          ],
-        };
-        setCommitTx(orderId, commitTx);
-        changeStatus(orderId, 'paid');
-        await waitSomeSeconds(1500);
-        setLoading(false);
-        setActiveStep(1);
-        setTimeout(() => {
-          startInscribe();
-        }, 0);
-      } else {
-        let funding = order.funding;
-        let fundingTxid = funding?.txid || '';
-        if (!funding) {
-          const fundingData = getFundingAddress(secret, network);
-          fundingTxid = await sendBTC({
-            toAddress: fundingData.address,
-            value: fee.totalFee,
-            feeRate: feeRate,
-            network: network,
-            fromAddress: currentAccount,
-            fromPubKey: publicKey,
-          });
-          funding = {
-            txid: fundingTxid,
-            vout: 0,
-            amount: fee.totalFee,
-            ...fundingData,
-          };
-          setFunding(orderId, funding);
-          changeStatus(orderId, 'paid');
-        }
-        setActiveStep(1);
-        await waitSomeSeconds(1500);
-        setLoading(false);
-        setTimeout(() => {
-          startInscribe();
-        }, 0);
-      }
+      const { inscription, feeRate, network, fee, metadata } = order;
+      let txid;
+      txid = await sendBTC({
+        toAddress: inscription.inscriptionAddress,
+        value: fee.totalFee,
+        feeRate: feeRate,
+        network: network,
+        fromAddress: currentAccount,
+        fromPubKey: publicKey,
+        utxos: metadata.utxos,
+      });
+      const commitTx = {
+        txid,
+        vout: 0,
+        amount: fee.totalFee,
+      };
+      setCommitTx(orderId, commitTx);
+      changeStatus(orderId, 'paid');
+      await waitSomeSeconds(1500);
+      setLoading(false);
+      setActiveStep(1);
+      setTimeout(() => {
+        startInscribe();
+      }, 0);
     } catch (error: any) {
       setLoading(false);
       console.error(error);
@@ -187,70 +120,13 @@ export const InscribingOrderModal = ({
     if (!order) {
       return;
     }
-    console.log(order);
-    const {
-      inscriptions,
-      funding,
-      feeRate,
-      inscriptionSize,
-      secret,
-      network,
-      fee,
-    } = order;
     setLoading(true);
-    if (inscriptions.length !== 1 && funding) {
-      try {
-        await ordx.pollGetTxStatus(funding.txid, order.network);
-        // await loopTilAddressReceivesMoney(funding.address, order.network, true);
-        const fundingData = getFundingAddress(secret, network);
-        const _funding = {
-          ...funding,
-          ...fundingData,
-        };
-        const commitData = await pushCommitTx({
-          inscriptions,
-          secret,
-          network,
-          funding: _funding,
-          serviceFee: fee.serviceFee,
-          inscriptionSize,
-          feeRate,
-        });
-        changeStatus(orderId, 'commit_success');
-        setCommitTx(orderId, commitData);
-        setActiveStep(2);
-        changeStatus(orderId, 'inscribe_wait');
-        await waitSomeSeconds(1000);
-        setLoading(false);
-        inscribeHandler();
-      } catch (error: any) {
-        console.log(error);
-        try {
-          // await savePaidOrder({
-          //   key: orderId,
-          //   content: {
-          //     order,
-          //     address: currentAccount,
-          //   },
-          // });
-        } catch (error) {
-          console.log(error);
-        }
-        setLoading(false);
-        changeStatus(orderId, 'commit_error');
-        notification.error({
-          message: 'Error',
-          description: error.message || JSON.stringify(error),
-        });
-      }
-    } else {
-      setLoading(true);
-      setActiveStep(2);
-      changeStatus(orderId, 'inscribe_wait');
-      await waitSomeSeconds(1000);
-      setLoading(false);
-      inscribeHandler();
-    }
+    setLoading(true);
+    setActiveStep(2);
+    changeStatus(orderId, 'inscribe_wait');
+    await waitSomeSeconds(1000);
+    setLoading(false);
+    inscribeHandler();
   };
 
   const inscribeHandler = async () => {
@@ -261,47 +137,31 @@ export const InscribingOrderModal = ({
       setLoading(true);
       console.log('order', order);
       const { commitTx, fee } = order;
-      let finishedNum = 0;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
       await ordx.pollGetTxStatus(commitTxid, order.network);
-      for (let i = 0; i < order.inscriptions.length; i++) {
-        const inscription = order.inscriptions[i];
-        await waitSomeSeconds(1500);
-        // if (!inscription.txid) {
-        const txid = await inscribe({
-          secret: order.secret,
-          network: order.network as any,
-          inscription,
-          file: inscription.file,
-          txid: commitTxid,
-          serviceFee: order.inscriptions.length === 1 ? fee.serviceFee : 0,
-          vout: commitTx.outputs[i].vout,
-          amount: commitTx.outputs[i].amount,
-          toAddress: order.toAddress[0],
-          inscribeFee: order.inscriptionSize,
-          ordxUtxo: order.ordxUtxo,
-        });
-        addTxidToInscription(order.orderId, i, txid);
-        // }
-        changeStatus(orderId, 'inscribe_success');
-        changeInscriptionStatus(order.orderId, i, 'inscribe_success');
-        finishedNum += 1;
-        setSuccessPercent(
-          Math.floor((finishedNum / order.inscriptions.length) * 100),
-        );
-      }
-      if (finishedNum === order.inscriptions.length) {
-        changeStatus(orderId, 'inscribe_success');
-        setActiveStep(3);
-        onFinished?.();
-        notification.success({
-          message: 'Success',
-          description: 'Inscribe Success',
-        });
-      } else {
-        changeStatus(orderId, 'inscribe_fail');
-      }
+      await waitSomeSeconds(1500);
+      const txid = await inscribe({
+        secret: order.secret,
+        network: order.network as any,
+        inscription: order.inscription,
+        files: order.files,
+        metadata: order.metadata,
+        txid: commitTxid,
+        serviceFee: 0,
+        vout: commitTx.vout,
+        amount: commitTx.amount,
+        toAddress: order.toAddress[0],
+        inscribeFee: order.inscriptionSize,
+      });
+      addSucccessTxid(orderId, txid);
+      changeStatus(orderId, 'inscribe_success');
+      setActiveStep(2);
+      notification.success({
+        message: 'Success',
+        description: 'Inscribe Success',
+      });
       setLoading(false);
+      onFinished?.();
     } catch (error: any) {
       try {
         // await savePaidOrder({
@@ -323,54 +183,26 @@ export const InscribingOrderModal = ({
       });
     }
   };
-  const clacSuccessPercent = () => {
-    const successNum =
-      order?.inscriptions?.filter((v) => v.status === 'inscribe_success')
-        .length || 0;
-    const total = order?.inscriptions?.length || 0;
-    setSuccessPercent(Math.floor((successNum / total) * 100));
-  };
   const checkStatus = () => {
-    if (order?.status === 'paid') {
+    if (order.status === 'paid') {
       setActiveStep(1);
     }
-    if (
-      (order?.funding && order?.commitTx) ||
-      order?.status === 'commit_error'
-    ) {
-      setActiveStep(1);
-    }
-
-    if (
-      order?.status === 'inscribe_wait' ||
-      order?.status === 'inscribe_fail'
-    ) {
-      // setActiveStep(2);
-    }
-    if (order?.status === 'inscribe_success') {
-      if (
-        order?.inscriptions?.length > 1 &&
-        order?.inscriptions?.some((v) => !v.txid)
-      ) {
-        setActiveStep(2);
-      } else {
-        setActiveStep(2);
-      }
+    if (order.status === 'inscribe_success') {
+      setActiveStep(2);
     }
   };
 
   const fundingAddressHref = (address?: string) => {
-    if (!address || !order?.network) {
+    if (!address || !order.network) {
       return '';
     }
     return generateMempoolUrl({
-      network: order?.network,
+      network: order.network,
       path: `address/${address}`,
     });
   };
   useEffect(() => {
     checkStatus();
-    clacSuccessPercent();
   }, []);
   const closeHandler = () => {
     onClose?.();
@@ -385,23 +217,14 @@ export const InscribingOrderModal = ({
       <ModalContent>
         <ModalHeader className="flex items-center">
           <span className="mr-2">Inscribing Order</span>
-          <Tag color="error">{order?.network}</Tag>
+          <Tag color="error">{order.network}</Tag>
         </ModalHeader>
         <ModalBody>
           <div className="mb-4">
             <Steps current={activeStep} items={steps} />
           </div>
           <div>
-            {activeStep > 0 && (
-              <>
-                <Divider />
-                <div>
-                  <Progress percent={successPercent} status="active" />
-                </div>
-              </>
-            )}
-            {/* step one */}
-            {activeStep === 0 && order?.status !== 'timeout' && (
+            {activeStep === 0 && order.status !== 'timeout' && (
               <div>
                 <div className="flex justify-center">
                   <WalletConnectBus>
@@ -418,37 +241,6 @@ export const InscribingOrderModal = ({
             )}
             {/* step two */}
             {activeStep === 1 && (
-              <div>
-                <div className="text-center mb-2">
-                  <div className="text-2xl font-bold">
-                    {t('pages.inscribe.pay.step_two.name')}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {t('pages.inscribe.pay.step_two.des')}
-                  </div>
-                </div>
-                {order?.txid && (
-                  <div className="flex justify-between mb-4">
-                    <div>Tx id</div>
-                    <div>{order?.txid}</div>
-                  </div>
-                )}
-                <div className="flex justify-center mt-4">
-                  <Button
-                    color="primary"
-                    isLoading={loading}
-                    onClick={startInscribe}
-                  >
-                    {t('buttons.start_inscribe')}
-                  </Button>
-                </div>
-                <div className="text-amber-400 text-base text-center">
-                  {t('pages.inscribe.order.continue')}
-                </div>
-              </div>
-            )}
-            {/* step three */}
-            {activeStep === 2 && (
               <div>
                 <div className="text-center">
                   <div className="text-2xl font-bold">
@@ -472,7 +264,7 @@ export const InscribingOrderModal = ({
                 </div>
               </div>
             )}
-            {activeStep === 3 && (
+            {activeStep === 2 && (
               <div>
                 <div className="text-center mb-4">
                   <div className="text-2xl font-bold">
@@ -483,24 +275,19 @@ export const InscribingOrderModal = ({
                   </div>
                 </div>
                 <div className="max-h-[20rem] overflow-y-auto">
-                  {order?.inscriptions?.map((item, index) => (
-                    <div key={index} className="flex justify-between mb-4">
-                      <div>
-                        {t('pages.inscribe.pay.step_four.genesis_tx')}{' '}
-                        {index + 1}
-                      </div>
-                      <a
-                        className="text-blue-500 underline"
-                        href={generateMempoolUrl({
-                          network: order.network,
-                          path: `tx/${item.txid}`,
-                        })}
-                        target="_blank"
-                      >
-                        {hideStr(item.txid, 10)}
-                      </a>
-                    </div>
-                  ))}
+                  <div className="flex justify-between mb-4">
+                    <div>{t('pages.inscribe.pay.step_four.genesis_tx')}</div>
+                    <a
+                      className="text-blue-500 underline"
+                      href={generateMempoolUrl({
+                        network: order.network,
+                        path: `tx/${order.txid}`,
+                      })}
+                      target="_blank"
+                    >
+                      {hideStr(order.txid, 10)}
+                    </a>
+                  </div>
                 </div>
                 <div className="flex justify-center mt-4">
                   <Button
@@ -517,11 +304,11 @@ export const InscribingOrderModal = ({
           </div>
           <FeeShow
             feeRate={feeRate.value}
-            // inscriptionSize={order?.inscriptionSize}
-            serviceFee={order?.fee.serviceFee}
-            // filesLength={order?.inscriptions.length}
-            totalFee={order?.fee.totalFee}
-            // networkFee={order?.fee.networkFee}
+            // inscriptionSize={order.inscriptionSize}
+            serviceFee={order.fee.serviceFee}
+            // filesLength={order.inscriptions.length}
+            totalFee={order.fee.totalFee}
+            // networkFee={order.fee.networkFee}
           />
 
           <>
@@ -531,25 +318,15 @@ export const InscribingOrderModal = ({
                 <CardHeader>Funding Account</CardHeader>
                 <div className="flex justify-between">
                   <div>{t('common.address')}</div>
-                  {order?.inscriptions?.length === 1 ? (
-                    <a
-                      className="text-blue-500 underline ml-4"
-                      href={fundingAddressHref(
-                        order?.inscriptions?.[0].inscriptionAddress,
-                      )}
-                      target="_blank"
-                    >
-                      {hideStr(order?.inscriptions?.[0].inscriptionAddress, 10)}
-                    </a>
-                  ) : (
-                    <a
-                      className="text-blue-500 underline ml-4"
-                      href={fundingAddressHref(order?.funding?.address)}
-                      target="_blank"
-                    >
-                      {hideStr(order?.funding?.address, 10)}
-                    </a>
-                  )}
+                  <a
+                    className="text-blue-500 underline ml-4"
+                    href={fundingAddressHref(
+                      order.inscription?.inscriptionAddress,
+                    )}
+                    target="_blank"
+                  >
+                    {hideStr(order.inscription?.inscriptionAddress, 10)}
+                  </a>
                 </div>
               </CardBody>
             </Card>
@@ -557,21 +334,21 @@ export const InscribingOrderModal = ({
           <Divider />
           <div className="max-h-[20rem] overflow-y-auto">
             <div className="mb-2 flex-col gap-2">
-              {order?.inscriptions?.map((item, index) => (
+              {order.files?.map((item, index) => (
                 <InscribeOrderItem
                   key={index}
                   label={index + 1}
                   status={item?.status}
-                  value={item.file.show}
+                  value={item.show}
                   address={order.toAddress[0]}
                 />
               ))}
             </div>
           </div>
-          {order?.createAt && (
+          {order.createAt && (
             <div className="text-right text-sm text-gray-400">
               {t('pages.inscribe.pay.created_text')}{' '}
-              {new Date(order?.createAt).toLocaleString('af')}
+              {new Date(order.createAt).toLocaleString('af')}
             </div>
           )}
         </ModalBody>

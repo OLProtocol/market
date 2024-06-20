@@ -38,7 +38,7 @@ export default function Inscribe() {
   //   });
   // }, []);
   const { t } = useTranslation();
-  const ordxUtxoRef = useRef<InscribeType>();
+  const [metadata, setMetadata] = useState<any>({});
   const [step, setStep] = useState(1);
   const [tab, setTab] = useState<any>('ordx');
   const [files, setFiles] = useState<any[]>([]);
@@ -141,9 +141,7 @@ export default function Inscribe() {
     setOrd2Data('blockChecked', data.blockChecked);
     console.log('change ', data.utxos);
   };
-  const onOrdxUtxoChange = (utxo: any) => {
-    ordxUtxoRef.current = utxo;
-  };
+
   const brc20Next = async () => {
     const list: any = [];
     if (brc20Data.type === 'mint') {
@@ -233,6 +231,7 @@ export default function Inscribe() {
   const ordxNext = async () => {
     const list: any = [];
     if (ordxData.type === 'mint') {
+      let offset = 0;
       for (let i = 0; i < ordxData.repeatMint; i++) {
         console.log(ordxData);
         const attrArr: string[] = [];
@@ -256,7 +255,8 @@ export default function Inscribe() {
             }),
           ),
         ];
-        let amount = ordxData.amount;
+        let amount = Math.max(ordxData.amount, 546);
+
         if (ordxData.utxos.length && ordxData.isSpecial) {
           amount = findSepiceAmt();
         }
@@ -285,10 +285,12 @@ export default function Inscribe() {
           name: `mint_${i}`,
           ordxType: 'mint',
           amount,
+          offset,
           utxos: ordxData.utxos,
           isSpecial: ordxData.isSpecial,
           value: ordxValue,
         });
+        offset += amount;
       }
     } else if (ordxData.type === 'deploy') {
       const attrArr: string[] = [];
@@ -337,6 +339,11 @@ export default function Inscribe() {
         value,
       });
     }
+    setMetadata({
+      type: list[0].type,
+      ordxType: list[0].ordxType,
+      isSpecial: list[0].isSpecial,
+    });
     const _files = await generteFiles(list);
     setList(_files);
     setStep(2);
@@ -494,11 +501,7 @@ export default function Inscribe() {
                     <InscribeText onNext={textNext} onChange={textChange} />
                   )}
                   {tab === 'ordx' && (
-                    <InscribeOrdx
-                      onChange={ordxChange}
-                      onNext={ordxNext}
-                      onUtxoChange={onOrdxUtxoChange}
-                    />
+                    <InscribeOrdx onChange={ordxChange} onNext={ordxNext} />
                   )}
                   {tab === 'name' && (
                     <InscribeOrdxName
@@ -518,7 +521,7 @@ export default function Inscribe() {
               )}
               {step === 3 && (
                 <InscribeStepThree
-                  ordxUtxo={ordxUtxoRef.current}
+                  metadata={metadata}
                   onItemRemove={onItemRemove}
                   onRemoveAll={onRemoveAll}
                   onAddOrder={onAddOrder}
