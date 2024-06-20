@@ -17,8 +17,14 @@ import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
 
-interface Props {}
-export const OrdxNameList = () => {
+interface Props {
+  assetsName: string;
+  assetsType: string;
+}
+export const OrdxNameList = ({
+  assetsName: assets_name,
+  assetsType: asserts_type,
+}: Props) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
   const {
@@ -34,7 +40,7 @@ export const OrdxNameList = () => {
   const [size, setSize] = useState(12);
   const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
-    return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-Name`;
+    return `/ordx/GetAddressOrdxAssets-${address}-Name-${page}-${size}`;
   }, [address, page, size]);
 
   const {
@@ -42,13 +48,20 @@ export const OrdxNameList = () => {
     isMutating: isLoading,
     trigger: getNsList,
   } = useSWRMutation(swrKey, () =>
-    getOrdxAssets({ address, network, type: 2 }),
+    getOrdxAssets({
+      address,
+      assets_name,
+      assets_type: 'ns',
+      offset: (page - 1) * size,
+      size,
+    }),
   );
   const total = useMemo(
     () => (nsData?.data?.total ? Math.ceil(nsData?.data?.total / size) : 0),
     [nsData],
   );
   useEffect(() => {
+    // console.log("OrdxNameList: nsdata:", nsData)
     if (nsData) {
       set(nsData?.data?.assets || []);
     }

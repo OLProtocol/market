@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 interface InscribeOrdxProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
-  onUtxoChange?: (data: any) => void;
 }
 
 export const InscribeOrdx = ({ onNext, onChange }: InscribeOrdxProps) => {

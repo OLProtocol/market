@@ -29,7 +29,7 @@ import {
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { getTickerSummary, submitBatchOrders } from '@/api';
+import { getAssetsSummary, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
@@ -51,14 +51,14 @@ export default function SellPage() {
   } = useSellStore((state) => state);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
-    `getTickerSummary-${ticker}`,
-    () => getTickerSummary({ ticker }),
+    `getAssetsSummary-${ticker}`,
+    () => getAssetsSummary({ ticker }),
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   useEffect(() => {
     if (summary.lowest_price) {
       for (const item of list) {
-        console.log('lowest price', item.utxo, summary.lowest_price);
+        // console.log('lowest price', item.utxo, summary.lowest_price);
         if (unit === 'btc') {
           changePrice(
             item.utxo,

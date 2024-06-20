@@ -64,13 +64,13 @@ export const OrdxFtAssetsItem = ({
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
           <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-200">
-              {item?.tickers[0].ticker}
+              {item?.assets_list[0].assets_name}
             </span>
           </div>
           <div className="flex justify-center">
             <section className="text-center pt-8">
               <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
-                {thousandSeparator(item?.tickers[0].amount)}
+                {thousandSeparator(item?.assets_list[0].amount)}
               </p>
               <p className="pt-5">
                 <Snippet

@@ -24,6 +24,8 @@ export interface UtxoAssetItem {
 interface SellState {
   unit: 'btc' | 'sats';
   ticker: string;
+  assets_type: string;
+  assets_name: string;
   type: 'ft' | 'name';
   amountUnit: 'btc' | 'sats';
   list: UtxoAssetItem[];
@@ -46,6 +48,8 @@ export const useSellStore = create<SellState>()(
     unit: 'sats',
     amountUnit: 'btc',
     ticker: '',
+    assets_type: '',
+    assets_name: '',
     type: 'ft',
     list: [
       // {
