@@ -39,6 +39,7 @@ export default function TransferTool() {
   const { feeRate } = useCommonStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { address, network, publicKey } = useReactWalletStore((state) => state);
+  const [refresh, setRefresh] = useState(0);
   const dropdownStyle = {
     backgroundColor: '#2f2f2f',
     color: '#353535',
@@ -48,6 +49,7 @@ export default function TransferTool() {
     backgroundColor: '#2f2f2f',
     color: '#353535',
   };
+
   const [inputList, { set: setInputList }] = useMap<any>({
     items: [
       {
@@ -100,7 +102,6 @@ export default function TransferTool() {
     }
 
     inputList.items[itemId - 1].options.utxos = utxos;
-
     setInputList('items', inputList.items);
   };
 
@@ -131,12 +132,14 @@ export default function TransferTool() {
   const handleInputUnitSelectChange = (itemId, e) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
+
     setInputList('items', inputList.items);
   };
 
   const handleOutputUnitSelectChange = (itemId: number, e: any) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
+
     setInputList('items', inputList.items);
   };
 
@@ -172,6 +175,7 @@ export default function TransferTool() {
       tmpItems.forEach((item, index) => {
         item.id = index + 1;
       });
+
       setInputList('items', tmpItems);
     }
   };
@@ -421,11 +425,8 @@ export default function TransferTool() {
     const tickers = await getTickers();
     const avialableTicker = await getAvialableTicker();
     tickers?.push(avialableTicker);
-
     const rareSatTickers = await getRareSatTicker();
-
     const combinedArray = tickers?.concat(rareSatTickers);
-
     setTickerList(combinedArray || []);
   };
 
@@ -485,26 +486,19 @@ export default function TransferTool() {
       });
 
       const txid = await signAndPushPsbt(psbt);
-      // const type = 'split_sats';
-      // const resp = await addChargedTask({ address, fee, txid, type });
-      // setLoading(false);
-      // if (resp.code !== 0) {
-      //   notification.error({
-      //     message: t('notification.transaction_title'),
-      //     description: resp.msg || 'Split & Send failed',
-      //   });
-      // } else {
-      //   notification.success({
-      //     message: t('notification.transaction_title'),
-      //     description: 'Split & Send success',
-      //   });
-      // }
+      setLoading(false);
+      notification.success({
+        message: t('notification.transaction_title'),
+        description: t('notification.transaction_spilt_success'),
+      });
+
+      setRefresh(refresh + 1);
     } catch (error: any) {
       console.log('error(transfer sats) = ', error);
       setLoading(false);
       notification.error({
         message: t('notification.transaction_title'),
-        description: error.message || 'Split & Send failed',
+        description: error.message || t('notification.transaction_spilt_fail'),
       });
     }
   };
@@ -545,7 +539,7 @@ export default function TransferTool() {
       },
     ]);
     getAllTickers();
-  }, [address]);
+  }, [address, refresh]);
   return (
     <div className="flex flex-col max-w-7xl mx-auto pt-8">
       <Card>
@@ -563,12 +557,16 @@ export default function TransferTool() {
                 <div className="flex gap-2 pb-2" key={i}>
                   <AntSelect
                     placeholder="Select Ticker"
-                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"    
-                    dropdownStyle = {dropdownStyle}
+                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"
+                    dropdownStyle={dropdownStyle}
                     value={item.value?.ticker ? item.value?.ticker : undefined}
                     options={
                       tickerList?.map((utxo) => ({
-                        label: <div className='w-full p-0 m-0 text-gray-400 hover:text-blue-600'>{utxo.ticker}</div>,
+                        label: (
+                          <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
+                            {utxo.ticker}
+                          </div>
+                        ),
                         value: utxo.ticker,
                       })) || []
                     }
@@ -576,8 +574,8 @@ export default function TransferTool() {
                   ></AntSelect>
                   <AntSelect
                     placeholder="Select UTXO"
-                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"    
-                    dropdownStyle = {dropdownStyle}
+                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"
+                    dropdownStyle={dropdownStyle}
                     value={
                       inputList.items[i]?.value?.utxo
                         ? inputList.items[i]?.value?.utxo
@@ -586,7 +584,7 @@ export default function TransferTool() {
                     options={
                       inputList.items[i]?.options?.utxos.map((utxo) => ({
                         label: (
-                          <div className='w-full p-0 m-0 text-gray-400 hover:text-blue-600'>
+                          <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
                             {utxo.assetamount && utxo.assetamount + ' Asset/'}
                             {utxo.value +
                               ' sats - ' +
@@ -622,24 +620,24 @@ export default function TransferTool() {
                       </div>
                     }
                   />
-                   <Button radius="full" onClick={addInputItem}>
+                  <Button radius="full" onClick={addInputItem}>
                     <Image
-                        radius="full"
-                        src="../icon/add.svg"
-                        alt="logo"
-                        className="w-10 h-10 p-1 rounded-full "
-                      />
+                      radius="full"
+                      src="../icon/add.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full "
+                    />
                   </Button>
                   <Button
                     radius="full"
                     onClick={() => removeInputItem(item.id)}
                   >
                     <Image
-                        radius="full"
-                        src="../icon/del.svg"
-                        alt="logo"
-                        className="w-10 h-10 p-1 rounded-full"
-                      />
+                      radius="full"
+                      src="../icon/del.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full"
+                    />
                   </Button>
                 </div>
               ))}
@@ -661,12 +659,12 @@ export default function TransferTool() {
                     />
                     <Tooltip content="Fill the BTC address of the current account">
                       <Button onClick={() => setBtcAddress(item.id, address)}>
-                         <Image
+                        <Image
                           radius="full"
                           src="../icon/copy.svg"
                           alt="logo"
                           className="w-10 h-10 p-1 rounded-full "
-                         />
+                        />
                       </Button>
                     </Tooltip>
                   </div>
@@ -682,11 +680,9 @@ export default function TransferTool() {
                     }
                     onChange={(e) => {
                       setOutputSats(item.id, e.target.value);
-                      // debugger
                       console.log('onBlur is skipped');
                     }}
                     onBlur={(e) => {
-                      // setOutputSats(item.id, e.target.value);
                       outputSatsOnBlur(e);
                     }}
                     endContent={
@@ -706,22 +702,22 @@ export default function TransferTool() {
                   />
                   <Button radius="full" onClick={addOuputItem}>
                     <Image
-                          radius="full"
-                          src="../icon/add.svg"
-                          alt="logo"
-                          className="w-10 h-10 p-1 rounded-full "
-                         />
+                      radius="full"
+                      src="../icon/add.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full "
+                    />
                   </Button>
                   <Button
                     radius="full"
                     onClick={() => removeOutputItem(item.id)}
                   >
                     <Image
-                          radius="full"
-                          src="../icon/del.svg"
-                          alt="logo"
-                          className="w-10 h-10 p-1 rounded-full "
-                         />
+                      radius="full"
+                      src="../icon/del.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full "
+                    />
                   </Button>
                 </div>
               ))}
@@ -785,7 +781,8 @@ export default function TransferTool() {
             </Button>
           </WalletConnectBus>
           <span className="text-gray-400 text-sm font-light pl-4">
-            ({t('pages.tools.transaction.network_fee')}: {fee + ' sats'})
+            ({t('pages.tools.transaction.network_fee')}: {fee + ' sats'},{' '}
+            {feeRate.value + ' sat/vb'})
           </span>
         </CardFooter>
       </Card>
