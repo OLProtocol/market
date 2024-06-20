@@ -154,26 +154,16 @@ export const InscribingOrderModal = ({
         inscribeFee: order.inscriptionSize,
       });
       addSucccessTxid(orderId, txid);
-      changeStatus(orderId, 'inscribe_success');
       setActiveStep(2);
       notification.success({
         message: 'Success',
         description: 'Inscribe Success',
       });
+      changeStatus(orderId, 'inscribe_success');
       setLoading(false);
       onFinished?.();
     } catch (error: any) {
-      try {
-        // await savePaidOrder({
-        //   key: orderId,
-        //   content: {
-        //     order,
-        //     address: currentAccount,
-        //   },
-        // });
-      } catch (error) {
-        console.log(error);
-      }
+      console.error(error);
 
       setLoading(false);
       changeStatus(orderId, 'inscribe_fail');
@@ -184,7 +174,7 @@ export const InscribingOrderModal = ({
     }
   };
   const checkStatus = () => {
-    if (order.status === 'paid') {
+    if (order.status === 'paid' || order.status === 'inscribe_fail') {
       setActiveStep(1);
     }
     if (order.status === 'inscribe_success') {

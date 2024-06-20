@@ -414,7 +414,6 @@ export const inscribe = async ({
   vout,
   amount,
   serviceFee,
-  inscribeFee = 546,
   toAddress,
   secret,
   files,
@@ -430,7 +429,7 @@ export const inscribe = async ({
 
   const outputs = files.map((f) => ({
     // We are leaving behind 1000 sats as a fee to the miners.
-    value: f.amount,
+    value: f.amount || 546,
     // This is the new script that we are locking our funds to.
     scriptPubKey: Address.toScriptPubKey(toAddress),
   }));
