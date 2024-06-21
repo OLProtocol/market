@@ -124,7 +124,7 @@ export const InscribeStepThree = ({
         </Button>
       </div>
       <div className="max-h-[30rem] overflow-y-auto p-4 bg-gray-800 rounded-xl mb-4">
-        <div className="w-full py-4 flex-col gap-2">
+        <div className="w-full py-4 flex flex-col gap-2">
           {list.map((item, index) => (
             <InscribeRemoveItem
               key={index}
