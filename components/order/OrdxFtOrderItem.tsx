@@ -87,7 +87,7 @@ export const OrdxFtOrderItem = ({
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
           <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-500">
-              {item?.assets[0].ticker}
+              {item?.assets[0].assets_name}
             </span>
           </div>
           <div className="flex justify-center">
@@ -102,7 +102,7 @@ export const OrdxFtOrderItem = ({
                   ).toFixed(2)}
                 </span>
                 <span className="font-mono text-gray-500">
-                  &nbsp;sats/{item?.assets[0].ticker}
+                  &nbsp;sats/{item?.assets[0].assets_name}
                 </span>
               </p>
               <p className="md:text-sm">
@@ -115,7 +115,7 @@ export const OrdxFtOrderItem = ({
                       100000000
                     }
                   />
-                  &nbsp; /{item?.assets[0].ticker}
+                  &nbsp; /{item?.assets[0].assets_name}
                 </span>
               </p>
             </section>

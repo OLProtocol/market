@@ -258,7 +258,9 @@ export const InscribeOrdxMint = ({
       if (contenttype === 'text/html') {
         set('relateInscriptionId', inscriptionId);
         if (!isSpecial) {
-          const utxos = selectUtxosByAmount(Math.max(data.amount, 546));
+          const utxos = selectUtxosByAmount(
+            Math.max(data.amount, 330) * data.repeatMint,
+          );
           console.log('utxos', utxos);
           if (!utxos.length) {
             setErrorText(t('pages.inscribe.ordx.error_18'));

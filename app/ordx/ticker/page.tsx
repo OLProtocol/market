@@ -32,7 +32,6 @@ export default function Page() {
   }, [ticker]);
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
-    debugger;
     return [
       {
         value: Number(summary.lowest_price).toFixed(2),
@@ -108,7 +107,7 @@ export default function Page() {
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
               <div className="text-2xl md:text-3xl font-medium text-gary-500">
-                {summary?.ticker}
+                {summary?.assets_name}
               </div>
             </div>
             <WalletConnectBus text={t('buttons.list_sale')}>
