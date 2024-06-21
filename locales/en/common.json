@@ -1,5 +1,6 @@
 {
   "tick": "Ticker",
+  "assets_name": "assetsName",
   "deploy": "Deploy",
   "mint": "Mint",
   "file": "File",

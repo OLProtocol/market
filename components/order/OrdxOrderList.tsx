@@ -17,12 +17,12 @@ import { SortDropdown } from '@/components/SortDropdown';
 import { useList } from 'react-use';
 
 interface OrdxOrderListProps {
-  ticker: string;
+  assets_name: string;
   address?: string;
   showResale?: boolean;
 }
 export const OrdxOrderList = ({
-  ticker,
+  assets_name,
   address,
   showResale = true,
 }: OrdxOrderListProps) => {
@@ -56,13 +56,13 @@ export const OrdxOrderList = ({
 
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${ticker}-${address}-${network}-${page}-${size}-${sort}`;
+      return `/ordx/getOrders-${assets_name}-${address}-${network}-${page}-${size}-${sort}`;
     }
-    return `/ordx/getOrders-${ticker}-${network}-${page}-${size}-${sort}`;
-  }, [ticker, address, page, size, network, sort]);
+    return `/ordx/getOrders-${assets_name}-${network}-${page}-${size}-${sort}`;
+  }, [assets_name, address, page, size, network, sort]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
-    getOrders({ offset: (page - 1) * size, size, ticker, address, sort }),
+    getOrders({ offset: (page - 1) * size, size, assets_name, address, sort }),
   );
   const [list, { set, reset: resetList, updateAt, removeAt }] = useList<any>(
     [],
