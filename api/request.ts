@@ -8,8 +8,8 @@ export const request = async (path: string, options: any = {}) => {
     useReactWalletStore.getState();
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data } = options;
-  // let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
-  let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '' : ''}${path}`;
+  let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
+  // let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
