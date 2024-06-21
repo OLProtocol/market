@@ -21,9 +21,14 @@ export default function Page() {
   const { address } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
   const assets_type = 'ticker';
-  const { data } = useSWR(`getAssetsSummary`, () =>
-    getAssetsSummary({ ticker }),
-  );
+  const { data } = useSWR(`getAssetsSummary`, () => {
+    console.log('app.ordx.ticker.page: ticker: ', ticker);
+    try {
+      return getAssetsSummary({ assets_name: ticker });
+    } catch (error) {
+      console.log('app.ordx.ticker.page: getAssetsSummary error: ', error);
+    }
+  });
   const toAccount = () => {
     router.push(`/account`);
   };

@@ -47,24 +47,21 @@ export default function AccountPage() {
   );
   const tickList = useMemo(() => orderListResp?.data || [], [orderListResp]);
 
-  const getPriceByTicker = async (ticker) => {
-    const resp = await getAssetsSummary({ ticker });
-    if (resp.code !== 200) {
-      notification.error({
-        message: 'Error',
-        description: resp.msg,
-      });
-      return;
-    }
-    return resp.data.summary.lowest_price;
-  };
   useEffect(() => {
     setTotalSatValue(0);
     let tmp = 0;
     tickList.map(async (item) => {
-      const resp = await getAssetsSummary({ ticker: item.assets_name });
-      const price = resp.data.summary.lowest_price;
-      tmp += Number(price) * item.balance;
+      console.log('app.account.page', item.assets_name);
+      try {
+        const resp = await getAssetsSummary({
+          assets_name: item.assets_name,
+          assets_type: item.assets_type,
+        });
+        const price = resp.data.summary.lowest_price;
+        tmp += Number(price) * item.balance;
+      } catch (error) {
+        console.log('app.account.page, getAssetsSummary err: ', error);
+      }
       setTotalSatValue(totalSatValue + tmp);
     });
   }, [tickList]);

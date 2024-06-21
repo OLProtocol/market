@@ -5,7 +5,7 @@ import { Tabs, Tab } from '@nextui-org/react';
 import { getAddressOrdxList } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
-import { useSellStore } from '@/store';
+
 import { useRouter } from 'next/navigation';
 
 interface OrdxUtxoTypeListProps {
@@ -14,7 +14,7 @@ interface OrdxUtxoTypeListProps {
 export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
-  const { reset } = useSellStore((state) => state);
+
   const [selected, setSelected] = useState<string>();
   const [page, setPage] = useState(1);
   // const page = useRef(1);

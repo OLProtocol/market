@@ -61,7 +61,7 @@ export const OrdxNameList = ({
     [nsData],
   );
   useEffect(() => {
-    // console.log("OrdxNameList: nsdata:", nsData)
+    console.log('OrdxNameList: nsdata:', nsData);
     if (nsData) {
       set(nsData?.data?.assets || []);
     }
