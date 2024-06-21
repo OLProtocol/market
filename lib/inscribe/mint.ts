@@ -169,7 +169,6 @@ export const generteFiles = async (list: any[]) => {
       }
       const b64 = (await encodeBase64(value)) as string;
       const base64 = b64.substring(b64.indexOf('base64,') + 7);
-      console.log('base64', base64);
       const hex = base64ToHex(base64);
       file.mimetype = mimetype;
       file.show = name;
@@ -177,14 +176,14 @@ export const generteFiles = async (list: any[]) => {
       file.sha256 = sha256.replace('0x', '');
       file.hex = hex;
     }
-    let prefix = 160;
+    // let prefix = 160;
 
-    if (file.sha256 != '') {
-      prefix = 546;
-    }
+    // if (file.sha256 != '') {
+    //   prefix = 546;
+    // }
     const contentBytes = hexToBytes(file.hex);
 
-    let txsize = prefix + Math.floor(contentBytes.length / 4);
+    let txsize = Math.floor(23 + contentBytes.length / 4);
     if (type === 'ordx' && ordxType === 'deploy' && file.fileHex) {
       const contentFileBytes = hexToBytes(file.fileHex);
       txsize += Math.floor(contentFileBytes.length / 4);

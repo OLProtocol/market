@@ -106,7 +106,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
-        startInscribe();
+        inscribeHandler();
       }, 0);
     } catch (error: any) {
       setLoading(false);
@@ -115,18 +115,6 @@ export const InscribingOrderModal = ({
         message: error.message || JSON.stringify(error),
       });
     }
-  };
-  const startInscribe = async () => {
-    if (!order) {
-      return;
-    }
-    setLoading(true);
-    setLoading(true);
-    setActiveStep(2);
-    changeStatus(orderId, 'inscribe_wait');
-    await waitSomeSeconds(1000);
-    setLoading(false);
-    inscribeHandler();
   };
 
   const inscribeHandler = async () => {
@@ -154,13 +142,14 @@ export const InscribingOrderModal = ({
         inscribeFee: order.inscriptionSize,
       });
       addSucccessTxid(orderId, txid);
-      setActiveStep(2);
+
       notification.success({
         message: 'Success',
         description: 'Inscribe Success',
       });
       changeStatus(orderId, 'inscribe_success');
       setLoading(false);
+      setActiveStep(2);
       onFinished?.();
     } catch (error: any) {
       console.error(error);
@@ -323,7 +312,7 @@ export const InscribingOrderModal = ({
           </>
           <Divider />
           <div className="max-h-[20rem] overflow-y-auto">
-            <div className="mb-2 flex-col gap-2">
+            <div className="mb-2 flex flex-col gap-2">
               {order.files?.map((item, index) => (
                 <InscribeOrderItem
                   key={index}

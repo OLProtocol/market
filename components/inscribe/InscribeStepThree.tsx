@@ -45,22 +45,21 @@ export const InscribeStepThree = ({
   const files = useMemo(() => {
     return list;
   }, [list]);
-  console.log('files', files);
   const inscriptionSize = useMemo(() => {
     console.log('type', type);
     console.log('type', list);
     if (['brc20', 'text'].includes(type)) {
-      return 546;
+      return 330;
     } else if (type === 'brc100') {
       return 294;
     } else if (type === 'ordx' && list?.[0]?.op === 'mint') {
       if (list?.[0]?.utxos?.length && list?.[0]?.isSpecial) {
         return list?.[0]?.amount;
       } else {
-        return list?.[0]?.amt > 546 ? list?.[0]?.amt : 546;
+        return list?.[0]?.amt > 330 ? list?.[0]?.amt : 330;
       }
     } else {
-      return 546;
+      return 330;
     }
   }, [type, list]);
   const clacFee = useCalcFee({
@@ -125,7 +124,7 @@ export const InscribeStepThree = ({
         </Button>
       </div>
       <div className="max-h-[30rem] overflow-y-auto p-4 bg-gray-800 rounded-xl mb-4">
-        <div className="w-full py-4 flex-col gap-2">
+        <div className="w-full py-4 flex flex-col gap-2">
           {list.map((item, index) => (
             <InscribeRemoveItem
               key={index}

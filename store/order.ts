@@ -70,7 +70,10 @@ export const useOrderStore = create<OrderState>()(
         },
         checkAllList: () => {
           const list = get().list.map((item) => {
-            if (item.status === 'pending') {
+            if (
+              item.status === 'pending' ||
+              item.status === 'inscribe_success'
+            ) {
               const dis = Date.now() - item.createAt;
               if (dis > 1000 * 60 * 5) {
                 item.status = 'timeout';

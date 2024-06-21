@@ -108,7 +108,7 @@ export const OrdxOrderHistoryList = ({
       },
       {
         key: 'assets_name',
-        label: t('common.tick'),
+        label: t('common.assets_name'),
         align: 'center',
       },
       {
