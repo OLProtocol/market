@@ -52,7 +52,16 @@ export default function SellPage() {
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
     `getAssetsSummary-${ticker}`,
-    () => getAssetsSummary({ ticker }),
+    () => {
+      console.log('app.account.sell.page: ticker: ', ticker);
+      let ret: Promise<any>;
+      try {
+        ret = getAssetsSummary({ assets_name: ticker });
+        return ret;
+      } catch (error) {
+        console.log('app.account.sell.page: getAssetsSummary err: ', error);
+      }
+    },
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   useEffect(() => {

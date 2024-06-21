@@ -59,13 +59,15 @@ export const getAddressOrdxList = async ({ address }: any) => {
 };
 
 interface GetAssetsSummary {
-  ticker: string;
   assets_name?: string;
   assets_type?: string;
 }
-export const getAssetsSummary = async ({ ticker }: GetAssetsSummary) => {
+export const getAssetsSummary = async ({
+  assets_name,
+  assets_type,
+}: GetAssetsSummary) => {
   const res = await request('/ordx/GetAssetsSummary', {
-    data: { ticker },
+    data: { assets_name, assets_type },
   });
   return res;
 };
