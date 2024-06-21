@@ -26,7 +26,7 @@ export const useCalcFee = ({
     const outputLength = serviceStatus ? files.length + 1 : files.length;
     console.log((160 + totalTxSize) * feeRate);
     feeObj.networkFee = Math.ceil(
-      (160 + totalTxSize) * feeRate + 34 * (outputLength + 10) * feeRate,
+      (160 + totalTxSize) * feeRate + (34 * outputLength + 10) * feeRate,
     );
     let totalFee = feeObj.networkFee + totalInscriptionSize;
     if (serviceStatus) {
