@@ -45,7 +45,6 @@ export const InscribeStepThree = ({
   const files = useMemo(() => {
     return list;
   }, [list]);
-  console.log('files', files);
   const inscriptionSize = useMemo(() => {
     console.log('type', type);
     console.log('type', list);

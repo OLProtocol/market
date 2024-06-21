@@ -177,14 +177,14 @@ export const generteFiles = async (list: any[]) => {
       file.sha256 = sha256.replace('0x', '');
       file.hex = hex;
     }
-    let prefix = 160;
+    // let prefix = 160;
 
-    if (file.sha256 != '') {
-      prefix = 546;
-    }
+    // if (file.sha256 != '') {
+    //   prefix = 546;
+    // }
     const contentBytes = hexToBytes(file.hex);
 
-    let txsize = prefix + Math.floor(contentBytes.length / 4);
+    let txsize = Math.floor(20 + contentBytes.length / 4);
     if (type === 'ordx' && ordxType === 'deploy' && file.fileHex) {
       const contentFileBytes = hexToBytes(file.fileHex);
       txsize += Math.floor(contentFileBytes.length / 4);
