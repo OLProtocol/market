@@ -255,7 +255,7 @@ export default function Inscribe() {
             }),
           ),
         ];
-        let amount = Math.max(ordxData.amount, 546);
+        let amount = Math.max(ordxData.amount, 330);
 
         if (ordxData.utxos.length && ordxData.isSpecial) {
           amount = findSepiceAmt();
