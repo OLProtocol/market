@@ -312,7 +312,7 @@ export const InscribingOrderModal = ({
           </>
           <Divider />
           <div className="max-h-[20rem] overflow-y-auto">
-            <div className="mb-2 flex-col gap-2">
+            <div className="mb-2 flex flex-col gap-2">
               {order.files?.map((item, index) => (
                 <InscribeOrderItem
                   key={index}
