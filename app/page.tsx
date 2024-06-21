@@ -1,6 +1,6 @@
 'use client';
 
-import { getTopTickers } from '@/api';
+import { getTopAssets } from '@/api';
 import useSWR from 'swr';
 import {
   Table,
@@ -47,19 +47,24 @@ export default function Home() {
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
     `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
-    () =>
-      getTopTickers({
+    () => {
+      let res = getTopAssets({
+        // assets_type: 'ticker',
         interval,
         top_count: 200,
         top_name: '',
         sort_field: sortField,
         sort_order: sortOrder,
-      }),
+      });
+      return res;
+    },
   );
   const onSortChange = (i?: number) => {
     setInterval(i);
   };
-  const list = useMemo(() => data?.data || [], [data]);
+  const list = useMemo(() => {
+    return data?.data || [];
+  }, [data]);
   const toDetail = (e) => {
     router.push(`/ordx/ticker?ticker=${e}`);
   };
@@ -69,7 +74,7 @@ export default function Home() {
     setSortOrder(e.direction === 'ascending' ? 0 : 1);
   };
   const columns = [
-    { key: 'ticker', label: t('common.tick'), allowsSorting: true },
+    { key: 'assets_name', label: t('common.assets_name'), allowsSorting: true },
     {
       key: 'lowest_price',
       label: t('common.lowest_price'),
@@ -147,12 +152,12 @@ export default function Home() {
         >
           {(item: any) => (
             <TableRow
-              key={item.ticker}
+              key={item.assets_name}
               className="cursor-pointer text-sm md:text-base"
             >
               {(columnKey) => {
-                if (columnKey === 'ticker') {
-                  const tick = getKeyValue(item, columnKey);
+                if (columnKey === 'assets_name') {
+                  const tick = getKeyValue(item, 'assets_name');
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base items-left">

@@ -9,6 +9,7 @@ export const request = async (path: string, options: any = {}) => {
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
+  // let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
@@ -39,40 +40,40 @@ export const request = async (path: string, options: any = {}) => {
 };
 export const getOrdxAssets = async ({
   address,
+  assets_type,
+  assets_name,
+  type,
+  utxo,
   offset,
   size,
-  type,
-  ticker,
 }: any) => {
   const res = await request('/ordx/GetAddressOrdxAssets', {
-    data: { address, offset, size, type, ticker },
-  });
-  return res;
-};
-export const getAddressOrdxList = async ({
-  address,
-  offset,
-  size,
-  type,
-  ticker,
-}: any) => {
-  const res = await request('/ordx/GetAddressOrdxList', {
-    data: { address, offset, size, type, ticker },
+    data: { address, offset, size, type, assets_type, assets_name, utxo },
   });
   return res;
 };
 
-interface GetTickerSummary {
-  ticker: string;
+export const getAddressOrdxList = async ({ address }: any) => {
+  const res = await request('/ordx/GetAddressOrdxList', { data: { address } });
+  return res;
+};
+
+interface GetAssetsSummary {
+  assets_name?: string;
+  assets_type?: string;
 }
-export const getTickerSummary = async ({ ticker }: GetTickerSummary) => {
-  const res = await request('/ordx/GetTickerSummary', {
-    data: { ticker },
+export const getAssetsSummary = async ({
+  assets_name,
+  assets_type,
+}: GetAssetsSummary) => {
+  const res = await request('/ordx/GetAssetsSummary', {
+    data: { assets_name, assets_type },
   });
   return res;
 };
 interface GetOrders {
-  ticker?: string;
+  assets_name?: string;
+  assets_type?: string;
   address?: string;
   offset: number;
   size: number;
@@ -80,7 +81,8 @@ interface GetOrders {
   type?: 1 | 2; // 1: 卖出订单 2: 买入订单， 当前只支持1（默认为1）
 }
 export const getOrders = async ({
-  ticker,
+  assets_name,
+  assets_type,
   offset,
   size,
   sort = 0,
@@ -88,12 +90,13 @@ export const getOrders = async ({
   address,
 }: GetOrders) => {
   const res = await request('/ordx/GetOrders', {
-    data: { ticker, offset, size, sort, type, address },
+    data: { assets_name, assets_type, offset, size, sort, type, address },
   });
   return res;
 };
 export const getHistory = async ({
-  ticker,
+  assets_name,
+  assets_type,
   offset,
   size,
   sort = 0, // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
@@ -101,28 +104,36 @@ export const getHistory = async ({
   filter,
 }: any) => {
   const res = await request('/ordx/GetHistory', {
-    data: { ticker, offset, size, sort, address, filter },
+    data: { assets_name, assets_type, offset, size, sort, address, filter },
   });
   return res;
 };
 
-interface GetTopTickers {
+interface GetTopAssets {
+  // assets_type: string;
   interval?: number;
   top_count?: number;
   top_name?: ''; //'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
   sort_field: string;
   sort_order: 0 | 1; //'asc' | 'desc';
 }
-export const getTopTickers = async ({
+export const getTopAssets = async ({
+  // assets_type = '',
   interval = 1,
   top_count = 20,
   top_name = '',
   sort_field = '',
   sort_order = 0,
-}: GetTopTickers) => {
+}: GetTopAssets) => {
   const _interval = interval === 0 ? undefined : interval;
-  const res = await request('/ordx/GetTopTickers', {
-    data: { interval: _interval, top_count, top_name, sort_field, sort_order },
+  const res = await request('/ordx/GetTopAssets', {
+    data: {
+      /*assets_type, */ interval: _interval,
+      top_count,
+      top_name,
+      sort_field,
+      sort_order,
+    },
   });
   return res;
 };

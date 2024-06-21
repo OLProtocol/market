@@ -8,19 +8,31 @@ import { OrdxUtxoList } from './OrdxUtxoList';
 
 export const OrdxAssetsUtxoList = () => {
   const router = useRouter();
-  const [ticker, setTicker] = useState<string>('Name');
+  const [assertType, setAssertType] = useState<string>('');
+  const [assertName, setAssertName] = useState<string>('Name');
 
-  const onTickerChange = (t: string) => {
-    setTicker(t);
+  const onAssertChange = (data: string) => {
+    const parts = data.split(':');
+    if (parts.length === 1) {
+      setAssertType('');
+      setAssertName(data);
+    } else {
+      setAssertType(parts[0]);
+      setAssertName(parts[1]);
+    }
   };
 
   return (
     <div>
       <div>
-        <OrdxUtxoTypeList onChange={onTickerChange} />
+        <OrdxUtxoTypeList onChange={onAssertChange} />
       </div>
-      {ticker === 'Name' && <OrdxNameList />}
-      {ticker !== 'Name' && <OrdxUtxoList ticker={ticker} />}
+      {assertName === 'Name' && (
+        <OrdxNameList assetsName={''} assetsType={assertType} />
+      )}
+      {assertName !== 'Name' && (
+        <OrdxUtxoList assetsName={assertName} assetsType={assertType} />
+      )}
     </div>
   );
 };

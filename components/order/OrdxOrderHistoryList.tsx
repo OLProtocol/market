@@ -23,11 +23,13 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 interface OrdxOrderHistoryListProps {
-  ticker?: string;
+  assets_name?: string;
+  assets_type?: string;
   address?: string;
 }
 export const OrdxOrderHistoryList = ({
-  ticker,
+  assets_name,
+  assets_type,
   address,
 }: OrdxOrderHistoryListProps) => {
   const { t, i18n } = useTranslation();
@@ -37,12 +39,13 @@ export const OrdxOrderHistoryList = ({
   const [sort, setSort] = useState(0);
   const [filter, setFilter] = useState<any>(undefined);
   const { data, isLoading } = useSWR(
-    `/ordx/history-${ticker}-${address}-${page}-${size}-${sort}-${filter}`,
+    `/ordx/history-${assets_name}-${address}-${page}-${size}-${sort}-${filter}`,
     () =>
       getHistory({
         offset: (page - 1) * size,
         size,
-        ticker,
+        assets_name,
+        assets_type,
         address,
         sort,
         filter: filter === 0 ? undefined : filter,
@@ -104,8 +107,8 @@ export const OrdxOrderHistoryList = ({
         align: 'center',
       },
       {
-        key: 'ticker',
-        label: t('common.tick'),
+        key: 'assets_name',
+        label: t('common.assets_name'),
         align: 'center',
       },
       {
@@ -300,10 +303,10 @@ export const OrdxOrderHistoryList = ({
                       </div>
                     </TableCell>
                   );
-                } else if (columnKey === 'ticker') {
+                } else if (columnKey === 'assets_name') {
                   const assets = getKeyValue(item, 'assets') || [];
                   const ticker = assets
-                    .map((asset: any) => asset.ticker)
+                    .map((asset: any) => asset.assets_name)
                     .join('-');
                   return (
                     <TableCell className="text-center font-light text-sm md:text-base">

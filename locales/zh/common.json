@@ -1,5 +1,6 @@
 {
   "tick": "Ticker",
+  "assets_name": "资产",
   "price": "价格",
   "account": "账户",
   "mint": "铸造",

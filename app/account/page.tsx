@@ -20,7 +20,7 @@ import { OrdxBillList } from '@/components/account/OrdxBillList';
 import { btcToSats, satsToBitcoin } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 import { BtcPrice } from '@/components/BtcPrice';
-import { getAddressOrdxList, getTickerSummary } from '@/api';
+import { getAddressOrdxList, getAssetsSummary } from '@/api';
 import useSWR from 'swr';
 
 export default function AccountPage() {
@@ -47,24 +47,21 @@ export default function AccountPage() {
   );
   const tickList = useMemo(() => orderListResp?.data || [], [orderListResp]);
 
-  const getPriceByTicker = async (ticker) => {
-    const resp = await getTickerSummary({ ticker });
-    if (resp.code !== 200) {
-      notification.error({
-        message: 'Error',
-        description: resp.msg,
-      });
-      return;
-    }
-    return resp.data.summary.lowest_price;
-  };
   useEffect(() => {
     setTotalSatValue(0);
     let tmp = 0;
-    tickList.map(async (item: any) => {
-      const resp = await getTickerSummary({ ticker: item.ticker });
-      const price = resp.data.summary.lowest_price;
-      tmp += Number(price) * item.balance;
+    tickList.map(async (item) => {
+      console.log('app.account.page', item.assets_name);
+      try {
+        const resp = await getAssetsSummary({
+          assets_name: item.assets_name,
+          assets_type: item.assets_type,
+        });
+        const price = resp.data.summary.lowest_price;
+        tmp += Number(price) * item.balance;
+      } catch (error) {
+        console.log('app.account.page, getAssetsSummary err: ', error);
+      }
       setTotalSatValue(totalSatValue + tmp);
     });
   }, [tickList]);

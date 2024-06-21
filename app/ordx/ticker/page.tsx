@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { Card, CardBody, Button, Avatar, Image } from '@nextui-org/react';
-import { getTickerSummary } from '@/api';
+import { getAssetsSummary } from '@/api';
 import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
@@ -20,9 +20,15 @@ export default function Page() {
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
-  const { data } = useSWR(`getTickerSummary`, () =>
-    getTickerSummary({ ticker }),
-  );
+  const assets_type = 'ticker';
+  const { data } = useSWR(`getAssetsSummary`, () => {
+    console.log('app.ordx.ticker.page: ticker: ', ticker);
+    try {
+      return getAssetsSummary({ assets_name: ticker });
+    } catch (error) {
+      console.log('app.ordx.ticker.page: getAssetsSummary error: ', error);
+    }
+  });
   const toAccount = () => {
     router.push(`/account`);
   };
@@ -106,7 +112,7 @@ export default function Page() {
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
               <div className="text-2xl md:text-3xl font-medium text-gary-500">
-                {summary?.ticker}
+                {summary?.assets_name}
               </div>
             </div>
             <WalletConnectBus text={t('buttons.list_sale')}>
@@ -160,14 +166,17 @@ export default function Page() {
           style={{ width: '100%' }}
         >
           <Tab key="market" title={t('pages.market.title')}>
-            <OrdxOrderList ticker={ticker} showResale />
+            <OrdxOrderList assets_name={ticker} showResale />
           </Tab>
           <Tab key="history" title={t('common.tx_history')}>
-            <OrdxOrderHistoryList ticker={ticker} />
+            <OrdxOrderHistoryList
+              assets_name={ticker}
+              assets_type={assets_type}
+            />
           </Tab>
           <Tab key="my" title={t('common.my_listings')}>
             <WalletConnectBus className="mx-auto mt-20 block">
-              <OrdxOrderList ticker={ticker} address={address} />
+              <OrdxOrderList assets_name={ticker} address={address} />
             </WalletConnectBus>
           </Tab>
         </Tabs>
