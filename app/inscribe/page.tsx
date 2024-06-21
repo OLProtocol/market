@@ -221,6 +221,7 @@ export default function Inscribe() {
       list.push({
         type: 'ordx_name',
         name: `mint`,
+        amount: 330,
         value: value,
       });
     }
@@ -327,6 +328,7 @@ export default function Inscribe() {
       if (ordxData.file) {
         value.push({
           type: 'file',
+
           name: ordxData.fileName,
           value: ordxData.file,
           mimeType: ordxData.fileType,
@@ -334,6 +336,7 @@ export default function Inscribe() {
       }
       list.push({
         type: 'ordx',
+        amount: 330,
         name: 'deploy_0',
         ordxType: 'deploy',
         value,
@@ -361,6 +364,7 @@ export default function Inscribe() {
         list.push({
           type: 'text',
           value: line,
+          amount: 330,
         });
       });
     }
