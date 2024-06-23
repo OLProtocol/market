@@ -10,6 +10,7 @@ import {
   Snippet,
 } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { UtxoContent } from '@/components/UtxoContent';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
@@ -90,8 +91,13 @@ export const OrdxFtOrderItem = ({
               {item?.assets[0].assets_name}
             </span>
           </div>
-          <div className="flex justify-center">
-            <section className="text-center pt-4 font-mono md:pt-8">
+          <div className="flex justify-center h-full">
+            <div className="h-full">
+              <UtxoContent
+                inscriptionId={item?.assets_list[0].inscriptionId}
+              ></UtxoContent>
+            </div>
+            <section className="text-center pt-4 font-mono md:pt-8 absolute top-0 left-0 w-full h-full">
               <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
                 {thousandSeparator(item?.assets[0].amount)}
               </p>
