@@ -122,6 +122,11 @@ export const Navbar = () => {
         isActive: true,
       },
       {
+        label: t('pages.explorer.title'),
+        href: `${process.env.NEXT_PUBLIC_ORDX_WEBSITE_HOST}/#/explorer`,
+        isActive: true,
+      },
+      {
         label: t('pages.tools.title'),
         href: '/tools',
         isActive: false,
