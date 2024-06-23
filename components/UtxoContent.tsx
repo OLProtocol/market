@@ -29,17 +29,18 @@ export function UtxoContent({ inscriptionId, ranges = [] }: UtxoContentProps) {
   }, [network, inscriptionId, seed]);
 
   return (
-    <div className="h-full">
+    <div className="flex justify-center items-center absolute w-full top-0 left-0 h-full p-0 m-0 overflow-hidden bg-black">
       {inscriptionId ? (
         <a
           href={contentSrc}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full h-full"
+          className="block w-full h-full overflow-hidden bg-transparent"
         >
           <iframe
             src={contentSrc}
-            className="max-w-full h-full pointer-events-none max-h-full"
+            className="max-w-full h-full pointer-events-none max-h-full overflow-hidden bg-transparent" 
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           ></iframe>
         </a>
       ) : (
