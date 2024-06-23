@@ -11,7 +11,7 @@ import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
-
+import { UtxoContent } from './UtxoContent';
 interface Props {
   item: any;
   onSell?: (item: any) => void;
@@ -67,8 +67,13 @@ export const OrdxFtAssetsItem = ({
               {item?.assets_list[0].assets_name}
             </span>
           </div>
-          <div className="flex justify-center">
-            <section className="text-center pt-8">
+          <div className="flex justify-center relative h-full">
+            <div className="h-full">
+              <UtxoContent
+                inscriptionId={item?.assets_list[0].inscriptionId}
+              ></UtxoContent>
+            </div>
+            <section className="text-center pt-8 absolute top-0 left-0 w-full h-full">
               <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
                 {thousandSeparator(item?.assets_list[0].amount)}
               </p>
