@@ -1,3 +1,5 @@
+import useSWRMutation from 'swr/mutation';
+import { ordx } from '@/api';
 import { useEffect, useMemo } from 'react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Spin } from 'antd';
@@ -6,14 +8,28 @@ import { generateSeed } from '@/lib/utils';
 
 interface UtxoContentProps {
   inscriptionId: string;
+  utxo?: string;
   ranges?: any[];
 }
-export function UtxoContent({ inscriptionId, ranges = [] }: UtxoContentProps) {
+export function UtxoContent({
+  inscriptionId,
+  utxo,
+  ranges = [],
+}: UtxoContentProps) {
   const { network } = useReactWalletStore();
-  const seed = useMemo(
-    () => (ranges.length > 0 ? generateSeed(ranges) : 0),
-    [ranges],
+  const { data, trigger, isMutating } = useSWRMutation(
+    `utxo-content-${network}-${utxo}`,
+    () =>
+      ordx.getSeedByUtxo({
+        utxo: utxo,
+        network,
+      }),
   );
+  const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
+  // const seed = useMemo(
+  //   () => (ranges.length > 0 ? generateSeed(ranges) : 0),
+  //   [ranges],
+  // );
   const contentSrc = useMemo(() => {
     if (inscriptionId && seed) {
       return generateOrdUrl({
@@ -27,20 +43,26 @@ export function UtxoContent({ inscriptionId, ranges = [] }: UtxoContentProps) {
       });
     }
   }, [network, inscriptionId, seed]);
+  useEffect(() => {
+    if (utxo) {
+      trigger();
+    }
+  }, [utxo, network]);
 
   return (
-    <div className="flex justify-center items-center absolute w-full top-0 left-0 h-full p-0 m-0 overflow-hidden bg-black">
-      {inscriptionId ? (
+    <div className="h-full">
+      {isMutating ? (
+        <Spin spinning={isMutating}></Spin>
+      ) : contentSrc ? (
         <a
           href={contentSrc}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full h-full overflow-hidden bg-transparent"
+          className="block w-full h-full"
         >
           <iframe
             src={contentSrc}
-            className="max-w-full h-full pointer-events-none max-h-full overflow-hidden bg-transparent" 
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            className="max-w-full h-full pointer-events-none max-h-full"
           ></iframe>
         </a>
       ) : (

@@ -1,3 +1,10 @@
+/**
+ * @author hugh
+ * @email ygz14835187@163.com
+ * @create date 2024-06-23 18:04:10
+ * @modify date 2024-06-23 18:04:10
+ * @desc [description]
+ */
 import axios from 'axios';
 import mempool from './mempool';
 const generateUrl = (url: string, network?: string) => {
