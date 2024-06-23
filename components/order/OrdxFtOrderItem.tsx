@@ -95,6 +95,7 @@ export const OrdxFtOrderItem = ({
             <div className="h-full">
               <UtxoContent
                 inscriptionId={item?.assets_list[0].inscriptionId}
+                utxo={item?.utxo}
               ></UtxoContent>
             </div>
             <section className="text-center pt-4 font-mono md:pt-8 absolute top-0 left-0 w-full h-full">

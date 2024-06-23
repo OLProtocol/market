@@ -60,42 +60,41 @@ export const OrdxFtAssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[11.5rem] h-[11.75rem] md:w-[15.5rem] md:h-[15.75rem] top-1 bottom-0 left-1">       
+      <CardBody className="radius-lg w-[11.5rem] h-[11.75rem] md:w-[15.5rem] md:h-[15.75rem] top-1 bottom-0 left-1">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
-         <div className="absolute inset-0 z-0">
-           <UtxoContent inscriptionId={item?.assets_list[0].inscriptionId} />
-         </div>
-        
+          <div className="absolute inset-0 z-0">
+            <UtxoContent
+              inscriptionId={item?.assets_list[0].inscriptionId}
+              utxo={item?.utxo}
+            />
+          </div>
+
           <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-200">
               {item?.assets_list[0].assets_name}
             </span>
           </div>
-         
         </div>
       </CardBody>
 
-      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:w-[18rem] md:h-[8rem]">          
-          <Snippet
-            codeString={item?.utxo}
-            className="bg-transparent text-blue-400 pt-0 pb-0"
-            symbol=""
-            size="sm"
-            variant="flat"
-          >
-            <span className="font-thin md:pl-8">
-              {hideStr(item?.utxo, 6)}
-            </span>
-          </Snippet>
+      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:w-[18rem] md:h-[8rem]">
+        <Snippet
+          codeString={item?.utxo}
+          className="bg-transparent text-blue-400 pt-0 pb-0"
+          symbol=""
+          size="sm"
+          variant="flat"
+        >
+          <span className="font-thin md:pl-8">{hideStr(item?.utxo, 6)}</span>
+        </Snippet>
 
-          <div className='pb-1 md:pb-2'> 
-            {item?.assets_list[0].assets_name} 
-            <span className="relative pl-4 font-medium text-lg md:text-xl">
-               assets: {thousandSeparator(item?.assets_list[0].amount)}
-            </span>
-          
-           </div>
-          <div className="flex item-center pb-1">
+        <div className="pb-1 md:pb-2">
+          {item?.assets_list[0].assets_name}
+          <span className="relative pl-4 font-medium text-lg md:text-xl">
+            assets: {thousandSeparator(item?.assets_list[0].amount)}
+          </span>
+        </div>
+        <div className="flex item-center pb-1">
           {item.order_id === 0 ? (
             <Button
               // fullWidth
