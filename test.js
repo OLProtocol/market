@@ -1,7 +1,7 @@
 const radash = require('radash');
 const flat = radash.flat;
 
-const splitUtxosByValue = (utxos, amount, chunks) => {
+const splitRareUtxosByValue = (utxos, amount, chunks) => {
   const sats = flat(utxos.map((v) => v.sats));
   let ranges = [];
   console.log(sats);
@@ -10,16 +10,15 @@ const splitUtxosByValue = (utxos, amount, chunks) => {
   for (let i = 0; i < sats.length; i++) {
     const item = sats[i];
     console.log('index', i);
-    const { size, start } = item;
-    console.log(start, size);
+    const { size, start, offset } = item;
     totalSize += size;
-    if (totalSize > amount && totalRanges.length < chunks) {
+    if (totalSize > amount) {
       const dis = totalSize - amount;
       const others = size - dis;
-      console.log(dis, others);
       ranges.push({
         start,
         size: others,
+        offset,
       });
       totalRanges.push(ranges);
       if (dis < amount) {
@@ -27,6 +26,7 @@ const splitUtxosByValue = (utxos, amount, chunks) => {
           {
             start: start + others,
             size: dis,
+            offset: offset + others,
           },
         ];
         totalSize = dis;
@@ -34,34 +34,38 @@ const splitUtxosByValue = (utxos, amount, chunks) => {
         const othersChunks = Math.floor(dis / amount);
         const othersDis = dis % amount;
         for (let j = 0; j < othersChunks; j++) {
-          if (totalRanges.length < chunks) {
-            totalRanges.push([
-              {
-                start: start + others + j * amount,
-                size: amount,
-              },
-            ]);
-          }
+          totalRanges.push([
+            {
+              start: start + others + j * amount,
+              size: amount,
+              offset: offset + others + j * amount,
+            },
+          ]);
+          ranges = [];
+          totalSize = 0;
         }
         if (othersDis > 0) {
-          if (totalRanges.length < chunks) {
-            ranges = [
-              {
-                start: start + others + othersChunks * amount,
-                size: othersDis,
-              },
-            ];
-            totalSize = othersDis;
-          }
+          console.log(start);
+          console.log(start + others + othersChunks * amount);
+          ranges = [
+            {
+              start: start + others + othersChunks * amount,
+              size: othersDis,
+              offset: offset + others + othersChunks * amount,
+            },
+          ];
+          totalSize = othersDis;
         }
       }
-    } else if (totalRanges.length < chunks) {
+    } else {
       ranges.push({
         start,
         size,
+        offset,
       });
     }
   }
+  console.log('ranges', ranges);
   return totalRanges;
 };
 
@@ -71,25 +75,20 @@ const utxosData = [
       {
         start: 1000,
         size: 1060,
+        offset: 6,
       },
       {
-        start: 2000,
-        size: 300,
-      },
-    ],
-  },
-  {
-    sats: [
-      {
-        start: 6000,
-        size: 222,
+        start: 2080,
+        size: 1030,
+        offset: 1996,
       },
       {
-        start: 7000,
-        size: 700,
+        start: 4080,
+        size: 10,
+        offset: 6000,
       },
     ],
   },
 ];
 
-console.log(splitUtxosByValue(utxosData, 300, 6));
+console.log(splitRareUtxosByValue(utxosData, 500));
