@@ -188,7 +188,7 @@ export default function Inscribe() {
   const findSepiceAmt = () => {
     const { utxos, amount } = ordxData;
     const userAmt = amount || 0;
-    const realAmt = Math.max(userAmt, 546);
+    const realAmt = Math.max(userAmt, 330);
     const findBetweenByValue = (userAmt: number, realAmt, ranges: any[]) => {
       let outAmt = 0;
       let outValue = 0;
@@ -236,11 +236,14 @@ export default function Inscribe() {
       let rangesArr: any[][] = [];
       let amount = Math.max(ordxData.amount, 330);
       if (ordxData.utxos?.length) {
-        rangesArr = splitUtxosByValue(
-          ordxData.utxos,
-          amount,
-          ordxData.repeatMint,
-        );
+        if (ordxData.isSpecial) {
+        } else {
+          rangesArr = splitUtxosByValue(
+            ordxData.utxos,
+            amount,
+            ordxData.repeatMint,
+          );
+        }
       }
       for (let i = 0; i < ordxData.repeatMint; i++) {
         const attrArr: string[] = [];
@@ -267,6 +270,7 @@ export default function Inscribe() {
 
         if (ordxData.utxos.length && ordxData.isSpecial) {
           amount = findSepiceAmt();
+          offset = ordxData.utxos[0]?.sats?.[0]?.offset;
         }
         console.log(rangesArr[i]);
         const seed = generateSeed(rangesArr[i]);
