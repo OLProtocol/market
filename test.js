@@ -1,28 +1,95 @@
-const crypto = require('crypto');
-function generateSeed2(ranges) {
-  const jsonString = JSON.stringify(ranges);
-  try {
-    const bytes = new TextEncoder().encode(jsonString);
-    const hash = crypto.createHash('sha256');
-    hash.update(bytes);
-    const hashResult = hash.digest('hex').slice(0, 16);
-    return hashResult;
-  } catch (error) {
-    console.error('json.Marshal failed. ' + error);
-    return '0';
+const radash = require('radash');
+const flat = radash.flat;
+
+const splitUtxosByValue = (utxos, amount, chunks) => {
+  const sats = flat(utxos.map((v) => v.sats));
+  let ranges = [];
+  console.log(sats);
+  const totalRanges = [];
+  let totalSize = 0;
+  for (let i = 0; i < sats.length; i++) {
+    const item = sats[i];
+    console.log('index', i);
+    const { size, start } = item;
+    console.log(start, size);
+    totalSize += size;
+    if (totalSize > amount && totalRanges.length < chunks) {
+      const dis = totalSize - amount;
+      const others = size - dis;
+      console.log(dis, others);
+      ranges.push({
+        start,
+        size: others,
+      });
+      totalRanges.push(ranges);
+      if (dis < amount) {
+        ranges = [
+          {
+            start: start + others,
+            size: dis,
+          },
+        ];
+        totalSize = dis;
+      } else {
+        const othersChunks = Math.floor(dis / amount);
+        const othersDis = dis % amount;
+        for (let j = 0; j < othersChunks; j++) {
+          if (totalRanges.length < chunks) {
+            totalRanges.push([
+              {
+                start: start + others + j * amount,
+                size: amount,
+              },
+            ]);
+          }
+        }
+        if (othersDis > 0) {
+          if (totalRanges.length < chunks) {
+            ranges = [
+              {
+                start: start + others + othersChunks * amount,
+                size: othersDis,
+              },
+            ];
+            totalSize = othersDis;
+          }
+        }
+      }
+    } else if (totalRanges.length < chunks) {
+      ranges.push({
+        start,
+        size,
+      });
+    }
   }
-}
+  return totalRanges;
+};
 
-const result = generateSeed2([
+const utxosData = [
   {
-    start: 1234567890123456,
-    size: 1000,
+    sats: [
+      {
+        start: 1000,
+        size: 1060,
+      },
+      {
+        start: 2000,
+        size: 300,
+      },
+    ],
   },
   {
-    start: 100000000,
-    size: 1,
+    sats: [
+      {
+        start: 6000,
+        size: 222,
+      },
+      {
+        start: 7000,
+        size: 700,
+      },
+    ],
   },
-]);
+];
 
-console.log(result);
-// d7a6f8f2
+console.log(splitUtxosByValue(utxosData, 300, 6));

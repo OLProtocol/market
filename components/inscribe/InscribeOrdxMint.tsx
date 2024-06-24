@@ -29,10 +29,7 @@ export const InscribeOrdxMint = ({
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
   const { selectUtxosByAmount } = useUtxoStore();
-  const [showRepeat, setShowRepeat] = useState(false);
-  const [tickBlurLoading, setTickBlurLoading] = useState(false);
-  const [tickBlurChecked, setTickBlurChecked] = useState(false);
-  const [contentType, setContentType] = useState('');
+
   const [data, { set }] = useMap<any>({
     type: 'mint',
     mode: 'fair',
@@ -42,30 +39,16 @@ export const InscribeOrdxMint = ({
     relateInscriptionId: '',
     utxos: [],
   });
+
+  const [showRepeat, setShowRepeat] = useState(false);
+  const [tickBlurLoading, setTickBlurLoading] = useState(false);
+  const [tickBlurChecked, setTickBlurChecked] = useState(false);
+  const [contentType, setContentType] = useState('');
   const [errorText, setErrorText] = useState('');
   const [loading, setLoading] = useState(false);
   const [tickLoading, setTickLoading] = useState(false);
   const [tickChecked, setTickChecked] = useState(false);
-  const [specialStatus, setSpecialStatus] = useState(false);
   const [utxoList, setUtxoList] = useState<any[]>([]);
-
-  const getOrdxUtxoByType = async (type: string, amount: number) => {
-    try {
-      const resp = await ordx.getUtxoByType({
-        address: currentAccount,
-        type,
-        amount,
-        network,
-      });
-      return resp;
-    } catch (error) {
-      notification.error({
-        message: t('notification.system_error'),
-      });
-      console.error('Failed to fetch ordxUTXO:', error);
-      throw error;
-    }
-  };
 
   const getOrdXInfo = async (tick: string, blur = false) => {
     setLoading(true);
@@ -106,7 +89,7 @@ export const InscribeOrdxMint = ({
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
       set('isSpecial', isSpecial);
       console.log('amount', _max);
-      if (isSpecial || contenttype === 'text/html') {
+      if (isSpecial) {
         setShowRepeat(false);
       }
       if (blur) {
@@ -258,11 +241,13 @@ export const InscribeOrdxMint = ({
       if (contenttype === 'text/html') {
         set('relateInscriptionId', inscriptionId);
         if (!isSpecial) {
-          const utxos = selectUtxosByAmount(
-            Math.max(data.amount, 330) * data.repeatMint,
-          );
+          const totalMintAmount = Math.max(data.amount, 330) * data.repeatMint;
+          const utxos = selectUtxosByAmount(totalMintAmount);
           console.log('utxos', utxos);
-          if (!utxos.length) {
+          const totalValue = utxos.reduce((acc, cur) => {
+            return acc + cur.value;
+          }, 0);
+          if (!utxos.length || totalValue < totalMintAmount) {
             setErrorText(t('pages.inscribe.ordx.error_18'));
             return false;
           }

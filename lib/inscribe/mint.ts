@@ -95,6 +95,71 @@ export const selectAmountRangesByUtxos = (utxos: any[], amount) => {
   }
   return ranges;
 };
+export const splitUtxosByValue = (
+  utxos: any[],
+  amount: number,
+  chunks: number,
+) => {
+  const sats: any[] = flat(utxos.map((v) => v.sats));
+  let ranges: any[] = [];
+  const totalRanges: any[][] = [];
+  let totalSize = 0;
+  for (let i = 0; i < sats.length; i++) {
+    const item = sats[i];
+    const { size, start } = item;
+    console.log(start, size);
+    totalSize += size;
+    if (totalSize > amount && totalRanges.length < chunks) {
+      const dis = totalSize - amount;
+      const others = size - dis;
+      console.log(dis, others);
+      ranges.push({
+        start,
+        size: others,
+      });
+      totalRanges.push(ranges);
+      if (dis < amount) {
+        ranges = [
+          {
+            start: start + others,
+            size: dis,
+          },
+        ];
+        totalSize = dis;
+      } else {
+        const othersChunks = Math.floor(dis / amount);
+        const othersDis = dis % amount;
+        for (let j = 0; j < othersChunks; j++) {
+          if (totalRanges.length < chunks) {
+            totalRanges.push([
+              {
+                start: start + others + j * amount,
+                size: amount,
+              },
+            ]);
+          }
+        }
+        if (othersDis > 0) {
+          if (totalRanges.length < chunks) {
+            ranges = [
+              {
+                start: start + others + othersChunks * amount,
+                size: othersDis,
+              },
+            ];
+            totalSize = othersDis;
+          }
+        }
+      }
+    } else if (totalRanges.length < chunks) {
+      ranges.push({
+        start,
+        size,
+      });
+    }
+  }
+  return totalRanges;
+};
 export const generateSeedByUtxos = (utxos: any[], amount) => {
   amount = Math.max(amount, 546);
   return generateSeed(selectAmountRangesByUtxos(utxos, amount));

@@ -18,7 +18,8 @@ import {
   removeObjectEmptyValue,
   generteFiles,
   hexString,
-  generateSeedByUtxos,
+  generateSeed,
+  splitUtxosByValue,
 } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
 import { OrderList } from '@/components/inscribe/OrderList';
@@ -139,7 +140,6 @@ export default function Inscribe() {
     // setOrd2Data('cnChecked', data.cnChecked);
     setOrd2Data('trzChecked', data.trzChecked);
     setOrd2Data('blockChecked', data.blockChecked);
-    console.log('change ', data.utxos);
   };
 
   const brc20Next = async () => {
@@ -233,8 +233,16 @@ export default function Inscribe() {
     const list: any = [];
     if (ordxData.type === 'mint') {
       let offset = 0;
+      let rangesArr: any[][] = [];
+      let amount = Math.max(ordxData.amount, 330);
+      if (ordxData.utxos?.length) {
+        rangesArr = splitUtxosByValue(
+          ordxData.utxos,
+          amount,
+          ordxData.repeatMint,
+        );
+      }
       for (let i = 0; i < ordxData.repeatMint; i++) {
-        console.log(ordxData);
         const attrArr: string[] = [];
         if (ordxData.rarity && ordxData.rarity !== 'common') {
           attrArr.push(`rar=${ordxData.rarity}`);
@@ -256,12 +264,12 @@ export default function Inscribe() {
             }),
           ),
         ];
-        let amount = Math.max(ordxData.amount, 330);
 
         if (ordxData.utxos.length && ordxData.isSpecial) {
           amount = findSepiceAmt();
         }
-        const seed = generateSeedByUtxos(ordxData.utxos, amount);
+        console.log(rangesArr[i]);
+        const seed = generateSeed(rangesArr[i]);
         console.log(amount, seed);
         if (ordxData.relateInscriptionId) {
           ordxValue = [
@@ -346,6 +354,7 @@ export default function Inscribe() {
       type: list[0].type,
       ordxType: list[0].ordxType,
       isSpecial: list[0].isSpecial,
+      utxos: ordxData.utxos,
     });
     const _files = await generteFiles(list);
     setList(_files);
