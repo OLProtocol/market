@@ -141,6 +141,7 @@ export const converUtxosToInputs = ({
 export const filterUtxosByValue = (
   utxos: any[],
   value,
+  spendUtxos: any[] = [],
   reverseStatus = true,
 ) => {
   const sortUtxos = sort(utxos, (u) => u.value);
@@ -152,10 +153,16 @@ export const filterUtxosByValue = (
   let avialableValue = 0;
   for (let i = 0; i < _utxoList.length; i++) {
     const utxo = _utxoList[i];
-    avialableUtxo.push(utxo);
-    avialableValue += utxo.value;
-    if (avialableValue >= value) {
-      break;
+    if (
+      spendUtxos.findIndex(
+        (v) => v.txid === utxo.txid && v.vout === utxo.vout,
+      ) === -1
+    ) {
+      avialableUtxo.push(utxo);
+      avialableValue += utxo.value;
+      if (avialableValue >= value) {
+        break;
+      }
     }
   }
   return {

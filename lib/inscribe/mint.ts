@@ -697,12 +697,11 @@ export const sendBTC = async ({
   feeRate = 1,
   fromAddress,
   fromPubKey,
-  ordxUtxo,
   utxos = [],
 }: SendBTCProps) => {
-  const hasOrdxUtxo = !!utxos.length;
+  const hasOrdxUtxo = !!utxos?.length;
   let totalAmountUtxo = 0;
-  if (utxos?.length) {
+  if (hasOrdxUtxo) {
     totalAmountUtxo = sum(utxos, (f) => f.value);
   }
   const {
@@ -718,37 +717,44 @@ export const sendBTC = async ({
     throw new Error(i18n.t('notification.insufficient_balance'));
   }
 
-  const fee = (168 * 10 + 34 * 2 + 10) * feeRate;
-  let filterTotalValue = value + 546 + fee;
+  const fee = (168 * 20 + 34 * 10 + 10) * feeRate;
+  const othersFee = 330 + fee;
+  let filterTotalValue = hasOrdxUtxo ? 0 : value + othersFee;
   console.log('filterTotalValue', filterTotalValue);
-  if (totalAmountUtxo) {
-    filterTotalValue = Math.max(filterTotalValue - totalAmountUtxo, 0);
-  }
   let avialableUtxos: any[] = utxos.map((v) => ({
     txid: v.txid,
     vout: v.vout,
     value: v.value,
   }));
-  console.log(filterTotalValue);
-  if (filterTotalValue) {
-    const { utxos: filterUtxos } = filterUtxosByValue(
-      unspendUtxos,
-      filterTotalValue,
-    );
-    avialableUtxos.push(...filterUtxos);
-  }
+  const { utxos: filterUtxos } = filterUtxosByValue(
+    unspendUtxos,
+    filterTotalValue,
+    utxos,
+  );
+  console.log(filterUtxos);
+  avialableUtxos.push(...filterUtxos);
   const totalAvialable = sum(avialableUtxos, (f) => f.value);
-  if (!avialableUtxos.length || totalAvialable < filterTotalValue) {
+  if (
+    !filterUtxos.length ||
+    !avialableUtxos.length ||
+    totalAvialable < filterTotalValue
+  ) {
     throw new Error(i18n.t('notification.insufficient_balance'));
   }
-
+  const ordxBalanceValue = totalAmountUtxo - value;
   const toValue = value;
-  const outputs = [
-    {
-      address: toAddress,
-      value: toValue,
-    },
-  ];
+  const outputs: any[] = [];
+  outputs.push({
+    address: toAddress,
+    value: toValue,
+  });
+  if (ordxBalanceValue > 330) {
+    outputs.push({
+      address: fromAddress,
+      value: ordxBalanceValue,
+    });
+  }
+  console.log('outputs', outputs);
   const psbt = await buildTransaction({
     utxos: avialableUtxos,
     outputs,
