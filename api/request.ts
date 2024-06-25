@@ -277,12 +277,12 @@ export const getUtxoByValue = async ({
   return res.json();
 };
 
-export const fetchChainFeeRate = async (network: 'main' | 'testnet') => {
-  const url = generateMempoolUrl({ network, path: 'api/v1/fees/recommended' });
-  const resp = await fetch(url);
-  const data = await resp.json();
-  return data;
-};
+// export const fetchChainFeeRate = async (network: 'main' | 'testnet') => {
+//   const url = generateMempoolUrl({ network, path: 'api/v1/fees/recommended' });
+//   const resp = await fetch(url);
+//   const data = await resp.json();
+//   return data;
+// };
 
 export const getAppVersion = async () => {
   const res = await fetch(`/version.txt?t=${+new Date()}`);
