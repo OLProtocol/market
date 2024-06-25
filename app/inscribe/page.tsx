@@ -17,7 +17,7 @@ import { InscribingOrderModal } from '@/components/inscribe/InscribingOrderModal
 import {
   removeObjectEmptyValue,
   generteFiles,
-  hexString,
+  splitRareUtxosByValue,
   generateSeed,
   splitUtxosByValue,
 } from '@/lib/inscribe';
@@ -237,6 +237,7 @@ export default function Inscribe() {
       let amount = Math.max(ordxData.amount, 330);
       if (ordxData.utxos?.length) {
         if (ordxData.isSpecial) {
+          rangesArr = splitRareUtxosByValue(ordxData.utxos, amount);
         } else {
           rangesArr = splitUtxosByValue(
             ordxData.utxos,
@@ -245,8 +246,11 @@ export default function Inscribe() {
           );
         }
       }
+      console.log('rangesArr', rangesArr);
+
       for (let i = 0; i < ordxData.repeatMint; i++) {
         const attrArr: string[] = [];
+        let amt = ordxData.amount;
         if (ordxData.rarity && ordxData.rarity !== 'common') {
           attrArr.push(`rar=${ordxData.rarity}`);
         }
@@ -263,26 +267,34 @@ export default function Inscribe() {
               p: 'ordx',
               op: 'mint',
               tick: ordxData.tick.toString().trim(),
-              amt: ordxData.amount.toString(),
+              amt: amt.toString(),
             }),
           ),
         ];
 
-        if (ordxData.utxos.length && ordxData.isSpecial) {
-          amount = findSepiceAmt();
-          offset = ordxData.utxos[0]?.sats?.[0]?.offset;
+        if (rangesArr[i] && ordxData.isSpecial) {
+          amt = rangesArr[i].reduce((acc, cur) => acc + cur.size, 0);
+          console.log('amt', amt);
+
+          const len = rangesArr[i].length;
+          amount =
+            rangesArr[i][len - 1].offset -
+            rangesArr[i][0].offset +
+            rangesArr[i][len - 1].size;
+          console.log('amount', amount);
+          offset = rangesArr[i][0].offset;
         }
-        console.log(rangesArr[i]);
-        const seed = generateSeed(rangesArr[i]);
-        console.log(amount, seed);
         if (ordxData.relateInscriptionId) {
+          console.log('rangesArr', rangesArr[i]);
+
+          const seed = generateSeed(rangesArr[i]);
           ordxValue = [
             JSON.stringify(
               removeObjectEmptyValue({
                 p: 'ordx',
                 op: 'mint',
                 tick: ordxData.tick.toString().trim(),
-                amt: ordxData.amount.toString(),
+                amt: amt.toString(),
                 desc: `seed=${seed}`,
               }),
             ),
@@ -299,7 +311,6 @@ export default function Inscribe() {
           ordxType: 'mint',
           amount,
           offset,
-          utxos: ordxData.utxos,
           isSpecial: ordxData.isSpecial,
           value: ordxValue,
         });
@@ -340,7 +351,6 @@ export default function Inscribe() {
       if (ordxData.file) {
         value.push({
           type: 'file',
-
           name: ordxData.fileName,
           value: ordxData.file,
           mimeType: ordxData.fileType,

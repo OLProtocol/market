@@ -59,7 +59,13 @@ interface InscriptionItem {
 }
 
 export const generateSeed = (ranges) => {
-  const jsonString = JSON.stringify(ranges);
+  const _ranges = ranges.map((v) => {
+    return {
+      start: v.start,
+      size: v.size,
+    };
+  });
+  const jsonString = JSON.stringify(_ranges);
   try {
     const bytes = new TextEncoder().encode(jsonString);
     const hash = crypto.createHash('sha256');
