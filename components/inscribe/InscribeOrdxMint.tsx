@@ -35,6 +35,7 @@ export const InscribeOrdxMint = ({
     mode: 'fair',
     tick: '',
     amount: 1,
+    limit: 0,
     repeatMint: 1,
     relateInscriptionId: '',
     utxos: [],
@@ -79,6 +80,7 @@ export const InscribeOrdxMint = ({
     } = info.data || {};
     let utxos: any = [];
     if (ticker) {
+      set('limit', limit);
       const { amount = 0 } = permissionInfo.data || {};
       let _max = limit;
       if (max > 0) {
@@ -90,7 +92,7 @@ export const InscribeOrdxMint = ({
       set('isSpecial', isSpecial);
       console.log('amount', _max);
       if (isSpecial) {
-        setShowRepeat(false);
+        // setShowRepeat(false);
       }
       if (blur) {
         set('amount', _max);
@@ -129,7 +131,14 @@ export const InscribeOrdxMint = ({
     set('tick', cleanValue);
     return cleanValue;
   };
-
+  const maxRepeat = useMemo(() => {
+    if (data.isSpecial && data.utxos?.[0]?.amount) {
+      const calcRepeat = Math.ceil(data.utxos[0]?.amount / data.amount);
+      console.log('calcRepeat', calcRepeat);
+      return Math.max(Math.min(calcRepeat, MAX_REPEAT), 1);
+    }
+    return MAX_REPEAT;
+  }, [data.isSpecial, data.utxos, data.amount]);
   const checkTick = async () => {
     const tick = cleanTick();
     if (!tick) {
@@ -199,8 +208,6 @@ export const InscribeOrdxMint = ({
       } else {
         status = 'Completed';
       }
-      console.log('status', status);
-
       if (isSpecial && !specialUtxos.length) {
         setErrorText(`${rarity}类型的特殊聪数量不够`);
         return false;
@@ -217,26 +224,19 @@ export const InscribeOrdxMint = ({
         setErrorText(t('pages.inscribe.ordx.error_7', { tick: data.tick }));
         return false;
       }
-      if (data.amount > _singleMaxAmount) {
-        setErrorText(
-          t('pages.inscribe.ordx.error_5', { limit: _singleMaxAmount }),
-        );
-        return false;
-      }
-      if (
-        _maxAmount !== undefined &&
-        Math.ceil(data.amount * data.repeatMint) > _maxAmount
-      ) {
-        setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
-        return false;
-      }
-      if (
-        _maxAmount !== undefined &&
-        Math.ceil(data.amount * data.repeatMint) > _maxAmount
-      ) {
-        setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
-        return false;
-      }
+      // if (data.amount > _singleMaxAmount) {
+      //   setErrorText(
+      //     t('pages.inscribe.ordx.error_5', { limit: _singleMaxAmount }),
+      //   );
+      //   return false;
+      // }
+      // if (
+      //   _maxAmount !== undefined &&
+      //   Math.ceil(data.amount * data.repeatMint) > _maxAmount
+      // ) {
+      //   setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
+      //   return false;
+      // }
       setContentType(contenttype);
       if (contenttype === 'text/html') {
         set('relateInscriptionId', inscriptionId);
@@ -280,10 +280,10 @@ export const InscribeOrdxMint = ({
       onNext?.();
     }
   };
-  const ontickBlur = async () => {
+  const onTickBlur = async () => {
     const tick = cleanTick();
     if (!connected) {
-      return [];
+      return;
     }
     if (tick) {
       setTickBlurChecked(false);
@@ -306,7 +306,15 @@ export const InscribeOrdxMint = ({
   const buttonDisabled = useMemo(() => {
     return !data.tick || !tickBlurChecked;
   }, [data, tickBlurChecked]);
+  const amountChange = (value: string) => {
+    const amount = isNaN(Number(value)) ? 0 : Number(value);
+    console.log('amount', amount);
+    console.log('data.limit', data.limit);
+    set('amount', Math.min(amount, data.limit));
 
+    set('repeatMint', 1);
+    setTickChecked(false);
+  };
   const handleUtxoChange = (utxoData: any) => {
     setTickChecked(false);
     console.log('utxo', utxoData);
@@ -320,7 +328,7 @@ export const InscribeOrdxMint = ({
         vout,
       },
     ] as any[]);
-    set('amount', utxoData.amount);
+    set('repeatMint', 1);
   };
   useEffect(() => {
     setTickChecked(false);
@@ -328,6 +336,11 @@ export const InscribeOrdxMint = ({
   useEffect(() => {
     onChange?.(data);
   }, [data]);
+  useEffect(() => {
+    if (connected) {
+      onTickBlur();
+    }
+  }, [connected]);
   return (
     <div>
       <div className="mb-4">
@@ -340,7 +353,7 @@ export const InscribeOrdxMint = ({
               tickChange(e.target.value);
             }}
             onBlur={() => {
-              ontickBlur();
+              onTickBlur();
             }}
             maxLength={32}
             type="text"
@@ -355,11 +368,7 @@ export const InscribeOrdxMint = ({
             value={data.amount?.toString()}
             isDisabled={tickLoading}
             onChange={(e) => {
-              set(
-                'amount',
-                isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
-              );
-              setTickChecked(false);
+              amountChange(e.target.value);
             }}
             min={1}
           ></Input>
@@ -381,19 +390,22 @@ export const InscribeOrdxMint = ({
                         'repeatMint',
                         isNaN(Number(e.target.value))
                           ? 0
-                          : Math.min(Number(e.target.value), MAX_REPEAT),
+                          : Math.min(Number(e.target.value), maxRepeat),
                       );
                     }}
                     min={1}
-                    max={MAX_REPEAT}
+                    max={maxRepeat}
                   ></Input>
                   <Slider
                     step={1}
-                    maxValue={MAX_REPEAT}
+                    maxValue={maxRepeat}
                     minValue={1}
                     value={[data.repeatMint]}
                     className="max-w-md"
-                    onChange={(e) => set('repeatMint', e[0])}
+                    onChange={(e) => {
+                      console.log(e);
+                      set('repeatMint', isNaN(e[0]) ? 0 : e[0]);
+                    }}
                   />
                 </div>
               </div>
