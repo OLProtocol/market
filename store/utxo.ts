@@ -63,7 +63,9 @@ export const useUtxoStore = create<UtxoState>()(
     },
     selectUtxosByAmount: (amount: number) => {
       const { list } = get();
-      const unspendList = list.filter((v) => v.status === 'unspend');
+      const unspendList = list.filter(
+        (v) => v.status === 'unspend' && v.location !== 'local',
+      );
       const filterlist = unspendList.filter((v) => v.value >= amount);
       let selectUtxos: any = [];
       if (filterlist.length) {

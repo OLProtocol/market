@@ -45,7 +45,6 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
   const { address: currentAccount, network, connected } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
-  const { selectUtxosByAmount } = useUtxoStore();
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
   const [data, { set }] = useMap<any>({
