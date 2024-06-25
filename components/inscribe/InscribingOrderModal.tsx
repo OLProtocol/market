@@ -12,17 +12,10 @@ import {
 import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { ordx } from '@/api';
-import mempool from '@/api/mempool';
+import { sleep } from 'radash';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useOrderStore, OrderItemType, useCommonStore } from '@/store';
-import {
-  inscribe,
-  pushCommitTx,
-  getFundingAddress,
-  waitSomeSeconds,
-  sendBTC,
-} from '@/lib/inscribe';
+import { inscribe, sendBTC } from '@/lib/inscribe';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { _0n } from '@cmdcode/crypto-utils/dist/const';
@@ -102,7 +95,7 @@ export const InscribingOrderModal = ({
       };
       setCommitTx(orderId, commitTx);
       changeStatus(orderId, 'paid');
-      await waitSomeSeconds(1500);
+      await sleep(1500);
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
@@ -126,8 +119,8 @@ export const InscribingOrderModal = ({
       console.log('order', order);
       const { commitTx, fee } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
-      await ordx.pollGetTxStatus(commitTxid, order.network);
-      await waitSomeSeconds(1500);
+      await sleep(10000);
+      // await ordx.pollGetTxStatus(commitTxid, order.network);
       const txid = await inscribe({
         secret: order.secret,
         network: order.network as any,

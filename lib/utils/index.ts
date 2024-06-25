@@ -6,6 +6,9 @@ import { add, format } from 'date-fns';
 import { flat } from 'radash';
 import crypto from 'crypto';
 
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 export const hideStr = (
   str?: string,
   num: number = 10,

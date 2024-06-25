@@ -47,6 +47,7 @@
   "service_fee": "Service Fee",
   "network_fee": "Network Fee",
   "fee_economy": "Economy",
+  "fee_slow": "Slow",
   "fee_normal": "Normal",
   "fee_custom": "Custom",
   "holder": "Holder",

@@ -33,6 +33,12 @@ const getOrdxStatusList = async (params: any): Promise<any> => {
   );
   return data;
 };
+const fetchChainFeeRate = async (network: string): Promise<any> => {
+  const { data } = await axios.get(
+    generateUrl(`extension/default/fee-summary`, network),
+  );
+  return data;
+};
 
 const health = async ({ network }) => {
   const { data } = await axios.get(generateUrl(`health`, network));
@@ -325,4 +331,5 @@ export const ordx = {
   getTickerPermission,
   pushTx,
   getTickDeploy,
+  fetchChainFeeRate,
 };
