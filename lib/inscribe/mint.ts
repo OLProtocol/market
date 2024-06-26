@@ -769,15 +769,17 @@ export const sendBTC = async ({
   if (psbt.txOutputs.length > 1) {
     const sliceOutputs = psbt.txOutputs.slice(1);
     sliceOutputs.forEach((output, index) => {
-      addUtxo({
-        utxo: `${txId}:${index + 1}`,
-        value: output.value,
-        status: 'unspend',
-        location: 'local',
-        sort: 1,
-        txid: txId,
-        vout: index + 1,
-      });
+      if (!(index == 1 && ordxBalanceValue > 330 && isSpecial)) {
+        addUtxo({
+          utxo: `${txId}:${index + 1}`,
+          value: output.value,
+          status: 'unspend',
+          location: 'local',
+          sort: 1,
+          txid: txId,
+          vout: index + 1,
+        });
+      }
     });
   }
   removeUtxos(avialableUtxos);
