@@ -77,16 +77,17 @@ export const InscribingOrderModal = ({
     setLoading(true);
 
     try {
-      const { inscription, feeRate, network, fee, metadata } = order;
+      const { inscription, network, fee, metadata } = order;
       let txid;
       txid = await sendBTC({
         toAddress: inscription.inscriptionAddress,
         value: fee.totalFee,
-        feeRate: feeRate,
+        feeRate: feeRate.value,
         network: network,
         fromAddress: currentAccount,
         fromPubKey: publicKey,
         utxos: metadata.utxos,
+        isSpecial: metadata.isSpecial,
       });
       const commitTx = {
         txid,

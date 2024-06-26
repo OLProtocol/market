@@ -7,6 +7,7 @@ import { last, sort } from 'radash';
 export interface UtxoItem {
   status: 'unspend' | 'spended';
   location: 'remote' | 'local';
+  sort: number;
   utxo: string;
   txid: string;
   vout: number;
@@ -44,13 +45,21 @@ export const useUtxoStore = create<UtxoState>()(
     removeUtxos: (utxos) => {
       console.log('source Utxos', utxos);
       const list = get().list.filter(
-        (item) => !utxos.find((u) => u.utxo === item.utxo),
+        (item) =>
+          !utxos.find((u) => u.txid === item.txid && u.vout === item.vout),
       );
       console.log('removeUtxos', list);
       set({ list });
     },
     getUnspendUtxos: () => {
-      return get().list.filter((v) => v.status === 'unspend') || [];
+      const { list } = get();
+      const unspendList = list.filter(
+        (v) => v.status === 'unspend' && v.location !== 'local',
+      );
+      const localUnspendList = list.filter(
+        (v) => v.status === 'unspend' && v.location === 'local',
+      );
+      return [...unspendList, ...localUnspendList];
     },
     changeUtxosStatus: (utxos, status) => {
       const list = get().list.map((v) => {

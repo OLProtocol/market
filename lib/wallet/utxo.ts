@@ -1,4 +1,3 @@
-import { sort } from 'radash';
 import { Address, Script } from '@cmdcode/tapscript';
 
 export interface Utxo {
@@ -144,8 +143,8 @@ export const filterUtxosByValue = (
   spendUtxos: any[] = [],
   reverseStatus = true,
 ) => {
-  const sortUtxos = sort(utxos, (u) => u.value);
-  const _utxoList = structuredClone(sortUtxos);
+  // const sortUtxos = sort(utxos, (u) => u.value);
+  const _utxoList = structuredClone(utxos);
   if (reverseStatus) {
     _utxoList.reverse();
   }
@@ -166,8 +165,6 @@ export const filterUtxosByValue = (
     }
   }
   return {
-    minUtxo: sortUtxos[0],
-    maxUtxo: sortUtxos[sortUtxos.length - 1],
     utxos: avialableUtxo,
     total: avialableValue,
   };

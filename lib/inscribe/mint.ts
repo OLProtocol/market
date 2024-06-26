@@ -683,6 +683,7 @@ interface SendBTCProps {
   network: string;
   value: number;
   feeRate: number;
+  isSpecial?: boolean;
   fromAddress: string;
   fromPubKey: string;
   ordxUtxo?: any;
@@ -697,6 +698,7 @@ export const sendBTC = async ({
   feeRate = 1,
   fromAddress,
   fromPubKey,
+  isSpecial,
   utxos = [],
 }: SendBTCProps) => {
   const hasOrdxUtxo = !!utxos?.length;
@@ -726,19 +728,18 @@ export const sendBTC = async ({
     vout: v.vout,
     value: v.value,
   }));
-  const { utxos: filterUtxos } = filterUtxosByValue(
-    unspendUtxos,
-    filterTotalValue,
-    utxos,
-  );
-  console.log(filterUtxos);
-  avialableUtxos.push(...filterUtxos);
+  if (totalAmountUtxo - filterTotalValue < 0 || (hasOrdxUtxo && isSpecial)) {
+    const { utxos: filterUtxos } = filterUtxosByValue(
+      unspendUtxos,
+      filterTotalValue,
+      utxos,
+    );
+    console.log(filterUtxos);
+    avialableUtxos.push(...filterUtxos);
+  }
+
   const totalAvialable = sum(avialableUtxos, (f) => f.value);
-  if (
-    !filterUtxos.length ||
-    !avialableUtxos.length ||
-    totalAvialable < filterTotalValue
-  ) {
+  if (!avialableUtxos.length || totalAvialable < filterTotalValue) {
     throw new Error(i18n.t('notification.insufficient_balance'));
   }
   const ordxBalanceValue = totalAmountUtxo - value;
@@ -748,7 +749,7 @@ export const sendBTC = async ({
     address: toAddress,
     value: toValue,
   });
-  if (ordxBalanceValue > 330) {
+  if (ordxBalanceValue > 330 && isSpecial) {
     outputs.push({
       address: fromAddress,
       value: ordxBalanceValue,
@@ -763,15 +764,20 @@ export const sendBTC = async ({
     address: fromAddress,
     publicKey: fromPubKey,
   });
+  console.log('psbt', psbt);
   const txId = await signAndPushPsbt(psbt);
   if (psbt.txOutputs.length > 1) {
-    addUtxo({
-      utxo: `${txId}:1`,
-      value: psbt.txOutputs[1].value,
-      status: 'unspend',
-      location: 'local',
-      txid: txId,
-      vout: 1,
+    const sliceOutputs = psbt.txOutputs.slice(1);
+    sliceOutputs.forEach((output, index) => {
+      addUtxo({
+        utxo: `${txId}:${index + 1}`,
+        value: output.value,
+        status: 'unspend',
+        location: 'local',
+        sort: 1,
+        txid: txId,
+        vout: index + 1,
+      });
     });
   }
   removeUtxos(avialableUtxos);
