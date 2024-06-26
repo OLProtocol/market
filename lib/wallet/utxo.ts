@@ -145,9 +145,9 @@ export const filterUtxosByValue = (
 ) => {
   // const sortUtxos = sort(utxos, (u) => u.value);
   const _utxoList = structuredClone(utxos);
-  if (reverseStatus) {
-    _utxoList.reverse();
-  }
+  // if (reverseStatus) {
+  //   _utxoList.reverse();
+  // }
   const avialableUtxo: any[] = [];
   let avialableValue = 0;
   for (let i = 0; i < _utxoList.length; i++) {
