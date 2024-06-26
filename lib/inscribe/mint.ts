@@ -721,7 +721,7 @@ export const sendBTC = async ({
 
   const fee = (168 * 20 + 34 * 10 + 10) * feeRate;
   const othersFee = 330 + fee;
-  let filterTotalValue = hasOrdxUtxo ? 0 : value + othersFee;
+  let filterTotalValue = (hasOrdxUtxo ? 0 : value) + othersFee;
   console.log('filterTotalValue', filterTotalValue);
   let avialableUtxos: any[] = utxos.map((v) => ({
     txid: v.txid,
