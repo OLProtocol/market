@@ -31,7 +31,7 @@ export const InscribeStepThree = ({
   onRemoveAll,
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
-  const { feeRate } = useCommonStore((state) => state);
+  const { feeRate, discount } = useCommonStore((state) => state);
   const { network, address: currentAccount } = useReactWalletStore();
   const [data, { set }] = useMap({
     toSingleAddress: currentAccount,
@@ -40,33 +40,15 @@ export const InscribeStepThree = ({
   const [loading, setLoading] = useState(false);
   const { add: addOrder, changeStatus } = useOrderStore((state) => state);
   // const { serviceStatus } = useCommonStore((state) => state);
-  const serviceStatus = 0;
 
   const files = useMemo(() => {
     return list;
   }, [list]);
-  const inscriptionSize = useMemo(() => {
-    console.log('type', type);
-    console.log('type', list);
-    if (['brc20', 'text'].includes(type)) {
-      return 330;
-    } else if (type === 'brc100') {
-      return 294;
-    } else if (type === 'ordx' && list?.[0]?.op === 'mint') {
-      if (list?.[0]?.utxos?.length && list?.[0]?.isSpecial) {
-        return list?.[0]?.amount;
-      } else {
-        return list?.[0]?.amt > 330 ? list?.[0]?.amt : 330;
-      }
-    } else {
-      return 330;
-    }
-  }, [type, list]);
+
   const clacFee = useCalcFee({
     feeRate: feeRate.value,
-    inscriptionSize,
     files,
-    serviceStatus,
+    discount,
   });
   const submit = async () => {
     if (loading) return;
@@ -91,7 +73,6 @@ export const InscribeStepThree = ({
       feeRate: feeRate.value,
       files,
       network,
-      inscriptionSize: inscriptionSize,
       status: 'pending',
       createAt: Date.now().valueOf(),
     };
@@ -164,12 +145,14 @@ export const InscribeStepThree = ({
       </div>
       <div>
         <FeeShow
-          inscriptionSize={inscriptionSize}
-          serviceFee={clacFee.serviceFee}
+          // serviceFee={clacFee.serviceFee}
+          // discountServiceFee={clacFee.discountServiceFee}
+          totalInscriptionSize={clacFee.totalInscriptionSize}
           feeRate={feeRate.value}
-          serviceStatus={clacFee.serviceStatus}
+          discount={discount}
           filesLength={files.length}
           totalFee={clacFee.totalFee}
+          discountTotalFee={clacFee.discountTotalFee}
           networkFee={clacFee.networkFee}
         />
       </div>

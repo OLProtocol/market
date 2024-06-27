@@ -20,7 +20,6 @@ export interface OrderItemType {
   inscription: any;
   secret: string;
   txid?: string;
-  inscriptionSize: number;
   toAddress: string[];
   network: string;
   files: any[];
@@ -29,6 +28,8 @@ export interface OrderItemType {
     serviceFee: number;
     totalFee: number;
     networkFee: number;
+    discountServiceFee: number;
+    totalInscriptionSize: number;
   };
   commitTx?: {
     txid: string;

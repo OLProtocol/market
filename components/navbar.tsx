@@ -33,7 +33,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
+import { getUtxoByValue, ordxSWR, getBTCPrice, ordx } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
@@ -44,7 +44,7 @@ const WalletButton = dynamic(
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
-  const { setHeight, setBtcPrice } = useCommonStore();
+  const { setHeight, setBtcPrice, setDiscount } = useCommonStore();
   const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
@@ -54,6 +54,10 @@ export const Navbar = () => {
   const { data, trigger: getUtxos } = useSWRMutation(
     `getUtxoByValue-${address}-${network}`,
     () => getUtxoByValue({ address, network, value: 500 }),
+  );
+  const { data: discountData, trigger: getDiscount } = useSWRMutation(
+    `getUtxoByValue-${address}-${network}`,
+    () => ordx.getFeeDiscount({ address, network }),
   );
   const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 
@@ -76,6 +80,12 @@ export const Navbar = () => {
     }
   }, [heightData]);
   useEffect(() => {
+    const discount = discountData?.data?.discount || 0;
+    if (discount) {
+      setDiscount(discount);
+    }
+  }, [discountData]);
+  useEffect(() => {
     if (btcData?.data?.amount) {
       setBtcPrice(btcData?.data?.amount);
     }
@@ -83,6 +93,7 @@ export const Navbar = () => {
   useEffect(() => {
     if (address && network) {
       getUtxos();
+      getDiscount();
     }
   }, [address, network]);
   const searchInput = (
