@@ -94,7 +94,7 @@ export const OrdxFtOrderItem = ({
           <div className="flex justify-center h-full">
             <div className="h-full">
               <UtxoContent
-                inscriptionId={item?.assets_list[0].inscriptionId}
+                inscriptionId={item?.assets_list?.[0]?.inscriptionId}
                 utxo={item?.utxo}
               ></UtxoContent>
             </div>

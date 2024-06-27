@@ -49,6 +49,7 @@ export default function SellPage() {
     changePrice,
     changeStatus,
   } = useSellStore((state) => state);
+  console.log('app.account.sell.page: list: ', list);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
     `getAssetsSummary-${ticker}`,

@@ -64,14 +64,14 @@ export const OrdxFtAssetsItem = ({
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="absolute inset-0 z-0">
             <UtxoContent
-              inscriptionId={item?.assets_list[0].inscriptionId}
+              inscriptionId={item?.assets_list?.[0]?.inscriptionId}
               utxo={item?.utxo}
             />
           </div>
 
           <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-200">
-              {item?.assets_list[0].assets_name}
+              {item?.assets_list?.[0]?.assets_name}
             </span>
           </div>
         </div>
@@ -89,9 +89,9 @@ export const OrdxFtAssetsItem = ({
         </Snippet>
 
         <div className="pb-1 md:pb-2">
-          {item?.assets_list[0].assets_name}
+          {item?.assets_list?.[0]?.assets_name}
           <span className="relative pl-4 font-medium text-lg md:text-xl">
-            assets: {thousandSeparator(item?.assets_list[0].amount)}
+            assets: {thousandSeparator(item?.assets_list?.[0]?.amount)}
           </span>
         </div>
         <div className="flex item-center pb-1">

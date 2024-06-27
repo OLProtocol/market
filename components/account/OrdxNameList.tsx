@@ -50,7 +50,6 @@ export const OrdxNameList = ({
   } = useSWRMutation(swrKey, () =>
     getOrdxAssets({
       address,
-      assets_name,
       assets_type: 'ns',
       offset: (page - 1) * size,
       size,

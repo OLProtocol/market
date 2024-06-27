@@ -23,6 +23,7 @@ export const OrdxUtxoList = ({
   assetsName: assets_name,
   assetsType: assets_type,
 }: Props) => {
+  console.log(assets_name, assets_type);
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
   const {
@@ -73,14 +74,22 @@ export const OrdxUtxoList = ({
   };
   const sellHandler = async (item: any) => {
     addHandler(item);
+    debugger;
     setCanSelect(true);
   };
   const addHandler = (item: any) => {
-    console.log(satsToBitcoin(item.value));
-    const tickerAmount =
-      item.tickers.find((v) => v.ticker === assets_name)?.amount || 0;
-    changeType('ft');
-    changeTicker('Name');
+    let tickerAmount = 0;
+    debugger;
+    if (assets_type === 'exotic') {
+      tickerAmount =
+        item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount || 0;
+    } else {
+      tickerAmount =
+        item.tickers?.find((v) => v.ticker === assets_name)?.amount || 0;
+    }
+    console.log(new Decimal('2').mul(new Decimal(tickerAmount)).toString());
+    changeType(assets_type);
+    // changeTicker('Name');
     addSell({
       ...item,
       unit_price: '2',
@@ -132,13 +141,13 @@ export const OrdxUtxoList = ({
     reset();
   }, []);
   useEffect(() => {
-    if (assets_name) {
+    if (assets_type) {
       resetList();
       setCanSelect(false);
       setPage(1);
       trigger();
     }
-  }, [assets_name]);
+  }, [assets_type]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
@@ -146,13 +155,13 @@ export const OrdxUtxoList = ({
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
           {list.map((item: any) => (
             <OrdxFtAssetsItem
-              // selected={!!sellList.find((i) => i.utxo === item.utxo)}
-              // canSelect={canSelect}
-              // onSelect={(bol) => selectHandler(bol, item)}
+              selected={!!sellList.find((i) => i.utxo === item.utxo)}
+              canSelect={canSelect}
+              onSelect={(bol) => selectHandler(bol, item)}
               key={item.utxo + item.locked}
               item={item}
-              // onSell={() => sellHandler(item)}
-              // onCancelOrder={() => onCancelOrder(item)}
+              onSell={() => sellHandler(item)}
+              onCancelOrder={() => onCancelOrder(item)}
             />
           ))}
         </div>
@@ -167,7 +176,7 @@ export const OrdxUtxoList = ({
               setPage(offset);
               // page.current = offset;
               // console.log("page", page.current);
-              // setSize(size);
+              setSize(size);
             }}
           />
         </div>

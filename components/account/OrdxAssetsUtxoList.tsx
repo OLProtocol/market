@@ -13,24 +13,26 @@ export const OrdxAssetsUtxoList = () => {
 
   const onAssertChange = (data: string) => {
     const parts = data.split(':');
+    console.log('onAssertChange', data, parts);
     if (parts.length === 1) {
-      setAssertType('');
-      setAssertName(data);
+      setAssertName('');
+      setAssertType(data);
     } else {
       setAssertType(parts[0]);
       setAssertName(parts[1]);
     }
   };
-
+  console.log('assertType', assertType);
+  console.log('assertName', assertName);
   return (
     <div>
       <div>
         <OrdxUtxoTypeList onChange={onAssertChange} />
       </div>
-      {assertName === 'Name' && (
-        <OrdxNameList assetsName={''} assetsType={assertType} />
+      {assertType === 'Name' && (
+        <OrdxNameList assetsName={''} assetsType={''} />
       )}
-      {assertName !== 'Name' && (
+      {assertType !== 'Name' && (
         <OrdxUtxoList assetsName={assertName} assetsType={assertType} />
       )}
     </div>
