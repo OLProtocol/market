@@ -72,10 +72,6 @@ export const buildSellOrder = async ({
   }
   console.log(sell);
   return sell.toHex();
-  // const tx = sell.extractTransaction();
-  // console.log(tx);
-  // const signed = await btcWallet.signPsbt(sell.toHex());
-  // return signed;
 };
 interface BatchSellOrderProps {
   inscriptionUtxos: UtxoAssetItem[];

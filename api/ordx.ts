@@ -257,10 +257,19 @@ const pushTx = async ({ hex, network }: any) => {
     throw new Error(data.msg);
   }
 };
+
 export const getNsName = async ({ name, network }: any) => {
   const { data } = await axios.get(generateUrl(`ns/name/${name}`, network));
   return data;
 };
+
+export const getFeeDiscount = async ({ address, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`fee/discount/${address}`, network),
+  );
+  return data;
+};
+
 async function pollGetTxStatus(
   txid: string,
   network: string,
@@ -332,4 +341,5 @@ export const ordx = {
   pushTx,
   getTickDeploy,
   fetchChainFeeRate,
+  getFeeDiscount,
 };

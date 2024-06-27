@@ -538,7 +538,6 @@ interface InscribeParams {
   vout: number;
   amount: number;
   files: any[];
-  inscribeFee: number;
   serviceFee?: number;
   secret: any;
   metadata: any;
@@ -551,16 +550,11 @@ export const inscribe = async ({
   txid,
   vout,
   amount,
-  serviceFee,
   toAddress,
   secret,
   files,
   metadata,
 }: InscribeParams) => {
-  const tipAddress =
-    network === 'testnet'
-      ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
-      : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
@@ -571,12 +565,7 @@ export const inscribe = async ({
     // This is the new script that we are locking our funds to.
     scriptPubKey: Address.toScriptPubKey(toAddress),
   }));
-  if (serviceFee && tipAddress) {
-    outputs.push({
-      value: serviceFee,
-      scriptPubKey: Address.toScriptPubKey(tipAddress),
-    });
-  }
+
   const txdata = Tx.create({
     vin: [
       {
@@ -684,6 +673,7 @@ interface SendBTCProps {
   value: number;
   feeRate: number;
   isSpecial?: boolean;
+  serviceFee?: number;
   fromAddress: string;
   fromPubKey: string;
   ordxUtxo?: any;
@@ -691,97 +681,44 @@ interface SendBTCProps {
   utxos?: any[];
 }
 
-export const sendBTC = async ({
-  toAddress,
+export const generateSendBtcPsbt = async ({
+  utxos,
+  outputs,
+  address,
+  feeRate,
   network,
-  value,
-  feeRate = 1,
-  fromAddress,
-  fromPubKey,
-  isSpecial,
-  utxos = [],
-}: SendBTCProps) => {
-  const hasOrdxUtxo = !!utxos?.length;
-  let totalAmountUtxo = 0;
-  if (hasOrdxUtxo) {
-    totalAmountUtxo = sum(utxos, (f) => f.value);
-  }
-  const {
-    getUnspendUtxos,
-    add: addUtxo,
-    removeUtxos,
-  } = useUtxoStore.getState();
-  const unspendUtxos = getUnspendUtxos();
-  console.log(unspendUtxos);
-  console.log('hasOrdxUtxo', hasOrdxUtxo);
-
-  if (!unspendUtxos.length) {
-    throw new Error(i18n.t('notification.insufficient_balance'));
-  }
-
-  const fee = (168 * 20 + 34 * 10 + 10) * feeRate;
-  const othersFee = 330 + fee;
-  let filterTotalValue = (hasOrdxUtxo ? 0 : value) + othersFee;
-  console.log('filterTotalValue', filterTotalValue);
-  let avialableUtxos: any[] = utxos.map((v) => ({
-    txid: v.txid,
-    vout: v.vout,
-    value: v.value,
-  }));
-  if (totalAmountUtxo - filterTotalValue < 0 || (hasOrdxUtxo && isSpecial)) {
-    const { utxos: filterUtxos } = filterUtxosByValue(
-      unspendUtxos,
-      filterTotalValue,
-      utxos,
-    );
-    console.log(filterUtxos);
-    avialableUtxos.push(...filterUtxos);
-  }
-
-  const totalAvialable = sum(avialableUtxos, (f) => f.value);
-  if (!avialableUtxos.length || totalAvialable < filterTotalValue) {
-    throw new Error(i18n.t('notification.insufficient_balance'));
-  }
-  const ordxBalanceValue = totalAmountUtxo - value;
-  const toValue = value;
-  const outputs: any[] = [];
-  outputs.push({
-    address: toAddress,
-    value: toValue,
-  });
-  if (ordxBalanceValue > 330 && isSpecial) {
-    outputs.push({
-      address: fromAddress,
-      value: ordxBalanceValue,
-    });
-  }
-  console.log('outputs', outputs);
+  publicKey,
+}) => {
   const psbt = await buildTransaction({
-    utxos: avialableUtxos,
+    utxos: utxos,
     outputs,
     feeRate,
     network,
-    address: fromAddress,
-    publicKey: fromPubKey,
+    address,
+    publicKey,
   });
+  return psbt;
+};
+export const sendBtcPsbt = async (psbt) => {
+  const { add: addUtxo, removeUtxos } = useUtxoStore.getState();
   console.log('psbt', psbt);
   const txId = await signAndPushPsbt(psbt);
-  if (psbt.txOutputs.length > 1) {
-    const sliceOutputs = psbt.txOutputs.slice(1);
-    sliceOutputs.forEach((output, index) => {
-      if (!(index == 1 && ordxBalanceValue > 330 && isSpecial)) {
-        addUtxo({
-          utxo: `${txId}:${index + 1}`,
-          value: output.value,
-          status: 'unspend',
-          location: 'local',
-          sort: 1,
-          txid: txId,
-          vout: index + 1,
-        });
-      }
-    });
-  }
-  removeUtxos(avialableUtxos);
+  // if (psbt.txOutputs.length > 1) {
+  //   const sliceOutputs = psbt.txOutputs.slice(1);
+  //   sliceOutputs.forEach((output, index) => {
+  //     if (output.address === fromAddress) {
+  //       addUtxo({
+  //         utxo: `${txId}:${index + 1}`,
+  //         value: output.value,
+  //         status: 'unspend',
+  //         location: 'local',
+  //         sort: 1,
+  //         txid: txId,
+  //         vout: index + 1,
+  //       });
+  //     }
+  //   });
+  // }
+  // removeUtxos(avialableUtxos);
   return txId;
 };

@@ -12,13 +12,19 @@ import {
 import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { sleep } from 'radash';
+import { sleep, sum } from 'radash';
+import { filterUtxosByValue, calcNetworkFee } from '@/lib/wallet';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { useOrderStore, OrderItemType, useCommonStore } from '@/store';
-import { inscribe, sendBTC } from '@/lib/inscribe';
+import {
+  useOrderStore,
+  OrderItemType,
+  useCommonStore,
+  useUtxoStore,
+} from '@/store';
+import { inscribe, generateSendBtcPsbt, sendBtcPsbt } from '@/lib/inscribe';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
-import { _0n } from '@cmdcode/crypto-utils/dist/const';
+import { tryit } from 'radash';
 import { hideStr } from '@/lib/utils';
 import { FeeShow } from './FeeShow';
 import { useTranslation } from 'react-i18next';
@@ -36,8 +42,25 @@ export const InscribingOrderModal = ({
   onFinished,
 }: InscribingOrderMdaolProps) => {
   const { t } = useTranslation();
-  const { feeRate } = useCommonStore();
-  const [successPercent, setSuccessPercent] = useState(0);
+  const {
+    list: utxoList,
+    getUnspendUtxos,
+    add: addUtxo,
+    removeUtxos,
+  } = useUtxoStore();
+  const [sendFee, setSendFee] = useState<number>();
+  const [psbt, setPsbt] = useState<any>();
+  const { feeRate, discount } = useCommonStore();
+  const {
+    address: currentAccount,
+    publicKey,
+    network,
+    connected,
+  } = useReactWalletStore();
+  const [loading, setLoading] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+  const { changeStatus, setCommitTx, addSucccessTxid, findOrder } =
+    useOrderStore((state) => state);
   const steps = [
     {
       title: (
@@ -61,15 +84,136 @@ export const InscribingOrderModal = ({
       ),
     },
   ];
-  const { address: currentAccount, publicKey } = useReactWalletStore();
-  const [loading, setLoading] = useState(false);
-  const { changeStatus, setCommitTx, addSucccessTxid, findOrder } =
-    useOrderStore((state) => state);
-
-  const [activeStep, setActiveStep] = useState(0);
+  const vertualGasFee = useMemo(() => {
+    const fee = (168 * 20 + 34 * 10 + 10) * feeRate.value;
+    return fee;
+  }, [feeRate]);
   const order = useMemo(() => {
     return findOrder(orderId) as OrderItemType;
   }, [orderId]);
+  const canCalcPsbt = useMemo(() => {
+    const unspendUtxos = getUnspendUtxos();
+    const unspendAmount = sum(unspendUtxos, (utxo) => utxo.value);
+    const orderUtxos = order?.metadata?.utxos || [];
+    const orderAmount = orderUtxos.reduce(
+      (acc, cur) => acc + cur?.value || 0,
+      0,
+    );
+    const serviceFee = order?.fee?.discountServiceFee || 0;
+    const totalFee = order?.fee?.totalFee || 0;
+    if (order?.metadata?.isSpecial) {
+      return unspendAmount > totalFee + serviceFee + vertualGasFee;
+    } else {
+      return (
+        unspendAmount + orderAmount > totalFee + serviceFee + vertualGasFee
+      );
+    }
+  }, [vertualGasFee, utxoList, order?.metadata, order.fee]);
+
+  const psbtData = useMemo(() => {
+    if (!canCalcPsbt || !order || !connected) {
+      return null;
+    }
+    const tipAddress =
+      network === 'testnet'
+        ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
+        : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+    const unspendUtxos = getUnspendUtxos();
+    const orderUtxos = order?.metadata?.utxos || [];
+    const orderAmount = orderUtxos.reduce(
+      (acc, cur) => acc + cur?.value || 0,
+      0,
+    );
+    const serviceFee = order?.fee?.discountServiceFee || 0;
+    const totalFee = order?.fee?.totalFee || 0;
+    const totalInscriptionSize = order?.fee?.totalInscriptionSize || 0;
+    const isSpecial = order?.metadata?.isSpecial || false;
+    const inputUntxos: any[] = orderUtxos.map((v) => ({
+      txid: v.txid,
+      vout: v.vout,
+      value: v.value,
+    }));
+    const totalNetworkFee = vertualGasFee + totalFee - totalInscriptionSize;
+
+    const totalSpendAmount = totalFee + serviceFee + vertualGasFee;
+
+    let pickAmount = totalSpendAmount;
+    const disAcmount = orderAmount - totalSpendAmount;
+    if (isSpecial) {
+      pickAmount = serviceFee + totalNetworkFee;
+    } else if (orderAmount > totalSpendAmount)
+      if (disAcmount < 0) {
+        pickAmount = totalSpendAmount;
+      }
+    pickAmount = Math.max(pickAmount, 1000);
+    if (pickAmount) {
+      const { utxos: filterUtxos } = filterUtxosByValue(
+        unspendUtxos,
+        pickAmount,
+        orderUtxos,
+      );
+      console.log(filterUtxos);
+      inputUntxos.push(...filterUtxos);
+    }
+    const outputs = [
+      {
+        address: order?.inscription.inscriptionAddress,
+        value: totalFee,
+      },
+    ];
+    if (isSpecial && orderAmount - totalFee > 330) {
+      outputs.push({
+        address: currentAccount,
+        value: orderAmount - totalFee,
+      });
+    }
+    if (serviceFee && tipAddress) {
+      outputs.push({
+        value: serviceFee,
+        address: tipAddress,
+      });
+    }
+    return [inputUntxos, outputs];
+  }, [
+    canCalcPsbt,
+    vertualGasFee,
+    utxoList,
+    order?.metadata,
+    order.fee,
+    order.toAddress,
+    currentAccount,
+  ]);
+  const caclPsbtAndFee = async () => {
+    if (psbtData?.[0]?.length) {
+      setLoading(true);
+      console.log('psbtData', psbtData);
+      const params = {
+        address: currentAccount,
+        publicKey,
+        network,
+        utxos: psbtData[0],
+        outputs: psbtData[1],
+        feeRate: feeRate.value,
+      };
+      const [psbtError, psbt] = await tryit(generateSendBtcPsbt)(params);
+      setPsbt(psbt);
+      const [feeError, fee] = await tryit(calcNetworkFee)(params);
+      setSendFee(fee);
+      setLoading(false);
+      console.error(psbtError);
+    }
+  };
+  useEffect(() => {
+    caclPsbtAndFee();
+  }, [psbtData]);
+
+  const totalFee = useMemo(() => {
+    if (!order || !sendFee) {
+      return 0;
+    }
+    const { fee } = order;
+    return fee.totalFee + fee.discountServiceFee + sendFee;
+  }, [order?.fee, sendFee]);
   const payOrder = async () => {
     if (!order) {
       return;
@@ -79,16 +223,10 @@ export const InscribingOrderModal = ({
     try {
       const { inscription, network, fee, metadata } = order;
       let txid;
-      txid = await sendBTC({
-        toAddress: inscription.inscriptionAddress,
-        value: fee.totalFee,
-        feeRate: feeRate.value,
-        network: network,
-        fromAddress: currentAccount,
-        fromPubKey: publicKey,
-        utxos: metadata.utxos,
-        isSpecial: metadata.isSpecial,
-      });
+      if (!psbt) {
+        return;
+      }
+      txid = await sendBtcPsbt(psbt);
       const commitTx = {
         txid,
         vout: 0,
@@ -96,7 +234,6 @@ export const InscribingOrderModal = ({
       };
       setCommitTx(orderId, commitTx);
       changeStatus(orderId, 'paid');
-      await sleep(1500);
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
@@ -129,11 +266,9 @@ export const InscribingOrderModal = ({
         files: order.files,
         metadata: order.metadata,
         txid: commitTxid,
-        serviceFee: 0,
         vout: commitTx.vout,
         amount: commitTx.amount,
         toAddress: order.toAddress[0],
-        inscribeFee: order.inscriptionSize,
       });
       addSucccessTxid(orderId, txid);
 
@@ -199,11 +334,15 @@ export const InscribingOrderModal = ({
           <div>
             {activeStep === 0 && order.status !== 'timeout' && (
               <div>
+                <div className="text-center mb-2 text-red-600">
+                  {!canCalcPsbt && t('notification.insufficient_balance')}
+                </div>
                 <div className="flex justify-center">
                   <WalletConnectBus>
                     <Button
                       color="primary"
                       isLoading={loading}
+                      disabled={!canCalcPsbt}
                       onClick={payOrder}
                     >
                       {t('buttons.pay_wallet')}
@@ -279,9 +418,11 @@ export const InscribingOrderModal = ({
             feeRate={feeRate.value}
             // inscriptionSize={order.inscriptionSize}
             serviceFee={order.fee.serviceFee}
+            discount={discount}
+            discountServiceFee={order.fee.discountServiceFee}
             // filesLength={order.inscriptions.length}
-            totalFee={order.fee.totalFee}
-            // networkFee={order.fee.networkFee}
+            totalFee={totalFee}
+            networkFee={sendFee}
           />
 
           <>

@@ -69,9 +69,7 @@ export const OrdxAssetNameItem = ({
           </div>
           <div className="flex justify-center">
             <section className="text-center pt-8">
-              <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
-                {/* {thousandSeparator(item?.tickers[0].amount)} */}
-              </p>
+              <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3"></p>
               <p className="pt-5">
                 <Snippet
                   codeString={item?.utxo}
