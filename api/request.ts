@@ -110,7 +110,7 @@ export const getHistory = async ({
 };
 
 interface GetTopAssets {
-  // assets_type: string;
+  assets_type: string;
   interval?: number;
   top_count?: number;
   top_name?: ''; //'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
@@ -118,7 +118,7 @@ interface GetTopAssets {
   sort_order: 0 | 1; //'asc' | 'desc';
 }
 export const getTopAssets = async ({
-  // assets_type = '',
+  assets_type = '',
   interval = 1,
   top_count = 20,
   top_name = '',
@@ -128,7 +128,8 @@ export const getTopAssets = async ({
   const _interval = interval === 0 ? undefined : interval;
   const res = await request('/ordx/GetTopAssets', {
     data: {
-      /*assets_type, */ interval: _interval,
+      assets_type,
+      interval: _interval,
       top_count,
       top_name,
       sort_field,

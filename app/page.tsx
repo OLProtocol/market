@@ -22,11 +22,13 @@ import { Icon } from '@iconify/react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { thousandSeparator } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
+import { HomeTypeTabs } from '@/components/home/HomeTypeTabs';
 import { BtcPrice } from '@/components/BtcPrice';
 
 export default function Home() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const [type, setType] = useState<string>('ticker');
   const [interval, setInterval] = useState<any>(1);
   const [sortField, setSortField] = useState<any>('');
   const [sortOrder, setSortOrder] = useState<any>(0);
@@ -46,10 +48,10 @@ export default function Home() {
   });
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
+    `/ordx/getTopTickers-${network}-${type}-${interval}-${sortField}-${sortOrder}`,
     () => {
       let res = getTopAssets({
-        // assets_type: 'ticker',
+        assets_type: type,
         interval,
         top_count: 200,
         top_name: '',
@@ -67,6 +69,12 @@ export default function Home() {
   }, [data]);
   const toDetail = (e) => {
     router.push(`/ordx/ticker?ticker=${e}`);
+  };
+  const typeChange = (e: string) => {
+    setType(e);
+    setSortOrder(0);
+    setSortField('');
+    setSortDescriptor({ column: '', direction: 'ascending' });
   };
   const onTableSortChange = (e: SortDescriptor) => {
     setSortDescriptor(e);
@@ -114,7 +122,8 @@ export default function Home() {
 
   return (
     <div className="pt-4">
-      <div className="mb-2 flex justify-end items-center">
+      <div className="mb-2 flex justify-between items-center">
+        <HomeTypeTabs value={type} onChange={typeChange} />
         <SortDropdown
           sortList={sortList}
           value={interval}
