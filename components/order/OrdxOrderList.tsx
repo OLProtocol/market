@@ -18,11 +18,13 @@ import { useList } from 'react-use';
 
 interface OrdxOrderListProps {
   assets_name: string;
+  assets_type?: string;
   address?: string;
   showResale?: boolean;
 }
 export const OrdxOrderList = ({
   assets_name,
+  assets_type,
   address,
   showResale = true,
 }: OrdxOrderListProps) => {
@@ -56,13 +58,20 @@ export const OrdxOrderList = ({
 
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${assets_name}-${address}-${network}-${page}-${size}-${sort}`;
+      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${network}-${page}-${size}-${sort}`;
     }
-    return `/ordx/getOrders-${assets_name}-${network}-${page}-${size}-${sort}`;
-  }, [assets_name, address, page, size, network, sort]);
+    return `/ordx/getOrders-${assets_name}-${assets_type}-${network}-${page}-${size}-${sort}`;
+  }, [assets_name, address, page, size, network, sort, assets_type]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
-    getOrders({ offset: (page - 1) * size, size, assets_name, address, sort }),
+    getOrders({
+      offset: (page - 1) * size,
+      size,
+      assets_name,
+      address,
+      sort,
+      assets_type,
+    }),
   );
   const [list, { set, reset: resetList, updateAt, removeAt }] = useList<any>(
     [],

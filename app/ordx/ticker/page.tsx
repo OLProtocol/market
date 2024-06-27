@@ -21,11 +21,11 @@ export default function Page() {
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
-  const assets_type = 'ticker';
+  const assets_type = params.get('assets_type') as string;
   const { data } = useSWR(`getAssetsSummary`, () => {
     console.log('app.ordx.ticker.page: ticker: ', ticker);
     try {
-      return getAssetsSummary({ assets_name: ticker });
+      return getAssetsSummary({ assets_name: ticker, assets_type });
     } catch (error) {
       console.log('app.ordx.ticker.page: getAssetsSummary error: ', error);
     }
@@ -165,7 +165,11 @@ export default function Page() {
           style={{ width: '100%' }}
         >
           <Tab key="market" title={t('pages.market.title')}>
-            <OrdxOrderList assets_name={ticker} showResale />
+            <OrdxOrderList
+              assets_name={ticker}
+              assets_type={assets_type}
+              showResale
+            />
           </Tab>
           <Tab key="history" title={t('common.tx_history')}>
             <OrdxOrderHistoryList
