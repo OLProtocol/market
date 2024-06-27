@@ -19,21 +19,14 @@ import NextLink from 'next/link';
 import { UpdateVersionModal } from './UpdateVersionModal';
 import { FeerateSelectButton } from '@/components/fee/FeerateSelectButton';
 import { ThemeSwitch } from '@/components/theme-switch';
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-} from '@/components/icons';
-import { Icon } from '@iconify/react';
+import { SearchIcon } from '@/components/icons';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { getUtxoByValue, ordxSWR, getBTCPrice, ordx } from '@/api';
+import { getUtxoByValue, ordxSWR, getBTCPrice, getFeeDiscount } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
@@ -57,7 +50,7 @@ export const Navbar = () => {
   );
   const { data: discountData, trigger: getDiscount } = useSWRMutation(
     `getUtxoByValue-${address}-${network}`,
-    () => ordx.getFeeDiscount({ address, network }),
+    () => getFeeDiscount({ address }),
   );
   const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 

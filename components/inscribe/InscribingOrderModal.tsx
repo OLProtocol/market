@@ -214,6 +214,15 @@ export const InscribingOrderModal = ({
     const { fee } = order;
     return fee.totalFee + fee.discountServiceFee + sendFee;
   }, [order?.fee, sendFee]);
+
+  const totalNetworkFee = useMemo(() => {
+    if (!order || !sendFee) {
+      return 0;
+    }
+    const { fee } = order;
+    return fee.networkFee + sendFee;
+  }, [order?.fee, sendFee]);
+
   const payOrder = async () => {
     if (!order) {
       return;
@@ -416,13 +425,13 @@ export const InscribingOrderModal = ({
           </div>
           <FeeShow
             feeRate={feeRate.value}
-            // inscriptionSize={order.inscriptionSize}
+            totalInscriptionSize={order.fee.totalInscriptionSize}
             serviceFee={order.fee.serviceFee}
             discount={discount}
             discountServiceFee={order.fee.discountServiceFee}
             // filesLength={order.inscriptions.length}
             totalFee={totalFee}
-            networkFee={sendFee}
+            networkFee={totalNetworkFee}
           />
 
           <>
