@@ -68,7 +68,7 @@ export default function Home() {
     return data?.data || [];
   }, [data]);
   const toDetail = (e) => {
-    router.push(`/ordx/ticker?ticker=${e}`);
+    router.push(`/ordx/ticker?ticker=${e}&assets_type=${type}`);
   };
   const typeChange = (e: string) => {
     setType(e);
