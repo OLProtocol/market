@@ -65,7 +65,7 @@ export const FeeShow = ({
 
       {!!networkFee && (
         <div className="flex justify-between">
-          <div>{t('pages.inscribe.fee.network_fee')}</div>
+          <div>{t('pages.inscribe.fee.network_fee')}(Submint&Reveal)</div>
           <div>
             <span>{networkFee}</span> <span> sats</span>
           </div>
@@ -77,11 +77,10 @@ export const FeeShow = ({
         <div className="flex justify-between mb-2">
           <div>
             {t('pages.inscribe.fee.service_fee')}
-            {/* <span className="text-blue-400">({serviceText})</span> */}
+            (orginal: {serviceFee} sats, discount: {discount}%)
           </div>
           <div>
             <span>{discountServiceFee}</span> <span> sats</span>
-            <span>{!!discount && `(${discount}%)`}</span>
           </div>
         </div>
       )}
