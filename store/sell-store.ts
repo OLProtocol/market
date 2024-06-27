@@ -15,6 +15,7 @@ export interface UtxoAssetItem {
     amount: number;
     inscriptionnum: number;
   }[];
+  assets_list: any[];
   nslist: {
     name: string;
     utxo: string;
@@ -26,7 +27,7 @@ interface SellState {
   ticker: string;
   assets_type: string;
   assets_name: string;
-  type: 'ft' | 'name';
+  type: string;
   amountUnit: 'btc' | 'sats';
   list: UtxoAssetItem[];
   add: (item: UtxoAssetItem) => void;
@@ -37,7 +38,7 @@ interface SellState {
   changePrice: (utxo: string, price: string) => void;
   changeUnit: (unit: 'btc' | 'sats') => void;
   changeTicker: (ticker: string) => void;
-  changeType: (t: 'ft' | 'name') => void;
+  changeType: (t: string) => void;
   changeAmountUnit: (unit: 'btc' | 'sats') => void;
   remove: (utxo: string) => void;
   reset: () => void;
@@ -73,7 +74,12 @@ export const useSellStore = create<SellState>()(
         let amount = 0;
         if (type === 'ft') {
           amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
-        } else if (type === 'name') {
+        } else if (type === 'exotic') {
+          amount =
+            item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
+            0;
+        }
+        if (type === 'name') {
           amount = 1;
         }
         if (price === '' || isNaN(Number(price))) {
