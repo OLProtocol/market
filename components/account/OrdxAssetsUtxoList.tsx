@@ -8,7 +8,7 @@ import { OrdxUtxoList } from './OrdxUtxoList';
 
 export const OrdxAssetsUtxoList = () => {
   const router = useRouter();
-  const [assertType, setAssertType] = useState<string>('');
+  const [assertType, setAssertType] = useState<string>('Name');
   const [assertName, setAssertName] = useState<string>('Name');
 
   const onAssertChange = (data: string) => {
