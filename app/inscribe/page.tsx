@@ -379,6 +379,7 @@ export default function Inscribe() {
     if (textData.type === 'single') {
       list.push({
         type: 'text',
+        amount: 330,
         value: textData.text,
       });
     } else {
@@ -403,6 +404,7 @@ export default function Inscribe() {
     const list = files.map((file) => ({
       type: 'file',
       name: file.name,
+      amount: 330,
       value: file,
     }));
     const _files = await generteFiles(list);

@@ -9,6 +9,7 @@ export const useCalcFee = ({
   files: any[];
 }) => {
   const VITE_TIP_MIN = 1000;
+  console.log(files);
   const clacFee = useMemo(() => {
     const feeObj: any = {
       networkFee: 0,

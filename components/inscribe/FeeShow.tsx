@@ -86,12 +86,14 @@ export const FeeShow = ({
         </div>
       )}
 
-      <div className="flex justify-between">
-        <div>{t('pages.inscribe.fee.total_fee')}</div>
-        <div>
-          <span>{totalFee}</span> <span> sats</span>
+      {!!totalFee && (
+        <div className="flex justify-between">
+          <div>{t('pages.inscribe.fee.total_fee')}</div>
+          <div>
+            <span>{totalFee}</span> <span> sats</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

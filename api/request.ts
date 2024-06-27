@@ -267,6 +267,16 @@ export const getOrderTaskList = async ({
   return res;
 };
 
+export const getFeeDiscount = async ({ address, project_id = 1 }: any) => {
+  const res = await request(`/ordx/GetFeeDiscount`, {
+    data: {
+      address,
+      project_id,
+    },
+  });
+  return res;
+};
+
 export const getUtxoByValue = async ({
   address,
   value = 600,

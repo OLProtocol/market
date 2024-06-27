@@ -149,11 +149,11 @@ export const InscribeStepThree = ({
           // discountServiceFee={clacFee.discountServiceFee}
           totalInscriptionSize={clacFee.totalInscriptionSize}
           feeRate={feeRate.value}
-          discount={discount}
+          // discount={discount}
           filesLength={files.length}
-          totalFee={clacFee.totalFee}
-          discountTotalFee={clacFee.discountTotalFee}
-          networkFee={clacFee.networkFee}
+          // totalFee={clacFee.totalFee}
+          // discountTotalFee={clacFee.discountTotalFee}
+          // networkFee={clacFee.networkFee}
         />
       </div>
       <div className="w-60 mx-auto flex justify-center">
