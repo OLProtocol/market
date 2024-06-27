@@ -12,6 +12,7 @@ import {
   calcNetworkFee,
   hideStr,
   signAndPushPsbt,
+  getTickLabel,
 } from '@/lib';
 import { useCommonStore } from '@/store';
 import {
@@ -564,7 +565,7 @@ export default function TransferTool() {
                       tickerList?.map((utxo) => ({
                         label: (
                           <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
-                            {utxo.ticker}
+                            {getTickLabel(utxo.ticker)}
                           </div>
                         ),
                         value: utxo.ticker,
