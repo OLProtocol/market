@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { thousandSeparator } from '@/lib/utils';
+import { thousandSeparator, getTickLabel } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
 import { HomeTypeTabs } from '@/components/home/HomeTypeTabs';
 import { BtcPrice } from '@/components/BtcPrice';
@@ -184,7 +184,7 @@ export default function Home() {
                           />
                         )}
                         &nbsp;&nbsp;
-                        <span className="pt-4">{tick}</span>
+                        <span className="pt-4">{getTickLabel(tick)}</span>
                       </div>
                     </TableCell>
                   );

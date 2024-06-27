@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { getTickLabel } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 
 export default function Page() {
@@ -32,9 +33,7 @@ export default function Page() {
   const toAccount = () => {
     router.push(`/account`);
   };
-  const showTextIcon = useMemo(() => {
-    return ticker?.slice(0, 1)?.toUpperCase();
-  }, [ticker]);
+
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
     return [
@@ -112,7 +111,7 @@ export default function Page() {
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
               <div className="text-2xl md:text-3xl font-medium text-gary-500">
-                {summary?.assets_name}
+                {getTickLabel(summary?.assets_name)}
               </div>
             </div>
             <WalletConnectBus text={t('buttons.list_sale')}>

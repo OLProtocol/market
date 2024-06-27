@@ -6,6 +6,16 @@ import { add, format } from 'date-fns';
 import { flat } from 'radash';
 import crypto from 'crypto';
 
+export const getTickLabel = (tick?: string) => {
+  if (tick === undefined) return undefined;
+  const tickMap = {
+    n: 'Name',
+    o: 'Ordinals NFT',
+    e: 'Rare',
+  };
+  return tickMap[tick] || tick;
+};
+
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
