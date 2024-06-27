@@ -28,7 +28,7 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     swrKey,
     () => getAddressOrdxList({ address }),
     {
-      revalidateOnMount: true,
+      // revalidateOnMount: true,
     },
   );
   const NsAssetTitle = 'ns';
