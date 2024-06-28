@@ -186,7 +186,11 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
   if (signed) {
     let txid = await btcWallet?.pushPsbt(signed);
     if (txid) {
-      txid = JSON.parse(txid);
+      try {
+        txid = JSON.parse(txid);
+      } catch (error) {
+        console.log(error);
+      }
     }
     for (let i = 0; i < num; i++) {
       dummyUtxos.push({

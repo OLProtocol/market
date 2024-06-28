@@ -74,7 +74,7 @@ export const OrdxNameList = ({
   };
   const addHandler = (item: any) => {
     const tickerAmount = 1;
-    changeType('name');
+    changeType('ns');
     changeTicker(item.ticker);
     addSell({
       ...item,

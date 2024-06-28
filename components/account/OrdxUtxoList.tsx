@@ -87,7 +87,7 @@ export const OrdxUtxoList = ({
     }
     console.log(new Decimal('2').mul(new Decimal(tickerAmount)).toString());
     changeType(assets_type);
-    // changeTicker('Name');
+    changeTicker(assets_name);
     addSell({
       ...item,
       unit_price: '2',
