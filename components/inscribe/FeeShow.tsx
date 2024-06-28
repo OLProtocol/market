@@ -73,7 +73,7 @@ export const FeeShow = ({
       )}
 
       <Divider style={{ margin: '10px 0' }} />
-      {!!discountServiceFee && (
+      {!!serviceFee && (
         <div className="flex justify-between mb-2">
           <div>
             {t('pages.inscribe.fee.service_fee')}
