@@ -36,6 +36,7 @@ export const OrdxFtAssetsItem = ({
     await onSell?.(item);
     setLoading(false);
   };
+  const showContent = (content_type: string) => {};
   const cancelHandler = async () => {
     setLoading(true);
     await onCancelOrder?.();
@@ -63,6 +64,7 @@ export const OrdxFtAssetsItem = ({
       <CardBody className="radius-lg w-[11.5rem] h-[11.75rem] md:w-[15.5rem] md:h-[15.75rem] top-1 bottom-0 left-1">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="absolute inset-0 z-0">
+            {item?.assets_list?.[0]?.content_type}
             <UtxoContent
               inscriptionId={item?.assets_list?.[0]?.inscriptionId}
               utxo={item?.utxo}
