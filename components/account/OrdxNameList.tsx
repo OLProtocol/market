@@ -126,8 +126,11 @@ export const OrdxNameList = ({
   useEffect(() => {
     getNsList();
   }, []);
-  console.log(list);
-
+  useEffect(() => {
+    setCanSelect(false);
+    resetList();
+    getNsList();
+  }, [page]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
