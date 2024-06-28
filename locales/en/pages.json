@@ -1,15 +1,15 @@
 {
   "app": {
-    "title": "OrdX Market",
+    "title": "SAT20 Market",
     "version_update_title": "There is a new version, do you want to update it?"
   },
   "market": {
-    "title": "Market"
+    "title": "MarketPlace"
   },
   "tools": {
     "title": "Toolbox",
     "transaction": {
-      "title": "Split & Transfer",
+      "title": "Split, Merge & Transfer",
       "description": "Batch Split and Transfer Tool",
       "btn_split": "Use Now",
       "input": "Input",
@@ -22,6 +22,9 @@
       "btn_send": "Send"
     },
     "search_sat": {
+      "title": "Sat Hunting",
+      "description": "Search Rare Sats",
+      "btn_search": "Search",
       "table_title": "Search Result",
       "table_col1": "UTXO",
       "table_col2": "Sats/BTC",
@@ -36,8 +39,26 @@
     "title": "Order",
     "modal_title": "Buy Order"
   },
+  "explorer": {
+    "title": "Explorer",
+    "subtitle": "Check out OrdX balance of the address.",
+    "des": "Recognize all operations including DEPLOY, MINT and TRANSFER.",
+    "list_title": "The full list of ordx",
+    "not_support": "Viewing the transferred balance is temporarily unavailable.",
+    "ordx_version": "OrdX Version"
+  },
   "inscribe": {
     "title": "Inscribe",
+    "name": {
+      "title": "Name",
+      "input_name": "Name",
+      "description": "Register a name on BTC",
+      "description_1": "Supports.x,.btc,.sats,.pizza, and no suffix. \n For example： abcd.x,  abcd.btc,  abcd.sats,  abcd.pizza,  and abcd .",
+      "name_placeholder": "Name must be 3, 5-32 bytes long",
+      "select_placeholder": "Select Suffix",
+      "error_1": "Name must be 3, 5-32 bytes long",
+      "error_2": "{{name}} has been minted"
+    },
     "files": {
       "name": "Files",
       "upload_title": "Upload your files to begin",
@@ -46,7 +67,7 @@
     },
     "text": {
       "name": "Text",
-      "single_des": "If single, we will inscribe exactly what is there",
+      "single_des": "Input what you want to inscribe on BTC",
       "bulk_des": "If bulk, we will inscribe one for every new line.",
       "single": "Single",
       "bulk": "bulk",
@@ -54,6 +75,11 @@
     },
     "ordx": {
       "name": "OrdX",
+      "current_height": "Current Hieght: {{height}}",
+      "deploy_file": "Ticker display resource file",
+      "deploy_mode": "Mode",
+      "deploy_mode_fair": "Fair Launch",
+      "deploy_mode_project": "Project-Led",
       "tick_placeholder": "Tick must be 3, 5-32 byte long",
       "reg_placeholder": "like \"^[1-9][0-9]*0{n}$\"",
       "cn_placeholder": "For example, cn=1000, 1000 consecutively numbered sats",
@@ -67,6 +93,16 @@
       "error_6": "{{tick}} has not started mint yet",
       "error_7": "{{tick}} has been minted",
       "error_8": "{{tick}} contains special sat and cannot be cast",
+      "error_9": "The minimum height of the block is less than {{block}}, the ticker is invalid and will not be indexed by the indexer",
+      "error_10": "The starting height of the block must be less than the ending height",
+      "error_11": "Rarity cannot be empty",
+      "error_12": "Quantity cannot be empty",
+      "error_13": "Block, rarity must be set.",
+      "error_14": "The Max must be set",
+      "error_15": "The Block must be set",
+      "error_16": "The Max must must greater than limit",
+      "error_17": "{{tick}} cannot minted",
+      "error_18": "Not enough balance",
       "rarity_helper": "Special sat attributes required for mint."
     },
     "step_two": {

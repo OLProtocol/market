@@ -21,17 +21,17 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
     <div>
       <div className="mb-4 text-center">
         <p>{t('pages.inscribe.text.single_des')}</p>
-        <p>{t('pages.inscribe.text.bulk_des')}</p>
+        {/* <p>{t('pages.inscribe.text.bulk_des')}</p> */}
       </div>
       <div className="mb-4 flex justify-center">
-        <RadioGroup
+        {/* <RadioGroup
           onValueChange={(e) => set('type', e)}
           value={data.type}
           orientation="horizontal"
         >
           <Radio value="single">{t('pages.inscribe.text.single')}</Radio>
           <Radio value="bulk">{t('pages.inscribe.text.bulk')}</Radio>
-        </RadioGroup>
+        </RadioGroup> */}
       </div>
       <div className="mb-2">
         <Textarea

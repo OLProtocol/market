@@ -1,6 +1,4 @@
 import { Button } from '@nextui-org/react';
-import { useState } from 'react';
-import { useMap } from 'react-use';
 import { InscribeCheckItem } from './InscribeCheckItem';
 import { useTranslation } from 'react-i18next';
 

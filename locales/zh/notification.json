@@ -1,4 +1,6 @@
 {
+  "system_error": "系统异常，请稍后再试。",
+  "insufficient_balance": "余额不足。",
   "list_failed_title": "挂单失败",
   "list_success_title": "挂单成功",
   "list_success_description": "挂单已成功提交，请等待买家购买。",
@@ -15,6 +17,8 @@
   "order_buy_failed_description_2": "订单原始数据为空",
   "order_buy_failed_description_3": "虚拟UTXO缺少两个UTXO",
   "order_buy_failed_description_4": "余额不足",
-  "transaction_failed_title": "交易失败",
-  "search_rare_sats_failed_title": "搜索稀有聪失败"
+  "transaction_title": "交易",
+  "transaction_spilt_success": "拆分及转账成功",
+  "transaction_spilt_fail": "拆分及转账失败",
+  "search_sats_title": "搜索聪"
 }

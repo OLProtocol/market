@@ -1,6 +1,6 @@
 'use client';
 
-import { getTopTickers } from '@/api';
+import { getTopAssets } from '@/api';
 import useSWR from 'swr';
 import {
   Table,
@@ -13,18 +13,22 @@ import {
   getKeyValue,
   SortDescriptor,
   Avatar,
+  Image,
 } from '@nextui-org/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { thousandSeparator } from '@/lib/utils';
+import { thousandSeparator, getTickLabel } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
+import { HomeTypeTabs } from '@/components/home/HomeTypeTabs';
+import { BtcPrice } from '@/components/BtcPrice';
 
 export default function Home() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const [type, setType] = useState<string>('ticker');
   const [interval, setInterval] = useState<any>(1);
   const [sortField, setSortField] = useState<any>('');
   const [sortOrder, setSortOrder] = useState<any>(0);
@@ -44,22 +48,33 @@ export default function Home() {
   });
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}-${interval}-${sortField}-${sortOrder}`,
-    () =>
-      getTopTickers({
+    `/ordx/getTopTickers-${network}-${type}-${interval}-${sortField}-${sortOrder}`,
+    () => {
+      let res = getTopAssets({
+        assets_type: type,
         interval,
-        top_count: 20,
+        top_count: 200,
         top_name: '',
         sort_field: sortField,
         sort_order: sortOrder,
-      }),
+      });
+      return res;
+    },
   );
   const onSortChange = (i?: number) => {
     setInterval(i);
   };
-  const list = useMemo(() => data?.data || [], [data]);
+  const list = useMemo(() => {
+    return data?.data || [];
+  }, [data]);
   const toDetail = (e) => {
-    router.push(`/ordx/ticker?ticker=${e}`);
+    router.push(`/ordx/ticker?ticker=${e}&assets_type=${type}`);
+  };
+  const typeChange = (e: string) => {
+    setType(e);
+    setSortOrder(0);
+    setSortField('');
+    setSortDescriptor({ column: '', direction: 'ascending' });
   };
   const onTableSortChange = (e: SortDescriptor) => {
     setSortDescriptor(e);
@@ -67,7 +82,7 @@ export default function Home() {
     setSortOrder(e.direction === 'ascending' ? 0 : 1);
   };
   const columns = [
-    { key: 'ticker', label: t('common.tick'), allowsSorting: true },
+    { key: 'assets_name', label: t('common.assets_name'), allowsSorting: true },
     {
       key: 'lowest_price',
       label: t('common.lowest_price'),
@@ -107,7 +122,8 @@ export default function Home() {
 
   return (
     <div className="pt-4">
-      <div className="mb-2 flex justify-end items-center">
+      <div className="mb-2 flex justify-between items-center">
+        <HomeTypeTabs value={type} onChange={typeChange} />
         <SortDropdown
           sortList={sortList}
           value={interval}
@@ -130,7 +146,8 @@ export default function Home() {
             <TableColumn
               key={column.key}
               allowsSorting={column.allowsSorting}
-              className="text-sm md:text-base font-extralight"
+              // className="text-sm md:text-base font-extralight"
+              className="text-sm md:text-xl md:font-extrablod font-extralight md:pb-3 md:pt-3"
             >
               {column.label}
             </TableColumn>
@@ -144,18 +161,30 @@ export default function Home() {
         >
           {(item: any) => (
             <TableRow
-              key={item.ticker}
+              key={item.assets_name}
               className="cursor-pointer text-sm md:text-base"
             >
               {(columnKey) => {
-                if (columnKey === 'ticker') {
-                  const tick = getKeyValue(item, columnKey);
+                if (columnKey === 'assets_name') {
+                  const tick = getKeyValue(item, 'assets_name');
                   return (
                     <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        <Avatar name={tick.slice(0, 1)?.toUpperCase()} />
-                        &nbsp;
-                        <span className="pt-2">{tick}</span>
+                      <div className="flex text-sm md:text-base items-left">
+                        {/^[a-zA-Z]$/.test(tick.slice(0, 1)) ? (
+                          <Image
+                            radius="full"
+                            src={`/tick-ico/${tick.slice(0, 1).toUpperCase()}.png`}
+                            alt="logo"
+                            className="w-14 h-14 p-2 rounded-full bg-gray-950"
+                          />
+                        ) : (
+                          <Avatar
+                            name={tick.slice(0, 1).toUpperCase()}
+                            className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
+                          />
+                        )}
+                        &nbsp;&nbsp;
+                        <span className="pt-4">{getTickLabel(tick)}</span>
                       </div>
                     </TableCell>
                   );
@@ -211,6 +240,7 @@ export default function Home() {
                           className="mr-1 mt-0.5"
                         />
                         {getKeyValue(item, columnKey)}
+                        {/* <BtcPrice btc={getKeyValue(item, columnKey)} /> */}
                       </div>
                     </TableCell>
                   );

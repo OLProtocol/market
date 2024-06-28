@@ -19,18 +19,16 @@ import NextLink from 'next/link';
 import { UpdateVersionModal } from './UpdateVersionModal';
 import { FeerateSelectButton } from '@/components/fee/FeerateSelectButton';
 import { ThemeSwitch } from '@/components/theme-switch';
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-} from '@/components/icons';
-import { Icon } from '@iconify/react';
+import { SearchIcon } from '@/components/icons';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
 import { usePathname } from 'next/navigation';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
+import { getUtxoByValue, ordxSWR, getBTCPrice, getFeeDiscount } from '@/api';
+import { useCommonStore, useUtxoStore } from '@/store';
+import { useReactWalletStore } from 'btc-connect/dist/react';
 
 const WalletButton = dynamic(
   () => import('../components/wallet/WalletConnectButton') as any,
@@ -38,10 +36,59 @@ const WalletButton = dynamic(
 );
 
 export const Navbar = () => {
+  const { address, network } = useReactWalletStore();
+  const { setHeight, setBtcPrice, setDiscount } = useCommonStore();
+  const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const taggleRef = useRef<any>();
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
+
+  const { data: heightData } = ordxSWR.useBtcHeight(network as any);
+  const { data, trigger: getUtxos } = useSWRMutation(
+    `getUtxoByValue-${address}-${network}`,
+    () => getUtxoByValue({ address, network, value: 500 }),
+  );
+  const { data: discountData, trigger: getDiscount } = useSWRMutation(
+    `getUtxoByValue-${address}-${network}`,
+    () => getFeeDiscount({ address }),
+  );
+  const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
+
+  useEffect(() => {
+    if (data?.data?.length) {
+      const list = data.data?.map((item: any) => ({
+        status: 'unspend',
+        location: 'remote',
+        utxo: `${item.txid}:${item.vout}`,
+        ...item,
+      }));
+      setList(list);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const height = heightData?.data?.height;
+    if (height) {
+      setHeight(height);
+    }
+  }, [heightData]);
+  useEffect(() => {
+    const discount = discountData?.data?.discount || 0;
+    if (discount) {
+      setDiscount(discount);
+    }
+  }, [discountData]);
+  useEffect(() => {
+    if (btcData?.data?.amount) {
+      setBtcPrice(btcData?.data?.amount);
+    }
+  }, [btcData]);
+  useEffect(() => {
+    if (address && network) {
+      getUtxos();
+      getDiscount();
+    }
+  }, [address, network]);
   const searchInput = (
     <Input
       aria-label="Search"
@@ -74,6 +121,16 @@ export const Navbar = () => {
         isActive: true,
       },
       {
+        label: t('pages.inscribe.title'),
+        href: '/inscribe',
+        isActive: true,
+      },
+      {
+        label: t('pages.explorer.title'),
+        href: `${process.env.NEXT_PUBLIC_ORDX_WEBSITE_HOST}/#/explorer`,
+        isActive: true,
+      },
+      {
         label: t('pages.tools.title'),
         href: '/tools',
         isActive: false,
@@ -103,6 +160,7 @@ export const Navbar = () => {
               alt="logo"
               className="w-14 h-14"
             />
+            <p className="font-bold text-purple-500/90">SAT20Market</p>
           </NextLink>
         </NavbarBrand>
 

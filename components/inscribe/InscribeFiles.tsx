@@ -36,10 +36,10 @@ export const InscribeFiles = ({ onChange }: InscribeFilesProps) => {
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">
+          <p className=" dark:text-white">
             {t('pages.inscribe.files.upload_des_1')}
           </p>
-          <p className="ant-upload-hint">
+          <p className="dark:text-white">
             {t('pages.inscribe.files.upload_des_2')}
           </p>
         </Dragger>

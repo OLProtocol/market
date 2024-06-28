@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { InscribeOrdx } from '@/components/inscribe/InscribeOrdx';
 import { InscribeText } from '@/components/inscribe/InscribeText';
 import { InscribeFiles } from '@/components/inscribe/InscribeFiles';
+import { InscribeOrdxName } from '@/components/inscribe/InscribeOrdxName';
 import { InscribeStepTwo } from '@/components/inscribe/InscribeStepTwo';
 import { InscribeStepThree } from '@/components/inscribe/InscribeStepThree';
 import { useMap, useList } from 'react-use';
@@ -16,7 +17,9 @@ import { InscribingOrderModal } from '@/components/inscribe/InscribingOrderModal
 import {
   removeObjectEmptyValue,
   generteFiles,
-  hexString,
+  splitRareUtxosByValue,
+  generateSeed,
+  splitUtxosByValue,
 } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
 import { OrderList } from '@/components/inscribe/OrderList';
@@ -35,11 +38,10 @@ export default function Inscribe() {
   //     isClosable: true,
   //   });
   // }, []);
-  console.log('hexstring:' + hexString('6f7264'));
   const { t } = useTranslation();
-  const ordxUtxoRef = useRef<InscribeType>();
+  const [metadata, setMetadata] = useState<any>({});
   const [step, setStep] = useState(1);
-  const [tab, setTab] = useState<any>('files');
+  const [tab, setTab] = useState<any>('ordx');
   const [files, setFiles] = useState<any[]>([]);
   const [orderId, setOrderId] = useState<string>();
   const [modalShow, setModalShow] = useState(false);
@@ -59,7 +61,7 @@ export default function Inscribe() {
     //   value: 'well4',
     // },
   ]);
-  const [ordxData, { set: setOrd2Data }] = useMap({
+  const [ordxData, { set: setOrd2Data }] = useMap<any>({
     type: 'mint',
     tick: '',
     amount: 1,
@@ -70,9 +72,10 @@ export default function Inscribe() {
     // cn: 0,
     trz: 0,
     des: '',
-    sat: 0,
     rarity: '',
     mintRarity: '',
+    selfmint: '',
+    max: '',
     file: '',
     fileName: '',
     fileType: '',
@@ -81,6 +84,8 @@ export default function Inscribe() {
     blockChecked: false,
     cnChecked: false,
     trzChecked: false,
+    utxos: [],
+    isSpecial: false,
   });
   const [brc20Data, { set: setBrc20 }] = useMap({
     type: 'mint',
@@ -94,6 +99,11 @@ export default function Inscribe() {
     type: 'single',
     text: '',
   });
+  const [nameData, { set: setNameData, reset: resetName }] = useMap({
+    type: 'mint',
+    name: '',
+    suffix: '.ordx',
+  });
   const brc20Change = (data: any) => {
     setBrc20('type', data.type);
     setBrc20('tick', data.tick);
@@ -102,13 +112,21 @@ export default function Inscribe() {
     setBrc20('limitPerMint', data.limitPerMint);
     setBrc20('totalSupply', data.totalSupply);
   };
+  const ordxNameChange = (data: any) => {
+    setNameData('type', data.type);
+    setNameData('name', data.name);
+    setNameData('suffix', data.suffix);
+  };
   const ordxChange = (data: any) => {
     setOrd2Data('type', data.type);
     setOrd2Data('tick', data.tick);
+    setOrd2Data('utxos', data.utxos);
     setOrd2Data('amount', data.amount);
-    setOrd2Data('file', data.file);
-    console.log(data.relateInscriptionId);
+    setOrd2Data('selfmint', data.selfmint);
+    setOrd2Data('max', data.max);
     setOrd2Data('relateInscriptionId', data.relateInscriptionId);
+    setOrd2Data('isSpecial', data.isSpecial);
+    setOrd2Data('file', data.file);
     setOrd2Data('fileName', data.fileName);
     setOrd2Data('fileType', data.fileType);
     setOrd2Data('repeatMint', data.repeatMint);
@@ -118,15 +136,12 @@ export default function Inscribe() {
     setOrd2Data('trz', data.trz);
     setOrd2Data('rarity', data.rarity);
     setOrd2Data('des', data.des);
-    setOrd2Data('sat', data.sat);
     setOrd2Data('rarityChecked', data.rarityChecked);
     // setOrd2Data('cnChecked', data.cnChecked);
     setOrd2Data('trzChecked', data.trzChecked);
     setOrd2Data('blockChecked', data.blockChecked);
   };
-  const onOrdxUtxoChange = (utxo: any) => {
-    ordxUtxoRef.current = utxo;
-  };
+
   const brc20Next = async () => {
     const list: any = [];
     if (brc20Data.type === 'mint') {
@@ -170,12 +185,72 @@ export default function Inscribe() {
     setList(_files);
     setStep(2);
   };
+  const findSepiceAmt = () => {
+    const { utxos, amount } = ordxData;
+    const userAmt = amount || 0;
+    const realAmt = Math.max(userAmt, 330);
+    const findBetweenByValue = (userAmt: number, realAmt, ranges: any[]) => {
+      let outAmt = 0;
+      let outValue = 0;
+      let preTotalSize = 0;
+      for (let i = 0; i < ranges.length; i++) {
+        const range = ranges[i];
+        outValue += range.size;
+        if (userAmt > outValue) {
+          preTotalSize += range.size;
+        }
+        if (userAmt <= outValue) {
+          const dis = userAmt - preTotalSize;
+          outAmt = range.offset + dis;
+          break;
+        }
+      }
+      if (outAmt < realAmt) {
+        outAmt += realAmt - outAmt;
+      }
+      return outAmt;
+    };
+    return findBetweenByValue(userAmt, realAmt, ordxData.utxos[0].sats);
+  };
+  const ordxNameNext = async () => {
+    const list: any = [];
+    const { suffix, name } = nameData;
+    if (nameData.type === 'mint') {
+      const _name = name.toString().trim();
+      const value = suffix === '.ordx' ? _name : `${name}${suffix}`;
+      list.push({
+        type: 'ordx_name',
+        name: `mint`,
+        amount: 330,
+        value: value,
+      });
+    }
+    const _files = await generteFiles(list);
+    setList(_files);
+    setStep(2);
+  };
   const ordxNext = async () => {
     const list: any = [];
     if (ordxData.type === 'mint') {
+      let offset = 0;
+      let rangesArr: any[][] = [];
+      let amount = Math.max(ordxData.amount, 330);
+      if (ordxData.utxos?.length) {
+        if (ordxData.isSpecial) {
+          rangesArr = splitRareUtxosByValue(ordxData.utxos, amount);
+        } else {
+          rangesArr = splitUtxosByValue(
+            ordxData.utxos,
+            amount,
+            ordxData.repeatMint,
+          );
+        }
+      }
+      console.log('rangesArr', rangesArr);
+
       for (let i = 0; i < ordxData.repeatMint; i++) {
-        console.log(ordxData);
         const attrArr: string[] = [];
+        let amt = ordxData.amount;
         if (ordxData.rarity && ordxData.rarity !== 'common') {
           attrArr.push(`rar=${ordxData.rarity}`);
         }
@@ -192,21 +267,35 @@ export default function Inscribe() {
               p: 'ordx',
               op: 'mint',
               tick: ordxData.tick.toString().trim(),
-              amt: ordxData.amount.toString(),
-              sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
+              amt: amt.toString(),
             }),
           ),
         ];
+
+        if (rangesArr[i] && ordxData.isSpecial) {
+          amt = rangesArr[i].reduce((acc, cur) => acc + cur.size, 0);
+          console.log('amt', amt);
+
+          const len = rangesArr[i].length;
+          amount =
+            rangesArr[i][len - 1].offset -
+            rangesArr[i][0].offset +
+            rangesArr[i][len - 1].size;
+          console.log('amount', amount);
+          offset = rangesArr[i][0].offset;
+        }
         if (ordxData.relateInscriptionId) {
+          console.log('rangesArr', rangesArr[i]);
+
+          const seed = generateSeed(rangesArr[i]);
           ordxValue = [
             JSON.stringify(
               removeObjectEmptyValue({
                 p: 'ordx',
                 op: 'mint',
                 tick: ordxData.tick.toString().trim(),
-                amt: ordxData.amount.toString(),
-                sat: ordxData.sat > 0 ? ordxData.sat.toString() : undefined,
-                desc: `seed=${random(0, 1000)}`,
+                amt: amt.toString(),
+                desc: `seed=${seed}`,
               }),
             ),
             {
@@ -220,8 +309,12 @@ export default function Inscribe() {
           type: 'ordx',
           name: `mint_${i}`,
           ordxType: 'mint',
+          amount,
+          offset,
+          isSpecial: ordxData.isSpecial,
           value: ordxValue,
         });
+        offset += amount;
       }
     } else if (ordxData.type === 'deploy') {
       const attrArr: string[] = [];
@@ -241,6 +334,11 @@ export default function Inscribe() {
             p: 'ordx',
             op: 'deploy',
             tick: ordxData.tick.toString().trim(),
+            max: !ordxData.max ? undefined : ordxData.max,
+            selfmint:
+              !ordxData.selfmint || ordxData.selfmint === '0'
+                ? undefined
+                : `${ordxData.selfmint}%`,
             block: ordxData.blockChecked
               ? ordxData.block.toString()
               : undefined,
@@ -260,11 +358,18 @@ export default function Inscribe() {
       }
       list.push({
         type: 'ordx',
+        amount: 330,
         name: 'deploy_0',
         ordxType: 'deploy',
         value,
       });
     }
+    setMetadata({
+      type: list[0].type,
+      ordxType: list[0].ordxType,
+      isSpecial: list[0].isSpecial,
+      utxos: ordxData.utxos,
+    });
     const _files = await generteFiles(list);
     setList(_files);
     setStep(2);
@@ -274,6 +379,7 @@ export default function Inscribe() {
     if (textData.type === 'single') {
       list.push({
         type: 'text',
+        amount: 330,
         value: textData.text,
       });
     } else {
@@ -282,6 +388,7 @@ export default function Inscribe() {
         list.push({
           type: 'text',
           value: line,
+          amount: 330,
         });
       });
     }
@@ -297,10 +404,10 @@ export default function Inscribe() {
     const list = files.map((file) => ({
       type: 'file',
       name: file.name,
+      amount: 330,
       value: file,
     }));
     const _files = await generteFiles(list);
-    console.log(_files);
     setList(_files);
     setStep(3);
   };
@@ -368,16 +475,21 @@ export default function Inscribe() {
 
   const tabList = [
     {
-      key: 'files',
-      label: t('pages.inscribe.files.name'),
+      key: 'ordx',
+      label: 'Ticker',
+    },
+    {
+      key: 'name',
+      label: t('pages.inscribe.name.title'),
     },
     {
       key: 'text',
       label: t('pages.inscribe.text.name'),
     },
+
     {
-      key: 'ordx',
-      label: 'FT',
+      key: 'files',
+      label: t('pages.inscribe.files.name'),
     },
   ];
   // useEffect(() => {
@@ -418,10 +530,12 @@ export default function Inscribe() {
                     <InscribeText onNext={textNext} onChange={textChange} />
                   )}
                   {tab === 'ordx' && (
-                    <InscribeOrdx
-                      onChange={ordxChange}
-                      onNext={ordxNext}
-                      onUtxoChange={onOrdxUtxoChange}
+                    <InscribeOrdx onChange={ordxChange} onNext={ordxNext} />
+                  )}
+                  {tab === 'name' && (
+                    <InscribeOrdxName
+                      onChange={ordxNameChange}
+                      onNext={ordxNameNext}
                     />
                   )}
                 </>
@@ -436,7 +550,7 @@ export default function Inscribe() {
               )}
               {step === 3 && (
                 <InscribeStepThree
-                  ordxUtxo={ordxUtxoRef.current}
+                  metadata={metadata}
                   onItemRemove={onItemRemove}
                   onRemoveAll={onRemoveAll}
                   onAddOrder={onAddOrder}

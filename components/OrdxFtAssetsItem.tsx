@@ -5,14 +5,13 @@ import {
   CardBody,
   Checkbox,
   Chip,
-  Listbox,
-  ListboxItem,
   Snippet,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
+import { UtxoContent } from './UtxoContent';
 interface Props {
   item: any;
   onSell?: (item: any) => void;
@@ -31,6 +30,7 @@ export const OrdxFtAssetsItem = ({
 }: Props) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const sellHandler = async () => {
     setLoading(true);
     await onSell?.(item);
@@ -44,7 +44,9 @@ export const OrdxFtAssetsItem = ({
   return (
     <Card
       radius="lg"
-      className="border-none w-full  h-[14rem] md:h-[18rem] relative"
+      className="card-hover forced-colors:hidden border-none w-[12rem] h-[18rem] md:w-[16rem] md:h-[24rem] relative hover:border hover:border-solid hover:border-indigo-500"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {canSelect && (
         <div
@@ -58,71 +60,61 @@ export const OrdxFtAssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className="h-4/5">
-        <div className="flex-1 text-sm md:text-base">
-          <Chip
-            variant="shadow"
-            size="lg"
-            classNames={{
-              base: 'bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30',
-              content: 'drop-shadow shadow-black text-white',
-            }}
-          >
-            {item?.tickers[0].ticker}
-          </Chip>
-          {/* {item?.tickers?.map((v: any) => (
-            <Listbox key={v.inscriptionnum} className='border-small border-gray-700 rounded-xl mt-5'>
-              <ListboxItem key={v.ticker + '-' + v.inscriptionnum}>
-                Inscription Num: {v.inscriptionnum}
-              </ListboxItem>
-              <ListboxItem key={v.ticker + '-' + v.amount}>
-                {t('common.asset_num')}: {v.amount}
-              </ListboxItem>
-            </Listbox>
-          ))} */}
-          <div className="flex justify-center">
-            <section className="text-center pt-10">
-              <p className="text-3xl font-medium text-white">
-                {thousandSeparator(item?.tickers[0].amount)}
-              </p>
-              <p className="pt-5">
-                <Snippet
-                  codeString={item?.utxo}
-                  className="bg-transparent text-blue-400"
-                  symbol=""
-                  size="lg"
-                  variant="flat"
-                >
-                  <span className="font-thin">{hideStr(item?.utxo, 6)}</span>
-                </Snippet>
-              </p>
-            </section>
+      <CardBody className="radius-lg w-[11.5rem] h-[11.75rem] md:w-[15.5rem] md:h-[15.75rem] top-1 bottom-0 left-1">
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
+          <div className="absolute inset-0 z-0">
+            <UtxoContent
+              inscriptionId={item?.assets_list?.[0]?.inscriptionId}
+              utxo={item?.utxo}
+            />
+          </div>
+
+          <div className={`label ${isHovered ? 'label-hover' : ''}`}>
+            <span className="flex absolute top-2 left-2 text-center text-gray-200">
+              {item?.assets_list?.[0]?.assets_name}
+            </span>
           </div>
         </div>
       </CardBody>
 
-      <CardFooter className="block bg-gray-800 h-1/5">
-        <div className="flex-1">
+      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:w-[18rem] md:h-[8rem]">
+        <Snippet
+          codeString={item?.utxo}
+          className="bg-transparent text-blue-400 pt-0 pb-0"
+          symbol=""
+          size="sm"
+          variant="flat"
+        >
+          <span className="font-thin md:pl-8">{hideStr(item?.utxo, 6)}</span>
+        </Snippet>
+
+        <div className="pb-1 md:pb-2">
+          {item?.assets_list?.[0]?.assets_name}
+          <span className="relative pl-4 font-medium text-lg md:text-xl">
+            assets: {thousandSeparator(item?.assets_list?.[0]?.amount)}
+          </span>
+        </div>
+        <div className="flex item-center pb-1">
           {item.order_id === 0 ? (
             <Button
               // fullWidth
               variant="ghost"
               size="md"
               isLoading={loading}
-              color="primary"
+              // color="primary"
               radius="sm"
               onClick={sellHandler}
-              className="border"
+              className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
             >
               {t('buttons.list_sale')}
             </Button>
           ) : (
             <Button
-              className="text-tiny"
+              className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
               // fullWidth
               variant="flat"
-              color="default"
-              radius="lg"
+              // color="default"
+              radius="sm"
               isLoading={loading}
               startContent={
                 item.locker == '1' ? (

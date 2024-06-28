@@ -1,4 +1,3 @@
-import { sort } from 'radash';
 import { Address, Script } from '@cmdcode/tapscript';
 
 export interface Utxo {
@@ -141,26 +140,31 @@ export const converUtxosToInputs = ({
 export const filterUtxosByValue = (
   utxos: any[],
   value,
+  spendUtxos: any[] = [],
   reverseStatus = true,
 ) => {
-  const sortUtxos = sort(utxos, (u) => u.value);
-  const _utxoList = structuredClone(sortUtxos);
-  if (reverseStatus) {
-    _utxoList.reverse();
-  }
+  // const sortUtxos = sort(utxos, (u) => u.value);
+  const _utxoList = structuredClone(utxos);
+  // if (reverseStatus) {
+  //   _utxoList.reverse();
+  // }
   const avialableUtxo: any[] = [];
   let avialableValue = 0;
   for (let i = 0; i < _utxoList.length; i++) {
     const utxo = _utxoList[i];
-    avialableUtxo.push(utxo);
-    avialableValue += utxo.value;
-    if (avialableValue >= value) {
-      break;
+    if (
+      spendUtxos.findIndex(
+        (v) => v.txid === utxo.txid && v.vout === utxo.vout,
+      ) === -1
+    ) {
+      avialableUtxo.push(utxo);
+      avialableValue += utxo.value;
+      if (avialableValue >= value) {
+        break;
+      }
     }
   }
   return {
-    minUtxo: sortUtxos[0],
-    maxUtxo: sortUtxos[sortUtxos.length - 1],
     utxos: avialableUtxo,
     total: avialableValue,
   };

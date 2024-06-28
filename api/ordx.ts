@@ -1,7 +1,20 @@
+/**
+ * @author hugh
+ * @email ygz14835187@163.com
+ * @create date 2024-06-23 18:04:10
+ * @modify date 2024-06-23 18:04:10
+ * @desc [description]
+ */
 import axios from 'axios';
-
+import mempool from './mempool';
 const generateUrl = (url: string, network?: string) => {
-  return `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
+  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/${url}`;
+  if (location.hostname.indexOf('test') > -1) {
+    url.replace('apiprd', 'apitest');
+  } else if (location.hostname.indexOf('dev') > -1) {
+    url.replace('apiprd', 'apidev');
+  }
+  return url;
 };
 const responseParse = async (response) => {
   const { code, msg, data } = response?.data || {};
@@ -14,10 +27,15 @@ const responseParse = async (response) => {
 const getOrdxStatusList = async (params: any): Promise<any> => {
   const { data } = await axios.get(
     generateUrl(
-      // `status?start=${params.start}&limit=${params.limit}`,
       `tick/status?start=${params.start}&limit=${params.limit}`,
       params.network,
     ),
+  );
+  return data;
+};
+const fetchChainFeeRate = async (network: string): Promise<any> => {
+  const { data } = await axios.get(
+    generateUrl(`extension/default/fee-summary`, network),
   );
   return data;
 };
@@ -28,9 +46,33 @@ const health = async ({ network }) => {
 };
 
 const getOrdxInfo = async ({ tick, network }: any) => {
+  const { data } = await axios.get(generateUrl(`tick/info/${tick}`, network), {
+    timeout: 10000,
+  });
+  return data;
+};
+const getTickDeploy = async ({ tick, address, network }: any) => {
   const { data } = await axios.get(
-    // generateUrl(`v1/indexer/ordx/${tick}/info`, network),
-    generateUrl(`tick/info/${tick}`, network),
+    generateUrl(`deploy/${tick}/${address}`, network),
+    {
+      timeout: 10000,
+    },
+  );
+  return data;
+};
+
+const exoticUtxo = async ({ utxo, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`exotic/utxo/${utxo}`, network),
+    {
+      timeout: 10000,
+    },
+  );
+  return data;
+};
+const getNsListByAddress = async ({ address, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`ns/address/${address}`, network),
     {
       timeout: 10000,
     },
@@ -40,9 +82,16 @@ const getOrdxInfo = async ({ tick, network }: any) => {
 
 const getOrdxSummary = async ({ address, network }: any) => {
   const { data } = await axios.get(
-    // generateUrl(`query-v4/address/${address}/ordx/summary`, network),
     generateUrl(`address/summary/${address}`, network),
   );
+  return data;
+};
+const getBestHeight = async ({ network }: any) => {
+  const { data } = await axios.get(generateUrl(`bestheight`, network));
+  return data;
+};
+const getHeightInfo = async ({ height, network }: any) => {
+  const { data } = await axios.get(generateUrl(`height/${height}`, network));
   return data;
 };
 const getOrdxTickHolders = async ({ tick, network, start, limit }) => {
@@ -61,7 +110,6 @@ const getOrdxAddressHistory = async ({
 }: any) => {
   const { data } = await axios.get(
     generateUrl(
-      // `query-v4/address/${address}/ordx/${ticker}/history?start=${start}&limit=${limit}`,
       `address/history/${address}/${ticker}?start=${start}&limit=${limit}`,
       network,
     ),
@@ -78,7 +126,6 @@ const getOrdxAddressHolders = async ({
 }: any) => {
   const { data } = await axios.get(
     generateUrl(
-      // `query-v4/address/${address}/ordx/${ticker}/holderlist?start=${start}&limit=${limit}`,
       `address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`,
       network,
     ),
@@ -88,7 +135,6 @@ const getOrdxAddressHolders = async ({
 const getOrdxTickHistory = async ({ start, limit, ticker, network }: any) => {
   const { data } = await axios.get(
     generateUrl(
-      // `query-v4/ordx/${ticker}?start=${start}&limit=${limit}`,
       `tick/history/${ticker}?start=${start}&limit=${limit}`,
       network,
     ),
@@ -118,6 +164,12 @@ const savePaidOrder = async ({ key, content, network }: any) => {
 const getInscriptiontInfo = async ({ inscriptionId, network }: any) => {
   const { data } = await axios.get(
     generateUrl(`mint/details/${inscriptionId}`, network),
+  );
+  return data;
+};
+const getTickerPermission = async ({ address, ticker, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`mint/permission/${ticker}/${address}`, network),
   );
   return data;
 };
@@ -195,6 +247,22 @@ const getUtxo = async ({ utxo, network }: any) => {
   return data;
 };
 
+const pushTx = async ({ hex, network }: any) => {
+  const { data } = await axios.post(generateUrl(`btc/tx`, network), {
+    SignedTxHex: hex,
+  });
+  if (data.code === 0) {
+    return JSON.parse(data.data);
+  } else {
+    throw new Error(data.msg);
+  }
+};
+
+export const getNsName = async ({ name, network }: any) => {
+  const { data } = await axios.get(generateUrl(`ns/name/${name}`, network));
+  return data;
+};
+
 async function pollGetTxStatus(
   txid: string,
   network: string,
@@ -202,8 +270,8 @@ async function pollGetTxStatus(
   retryCount = 30,
 ) {
   try {
-    const result = await getTxStatus({ txid, network });
-    if (result?.status) {
+    const result = await mempool.getTxHex(txid, network);
+    if (result) {
       console.log('getTxStatus succeeded, stopping poll.');
       console.log(result);
       return result;
@@ -257,4 +325,13 @@ export const ordx = {
   getSatTypes,
   getUtxo,
   pollGetTxStatus,
+  exoticUtxo,
+  getHeightInfo,
+  getNsListByAddress,
+  getNsName,
+  getBestHeight,
+  getTickerPermission,
+  pushTx,
+  getTickDeploy,
+  fetchChainFeeRate,
 };

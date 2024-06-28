@@ -1,5 +1,23 @@
 #footer {
-    background: #272833;
-    padding: 1em 0;
-    text-align: center;
+  background: #272833;
+  padding: 1em 0;
+  text-align: center;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2rem;
+  width: 5rem;
+  z-index: 10;
+  background: rgba(85, 0, 128, 0.3); /* 初始背景色 */
+  border-bottom-right-radius: 1rem;
+  color: rgb(104, 96, 96);
+  transition: background-color 0.3s ease;
+}
+
+.label-hover {
+  background-color: rgba(169, 85, 247, 0.459); /* 悬停时的背景色 */
+  color: rgba(255, 255, 255, 0.822);
 }

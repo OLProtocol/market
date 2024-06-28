@@ -7,8 +7,13 @@ interface CommonState {
     type?: string;
   };
   btcHeight: number;
+  btcPrice: number;
+  discount: number;
   appVersion: number;
   signature?: string;
+  setBtcPrice: (b: number) => void;
+  setHeight: (h: number) => void;
+  setDiscount: (d: number) => void;
   setSignature: (signature: string) => void;
   setFeeRate: (feeRate: any) => void;
   reset: () => void;
@@ -22,7 +27,9 @@ export const useCommonStore = create<CommonState>()(
           value: 1,
           type: 'custom',
         },
+        discount: 0,
         btcHeight: 0,
+        btcPrice: 0,
         appVersion: 0,
         signature: '',
         setSignature: (signature) => {
@@ -30,9 +37,24 @@ export const useCommonStore = create<CommonState>()(
             signature,
           });
         },
+        setDiscount: (d) => {
+          set({
+            discount: d,
+          });
+        },
         setFeeRate: (rate) => {
           set({
             feeRate: rate,
+          });
+        },
+        setBtcPrice: (b) => {
+          set({
+            btcPrice: b,
+          });
+        },
+        setHeight: (height) => {
+          set({
+            btcHeight: height,
           });
         },
         reset: () => {

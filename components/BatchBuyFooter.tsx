@@ -62,7 +62,7 @@ export const BatchBuyFooter = ({
       10,
     );
   }, [assetsList]);
-  console.log('canSelectLength', canSelectLength);
+
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
@@ -136,7 +136,6 @@ export const BatchBuyFooter = ({
     };
   };
   const calcFee = async () => {
-    console.log('calcFee', list.length, dummyLength, insufficientBalanceStatus);
     if (calcLoading || list.length === 0) {
       return;
     }
@@ -151,6 +150,7 @@ export const BatchBuyFooter = ({
     }
     setCalcLoading(true);
     const newDummyUtxos = dummyUtxos?.slice(0, dummyLength);
+
     const virtualFee = (170 * 10 + 34 * (3 + dummyLength) + 10) * feeRate.value;
     const { utxos: filterConsumUtxos } = filterUtxosByValue(
       canSpendableUtxos,
@@ -160,6 +160,7 @@ export const BatchBuyFooter = ({
         serviceFee +
         DUMMY_UTXO_VALUE * dummyLength,
     );
+
     const networkFee = await calcBuyOrderFee({
       orders: list,
       utxos: filterConsumUtxos,
@@ -259,8 +260,7 @@ export const BatchBuyFooter = ({
       setLoading(false);
     }
   };
-  // const { data: order } = await buyOrder({
-  //   address,
+
   return (
     <>
       {show && list.length && (
@@ -304,7 +304,8 @@ export const BatchBuyFooter = ({
               <div
                 className={`text-xs text-right  ${!insufficientBalanceStatus ? 'text-red-500' : 'text-gray-400'}`}
               >
-                余额：{satsToBitcoin(totalBalacne)} BTC
+                {t('common.balance')}:&nbsp;&nbsp;{satsToBitcoin(totalBalacne)}{' '}
+                BTC
               </div>
             </div>
             <Button
