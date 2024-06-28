@@ -20,51 +20,11 @@ import { OrdxBillList } from '@/components/account/OrdxBillList';
 import { btcToSats, satsToBitcoin } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 import { BtcPrice } from '@/components/BtcPrice';
-import { getAddressOrdxList, getAssetsSummary } from '@/api';
-import useSWR from 'swr';
 
 export default function AccountPage() {
   const { t } = useTranslation();
   const { address, balance, network } = useReactWalletStore((state) => state);
   const [totalSatValue, setTotalSatValue] = useState(0);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(1000);
-
-  const swrKey = useMemo(() => {
-    return `/ordx/getAddressOrdxList-${address}-${network}-${page}-${size}`;
-  }, [address, page, size, network]);
-
-  const {
-    data: orderListResp,
-    isLoading,
-    mutate,
-  } = useSWR(
-    swrKey,
-    () => getAddressOrdxList({ address, offset: (page - 1) * size, size }),
-    {
-      revalidateOnMount: true,
-    },
-  );
-  const tickList = useMemo(() => orderListResp?.data || [], [orderListResp]);
-
-  useEffect(() => {
-    setTotalSatValue(0);
-    let tmp = 0;
-    tickList.map(async (item) => {
-      console.log('app.account.page', item.assets_name);
-      try {
-        const resp = await getAssetsSummary({
-          assets_name: item.assets_name,
-          assets_type: item.assets_type,
-        });
-        const price = resp.data.summary.lowest_price;
-        tmp += Number(price) * item.balance;
-      } catch (error) {
-        console.log('app.account.page, getAssetsSummary err: ', error);
-      }
-      setTotalSatValue(totalSatValue + tmp);
-    });
-  }, [tickList]);
 
   return (
     <div>

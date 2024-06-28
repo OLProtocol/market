@@ -50,21 +50,14 @@ export function UtxoContent({
   }, [utxo, network]);
 
   return (
-    <div className="h-full">
+    <div className="h-full w-full">
       {isMutating ? (
         <Spin spinning={isMutating}></Spin>
       ) : contentSrc ? (
-        <a
-          href={contentSrc}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full h-full"
-        >
-          <iframe
-            src={contentSrc}
-            className="max-w-full h-full pointer-events-none max-h-full"
-          ></iframe>
-        </a>
+        <iframe
+          src={contentSrc}
+          className="pointer-events-none max-w-full h-full max-h-full"
+        ></iframe>
       ) : (
         '-'
       )}

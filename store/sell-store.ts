@@ -78,8 +78,7 @@ export const useSellStore = create<SellState>()(
           amount =
             item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
             0;
-        }
-        if (type === 'name') {
+        } else if (type === 'name') {
           amount = 1;
         }
         if (price === '' || isNaN(Number(price))) {
@@ -148,6 +147,10 @@ export const useSellStore = create<SellState>()(
         let amount = 0;
         if (type === 'ft') {
           amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        } else if (type === 'exotic') {
+          amount =
+            item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
+            0;
         } else if (type === 'name') {
           amount = 1;
         }
@@ -194,6 +197,10 @@ export const useSellStore = create<SellState>()(
         let amount = 0;
         if (type === 'ft') {
           amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        } else if (type === 'exotic') {
+          amount =
+            item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
+            0;
         } else if (type === 'name') {
           amount = 1;
         }

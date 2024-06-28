@@ -12,7 +12,6 @@ import { Content } from '@/components/Content';
 import { OrdxAssetNameItem } from '@/components/OrdxAssetNameItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
-import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
@@ -154,6 +153,7 @@ export const OrdxNameList = ({
             size={size}
             page={page}
             onChange={(offset, size) => {
+              console.log('ns offset:', offset, 'size:', size);
               setPage(offset);
             }}
           />

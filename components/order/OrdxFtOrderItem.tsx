@@ -54,6 +54,10 @@ export const OrdxFtOrderItem = ({
     () => currentAddress && item.address !== currentAddress,
     [currentAddress, item.address],
   );
+  const showContent = (content_type?: string) => {
+    if (!content_type) return false;
+    return !['text/plain'].some((type) => content_type.indexOf(type) > -1);
+  };
   const selectHandler = (b: boolean) => {
     if (!canBuy) {
       return;
@@ -91,12 +95,14 @@ export const OrdxFtOrderItem = ({
               {item?.assets[0].assets_name}
             </span>
           </div>
-          <div className="flex justify-center h-full">
+          <div className="flex justify-center h-full overflow-hidden">
             <div className="h-full">
-              <UtxoContent
-                inscriptionId={item?.assets_list?.[0]?.inscriptionId}
-                utxo={item?.utxo}
-              ></UtxoContent>
+              {showContent(item?.assets?.[0]?.content_type) && (
+                <UtxoContent
+                  inscriptionId={item?.assets?.[0]?.inscription_id}
+                  utxo={item?.utxo}
+                ></UtxoContent>
+              )}
             </div>
             <section className="text-center pt-4 font-mono md:pt-8 absolute top-0 left-0 w-full h-full">
               <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3">
