@@ -230,7 +230,7 @@ export const InscribingOrderModal = ({
     setLoading(true);
 
     try {
-      const { inscription, network, fee, metadata } = order;
+      const { fee } = order;
       let txid;
       if (!psbt) {
         return;
