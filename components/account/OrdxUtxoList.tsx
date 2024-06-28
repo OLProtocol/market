@@ -39,7 +39,7 @@ export const OrdxUtxoList = ({
   const [size, setSize] = useState(12);
   const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
-    return `/ordx/GetAddressOrdxAssets-${address}${assets_type}-${assets_name}-${page}-${size}`;
+    return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${page}-${size}`;
   }, [address, page, size, assets_name, assets_type]);
 
   const {
@@ -74,12 +74,10 @@ export const OrdxUtxoList = ({
   };
   const sellHandler = async (item: any) => {
     addHandler(item);
-    debugger;
     setCanSelect(true);
   };
   const addHandler = (item: any) => {
     let tickerAmount = 0;
-    debugger;
     if (assets_type === 'exotic') {
       tickerAmount =
         item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount || 0;
@@ -94,7 +92,6 @@ export const OrdxUtxoList = ({
       ...item,
       unit_price: '2',
       status: 'pending',
-      price: new Decimal('2').mul(new Decimal(tickerAmount)).toString(),
     });
   };
   const selectHandler = (bol: boolean, item: any) => {
@@ -140,14 +137,22 @@ export const OrdxUtxoList = ({
   useEffect(() => {
     reset();
   }, []);
+
   useEffect(() => {
-    if (assets_type) {
+    if (assets_type || assets_name) {
+      resetList();
+      setCanSelect(false);
+      trigger();
+    }
+  }, [page, size]);
+  useEffect(() => {
+    if (assets_type || assets_name) {
       resetList();
       setCanSelect(false);
       setPage(1);
       trigger();
     }
-  }, [assets_type]);
+  }, [assets_type, assets_name]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
@@ -173,10 +178,11 @@ export const OrdxUtxoList = ({
             size={size}
             page={page}
             onChange={(offset, size) => {
+              console.log('offset, size', offset, size);
               setPage(offset);
               // page.current = offset;
               // console.log("page", page.current);
-              setSize(size);
+              // setSize(size);
             }}
           />
         </div>

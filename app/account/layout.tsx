@@ -5,11 +5,6 @@ import { hideStr, satsToBitcoin } from '@/lib/utils';
 import { Snippet } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 
-import { getAddressOrdxList, getAssetsSummary } from '@/api';
-import { useEffect, useMemo, useState } from 'react';
-import { notification } from 'antd';
-import useSWR from 'swr';
-
 export default function AccountLayout({
   children,
 }: {
