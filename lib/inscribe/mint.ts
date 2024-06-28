@@ -705,10 +705,7 @@ export const generateSendBtcPsbt = async ({
 export const sendBtcPsbt = async (psbt) => {
   const { add: addUtxo, removeUtxos } = useUtxoStore.getState();
   console.log('psbt', psbt);
-  let txId = await signAndPushPsbt(psbt);
-  if (txId) {
-    txId = JSON.parse(txId);
-  }
+  const txId = await signAndPushPsbt(psbt);
   // if (psbt.txOutputs.length > 1) {
   //   const sliceOutputs = psbt.txOutputs.slice(1);
   //   sliceOutputs.forEach((output, index) => {
