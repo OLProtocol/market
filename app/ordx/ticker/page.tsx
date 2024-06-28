@@ -1,9 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
-import { Card, CardBody, Button, Avatar } from '@nextui-org/react';
-import { getTickerSummary } from '@/api';
-import { Image, Divider, Tabs, Tab } from '@nextui-org/react';
+import { Card, CardBody, Button, Avatar, Image } from '@nextui-org/react';
+import { getAssetsSummary } from '@/api';
+import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { getTickLabel } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 
 export default function Page() {
@@ -20,15 +21,19 @@ export default function Page() {
   const params = useSearchParams();
   const { address } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
-  const { data } = useSWR(`getTickerSummary`, () =>
-    getTickerSummary({ ticker }),
-  );
+  const assets_type = params.get('assets_type') as string;
+  const { data } = useSWR(`getAssetsSummary`, () => {
+    console.log('app.ordx.ticker.page: ticker: ', ticker);
+    try {
+      return getAssetsSummary({ assets_name: ticker, assets_type });
+    } catch (error) {
+      console.log('app.ordx.ticker.page: getAssetsSummary error: ', error);
+    }
+  });
   const toAccount = () => {
     router.push(`/account`);
   };
-  const showTextIcon = useMemo(() => {
-    return ticker?.slice(0, 1)?.toUpperCase();
-  }, [ticker]);
+
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   const headList = useMemo(() => {
     return [
@@ -85,21 +90,28 @@ export default function Page() {
       },
     ];
   }, [summary, i18n.language]);
-  console.log(headList);
+
   return (
     <div>
       <div className="min-h-40 flex flex-col py-2">
-        <div className='flex-1 flex items-center mb-4 gap-4'>
-          <Avatar
-            name={showTextIcon}
-            size="lg"
-            className="w-16 h-16"
-            classNames={{ name: 'text-4xl font-bold' }}
-          />
+        <div className="flex-1 flex items-center mb-4 gap-4">
+          {/^[a-zA-Z]$/.test(ticker.slice(0, 1)) ? (
+            <Image
+              radius="full"
+              src={`/tick-ico/${ticker.slice(0, 1).toUpperCase()}.png`}
+              alt="logo"
+              className="w-20 h-20 p-2 rounded-full bg-gray-900"
+            />
+          ) : (
+            <Avatar
+              name={ticker.slice(0, 1).toUpperCase()}
+              className="text-3xl text-gray-200 font-black w-20 h-20 bg-gray-900"
+            />
+          )}
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
-              <div className="text-2xl md:text-4xl font-bold">
-                {summary?.ticker}
+              <div className="text-2xl md:text-3xl font-medium text-gary-500">
+                {getTickLabel(summary?.assets_name)}
               </div>
             </div>
             <WalletConnectBus text={t('buttons.list_sale')}>
@@ -153,14 +165,21 @@ export default function Page() {
           style={{ width: '100%' }}
         >
           <Tab key="market" title={t('pages.market.title')}>
-            <OrdxOrderList ticker={ticker} showResale />
+            <OrdxOrderList
+              assets_name={ticker}
+              assets_type={assets_type}
+              showResale
+            />
           </Tab>
           <Tab key="history" title={t('common.tx_history')}>
-            <OrdxOrderHistoryList ticker={ticker} />
+            <OrdxOrderHistoryList
+              assets_name={ticker}
+              assets_type={assets_type}
+            />
           </Tab>
           <Tab key="my" title={t('common.my_listings')}>
             <WalletConnectBus className="mx-auto mt-20 block">
-              <OrdxOrderList ticker={ticker} address={address} />
+              <OrdxOrderList assets_name={ticker} address={address} />
             </WalletConnectBus>
           </Tab>
         </Tabs>

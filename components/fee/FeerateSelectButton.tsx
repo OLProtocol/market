@@ -10,12 +10,12 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useCommonStore } from '@/store';
 import { BtcFeeRate } from './BtcFeeRate';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
-import { fetchChainFeeRate } from '@/api';
+import { ordx } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 
 export const FeerateSelectButton = () => {
@@ -24,11 +24,16 @@ export const FeerateSelectButton = () => {
   const { isOpen, onClose, onOpenChange, onOpen } = useDisclosure();
   const [fee, setFee] = useState({ value: 1, type: 'Normal' });
 
-  const { data: feeRateData, isLoading } = useSWR(
-    `fetchChainFeeRate-${network}`,
-    () => fetchChainFeeRate(network as any),
+  const { data, isLoading } = useSWR(`fetchChainFeeRate-${network}`, () =>
+    ordx.fetchChainFeeRate(network as any),
   );
-
+  const feeRateData = useMemo(() => {
+    if (data?.code === 0) {
+      return data.data.list;
+    } else {
+      return [];
+    }
+  }, [data]);
   const { setFeeRate, feeRate } = useCommonStore((state) => state);
   const handleOk = () => {
     setFeeRate(fee);
@@ -42,7 +47,11 @@ export const FeerateSelectButton = () => {
     setFee(fee);
   };
   useEffect(() => {
-    setFeeRate({ value: feeRateData?.halfHourFee || 1, type: 'Normal' });
+    console.log('feeRateData', feeRateData);
+    if (feeRateData?.length) {
+      const normalFee = feeRateData.find((item) => item.title === 'Normal');
+      setFeeRate({ value: normalFee?.feeRate || 1, type: 'Normal' });
+    }
   }, [feeRateData]);
 
   return (

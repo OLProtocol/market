@@ -1,10 +1,18 @@
 import { Address, Signer, Tap, Tx, Script } from '@cmdcode/tapscript';
 import * as cbor from 'cbor-web';
-import { buildTransaction, filterUtxosByValue } from '@/lib/wallet';
+import {
+  buildTransaction,
+  filterUtxosByValue,
+  bitcoin,
+  toPsbtNetwork,
+  NetworkType,
+} from '@/lib/wallet';
 import { signAndPushPsbt } from '@/lib';
-import * as bitcoin from 'bitcoinjs-lib';
+import { flat, sum } from 'radash';
 import { keys } from '@cmdcode/crypto-utils';
 import i18n from '@/locales';
+import { Decimal } from 'decimal.js';
+const crypto = require('crypto');
 import {
   textToHex,
   encodeBase64,
@@ -14,8 +22,9 @@ import {
   serializeInscriptionId,
   createLittleEndianInteger,
 } from './index';
-import { getUtxoByValue, pushBTCpmt } from '@/api';
-import { addresToScriptPublicKey } from '@/lib/utils';
+import { useUtxoStore } from '@/store';
+import { ordx } from '@/api';
+
 interface FileItem {
   mimetype: string;
   show: string;
@@ -23,6 +32,7 @@ interface FileItem {
   originValue: string;
   hex: string;
   amt?: number;
+  offset?: number;
   op?: string;
   relateInscriptionId?: string;
   type: string;
@@ -48,16 +58,201 @@ interface InscriptionItem {
   file: FileItem;
 }
 
+export const generateSeed = (ranges) => {
+  const _ranges = ranges.map((v) => {
+    return {
+      start: v.start,
+      size: v.size,
+    };
+  });
+  const jsonString = JSON.stringify(_ranges);
+  try {
+    const bytes = new TextEncoder().encode(jsonString);
+    const hash = crypto.createHash('sha256');
+    hash.update(bytes);
+    const hashResult = hash.digest('hex').slice(0, 16);
+    return hashResult;
+  } catch (error) {
+    console.error('json.Marshal failed. ' + error);
+    return '0';
+  }
+};
+export const selectAmountRangesByUtxos = (utxos: any[], amount) => {
+  const sats: any[] = flat(utxos.map((v) => v.sats));
+  const ranges: any[] = [];
+  let totalSize = 0;
+  for (let i = 0; i < sats.length; i++) {
+    const item = sats[i];
+    const { size, start } = item;
+    totalSize += size;
+
+    if (totalSize > amount) {
+      const dis = totalSize - amount;
+      ranges.push({
+        start,
+        size: size - dis,
+      });
+    } else {
+      ranges.push({
+        start,
+        size,
+      });
+    }
+  }
+  return ranges;
+};
+export const splitUtxosByValue = (
+  utxos: any[],
+  amount: number,
+  chunks: number,
+) => {
+  const sats: any[] = flat(utxos.map((v) => v.sats));
+  let ranges: any[] = [];
+  const totalRanges: any[][] = [];
+  let totalSize = 0;
+  for (let i = 0; i < sats.length; i++) {
+    const item = sats[i];
+    const { size, start } = item;
+    console.log(start, size);
+    totalSize += size;
+    if (totalSize > amount && totalRanges.length < chunks) {
+      const dis = totalSize - amount;
+      const others = size - dis;
+      console.log(dis, others);
+      ranges.push({
+        start,
+        size: others,
+      });
+      totalRanges.push(ranges);
+      if (dis < amount) {
+        ranges = [
+          {
+            start: start + others,
+            size: dis,
+          },
+        ];
+        totalSize = dis;
+      } else {
+        const othersChunks = Math.floor(dis / amount);
+        const othersDis = dis % amount;
+        for (let j = 0; j < othersChunks; j++) {
+          if (totalRanges.length < chunks) {
+            totalRanges.push([
+              {
+                start: start + others + j * amount,
+                size: amount,
+              },
+            ]);
+          }
+        }
+        if (othersDis > 0) {
+          if (totalRanges.length < chunks) {
+            ranges = [
+              {
+                start: start + others + othersChunks * amount,
+                size: othersDis,
+              },
+            ];
+            totalSize = othersDis;
+          }
+        }
+      }
+    } else if (totalRanges.length < chunks) {
+      ranges.push({
+        start,
+        size,
+      });
+    }
+  }
+  return totalRanges;
+};
+export const splitRareUtxosByValue = (utxos: any[], amount: number) => {
+  const sats: any[] = flat(utxos.map((v) => v.sats));
+  let ranges: any[] = [];
+  const totalRanges: any[][] = [];
+  let totalSize = 0;
+  for (let i = 0; i < sats.length; i++) {
+    const item = sats[i];
+    console.log('index', i);
+    const { size, start, offset } = item;
+    totalSize += size;
+    if (totalSize > amount) {
+      const dis = totalSize - amount;
+      const others = size - dis;
+      ranges.push({
+        start,
+        size: others,
+        offset,
+      });
+      totalRanges.push(ranges);
+      if (dis < amount) {
+        ranges = [
+          {
+            start: start + others,
+            size: dis,
+            offset: offset + others,
+          },
+        ];
+        totalSize = dis;
+      } else {
+        const othersChunks = Math.floor(dis / amount);
+        const othersDis = dis % amount;
+        for (let j = 0; j < othersChunks; j++) {
+          totalRanges.push([
+            {
+              start: start + others + j * amount,
+              size: amount,
+              offset: offset + others + j * amount,
+            },
+          ]);
+          ranges = [];
+          totalSize = 0;
+        }
+        if (othersDis > 0) {
+          console.log(start);
+          console.log(start + others + othersChunks * amount);
+          ranges = [
+            {
+              start: start + others + othersChunks * amount,
+              size: othersDis,
+              offset: offset + others + othersChunks * amount,
+            },
+          ];
+          totalSize = othersDis;
+        }
+      }
+    } else {
+      ranges.push({
+        start,
+        size,
+        offset,
+      });
+    }
+  }
+  if (ranges.length > 0) {
+    totalRanges.push(ranges);
+  }
+  return totalRanges;
+};
+export const generateSeedByUtxos = (utxos: any[], amount) => {
+  amount = Math.max(amount, 546);
+  return generateSeed(selectAmountRangesByUtxos(utxos, amount));
+};
 export const generteFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
-    const { type, value, name, ordxType } = item;
+    const { type, value, name, ordxType, utxos, isSpecial, amount, offset } =
+      item;
     const file: any = {
       type,
       name,
       originValue: value,
       ordxType,
+      isSpecial,
+      amount,
+      offset,
+      utxos,
     };
     if (type === 'text') {
       const _value = value?.trim();
@@ -68,6 +263,16 @@ export const generteFiles = async (list: any[]) => {
     } else if (type === 'brc20') {
       file.mimetype = 'text/plain;charset=utf-8';
       file.show = value;
+      file.hex = textToHex(value);
+      file.sha256 = '';
+    } else if (type === 'ordx_name') {
+      file.mimetype = 'text/plain;charset=utf-8';
+      try {
+        const parseData = JSON.parse(value);
+        file.show = parseData.name || value;
+      } catch (error) {
+        file.show = value;
+      }
       file.hex = textToHex(value);
       file.sha256 = '';
     } else if (type === 'ordx') {
@@ -103,7 +308,6 @@ export const generteFiles = async (list: any[]) => {
       }
       const b64 = (await encodeBase64(value)) as string;
       const base64 = b64.substring(b64.indexOf('base64,') + 7);
-      console.log('base64', base64);
       const hex = base64ToHex(base64);
       file.mimetype = mimetype;
       file.show = name;
@@ -111,14 +315,14 @@ export const generteFiles = async (list: any[]) => {
       file.sha256 = sha256.replace('0x', '');
       file.hex = hex;
     }
-    let prefix = 160;
+    // let prefix = 160;
 
-    if (file.sha256 != '') {
-      prefix = 546;
-    }
+    // if (file.sha256 != '') {
+    //   prefix = 546;
+    // }
     const contentBytes = hexToBytes(file.hex);
 
-    let txsize = prefix + Math.floor(contentBytes.length / 4);
+    let txsize = Math.floor(23 + contentBytes.length / 4);
     if (type === 'ordx' && ordxType === 'deploy' && file.fileHex) {
       const contentFileBytes = hexToBytes(file.fileHex);
       txsize += Math.floor(contentFileBytes.length / 4);
@@ -169,209 +373,142 @@ export const getAddressBySescet = (sescet: string, network: string) => {
   const pubkey = keys.get_pubkey(seckey, true);
   return Address.p2tr.fromPubKey(pubkey, network as any);
 };
-const generateScript = (secret: string, file: FileItem, ordxUtxo?: any) => {
+
+const generateMultiScript = (secret: string, files: FileItem[], meta: any) => {
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const ec = new TextEncoder();
-  const content = hexToBytes(file.hex);
-  const mimetype = ec.encode(file.mimetype);
-  let script: any;
-  if (file.type === 'ordx' && file.ordxType === 'deploy' && file.fileHex) {
-    const fileContent = hexToBytes(file.fileHex);
-    const fileMimeType = ec.encode(file.fileMimeType);
-    const metaData = cbor.encode(JSON.parse(file.originValue));
-    console.log(metaData);
-    script = [
-      pubkey,
-      'OP_CHECKSIG',
-      'OP_0',
-      'OP_IF',
-      ec.encode('ord'),
-      '01',
-      fileMimeType,
-      '07',
-      ec.encode('ordx'),
-      '05',
-      metaData,
-      'OP_0',
-      fileContent,
-      // '01',
-      // mimetype,
-      // 'OP_0',
-      // content,
-      'OP_ENDIF',
-    ];
-  } else if (file.type === 'ordx' && file.ordxType === 'mint') {
-    if (file.parent) {
-      const parentMimeType = ec.encode(file.parentMimeType);
-      const parentConent = hexToBytes(file.parentHex);
+  // const content = hexToBytes(file.hex);
+  // const mimetype = ec.encode(file.mimetype);
+  let script: any = [];
+  const startScript = [pubkey, 'OP_CHECKSIG'];
+  if (
+    meta.type === 'ordx' &&
+    meta.ordxType === 'deploy' &&
+    meta.hasDeployFile
+  ) {
+    files.forEach((file) => {
+      const fileContent = hexToBytes(file.fileHex);
+      const fileMimeType = ec.encode(file.fileMimeType);
       const metaData = cbor.encode(JSON.parse(file.originValue));
-      const offset = ordxUtxo?.sats?.[0]?.offset || 0;
-      console.log('offset', offset);
-      if (ordxUtxo && offset > 0) {
-        script = [
-          pubkey,
-          'P_CHECKSIG',
+      script.push(
+        ...[
           'OP_0',
           'OP_IF',
           ec.encode('ord'),
           '01',
-          parentMimeType,
-          '02',
-          createLittleEndianInteger(offset),
+          fileMimeType,
           '07',
           ec.encode('ordx'),
           '05',
           metaData,
           'OP_0',
-          parentConent,
+          fileContent,
           'OP_ENDIF',
-        ];
+        ],
+      );
+    });
+  } else if (meta.type === 'ordx' && meta.ordxType === 'mint') {
+    files.forEach((file) => {
+      const content = hexToBytes(file.hex);
+      const mimetype = ec.encode(file.mimetype);
+      if (file.parent) {
+        const parentMimeType = ec.encode(file.parentMimeType);
+        const parentConent = hexToBytes(file.parentHex);
+        const metaData = cbor.encode(JSON.parse(file.originValue));
+        const offset = file.offset || 0;
+        script.push(
+          ...['OP_0', 'OP_IF', ec.encode('ord'), '01', parentMimeType],
+        );
+        if (offset > 0) {
+          script.push(...['02', createLittleEndianInteger(offset)]);
+        }
+        script.push(
+          ...[
+            '07',
+            ec.encode('ordx'),
+            '05',
+            metaData,
+            'OP_0',
+            parentConent,
+            'OP_ENDIF',
+          ],
+        );
+      } else if (file.relateInscriptionId) {
+        const offset = file.offset || 0;
+        const detaConent = serializeInscriptionId(file.relateInscriptionId);
+        const originValue: any = JSON.parse(file.originValue);
+        const meteData: any = originValue;
+        const edcodeMetaData = cbor.encode(meteData);
+        script.push(...['OP_0', 'OP_IF', ec.encode('ord')]);
+        if (offset > 0) {
+          script.push(...['02', createLittleEndianInteger(offset)]);
+        }
+        script.push(
+          ...[
+            '07',
+            ec.encode('ordx'),
+            '05',
+            edcodeMetaData,
+            '0B',
+            detaConent,
+            'OP_ENDIF',
+          ],
+        );
       } else {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '01',
-          parentMimeType,
-          '07',
-          ec.encode('ordx'),
-          '05',
-          metaData,
-          'OP_0',
-          parentConent,
-          'OP_ENDIF',
-        ];
+        const offset = file?.offset || 0;
+        script.push(...['OP_0', 'OP_IF', ec.encode('ord'), '01', mimetype]);
+        if (offset > 0) {
+          script.push(...['02', createLittleEndianInteger(offset)]);
+        }
+        script.push(...['OP_0', content, 'OP_ENDIF']);
       }
-    } else if (file.relateInscriptionId) {
-      const offset = ordxUtxo?.sats?.[0]?.offset || 0;
-      const detaConent = serializeInscriptionId(file.relateInscriptionId);
-      const originValue: any = JSON.parse(file.originValue);
-      const meteData: any = originValue;
-      // if (file.seed !== undefined && file.seed !== null) {
-      //   meteData.seed = file.seed;
-      // }
-      const edcodeMetaData = cbor.encode(meteData);
-      console.log('detaConent', detaConent);
-      if (ordxUtxo && offset > 0) {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '02',
-          createLittleEndianInteger(offset),
-          '07',
-          ec.encode('ordx'),
-          '05',
-          edcodeMetaData,
-          '0B',
-          detaConent,
-          // 'OP_0',
-          // content,
-          'OP_ENDIF',
-        ];
-      } else {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '07',
-          ec.encode('ordx'),
-          '05',
-          edcodeMetaData,
-          '0B',
-          detaConent,
-          // 'OP_0',
-          // content,
-          'OP_ENDIF',
-        ];
-      }
-    } else {
-      const offset = ordxUtxo?.sats?.[0]?.offset || 0;
-      if (ordxUtxo && offset > 0) {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '01',
-          mimetype,
-          '02',
-          createLittleEndianInteger(offset),
-          'OP_0',
-          content,
-          'OP_ENDIF',
-        ];
-      } else {
-        script = [
-          pubkey,
-          'OP_CHECKSIG',
-          'OP_0',
-          'OP_IF',
-          ec.encode('ord'),
-          '01',
-          mimetype,
-          'OP_0',
-          content,
-          'OP_ENDIF',
-        ];
-      }
-    }
+    });
   } else {
-    script = [
-      pubkey,
-      'OP_CHECKSIG',
-      'OP_0',
-      'OP_IF',
-      ec.encode('ord'),
-      '01',
-      mimetype,
-      'OP_0',
-      content,
-      'OP_ENDIF',
-    ];
+    files.forEach((file) => {
+      const content = hexToBytes(file.hex);
+      const mimetype = ec.encode(file.mimetype);
+      const offset = file.offset || 0;
+      script.push(...['OP_0', 'OP_IF', ec.encode('ord'), '01', mimetype]);
+      if (offset > 0) {
+        script.push(...['02', createLittleEndianInteger(offset)]);
+      }
+      script.push(...['OP_0', content, 'OP_ENDIF']);
+    });
   }
+  script = [...startScript, ...script];
   console.log('script', script);
   return script;
 };
 /*
 铭刻过程
 */
-export const generateInscriptions = ({
+export const generateInscription = ({
   files,
   feeRate,
   secret,
   network = 'main',
-  ordxUtxo,
+  metadata,
 }: {
   files: FileItem[];
   feeRate: number;
   secret: string;
   network: any;
-  ordxUtxo: any;
+  metadata: any;
 }) => {
-  const inscriptions: InscriptionItem[] = [];
-
+  let inscription: any;
+  const seckey = keys.get_seckey(secret);
+  const pubkey = keys.get_pubkey(seckey, true);
+  const script = generateMultiScript(secret, files, metadata);
+  const leaf = Tap.encodeScript(script);
+  const [tapkey, cblock] = Tap.getPubKey(pubkey, { target: leaf });
+  const inscriptionAddress = Address.p2tr.fromPubKey(tapkey, network);
+  console.log('network:', network);
+  console.log('Inscription address: ', inscriptionAddress);
+  console.log('Tapkey:', tapkey);
+  let txsize = 0;
   for (let i = 0; i < files.length; i++) {
-    const seckey = keys.get_seckey(secret);
-    const pubkey = keys.get_pubkey(seckey, true);
     const content = hexToBytes(files[i].hex);
-    const script = generateScript(secret, files[i], ordxUtxo);
-
-    const leaf = Tap.encodeScript(script);
-    const [tapkey, cblock] = Tap.getPubKey(pubkey, { target: leaf });
-    const inscriptionAddress = Address.p2tr.fromPubKey(tapkey, network);
-
-    console.log('network:', network);
-    console.log('Inscription address: ', inscriptionAddress);
-    console.log('Tapkey:', tapkey);
 
     let prefix = 160;
 
@@ -379,70 +516,56 @@ export const generateInscriptions = ({
       prefix = feeRate > 1 ? 546 : 700;
     }
 
-    const txsize = prefix + Math.floor(content.length / 4);
+    txsize = prefix + Math.floor(content.length / 4);
 
     console.log('TXSIZE', txsize);
-    inscriptions.push({
-      file: files[i],
-      script: script,
-      leaf: leaf,
-      tapkey: tapkey,
-      cblock: cblock,
-      inscriptionAddress: inscriptionAddress,
-      txsize: txsize,
-      status: 'pending',
-      txid: '',
-    });
   }
-  return inscriptions;
+  inscription = {
+    script: script,
+    leaf: leaf,
+    tapkey: tapkey,
+    cblock: cblock,
+    inscriptionAddress: inscriptionAddress,
+    txsize: txsize,
+    status: 'pending',
+    txid: '',
+  };
+  return inscription;
 };
 interface InscribeParams {
   inscription: InscriptionItem;
   txid: string;
   vout: number;
   amount: number;
-  file: any;
-  inscribeFee: number;
+  files: any[];
   serviceFee?: number;
   secret: any;
+  metadata: any;
   toAddress: string;
-  ordxUtxo?: any;
   network: 'main' | 'testnet';
 }
 export const inscribe = async ({
   inscription,
   network,
-  file,
   txid,
   vout,
   amount,
-  serviceFee,
-  inscribeFee = 546,
   toAddress,
   secret,
-  ordxUtxo,
+  files,
+  metadata,
 }: InscribeParams) => {
-  const tipAddress =
-    network === 'testnet'
-      ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
-      : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
-  const outputs = [
-    {
-      // We are leaving behind 1000 sats as a fee to the miners.
-      value: inscribeFee,
-      // This is the new script that we are locking our funds to.
-      scriptPubKey: Address.toScriptPubKey(toAddress),
-    },
-  ];
-  if (serviceFee && tipAddress) {
-    outputs.push({
-      value: serviceFee,
-      scriptPubKey: Address.toScriptPubKey(tipAddress),
-    });
-  }
+
+  const outputs = files.map((f) => ({
+    // We are leaving behind 1000 sats as a fee to the miners.
+    value: f.amount || 546,
+    // This is the new script that we are locking our funds to.
+    scriptPubKey: Address.toScriptPubKey(toAddress),
+  }));
+
   const txdata = Tx.create({
     vin: [
       {
@@ -462,8 +585,7 @@ export const inscribe = async ({
     vout: outputs,
   });
   const sig = Signer.taproot.sign(seckey, txdata, 0, { extension: leaf });
-
-  const script = generateScript(secret, file, ordxUtxo);
+  const script = generateMultiScript(secret, files, metadata);
 
   // Add the signature to our witness data for input 0, along with the script
   // and merkle proof (cblock) for the script.
@@ -472,7 +594,7 @@ export const inscribe = async ({
   const isValid = Signer.taproot.verify(txdata, 0, { pubkey, throws: true });
   console.log('isValid', isValid);
   console.log('Your txhex:', Tx.encode(txdata).hex);
-  const result = await pushBTCpmt(Tx.encode(txdata).hex, network);
+  const result = await ordx.pushTx({ hex: Tx.encode(txdata).hex, network });
   return result;
 };
 
@@ -532,7 +654,7 @@ export const pushCommitTx = async ({
   console.log('commit Tx isValid', isValid);
   const rawtx = Tx.encode(commitTxData).hex;
   console.log('Your Commit Tx txhex:', rawtx);
-  const txid = await pushBTCpmt(rawtx, network);
+  const txid = await ordx.pushTx({ hex: rawtx, network });
   const result = {
     txid,
     outputs: outputs.map((item, i) => {
@@ -550,72 +672,53 @@ interface SendBTCProps {
   network: string;
   value: number;
   feeRate: number;
+  isSpecial?: boolean;
+  serviceFee?: number;
   fromAddress: string;
   fromPubKey: string;
   ordxUtxo?: any;
   specialAmt?: number;
+  utxos?: any[];
 }
 
-export const sendBTC = async ({
-  toAddress,
+export const generateSendBtcPsbt = async ({
+  utxos,
+  outputs,
+  address,
+  feeRate,
   network,
-  value,
-  feeRate = 1,
-  fromAddress,
-  fromPubKey,
-  ordxUtxo,
-}: SendBTCProps) => {
-  const hasOrdxUtxo = !!ordxUtxo;
-  console.log('hasOrdxUtxo', hasOrdxUtxo);
-  const data = await getUtxoByValue({
-    address: fromAddress,
-    value: 0,
-    network,
-  });
-  const consumUtxos = data?.data || [];
-  if (!consumUtxos.length) {
-    throw new Error(i18n.t('toast.insufficient_balance'));
-  }
-  console.log(value);
-  console.log(hasOrdxUtxo);
-  const fee = (148 * (hasOrdxUtxo ? 2 : 1) + 34 * 2 + 10) * feeRate;
-  console.log(fee);
-  const filterTotalValue = hasOrdxUtxo ? 546 + fee : value + 546 + fee;
-  console.log(consumUtxos);
-  const { utxos: avialableUtxos } = filterUtxosByValue(
-    consumUtxos,
-    filterTotalValue,
-  );
-  if (!avialableUtxos.length) {
-    throw new Error(i18n.t('toast.insufficient_balance'));
-  }
-
-  if (hasOrdxUtxo) {
-    const { utxo, value } = ordxUtxo;
-    const ordxTxid = utxo.split(':')[0];
-    const ordxVout = utxo.split(':')[1];
-    avialableUtxos.unshift({
-      txid: ordxTxid,
-      vout: Number(ordxVout),
-      value: value,
-    });
-  }
-  const toValue = value;
-  const outputs = [
-    {
-      address: toAddress,
-      value: toValue,
-    },
-  ];
-  console.log(avialableUtxos);
+  publicKey,
+}) => {
   const psbt = await buildTransaction({
-    utxos: avialableUtxos,
+    utxos: utxos,
     outputs,
     feeRate,
     network,
-    address: fromAddress,
-    publicKey: fromPubKey,
+    address,
+    publicKey,
   });
-  return await signAndPushPsbt(psbt);
-  // return await signAndPushPsbt(inputs, outputs, network);
+  return psbt;
+};
+export const sendBtcPsbt = async (psbt) => {
+  const { add: addUtxo, removeUtxos } = useUtxoStore.getState();
+  console.log('psbt', psbt);
+  const txId = await signAndPushPsbt(psbt);
+  // if (psbt.txOutputs.length > 1) {
+  //   const sliceOutputs = psbt.txOutputs.slice(1);
+  //   sliceOutputs.forEach((output, index) => {
+  //     if (output.address === fromAddress) {
+  //       addUtxo({
+  //         utxo: `${txId}:${index + 1}`,
+  //         value: output.value,
+  //         status: 'unspend',
+  //         location: 'local',
+  //         sort: 1,
+  //         txid: txId,
+  //         vout: index + 1,
+  //       });
+  //     }
+  //   });
+  // }
+  // removeUtxos(avialableUtxos);
+  return txId;
 };

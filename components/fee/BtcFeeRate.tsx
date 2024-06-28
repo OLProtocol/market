@@ -36,19 +36,28 @@ export const BtcFeeRate = ({
     });
   };
   const setRecommendFee = async () => {
+    console.log('setRecommendFee', feeRateData);
     const defaultFee = network === 'testnet' ? 1 : 50;
-    setCustomValue(feeRateData?.fastestFee || defaultFee);
-    setEconomyValue(feeRateData?.hourFee || defaultFee);
-    setNormalValue(feeRateData?.halfHourFee || defaultFee);
-    setMinFee(feeRateData?.minimumFee || defaultFee);
-    onChange?.(feeRateData?.halfHourFee || defaultFee);
+    feeRateData?.forEach(({ title, feeRate }) => {
+      if (title === 'Slow') {
+        setMinFee(Number(parseInt(feeRate || defaultFee)));
+        setEconomyValue(feeRate || defaultFee);
+      } else if (title === 'Normal') {
+        setNormalValue(feeRate || defaultFee);
+        onChange?.(feeRate || defaultFee);
+      } else if (title === 'Fast') {
+        // setMaxFee(Number(parseInt(feeRate || defaultFee)));
+        setCustomValue(Number(parseInt(feeRate || defaultFee)));
+      }
+    });
+
     setType('Normal');
   };
   const list = useMemo(() => {
     return [
       {
         label: 'Economy',
-        name: t('common.fee_economy'),
+        name: t('common.fee_slow'),
         value: economyValue,
       },
       {
@@ -63,15 +72,17 @@ export const BtcFeeRate = ({
       },
     ];
   }, [economyValue, normalValue, customValue, i18n.language]);
-  console.log(list);
+
   useEffect(() => {
     setRecommendFee();
   }, [feeRateData]);
+
   useEffect(() => {
     if (type === 'Custom') {
       onChange?.({ value: customValue, type: 'Custom' });
     }
   }, [customValue]);
+
   useEffect(() => {
     if (feeType === 'Custom' && value) {
       setCustomValue(value);
@@ -114,10 +125,11 @@ export const BtcFeeRate = ({
             step={1}
             maxValue={maxFee}
             minValue={minFee}
-            value={customValue}
             className="flex-1"
+            value={[customValue]}
             onChange={(e) => {
-              setCustomValue(e as number);
+              console.log(e);
+              setCustomValue(isNaN(e[0]) ? 0 : e[0]);
             }}
           />
         </div>

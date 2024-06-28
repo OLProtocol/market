@@ -29,7 +29,7 @@ import {
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { getTickerSummary, submitBatchOrders } from '@/api';
+import { getAssetsSummary, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
@@ -49,16 +49,26 @@ export default function SellPage() {
     changePrice,
     changeStatus,
   } = useSellStore((state) => state);
+  console.log('app.account.sell.page: list: ', list);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
-    `getTickerSummary-${ticker}`,
-    () => getTickerSummary({ ticker }),
+    `getAssetsSummary-${ticker}`,
+    () => {
+      console.log('app.account.sell.page: ticker: ', ticker);
+      let ret: Promise<any>;
+      try {
+        ret = getAssetsSummary({ assets_name: ticker });
+        return ret;
+      } catch (error) {
+        console.log('app.account.sell.page: getAssetsSummary err: ', error);
+      }
+    },
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
   useEffect(() => {
     if (summary.lowest_price) {
       for (const item of list) {
-        console.log('lowest price', item.utxo, summary.lowest_price);
+        // console.log('lowest price', item.utxo, summary.lowest_price);
         if (unit === 'btc') {
           changePrice(
             item.utxo,
@@ -161,8 +171,8 @@ export default function SellPage() {
           ) : (
             <div className="mb-2 flex items-center gap-6">
               <div className="flex items-center gap-4">
-                <span>{t('common.tick')}:</span>
-                <span>{ticker}</span>
+                {/* <span>{t('common.tick')}:</span>
+                <span>{ticker}</span> */}
               </div>
               <div className="flex items-center gap-4">
                 <span>{t('common.lowest_price')}:</span>
@@ -233,9 +243,17 @@ export default function SellPage() {
                           </div>
                         </div>
                       ))}
+                      {item.nslist?.map((v) => (
+                        <div key={v.name}>
+                          <div>
+                            <span className="text-gray-400">Name：</span>
+                            <span>{v.name}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <div>
-                      <span className="text-gray-400">Sats:</span>
+                      <span className="text-gray-400 mr-4">Sats:</span>
                       {item.value}
                     </div>
                     <div className="flex items-center">

@@ -4,6 +4,7 @@ import {
   getOrdxSummary,
   getSats,
   getUtxoByValue,
+  addChargedTask,
 } from '@/api';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import {
@@ -11,6 +12,7 @@ import {
   calcNetworkFee,
   hideStr,
   signAndPushPsbt,
+  getTickLabel,
 } from '@/lib';
 import { useCommonStore } from '@/store';
 import {
@@ -21,11 +23,9 @@ import {
   CardFooter,
   CardHeader,
   Divider,
-  Image,
   Input,
-  Select,
-  SelectItem,
   Tooltip,
+  Image,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
@@ -34,12 +34,22 @@ import { useTranslation } from 'react-i18next';
 import { useList, useMap } from 'react-use';
 import { Select as AntSelect } from 'antd';
 
-export default function Transaction() {
+export default function TransferTool() {
   const { t, i18n } = useTranslation();
   const [fee, setFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { address, network, publicKey } = useReactWalletStore((state) => state);
+  const [refresh, setRefresh] = useState(0);
+  const dropdownStyle = {
+    backgroundColor: '#2f2f2f',
+    color: '#353535',
+  };
+
+  const optionStyle = {
+    backgroundColor: '#2f2f2f',
+    color: '#353535',
+  };
 
   const [inputList, { set: setInputList }] = useMap<any>({
     items: [
@@ -93,7 +103,6 @@ export default function Transaction() {
     }
 
     inputList.items[itemId - 1].options.utxos = utxos;
-
     setInputList('items', inputList.items);
   };
 
@@ -124,12 +133,14 @@ export default function Transaction() {
   const handleInputUnitSelectChange = (itemId, e) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
+
     setInputList('items', inputList.items);
   };
 
   const handleOutputUnitSelectChange = (itemId: number, e: any) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
+
     setInputList('items', inputList.items);
   };
 
@@ -165,6 +176,7 @@ export default function Transaction() {
       tmpItems.forEach((item, index) => {
         item.id = index + 1;
       });
+
       setInputList('items', tmpItems);
     }
   };
@@ -264,7 +276,7 @@ export default function Transaction() {
 
     if (res.code !== 0) {
       notification.error({
-        message: t('notification.transaction_failed_title'),
+        message: t('notification.transaction_title'),
         description: res.msg,
       });
       return;
@@ -309,7 +321,7 @@ export default function Transaction() {
     });
     if (res.code !== 0) {
       notification.error({
-        message: t('notification.transaction_failed_title'),
+        message: t('notification.transaction_title'),
         description: res.msg,
       });
       return;
@@ -414,11 +426,8 @@ export default function Transaction() {
     const tickers = await getTickers();
     const avialableTicker = await getAvialableTicker();
     tickers?.push(avialableTicker);
-
     const rareSatTickers = await getRareSatTicker();
-
     const combinedArray = tickers?.concat(rareSatTickers);
-
     setTickerList(combinedArray || []);
   };
 
@@ -459,7 +468,7 @@ export default function Transaction() {
       if (inTotal - outTotal - fee < 0) {
         setLoading(false);
         notification.error({
-          message: t('notification.transaction_failed_title'),
+          message: t('notification.transaction_title'),
           description: 'Not enough sats',
         });
         return;
@@ -476,18 +485,21 @@ export default function Transaction() {
         address: address,
         publicKey,
       });
-      await signAndPushPsbt(psbt);
+
+      const txid = await signAndPushPsbt(psbt);
       setLoading(false);
-      notification.error({
-        message: t('notification.transaction_failed_title'),
-        description: 'Split & Send success',
+      notification.success({
+        message: t('notification.transaction_title'),
+        description: t('notification.transaction_spilt_success'),
       });
+
+      setRefresh(refresh + 1);
     } catch (error: any) {
-      console.log('error = ', error);
+      console.log('error(transfer sats) = ', error);
       setLoading(false);
       notification.error({
-        message: t('notification.transaction_failed_title'),
-        description: error.message || 'Split & Send failed',
+        message: t('notification.transaction_title'),
+        description: error.message || t('notification.transaction_spilt_fail'),
       });
     }
   };
@@ -528,7 +540,7 @@ export default function Transaction() {
       },
     ]);
     getAllTickers();
-  }, [address]);
+  }, [address, refresh]);
   return (
     <div className="flex flex-col max-w-7xl mx-auto pt-8">
       <Card>
@@ -546,11 +558,16 @@ export default function Transaction() {
                 <div className="flex gap-2 pb-2" key={i}>
                   <AntSelect
                     placeholder="Select Ticker"
-                    className={'w-[30%] h-10'}
+                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"
+                    dropdownStyle={dropdownStyle}
                     value={item.value?.ticker ? item.value?.ticker : undefined}
                     options={
                       tickerList?.map((utxo) => ({
-                        label: <div>{utxo.ticker}</div>,
+                        label: (
+                          <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
+                            {getTickLabel(utxo.ticker)}
+                          </div>
+                        ),
                         value: utxo.ticker,
                       })) || []
                     }
@@ -558,7 +575,8 @@ export default function Transaction() {
                   ></AntSelect>
                   <AntSelect
                     placeholder="Select UTXO"
-                    className="w-[40%] h-10"
+                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"
+                    dropdownStyle={dropdownStyle}
                     value={
                       inputList.items[i]?.value?.utxo
                         ? inputList.items[i]?.value?.utxo
@@ -567,7 +585,7 @@ export default function Transaction() {
                     options={
                       inputList.items[i]?.options?.utxos.map((utxo) => ({
                         label: (
-                          <div>
+                          <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
                             {utxo.assetamount && utxo.assetamount + ' Asset/'}
                             {utxo.value +
                               ' sats - ' +
@@ -604,13 +622,23 @@ export default function Transaction() {
                     }
                   />
                   <Button radius="full" onClick={addInputItem}>
-                    +
+                    <Image
+                      radius="full"
+                      src="../icon/add.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full "
+                    />
                   </Button>
                   <Button
                     radius="full"
                     onClick={() => removeInputItem(item.id)}
                   >
-                    -
+                    <Image
+                      radius="full"
+                      src="../icon/del.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full"
+                    />
                   </Button>
                 </div>
               ))}
@@ -632,7 +660,12 @@ export default function Transaction() {
                     />
                     <Tooltip content="Fill the BTC address of the current account">
                       <Button onClick={() => setBtcAddress(item.id, address)}>
-                        +
+                        <Image
+                          radius="full"
+                          src="../icon/copy.svg"
+                          alt="logo"
+                          className="w-10 h-10 p-1 rounded-full "
+                        />
                       </Button>
                     </Tooltip>
                   </div>
@@ -646,8 +679,13 @@ export default function Transaction() {
                         ? item.value.sats
                         : item.value.sats / 100000000
                     }
-                    onChange={(e) => setOutputSats(item.id, e.target.value)}
-                    onBlur={(e) => outputSatsOnBlur(e)}
+                    onChange={(e) => {
+                      setOutputSats(item.id, e.target.value);
+                      console.log('onBlur is skipped');
+                    }}
+                    onBlur={(e) => {
+                      outputSatsOnBlur(e);
+                    }}
                     endContent={
                       <div className="flex items-center">
                         <select
@@ -664,13 +702,23 @@ export default function Transaction() {
                     }
                   />
                   <Button radius="full" onClick={addOuputItem}>
-                    +
+                    <Image
+                      radius="full"
+                      src="../icon/add.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full "
+                    />
                   </Button>
                   <Button
                     radius="full"
                     onClick={() => removeOutputItem(item.id)}
                   >
-                    -
+                    <Image
+                      radius="full"
+                      src="../icon/del.svg"
+                      alt="logo"
+                      className="w-10 h-10 p-1 rounded-full "
+                    />
                   </Button>
                 </div>
               ))}
@@ -721,7 +769,6 @@ export default function Transaction() {
                     </div>
                   }
                 />
-
                 <ButtonGroup className={'w-[10%]'}>{/* 占位 */}</ButtonGroup>
               </div>
             </div>
@@ -731,11 +778,12 @@ export default function Transaction() {
         <CardFooter>
           <WalletConnectBus className="mx-auto mt-20 block">
             <Button color="primary" onClick={splitHandler} isLoading={loading}>
-            {t('pages.tools.transaction.btn_send')}
+              {t('pages.tools.transaction.btn_send')}
             </Button>
           </WalletConnectBus>
           <span className="text-gray-400 text-sm font-light pl-4">
-            ({t('pages.tools.transaction.network_fee')}: {fee + ' sats'})
+            ({t('pages.tools.transaction.network_fee')}: {fee + ' sats'},{' '}
+            {feeRate.value + ' sat/vb'})
           </span>
         </CardFooter>
       </Card>

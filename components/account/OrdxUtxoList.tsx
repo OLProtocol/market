@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { notification, Empty } from 'antd';
-import { getOrdxAssets, cancelOrder } from '@/api';
+import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSellStore } from '@/store';
@@ -11,17 +12,24 @@ import { Content } from '@/components/Content';
 import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
-import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
-export const OrdxUtxoList = () => {
+interface Props {
+  assetsName: string;
+  assetsType: string;
+}
+export const OrdxUtxoList = ({
+  assetsName: assets_name,
+  assetsType: assets_type,
+}: Props) => {
+  console.log(assets_name, assets_type);
   const router = useRouter();
-  const [ticker, setTicker] = useState<string>('');
-  const { address } = useReactWalletStore((state) => state);
+  const { address, network } = useReactWalletStore((state) => state);
   const {
     add: addSell,
     changeTicker,
+    changeType,
     reset,
     list: sellList,
     remove: removeSell,
@@ -31,23 +39,32 @@ export const OrdxUtxoList = () => {
   const [size, setSize] = useState(12);
   const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
-    return `/ordx/GetAddressOrdxAssets-${address}-${page}-${size}-${ticker}`;
-  }, [address, page, size, ticker]);
+    return `/ordx/GetAddressOrdxAssets-${address}${assets_type}-${assets_name}-${page}-${size}`;
+  }, [address, page, size, assets_name, assets_type]);
 
-  console.log('swrKey', swrKey);
-  const { data, isLoading, mutate } = useSWR(
-    swrKey,
-    () => getOrdxAssets({ address, ticker, offset: (page - 1) * size, size }),
-    {
-      revalidateOnMount: true,
-    },
-  );
-  const total = useMemo(
-    () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
-    [data],
-  );
+  const {
+    data,
+    isMutating: isLoading,
+    trigger,
+  } = useSWRMutation(swrKey, () => {
+    return getOrdxAssets({
+      address,
+      assets_name,
+      assets_type: assets_type,
+      offset: (page - 1) * size,
+      size,
+    });
+  });
+
+  const total = useMemo(() => {
+    // if (data) {
+    //   console.log("OrdxUtxoList: data, total", data, data?.data?.total);
+    // }
+    return data?.data?.total ? Math.ceil(data?.data?.total / size) : 0;
+  }, [data]);
   useEffect(() => {
     if (data) {
+      console.log('OrdxUtxoList: data', data);
       set(data?.data?.assets || []);
     }
   }, [data, set]);
@@ -57,13 +74,22 @@ export const OrdxUtxoList = () => {
   };
   const sellHandler = async (item: any) => {
     addHandler(item);
+    debugger;
     setCanSelect(true);
   };
   const addHandler = (item: any) => {
-    console.log(satsToBitcoin(item.value));
-    const tickerAmount =
-      item.tickers.find((v) => v.ticker === ticker)?.amount || 0;
-    changeTicker(ticker);
+    let tickerAmount = 0;
+    debugger;
+    if (assets_type === 'exotic') {
+      tickerAmount =
+        item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount || 0;
+    } else {
+      tickerAmount =
+        item.tickers?.find((v) => v.ticker === assets_name)?.amount || 0;
+    }
+    console.log(new Decimal('2').mul(new Decimal(tickerAmount)).toString());
+    changeType(assets_type);
+    // changeTicker('Name');
     addSell({
       ...item,
       unit_price: '2',
@@ -110,25 +136,20 @@ export const OrdxUtxoList = () => {
       });
     }
   };
-  const onTickerChange = (t: string) => {
-    if (ticker === t) {
-      return;
-    }
-    setTicker(t);
-    reset();
-    resetList();
-    setCanSelect(false);
-    setPage(1);
-  };
 
   useEffect(() => {
     reset();
   }, []);
+  useEffect(() => {
+    if (assets_type) {
+      resetList();
+      setCanSelect(false);
+      setPage(1);
+      trigger();
+    }
+  }, [assets_type]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
-      <div>
-        <OrdxUtxoTypeList onChange={onTickerChange} />
-      </div>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4">
@@ -155,7 +176,7 @@ export const OrdxUtxoList = () => {
               setPage(offset);
               // page.current = offset;
               // console.log("page", page.current);
-              // setSize(size);
+              setSize(size);
             }}
           />
         </div>

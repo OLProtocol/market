@@ -5,7 +5,7 @@ import { Tabs, Tab } from '@nextui-org/react';
 import { getAddressOrdxList } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
-import { useSellStore } from '@/store';
+
 import { useRouter } from 'next/navigation';
 
 interface OrdxUtxoTypeListProps {
@@ -14,7 +14,7 @@ interface OrdxUtxoTypeListProps {
 export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
-  const { reset } = useSellStore((state) => state);
+
   const [selected, setSelected] = useState<string>();
   const [page, setPage] = useState(1);
   // const page = useRef(1);
@@ -26,16 +26,35 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
 
   const { data, isLoading, mutate } = useSWR(
     swrKey,
-    () => getAddressOrdxList({ address, offset: (page - 1) * size, size }),
+    () => getAddressOrdxList({ address }),
     {
-      revalidateOnMount: true,
+      // revalidateOnMount: true,
     },
   );
+  const NsAssetTitle = 'ns';
+  const list = useMemo(() => {
+    let ret = [{ assert: 'Name', balance: 0 }];
+    if (!data) {
+      return ret;
+    }
 
-  const list = useMemo(() => data?.data || [], [data]);
+    for (let i = 0; i < data?.data?.length; i++) {
+      const item = data?.data[i];
+      const assert =
+        item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
+      if (assert === NsAssetTitle) {
+        ret[0].balance = item?.balance;
+        continue;
+      } else {
+        ret.push({ assert: assert, balance: item?.balance });
+      }
+    }
+
+    return ret;
+  }, [data]);
   useEffect(() => {
     if (list.length > 0) {
-      onChange?.(list[0].ticker);
+      onChange?.(list[0].assert);
     }
   }, [list]);
 
@@ -61,8 +80,11 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
         }}
         onSelectionChange={changeHandler}
       >
-        {list?.map((item: any) => (
-          <Tab key={item.ticker} title={`${item.ticker}(${item.balance})`} />
+        {list?.map((item) => (
+          <Tab
+            key={item.assert}
+            title={`${item.assert}${!!item.balance ? `(${item.balance})` : ''}`}
+          />
         ))}
       </Tabs>
     </div>

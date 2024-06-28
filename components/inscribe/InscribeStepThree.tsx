@@ -5,8 +5,7 @@ import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
-// import mempoolJS from '@mempool/mempool.js';
-import { generatePrivateKey, generateInscriptions } from '@/lib/inscribe';
+import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useCalcFee } from '@/lib/hooks';
 import { OrderItemType, useCommonStore, useOrderStore } from '@/store';
@@ -16,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 interface Brc20SetpOneProps {
   list: any[];
   type: any;
+  metadata: any;
   ordxUtxo?: any;
   onItemRemove?: (index: number) => void;
   onRemoveAll?: () => void;
@@ -26,11 +26,12 @@ export const InscribeStepThree = ({
   type,
   ordxUtxo,
   onItemRemove,
+  metadata,
   onAddOrder,
   onRemoveAll,
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
-  const { feeRate } = useCommonStore((state) => state);
+  const { feeRate, discount } = useCommonStore((state) => state);
   const { network, address: currentAccount } = useReactWalletStore();
   const [data, { set }] = useMap({
     toSingleAddress: currentAccount,
@@ -39,86 +40,39 @@ export const InscribeStepThree = ({
   const [loading, setLoading] = useState(false);
   const { add: addOrder, changeStatus } = useOrderStore((state) => state);
   // const { serviceStatus } = useCommonStore((state) => state);
-  const serviceStatus = 0;
 
   const files = useMemo(() => {
     return list;
   }, [list]);
-  console.log('files', files);
-  const inscriptionSize = useMemo(() => {
-    console.log('type', type);
-    console.log('type', list);
-    if (['brc20', 'text'].includes(type)) {
-      return 546;
-    } else if (type === 'brc100') {
-      return 294;
-    } else if (type === 'ordx' && list?.[0]?.op === 'mint') {
-      if (ordxUtxo) {
-        const userAmt = list?.[0]?.amt || 0;
-        const realAmt = Math.max(userAmt, 546);
-        const findBetweenByValue = (
-          userAmt: number,
-          realAmt,
-          ranges: any[],
-        ) => {
-          let outAmt = 0;
-          let outValue = 0;
-          let preTotalSize = 0;
-          for (let i = 0; i < ranges.length; i++) {
-            const range = ranges[i];
-            outValue += range.size;
-            if (userAmt > outValue) {
-              preTotalSize += range.size;
-            }
-            if (userAmt <= outValue) {
-              const dis = userAmt - preTotalSize;
-              outAmt = range.offset + dis;
-              break;
-            }
-          }
-          if (outAmt < realAmt) {
-            outAmt += realAmt - outAmt;
-          }
-          return outAmt;
-        };
-        return findBetweenByValue(userAmt, realAmt, ordxUtxo.sats);
-      } else {
-        return list?.[0]?.amt > 546 ? list?.[0]?.amt : 546;
-      }
-    } else {
-      return 546;
-    }
-  }, [type, list, ordxUtxo]);
+
   const clacFee = useCalcFee({
     feeRate: feeRate.value,
-    inscriptionSize,
     files,
-    serviceStatus,
+    discount,
   });
   const submit = async () => {
     if (loading) return;
     setLoading(true);
     const secret = generatePrivateKey();
-    const inscriptions = generateInscriptions({
+    const inscription = generateInscription({
+      metadata,
       secret,
       files,
       network,
       feeRate: feeRate.value,
-      ordxUtxo,
     });
     const orderId = uuidV4();
     const order: OrderItemType = {
       orderId,
       type,
-      inscriptions,
+      inscription,
       secret,
       fee: clacFee,
+      metadata,
       toAddress: [data.toSingleAddress],
       feeRate: feeRate.value,
       files,
       network,
-      ordxUtxo,
-      inscriptionSize: inscriptionSize,
       status: 'pending',
       createAt: Date.now().valueOf(),
     };
@@ -151,7 +105,7 @@ export const InscribeStepThree = ({
         </Button>
       </div>
       <div className="max-h-[30rem] overflow-y-auto p-4 bg-gray-800 rounded-xl mb-4">
-        <div className="w-full py-4 flex-col gap-2">
+        <div className="w-full py-4 flex flex-col gap-2">
           {list.map((item, index) => (
             <InscribeRemoveItem
               key={index}
@@ -191,13 +145,9 @@ export const InscribeStepThree = ({
       </div>
       <div>
         <FeeShow
-          inscriptionSize={inscriptionSize}
-          serviceFee={clacFee.serviceFee}
+          totalInscriptionSize={clacFee.totalInscriptionSize}
           feeRate={feeRate.value}
-          serviceStatus={clacFee.serviceStatus}
           filesLength={files.length}
-          totalFee={clacFee.totalFee}
-          networkFee={clacFee.networkFee}
         />
       </div>
       <div className="w-60 mx-auto flex justify-center">

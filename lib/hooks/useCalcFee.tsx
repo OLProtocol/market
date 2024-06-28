@@ -1,62 +1,40 @@
 import { useMemo } from 'react';
 export const useCalcFee = ({
   feeRate,
-  inscriptionSize,
   files,
-  serviceStatus,
+  discount,
 }: {
   feeRate: number;
-  serviceStatus: number;
-  inscriptionSize: number;
+  discount: number;
   files: any[];
 }) => {
   const VITE_TIP_MIN = 1000;
+  console.log(files);
   const clacFee = useMemo(() => {
-    const base_size = 190;
     const feeObj: any = {
       networkFee: 0,
       serviceFee: 0,
-      serviceStatus,
       totalFee: 0,
+      discountServiceFee: 0,
+      totalInscriptionSize: 0,
     };
-    if (files?.length === 1) {
-      feeObj.networkFee = files[0].txsize * feeRate;
-      if (serviceStatus) {
-        feeObj.networkFee += 50 * feeRate;
-      }
-      let totalFee = feeObj.networkFee + inscriptionSize;
-      if (serviceStatus) {
-        const oneFee = Math.max(
-          Number(VITE_TIP_MIN),
-          Math.ceil(inscriptionSize * 0.1),
-        );
-        feeObj.serviceFee = Math.ceil(oneFee * files.length);
-        totalFee += feeObj.serviceFee;
-      }
-      feeObj.totalFee = totalFee;
-    } else {
-      let totalInscriptionFee = 0;
-      for (let i = 0; i < files.length; i++) {
-        totalInscriptionFee += files[i].txsize * feeRate;
-      }
-      const networkFee =
-        (base_size + 34 * (files.length + (serviceStatus ? 1 : 0)) + 10) *
-          feeRate +
-        base_size * files.length +
-        totalInscriptionFee;
-      let totalFee = networkFee + inscriptionSize * files.length;
-      feeObj.networkFee = networkFee;
-      if (serviceStatus) {
-        const oneFee = Math.max(
-          Number(VITE_TIP_MIN),
-          Math.ceil(inscriptionSize * 0.1),
-        );
-        feeObj.serviceFee = Math.ceil(oneFee * files.length);
-        totalFee += feeObj.serviceFee;
-      }
-      feeObj.totalFee = totalFee;
-    }
+    const totalInscriptionSize = files.reduce(
+      (acc, cur) => acc + cur.amount,
+      0,
+    );
+    const totalTxSize = files.reduce((acc, cur) => acc + cur.txsize, 0);
+    const outputLength = files.length;
+    console.log((160 + totalTxSize) * feeRate);
+    feeObj.networkFee = Math.ceil(
+      (160 + totalTxSize) * feeRate + (34 * outputLength + 10) * feeRate,
+    );
+    let totalFee = feeObj.networkFee + totalInscriptionSize;
+    const oneFee = Number(VITE_TIP_MIN) + Math.ceil(totalInscriptionSize * 0.1);
+    feeObj.serviceFee = Math.ceil(oneFee);
+    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - discount)) / 100);
+    feeObj.totalInscriptionSize = totalInscriptionSize;
+    feeObj.totalFee = totalFee;
     return feeObj;
-  }, [feeRate, inscriptionSize, files]);
+  }, [feeRate, files, discount]);
   return clacFee;
 };
