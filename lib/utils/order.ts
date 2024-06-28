@@ -184,7 +184,14 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
   let balanceUtxo: any = {};
   const signed = await btcWallet?.signPsbt(psbt.toHex());
   if (signed) {
-    const txid = await btcWallet?.pushPsbt(signed);
+    let txid = await btcWallet?.pushPsbt(signed);
+    if (txid) {
+      try {
+        txid = JSON.parse(txid);
+      } catch (error) {
+        console.log(error);
+      }
+    }
     for (let i = 0; i < num; i++) {
       dummyUtxos.push({
         txid,
@@ -309,8 +316,8 @@ export const buildBuyOrder = async ({
   }
   const signed = await btcWallet.signPsbt(buyPsbt.toHex());
   console.log('signed', signed);
-  const txid = await btcWallet.pushPsbt(signed);
-  console.log('buy order txid', txid);
+  // const txid = await btcWallet.pushPsbt(signed);
+  // console.log('buy order txid', txid);
   const psbt = bitcoin.Psbt.fromHex(signed, {
     network: psbtNetwork,
   });

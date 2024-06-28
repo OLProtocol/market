@@ -50,10 +50,11 @@ export const BatchCart = ({
     [list],
   );
 
-  const feeChange = (fee: any) => {
-    setFee(fee);
-    setFeeRate(fee);
-  };
+  // const feeChange = (fee: any) => {
+  //   console.log(fee);
+  //   setFee(fee);
+  //   setFeeRate(fee);
+  // };
 
   const removeHandler = (u: string) => {
     remove(u);
@@ -105,12 +106,12 @@ export const BatchCart = ({
       <Divider className="my-2" />
       <div>
         <div>
-          <BtcFeeRate
+          {/* <BtcFeeRate
             onChange={feeChange}
             value={feeRate.value}
             feeType={feeRate.type}
             feeRateData={feeRateData}
-          />
+          /> */}
         </div>
         <div className="flex justify-between items-center">
           <span>{t('common.network_fee')}</span>

@@ -68,6 +68,7 @@ export const BatchBuyFooter = ({
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
   );
+  console.log('dummyUtxos', dummyUtxos);
   const splitDummyBol = useMemo(
     () => dummyLength > dummyUtxos.length,
     [dummyLength, dummyUtxos],
@@ -169,6 +170,8 @@ export const BatchBuyFooter = ({
       feeRate: feeRate.value,
       network: network,
     });
+    console.log('networkFee', networkFee);
+    console.log(feeRate);
     setCalcLoading(false);
     setNetworkFee(networkFee);
   };
@@ -311,7 +314,7 @@ export const BatchBuyFooter = ({
             <Button
               className="btn btn-primary"
               color="primary"
-              isDisabled={!insufficientBalanceStatus}
+              isDisabled={!insufficientBalanceStatus || !list.length}
               isLoading={loading || isLoading}
               onClick={buyHandler}
             >

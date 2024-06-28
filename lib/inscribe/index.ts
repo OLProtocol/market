@@ -25,7 +25,9 @@ export const createLittleEndianInteger = (value: number) => {
 
   // Remove trailing zeroes
   hex = hex.replace(/0+$/, '');
-
+  if (hex.length % 2 !== 0) {
+    hex += '0';
+  }
   return hex;
 };
 

@@ -51,7 +51,7 @@ export const useSellStore = create<SellState>()(
     ticker: '',
     assets_type: '',
     assets_name: '',
-    type: 'ft',
+    type: 'ticker',
     list: [
       // {
       //   utxo: 'c1751e4beb5472305875f2b7ed30f8805c5f8027c393e884fad86be2fc6bc00c:0',
@@ -72,14 +72,15 @@ export const useSellStore = create<SellState>()(
       const { list, ticker, amountUnit, unit, type } = get();
       const newList = list.map((item) => {
         let amount = 0;
-        if (type === 'ft') {
-          amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
+        if (type === 'ticker') {
+          amount =
+            item.assets_list?.find((t) => t.assets_name === ticker)?.amount ||
+            0;
         } else if (type === 'exotic') {
           amount =
             item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
             0;
-        }
-        if (type === 'name') {
+        } else if (type === 'ns') {
           amount = 1;
         }
         if (price === '' || isNaN(Number(price))) {
@@ -146,9 +147,15 @@ export const useSellStore = create<SellState>()(
             ? satsToBitcoin(item.unit_price).toString()
             : btcToSats(item.unit_price).toString();
         let amount = 0;
-        if (type === 'ft') {
-          amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
-        } else if (type === 'name') {
+        if (type === 'ticker') {
+          amount =
+            item.assets_list?.find((t) => t.assets_name === ticker)?.amount ||
+            0;
+        } else if (type === 'exotic') {
+          amount =
+            item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
+            0;
+        } else if (type === 'ns') {
           amount = 1;
         }
 
@@ -192,9 +199,15 @@ export const useSellStore = create<SellState>()(
       const { list, ticker, type } = get();
       if (!list.find((i) => i.utxo === item.utxo)) {
         let amount = 0;
-        if (type === 'ft') {
-          amount = item.tickers.find((t) => t.ticker === ticker)?.amount || 0;
-        } else if (type === 'name') {
+        if (type === 'ticker') {
+          amount =
+            item.assets_list?.find((t) => t.assets_name === ticker)?.amount ||
+            0;
+        } else if (type === 'exotic') {
+          amount =
+            item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
+            0;
+        } else if (type === 'ns') {
           amount = 1;
         }
         let amountPrice = new Decimal(item.unit_price)
