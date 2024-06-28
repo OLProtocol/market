@@ -409,7 +409,7 @@ const generateMultiScript = (secret: string, files: FileItem[], meta: any) => {
       );
     });
   } else if (meta.type === 'ordx' && meta.ordxType === 'mint') {
-    files.forEach((file) => {
+    files.forEach((file, i) => {
       const content = hexToBytes(file.hex);
       const mimetype = ec.encode(file.mimetype);
       if (file.parent) {
@@ -442,6 +442,9 @@ const generateMultiScript = (secret: string, files: FileItem[], meta: any) => {
         const edcodeMetaData = cbor.encode(meteData);
         script.push(...['OP_0', 'OP_IF', ec.encode('ord')]);
         if (offset > 0) {
+          if (createLittleEndianInteger(offset) === '28a') {
+            console.log(i);
+          }
           script.push(...['02', createLittleEndianInteger(offset)]);
         }
         script.push(

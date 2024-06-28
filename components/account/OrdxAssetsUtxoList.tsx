@@ -14,13 +14,8 @@ export const OrdxAssetsUtxoList = () => {
   const onAssertChange = (data: string) => {
     const parts = data.split(':');
     console.log('onAssertChange', data, parts);
-    if (parts.length === 1) {
-      setAssertName('');
-      setAssertType(data);
-    } else {
-      setAssertType(parts[0]);
-      setAssertName(parts[1]);
-    }
+    setAssertType(parts[0]);
+    setAssertName(parts[1]);
   };
   console.log('assertType', assertType);
   console.log('assertName', assertName);

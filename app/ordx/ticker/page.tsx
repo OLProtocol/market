@@ -179,7 +179,11 @@ export default function Page() {
           </Tab>
           <Tab key="my" title={t('common.my_listings')}>
             <WalletConnectBus className="mx-auto mt-20 block">
-              <OrdxOrderList assets_name={ticker} address={address} />
+              <OrdxOrderList
+                assets_name={ticker}
+                assets_type={assets_type}
+                address={address}
+              />
             </WalletConnectBus>
           </Tab>
         </Tabs>

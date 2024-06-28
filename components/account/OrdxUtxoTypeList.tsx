@@ -28,31 +28,27 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     swrKey,
     () => getAddressOrdxList({ address }),
     {
+      revalidateOnFocus: false,
       // revalidateOnMount: true,
     },
   );
   const NsAssetTitle = 'ns';
   const list = useMemo(() => {
-    let ret = [{ assert: 'Name', balance: 0 }];
     if (!data) {
-      return ret;
+      return [];
     }
-
+    let ret = [{ assert: 'Name', balance: 0 }];
     for (let i = 0; i < data?.data?.length; i++) {
       const item = data?.data[i];
       const assert =
         item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
-      if (assert === NsAssetTitle) {
-        ret[0].balance = item?.balance;
-        continue;
-      } else {
-        ret.push({ assert: assert, balance: item?.balance });
-      }
+      ret.push({ assert: assert, balance: item?.balance });
     }
 
     return ret;
   }, [data]);
   useEffect(() => {
+    console.log('list changed', list);
     if (list.length > 0) {
       onChange?.(list[0].assert);
     }

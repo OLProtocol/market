@@ -12,7 +12,6 @@ import { Content } from '@/components/Content';
 import { OrdxAssetNameItem } from '@/components/OrdxAssetNameItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
-import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
 import { useList } from 'react-use';
 import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
@@ -75,7 +74,7 @@ export const OrdxNameList = ({
   };
   const addHandler = (item: any) => {
     const tickerAmount = 1;
-    changeType('name');
+    changeType('ns');
     changeTicker(item.ticker);
     addSell({
       ...item,
@@ -127,8 +126,11 @@ export const OrdxNameList = ({
   useEffect(() => {
     getNsList();
   }, []);
-  console.log(list);
-
+  useEffect(() => {
+    setCanSelect(false);
+    resetList();
+    getNsList();
+  }, [page]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
@@ -154,6 +156,7 @@ export const OrdxNameList = ({
             size={size}
             page={page}
             onChange={(offset, size) => {
+              console.log('ns offset:', offset, 'size:', size);
               setPage(offset);
             }}
           />
