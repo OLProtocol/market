@@ -314,7 +314,7 @@ export const BatchBuyFooter = ({
             <Button
               className="btn btn-primary"
               color="primary"
-              isDisabled={!insufficientBalanceStatus}
+              isDisabled={!insufficientBalanceStatus || !list.length}
               isLoading={loading || isLoading}
               onClick={buyHandler}
             >
