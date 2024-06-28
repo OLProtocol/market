@@ -252,7 +252,7 @@ const pushTx = async ({ hex, network }: any) => {
     SignedTxHex: hex,
   });
   if (data.code === 0) {
-    return JSON.parse(data.data);
+    return data.data;
   } else {
     throw new Error(data.msg);
   }
