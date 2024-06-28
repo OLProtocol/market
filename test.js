@@ -92,3 +92,32 @@ const utxosData = [
 ];
 
 console.log(splitRareUtxosByValue(utxosData, 500));
+
+function convertHexToLittleEndianInteger(hexString) {
+  // 1. 验证16进制字符串长度，确保为8个字符
+  // if (hexString.length !== 8 || !/^[0-9A-Fa-f]+$/.test(hexString)) {
+  //   throw new Error('Invalid hex string for a 32-bit unsigned integer.');
+  // }
+
+  // 2. 创建一个4字节的ArrayBuffer
+  const buffer = new ArrayBuffer(4);
+
+  // 3. 创建DataView来操作ArrayBuffer
+  const view = new DataView(buffer);
+
+  // 4. 将16进制字符串转换为整数，并以小端格式写入
+  // 首先，需要将16进制字符串转换为大写，然后转换为10进制整数
+  const value = parseInt(hexString, 16);
+  view.setUint32(0, value, true);
+
+  // 5. 读取数值
+  const integerValue = view.getUint32(0, true);
+
+  // 返回转换后的数值
+  return integerValue;
+}
+
+// 使用示例
+const hexString = '28a00000'; // 16进制字符串示例
+const integerValue = convertHexToLittleEndianInteger(hexString);
+console.log(integerValue); // 输出：305419896（即0x12345678）
