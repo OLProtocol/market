@@ -231,6 +231,7 @@ export default function Inscribe() {
   };
   const ordxNext = async () => {
     const list: any = [];
+    let hasDeployFile = false;
     if (ordxData.type === 'mint') {
       let offset = 0;
       let rangesArr: any[][] = [];
@@ -349,6 +350,7 @@ export default function Inscribe() {
         ),
       ];
       if (ordxData.file) {
+        hasDeployFile = true;
         value.push({
           type: 'file',
           name: ordxData.fileName,
@@ -366,6 +368,7 @@ export default function Inscribe() {
     }
     setMetadata({
       type: list[0].type,
+      hasDeployFile,
       ordxType: list[0].ordxType,
       isSpecial: list[0].isSpecial,
       utxos: ordxData.utxos,
