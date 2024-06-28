@@ -39,15 +39,21 @@ export const BtcFeeRate = ({
     console.log('setRecommendFee', feeRateData);
     const defaultFee = network === 'testnet' ? 1 : 50;
     feeRateData?.forEach(({ title, feeRate }) => {
+      if (feeRate) {
+        feeRate = Number(feeRate);
+      }
+      if (feeRate < 1.02) {
+        feeRate = 1.02;
+      }
       if (title === 'Slow') {
-        setMinFee(Number(parseInt(feeRate || defaultFee)));
         setEconomyValue(feeRate || defaultFee);
       } else if (title === 'Normal') {
         setNormalValue(feeRate || defaultFee);
+        console.log(feeRate);
         onChange?.(feeRate || defaultFee);
       } else if (title === 'Fast') {
         // setMaxFee(Number(parseInt(feeRate || defaultFee)));
-        setCustomValue(Number(parseInt(feeRate || defaultFee)));
+        setCustomValue(Math.ceil(feeRate || defaultFee));
       }
     });
 

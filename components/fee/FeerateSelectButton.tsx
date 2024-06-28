@@ -36,7 +36,7 @@ export const FeerateSelectButton = () => {
   }, [data]);
   const { setFeeRate, feeRate } = useCommonStore((state) => state);
   const handleOk = () => {
-    setFeeRate(fee);
+    setFeeRate(fee.value);
     onClose();
   };
 
@@ -50,7 +50,11 @@ export const FeerateSelectButton = () => {
     console.log('feeRateData', feeRateData);
     if (feeRateData?.length) {
       const normalFee = feeRateData.find((item) => item.title === 'Normal');
-      setFeeRate({ value: normalFee?.feeRate || 1, type: 'Normal' });
+      let feeRate = normalFee?.feeRate;
+      if (feeRate) {
+        feeRate = Math.max(Number(feeRate), 1.02);
+        setFeeRate({ value: feeRate || 1, type: 'Normal' });
+      }
     }
   }, [feeRateData]);
 

@@ -68,6 +68,7 @@ export const BatchBuyFooter = ({
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
   );
+  console.log('dummyUtxos', dummyUtxos);
   const splitDummyBol = useMemo(
     () => dummyLength > dummyUtxos.length,
     [dummyLength, dummyUtxos],
@@ -110,6 +111,7 @@ export const BatchBuyFooter = ({
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
     // const spendableDummyUtxos = dummyUtxos?.slice(0, 1) || [];
+    debugger;
     const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
     const dis = dummyLength - spendableDummyUtxos.length;
     let balanceUtxo: any;
@@ -169,6 +171,8 @@ export const BatchBuyFooter = ({
       feeRate: feeRate.value,
       network: network,
     });
+    console.log('networkFee', networkFee);
+    console.log(feeRate);
     setCalcLoading(false);
     setNetworkFee(networkFee);
   };
