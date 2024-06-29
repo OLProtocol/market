@@ -94,7 +94,7 @@ export const OrdxFtAssetsItem = ({
                   radius="full"
                   src={`/raresats/${item?.assets_list?.[0]?.assets_name}.png`}
                   alt="logo"
-                  className="w-36 h-36 top-14 left-14 rounded-full"
+                  className="w-36 h-36 top-12 left-14 rounded-full"
                 />
               ) : (
                 showContent(item?.assets_list?.[0]?.content_type) && (
@@ -107,9 +107,16 @@ export const OrdxFtAssetsItem = ({
             </div>
             {showContent(item?.assets_list?.[0]?.content_type) || !isText ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
-                <p className="font-medium text-2xl md:text-3xl mb-1">
-                  {thousandSeparator(item?.assets_list?.[0]?.amount)}
-                </p>
+                 {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
+                  <p className="font-medium text-2xl md:text-3xl mb-6">
+                    {thousandSeparator(item?.assets_list?.[0]?.amount)}
+                  </p>
+                ):(
+                  <p className="font-medium text-2xl md:text-3xl mb-1">
+                    {thousandSeparator(item?.assets_list?.[0]?.amount)}
+                  </p> 
+                )
+                }
               </section>
             ) : isText ? (
               <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-40">
