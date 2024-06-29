@@ -64,7 +64,7 @@ export const OrdxFtAssetsItem = ({
   return (
     <Card
       radius="lg"
-      className="card-hover forced-colors:hidden border-none w-[12rem] h-[17.5rem] md:w-[16rem] md:h-[21.75rem] relative hover:border hover:border-solid hover:border-indigo-500"
+      className="card-hover forced-colors:hidden border-none w-[12rem] h-[17.5rem] md:w-[16rem] md:h-[21.75rem] relative hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
