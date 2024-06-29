@@ -104,7 +104,7 @@ export const OrdxFtOrderItem = ({
                   radius="full"
                   src={`/raresats/${item?.assets[0]?.assets_name}.png`}
                   alt="logo"
-                  className="w-36 h-36 p-2 left-14 rounded-full"
+                  className="w-36 h-36 p-2 left-8 md:left-14 rounded-full"
                 />
               ) : (
                 showContent(item?.assets?.[0]?.content_type) && (
@@ -123,7 +123,7 @@ export const OrdxFtOrderItem = ({
               </section>
             ) : (
               <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-40">
-                <p className="font-medium pt-3 text-2xl md:text-3xl md:pt-3">
+                <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
                   {thousandSeparator(item?.assets[0].amount)}
                 </p>
                 <p className="pt-12 md:pb-2 md:text-sm">
