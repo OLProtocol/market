@@ -54,7 +54,7 @@ export const OrdxFtAssetsItem = ({
     >
       {canSelect && (
         <div
-          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-10 cursor-pointer"
+          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-20 cursor-pointer"
           onClick={() => {
             onSelect?.(!selected);
           }}
@@ -67,6 +67,7 @@ export const OrdxFtAssetsItem = ({
       <CardBody className="radius-lg w-[11.5rem] h-[11.75rem] md:w-[15.5rem] md:h-[15.75rem] top-1 bottom-0 left-1">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="absolute inset-0 z-0">
+            {item?.assets_list?.[0]?.assets_type?.toLowerCase()}
             {showContent(item?.assets_list?.[0]?.content_type) && (
               <UtxoContent
                 inscriptionId={item?.assets_list?.[0]?.inscriptionId}
