@@ -107,7 +107,7 @@ export const OrdxFtAssetsItem = ({
             </div>
             {showContent(item?.assets_list?.[0]?.content_type) || !isText ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
-                 {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
+                {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
                   <p className="font-medium text-2xl md:text-3xl mb-6">
                     {thousandSeparator(item?.assets_list?.[0]?.amount)}
                   </p>
