@@ -158,7 +158,7 @@ export const OrdxUtxoList = ({
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         {/* <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4"> */}
-        <div className="min-h-[30rem] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-8 sm:gap-8 mb-4">
+        <div className="min-h-[30rem] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 5xl:grid-cols-8 gap-3 sm:gap-8 mb-4">
           {list.map((item: any) => (
             <OrdxFtAssetsItem
               selected={!!sellList.find((i) => i.utxo === item.utxo)}
