@@ -72,7 +72,7 @@ export const OrdxFtOrderItem = ({
       isPressable
       radius="lg"
       // className="border-none w-full h-[14rem] md:h-[18rem] relative"
-      className="forced-colors:hidden border-none w-[12rem] h-[16rem] md:w-[16rem] md:h-[22rem] relative hover:border-1 hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
+      className="forced-colors:hidden border-none w-[12rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative hover:border-1 hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
     >
       {canSelect && (
         <div
@@ -90,13 +90,8 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[11.8rem] h-[11.5rem] md:w-[15.9rem] md:h-[15.85rem] top-0 bottom-0 left-0">
-        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
-          <div className={`label ${isHovered ? 'label-hover' : ''}`}>
-            <span className="flex absolute top-2 left-2 text-center text-gray-100">
-              {item?.assets[0].assets_name}
-            </span>
-          </div>
+      <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">         
           <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
             <div className="absolute items-center inset-0 z-0">
               {item?.assets[0]?.assets_type === 'exotic' ? (
@@ -152,24 +147,29 @@ export const OrdxFtOrderItem = ({
               </section>
             )}
           </div>
+          <div className="grid justify-items-start ... z-40">
+            <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
+              {item?.assets[0].assets_name}
+            </div>
+          </div>
         </div>
       </CardBody>
-      <CardFooter className="block bg-gray-800">
-        <div className="pb-1 flex-1 flex items-center justify-between gap-4 font-bold md:pb-5">
-          <div className="flex pl-2">
+      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:h-[6.5rem]  md:w-[16rem]">
+        <div className="pb-2 flex-1 flex items-center justify-between gap-4 font-bold md:pb-4">
+          <div className="flex pl-2 justify-items-start">
             {item.currency === 'BTC' && (
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
             )}
             <span className="text-sm text-gray-400">{item?.price}</span>
           </div>
-          <div className="flex pr-2">
+          <div className="flex pr-2 justify-items-end">
             <span className="text-sm text-gray-500">
               &nbsp;&nbsp;$
               <BtcPrice btc={item?.price} />
             </span>
           </div>
         </div>
-        <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
+        <WalletConnectBus className="flex-1 mb-2" text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
             <Button
               className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
