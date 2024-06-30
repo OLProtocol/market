@@ -37,17 +37,19 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     if (!data) {
       return [];
     }
-    let ret = [{assetsType:'assetsType', assert: 'Name', balance: 0 }];
+    let ret = [{assetsName:'Name', assert: 'Name', balance: 0 }];
     for (let i = 0; i < data?.data?.length; i++) {
       const item = data?.data[i];
       
       let assert = item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
-      const assetsType = item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
+      let assetsName = item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
       if(item?.assets_type === 'ticker'){
-        assert = item?.assets_name ? item?.assets_name :'';
+        assetsName = item?.assets_name ? item?.assets_name :'';
       }
-      
-      ret.push({assetsType: assetsType, assert: assert, balance: item?.balance });
+      // if(item?.assets_type != 'ticker' && item?.assets_type != 'exotic'){
+      //   assetsName =  NsAssetTitle;
+      // }
+      ret.push({assetsName: assetsName, assert: assert, balance: item?.balance });
     }
 
     return ret;
@@ -83,8 +85,8 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
       >
         {list?.map((item) => (
           <Tab
-            key={item.assetsType}
-            title={`${item.assert}${!!item.balance ? `(${item.balance})` : ''}`}
+            key={item.assert}
+            title={`${item.assetsName}${!!item.balance ? `(${item.balance})` : ''}`}
           />
         ))}
       </Tabs>
