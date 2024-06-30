@@ -64,7 +64,7 @@ export const OrdxFtAssetsItem = ({
   return (
     <Card
       radius="lg"
-      className="card-hover forced-colors:hidden border-none w-[12rem] h-[17.5rem] md:w-[16rem] md:h-[21.75rem] relative hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
+      className="card-hover forced-colors:hidden border-none w-[12rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative outline-2 hover:outline-offset-2 hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -80,21 +80,16 @@ export const OrdxFtAssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[11.5rem] h-[11.75rem] md:w-[15.5rem] md:h-[15.75rem] top-1 bottom-0 left-1">
-        <div className="flex-1 text-xs tracking-widest antialiased md:text-base">
-          <div className={`label ${isHovered ? 'label-hover' : ''}`}>
-            <span className="flex absolute top-2 left-2 text-center text-gray-100 uppercase">
-              {item?.assets_list?.[0]?.assets_name}
-            </span>
-          </div>
-          <div className="flex-1 justify-center h-full overflow-hidden top-0 left-0">
+      <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16rem] md:h-[16rem] top-0 bottom-0 left-0">
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">          
+          <div className="flex-1 justify-center h-full overflow-hidden top- left-1">
             <div className="absolute items-center inset-0 z-0">
               {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
                 <Image
                   radius="full"
                   src={`/raresats/${item?.assets_list?.[0]?.assets_name}.png`}
                   alt="logo"
-                  className="w-36 h-36 top-12 left-14 rounded-full"
+                  className="w-36 h-36 top-14 left-14 rounded-full"
                 />
               ) : (
                 showContent(item?.assets_list?.[0]?.content_type) && (
@@ -108,7 +103,7 @@ export const OrdxFtAssetsItem = ({
             {showContent(item?.assets_list?.[0]?.content_type) || !isText ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
                 {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
-                  <p className="font-medium text-2xl md:text-3xl mb-6">
+                  <p className="font-medium text-2xl md:text-3xl mb-4">
                     {thousandSeparator(item?.assets_list?.[0]?.amount)}
                   </p>
                 ):(
@@ -131,10 +126,15 @@ export const OrdxFtAssetsItem = ({
               ''
             )}
           </div>
+          <div className="grid justify-items-start ... z-40">
+            <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
+              {item?.assets_list?.[0]?.assets_name}
+            </div>
+          </div>
         </div>
       </CardBody>
 
-      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:w-[18rem]">
+      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:h-[6.5rem]  md:w-[18rem]">
         <Snippet
           codeString={item?.utxo}
           className="bg-transparent text-blue-400 pt-0 pb-0"
