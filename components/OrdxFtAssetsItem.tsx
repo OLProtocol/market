@@ -89,7 +89,7 @@ export const OrdxFtAssetsItem = ({
                   radius="full"
                   src={`/raresats/${item?.assets_list?.[0]?.assets_name}.png`}
                   alt="logo"
-                  className="w-36 h-36 top-14 left-14 rounded-full"
+                  className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
                 />
               ) : (
                 showContent(item?.assets_list?.[0]?.content_type) && (
