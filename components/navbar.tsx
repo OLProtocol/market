@@ -74,7 +74,7 @@ export const Navbar = () => {
   }, [heightData]);
   useEffect(() => {
     const discount = discountData?.data?.discount || 0;
-    if (discount) {
+    if (discount !== undefined) {
       setDiscount(discount);
     }
   }, [discountData]);
