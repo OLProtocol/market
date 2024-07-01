@@ -1,6 +1,7 @@
 import { Address, Script } from '@cmdcode/tapscript';
 import { btcToSats } from '@/lib/utils';
 import { parseUtxo } from './btc';
+import { tryit } from 'radash';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
 import {
@@ -14,7 +15,7 @@ import {
   PsbtInput,
 } from '../wallet';
 import { UtxoAssetItem } from '@/store';
-import mempool from '@/api/mempool';
+import { ordx } from '@/api';
 interface SellOrderProps {
   inscriptionUtxo: {
     txid: string;
@@ -31,47 +32,6 @@ export const addresToScriptPublicKey = (address: string) => {
     Address.toScriptPubKey(address),
   )?.[0];
   return scriptPublicKey;
-};
-export const buildSellOrder = async ({
-  inscriptionUtxo,
-  total,
-  network,
-  address,
-}: SellOrderProps) => {
-  console.log(
-    'build sell order params',
-    inscriptionUtxo,
-    total,
-    network,
-    address,
-  );
-  const { btcWallet } = useReactWalletStore.getState();
-  const rawTx = await mempool.getTxHex(inscriptionUtxo.txid, network);
-  const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx);
-  console.log(ordinalPreTx);
-  const utxoInput = {
-    hash: inscriptionUtxo.txid,
-    index: inscriptionUtxo.vout,
-    witnessUtxo: ordinalPreTx.outs[inscriptionUtxo.vout],
-    sighashType: SIGHASH_SINGLE_ANYONECANPAY,
-  };
-  const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
-  );
-  const sell = new bitcoin.Psbt({
-    network: psbtNetwork,
-  });
-
-  sell.addInput(utxoInput);
-  sell.addOutput({
-    address,
-    value: total,
-  });
-  if (!btcWallet) {
-    throw new Error('Wallet not initialized');
-  }
-  console.log(sell);
-  return sell.toHex();
 };
 interface BatchSellOrderProps {
   inscriptionUtxos: UtxoAssetItem[];
@@ -103,9 +63,11 @@ export const buildBatchSellOrder = async ({
     const { utxo, price } = inscriptionUtxos[i];
     console.log(utxo, price);
     const { txid, vout } = parseUtxo(utxo);
-    const rawTx = await mempool.getTxHex(txid, network);
-    console.log(rawTx);
-    const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx);
+    const [error, rawTx] = await tryit(ordx.getTxHex)({ txid: txid, network });
+    if (error) {
+      throw error;
+    }
+    const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx.data);
     console.log(ordinalPreTx);
     const utxoInput = {
       hash: txid,
