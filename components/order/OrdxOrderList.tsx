@@ -232,6 +232,7 @@ export const OrdxOrderList = ({
               <OrdxFtOrderItem
                 showResale={showResale}
                 canSelect={canSelect}
+                delay={i > 5 ? 2000 : 0}
                 selected={!!buyList.find((i) => i.utxo === item.utxo)}
                 item={item}
                 onCancelOrder={() => onCancelOrder(item)}

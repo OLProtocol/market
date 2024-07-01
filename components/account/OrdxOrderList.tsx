@@ -70,10 +70,11 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
-          {list.map((item: any) => (
+          {list.map((item: any, i) => (
             <div key={item.utxo}>
               <OrdxFtOrderItem
                 item={item}
+                delay={i > 5 ? 2000 : 0}
                 onCancelOrder={() => onCancelOrder(item)}
               />
             </div>

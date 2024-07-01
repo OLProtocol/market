@@ -1,6 +1,6 @@
 import useSWRMutation from 'swr/mutation';
 import { ordx } from '@/api';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Spin } from 'antd';
@@ -20,7 +20,8 @@ export function UtxoContent({
 }: UtxoContentProps) {
   const { network } = useReactWalletStore();
   const [seed, setSeed] = useState('');
-  const [delayLoading, setDelayLoading] = useState(false);
+  const timer = useRef<any>(null);
+  const [delayLoading, setDelayLoading] = useState(true);
   const { data, trigger, isMutating } = useSWRMutation(
     `utxo-content-seed-${network}-${utxo}`,
     () =>
@@ -55,13 +56,22 @@ export function UtxoContent({
     }
   };
   useEffect(() => {
+    console.log('delay,', delay);
     if (delay && delay > 0) {
       setDelayLoading(true);
-      setTimeout(() => {
+      timer.current = setTimeout(() => {
         setDelayLoading(false);
       }, delay);
+    } else {
+      setDelayLoading(false);
     }
-  }, [delay, trigger]);
+    return () => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+    };
+  }, []);
+  console.log('delayLoading', delayLoading);
   // const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
   // const seed = useMemo(
   //   () => (ranges.length > 0 ? generateSeed(ranges) : 0),
