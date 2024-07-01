@@ -188,6 +188,11 @@ const getTxStatus = async ({ txid, network }: any) => {
   return data;
 };
 
+const getTxHex = async ({ txid, network }: any) => {
+  const { data } = await axios.get(generateUrl(`btc/rawtx/${txid}`, network));
+  return data;
+};
+
 const getSats = async ({ address, network }: any) => {
   const { data } = await axios.get(
     generateUrl(`exotic/address/${address}`, network),
@@ -334,4 +339,5 @@ export const ordx = {
   pushTx,
   getTickDeploy,
   fetchChainFeeRate,
+  getTxHex,
 };
