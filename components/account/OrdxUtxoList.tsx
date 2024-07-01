@@ -36,7 +36,7 @@ export const OrdxUtxoList = ({
   } = useSellStore((state) => state);
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(36);
+  const [size, setSize] = useState(12);
   const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
     return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${page}-${size}`;

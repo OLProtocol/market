@@ -20,7 +20,7 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
     (state) => state,
   );
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(36);
+  const [size, setSize] = useState(12);
   const swrKey = useMemo(() => {
     if (address) {
       return `/ordx/getOrders-${address}-${network}-${page}-${size}`;
