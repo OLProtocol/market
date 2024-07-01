@@ -61,7 +61,7 @@ export const BatchCart = ({
   };
 
   return (
-    <div className="fixed max-w-screen w-96 bottom-20 right-0 bg-gray-100 dark:bg-slate-900 rounded-t-lg px-4 z-10">
+    <div className="fixed max-w-screen w-96 bottom-20 right-0 bg-gray-100 dark:bg-slate-900 rounded-t-lg px-4 z-50">
       <div className="h-10 flex items-center justify-between font-bold">
         <span>Cart ({list.length})</span>
         <span>Total: {totalPrice} BTC</span>

@@ -69,7 +69,7 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
     <div className="">
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] flex flex-col mb-4">
+        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
           {list.map((item: any) => (
             <div key={item.utxo}>
               <OrdxFtOrderItem
