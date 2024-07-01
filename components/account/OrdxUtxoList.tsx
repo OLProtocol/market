@@ -36,7 +36,7 @@ export const OrdxUtxoList = ({
   } = useSellStore((state) => state);
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(12);
+  const [size, setSize] = useState(36);
   const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
     return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${page}-${size}`;
@@ -158,17 +158,18 @@ export const OrdxUtxoList = ({
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
         {/* <div className="min-h-[30rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3  lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mb-4"> */}
-        <div className="min-h-[30rem] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 5xl:grid-cols-8 gap-3 sm:gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
           {list.map((item: any) => (
-            <OrdxFtAssetsItem
-              selected={!!sellList.find((i) => i.utxo === item.utxo)}
-              canSelect={canSelect}
-              onSelect={(bol) => selectHandler(bol, item)}
-              key={item.utxo + item.locked}
-              item={item}
-              onSell={() => sellHandler(item)}
-              onCancelOrder={() => onCancelOrder(item)}
-            />
+            <div key={item.utxo + item.locked}>
+              <OrdxFtAssetsItem
+                selected={!!sellList.find((i) => i.utxo === item.utxo)}
+                canSelect={canSelect}
+                onSelect={(bol) => selectHandler(bol, item)}
+                item={item}
+                onSell={() => sellHandler(item)}
+                onCancelOrder={() => onCancelOrder(item)}
+              />
+            </div>
           ))}
         </div>
       </Content>
