@@ -81,7 +81,7 @@ export const OrdxFtAssetsItem = ({
         </div>
       )}
       <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16rem] md:h-[16rem] top-0 bottom-0 left-0">
-        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">          
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="flex-1 justify-center h-full overflow-hidden top- left-1">
             <div className="absolute items-center inset-0 z-0">
               {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
@@ -93,10 +93,12 @@ export const OrdxFtAssetsItem = ({
                 />
               ) : (
                 showContent(item?.assets_list?.[0]?.content_type) && (
-                  <UtxoContent
-                    inscriptionId={item?.assets_list?.[0]?.inscriptionId}
-                    utxo={item?.utxo}
-                  ></UtxoContent>
+                  <div className="w-full h-full">
+                    <UtxoContent
+                      inscriptionId={item?.assets_list?.[0]?.inscriptionId}
+                      utxo={item?.utxo}
+                    ></UtxoContent>
+                  </div>
                 )
               )}
             </div>
@@ -106,12 +108,11 @@ export const OrdxFtAssetsItem = ({
                   <p className="font-medium text-2xl md:text-3xl mb-4">
                     {thousandSeparator(item?.assets_list?.[0]?.amount)}
                   </p>
-                ):(
+                ) : (
                   <p className="font-medium text-2xl md:text-3xl mb-1">
                     {thousandSeparator(item?.assets_list?.[0]?.amount)}
-                  </p> 
-                )
-                }
+                  </p>
+                )}
               </section>
             ) : isText ? (
               <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-40">
