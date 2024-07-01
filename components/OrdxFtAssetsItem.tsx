@@ -20,6 +20,7 @@ interface Props {
   selected?: boolean;
   canSelect?: boolean;
   onSelect?: (b: boolean) => void;
+  delay?: number;
 }
 export const OrdxFtAssetsItem = ({
   item,
@@ -28,6 +29,7 @@ export const OrdxFtAssetsItem = ({
   selected,
   canSelect,
   onSelect,
+  delay,
 }: Props) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -70,7 +72,7 @@ export const OrdxFtAssetsItem = ({
     >
       {canSelect && (
         <div
-          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-20 cursor-pointer"
+          className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-70 z-30 cursor-pointer"
           onClick={() => {
             onSelect?.(!selected);
           }}
@@ -96,6 +98,7 @@ export const OrdxFtAssetsItem = ({
                   <div className="w-full h-full">
                     <UtxoContent
                       inscriptionId={item?.assets_list?.[0]?.inscriptionId}
+                      delay={delay}
                       utxo={item?.utxo}
                     ></UtxoContent>
                   </div>
@@ -103,7 +106,7 @@ export const OrdxFtAssetsItem = ({
               )}
             </div>
             {showContent(item?.assets_list?.[0]?.content_type) || !isText ? (
-              <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
+              <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
                 {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
                   <p className="font-medium text-2xl md:text-3xl mb-4">
                     {thousandSeparator(item?.assets_list?.[0]?.amount)}

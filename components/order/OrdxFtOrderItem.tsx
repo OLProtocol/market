@@ -22,6 +22,7 @@ import { BtcPrice } from '../BtcPrice';
 interface Props {
   item: any;
   onBuy?: any;
+  delay?: number;
   showResale?: boolean;
   onCancelOrder?: () => void;
   canSelect?: boolean;
@@ -36,6 +37,7 @@ export const OrdxFtOrderItem = ({
   selected,
   onSelect,
   onCancelOrder,
+  delay,
   showResale = true,
 }: Props) => {
   const { address: currentAddress } = useReactWalletStore();
@@ -106,6 +108,7 @@ export const OrdxFtOrderItem = ({
                   <div className="h-full w-full">
                     <UtxoContent
                       inscriptionId={item?.assets?.[0]?.inscription_id}
+                      delay={delay}
                       utxo={item?.utxo}
                     ></UtxoContent>
                   </div>
