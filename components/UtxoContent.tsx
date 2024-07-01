@@ -11,14 +11,16 @@ interface UtxoContentProps {
   inscriptionId: string;
   utxo?: string;
   ranges?: any[];
+  delay?: number;
 }
 export function UtxoContent({
   inscriptionId,
   utxo,
-  ranges = [],
+  delay = 0,
 }: UtxoContentProps) {
   const { network } = useReactWalletStore();
   const [seed, setSeed] = useState('');
+  const [delayLoading, setDelayLoading] = useState(false);
   const { data, trigger, isMutating } = useSWRMutation(
     `utxo-content-seed-${network}-${utxo}`,
     () =>
@@ -52,7 +54,14 @@ export function UtxoContent({
       sessionStorage.setItem(key, seed);
     }
   };
-
+  useEffect(() => {
+    if (delay && delay > 0) {
+      setDelayLoading(true);
+      setTimeout(() => {
+        setDelayLoading(false);
+      }, delay);
+    }
+  }, [delay, trigger]);
   // const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
   // const seed = useMemo(
   //   () => (ranges.length > 0 ? generateSeed(ranges) : 0),
@@ -78,8 +87,8 @@ export function UtxoContent({
   }, [utxo, network]);
 
   return (
-    <div className="h-full w-full">
-      {isMutating ? (
+    <div className="h-full w-full flex justify-center items-center">
+      {delayLoading || isMutating ? (
         <Spin spinning={isMutating}></Spin>
       ) : contentSrc ? (
         <iframe
