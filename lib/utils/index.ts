@@ -10,8 +10,8 @@ export const getTickLabel = (tick?: string) => {
   if (tick === undefined) return undefined;
   const tickMap = {
     n: 'Name',
-    o: 'Ordinals NFT',
-    e: 'Rare',
+    // o: 'Ordinals NFT',// 要求暂不显示
+    // e: 'Rare',
   };
   return tickMap[tick] || tick;
 };
