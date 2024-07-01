@@ -44,7 +44,7 @@ export const OrdxOrderList = ({
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(1000);
+  const [size, setSize] = useState(36);
   const [sort, setSort] = useState(1);
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
@@ -226,18 +226,19 @@ export const OrdxOrderList = ({
             ></SortDropdown>
           </div>
         )}
-         <div className="min-h-[30rem] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 5xl:grid-cols-8 gap-3 sm:gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
           {list.map((item: any, i) => (
-            <OrdxFtOrderItem
-              showResale={showResale}
-              canSelect={canSelect}
-              selected={!!buyList.find((i) => i.utxo === item.utxo)}
-              key={item.utxo + i}
-              item={item}
-              onCancelOrder={() => onCancelOrder(item)}
-              onSelect={(s) => selectHandler(s, item)}
-              onBuy={() => onBuy(item)}
-            />
+            <div key={item.utxo + i}>
+              <OrdxFtOrderItem
+                showResale={showResale}
+                canSelect={canSelect}
+                selected={!!buyList.find((i) => i.utxo === item.utxo)}
+                item={item}
+                onCancelOrder={() => onCancelOrder(item)}
+                onSelect={(s) => selectHandler(s, item)}
+                onBuy={() => onBuy(item)}
+              />
+            </div>
           ))}
         </div>
       </Content>

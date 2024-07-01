@@ -1,5 +1,6 @@
 import useSWRMutation from 'swr/mutation';
 import { ordx } from '@/api';
+import { useState } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Spin } from 'antd';
@@ -17,15 +18,42 @@ export function UtxoContent({
   ranges = [],
 }: UtxoContentProps) {
   const { network } = useReactWalletStore();
+  const [seed, setSeed] = useState('');
   const { data, trigger, isMutating } = useSWRMutation(
-    `utxo-content-${network}-${utxo}`,
+    `utxo-content-seed-${network}-${utxo}`,
     () =>
       ordx.getSeedByUtxo({
         utxo: utxo,
         network,
       }),
+    {
+      populateCache: true,
+      revalidate: false,
+    },
   );
-  const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
+  const getSeedByUtxo = async () => {
+    // 检查 sessionStorage 中是否已经存在 seed
+    const key = `utxo-content-seed-${network}-${utxo}`;
+    const cachedSeed = sessionStorage.getItem(key);
+    if (cachedSeed) {
+      setSeed(cachedSeed);
+      return;
+    }
+
+    const res = await ordx.getSeedByUtxo({
+      utxo: utxo,
+      network,
+    });
+    console.log(res);
+    const seed = res?.data?.[0]?.seed;
+    if (seed) {
+      setSeed(seed);
+      // 将 seed 存储在 sessionStorage 中
+      sessionStorage.setItem(key, seed);
+    }
+  };
+
+  // const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
   // const seed = useMemo(
   //   () => (ranges.length > 0 ? generateSeed(ranges) : 0),
   //   [ranges],
@@ -34,18 +62,18 @@ export function UtxoContent({
     if (inscriptionId && seed) {
       return generateOrdUrl({
         network,
-        path: `preview/${inscriptionId}?seed=${seed}`,
+        path: `content/${inscriptionId}?seed=${seed}`,
       });
     } else {
       return generateOrdUrl({
         network,
-        path: `preview/${inscriptionId}`,
+        path: `content/${inscriptionId}`,
       });
     }
   }, [network, inscriptionId, seed]);
   useEffect(() => {
-    if (utxo) {
-      trigger();
+    if (utxo && network) {
+      getSeedByUtxo();
     }
   }, [utxo, network]);
 

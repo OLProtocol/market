@@ -20,7 +20,7 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
     (state) => state,
   );
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(12);
+  const [size, setSize] = useState(36);
   const swrKey = useMemo(() => {
     if (address) {
       return `/ordx/getOrders-${address}-${network}-${page}-${size}`;
@@ -69,13 +69,14 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
     <div className="">
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
+        <div className="min-h-[30rem] flex flex-col mb-4">
           {list.map((item: any) => (
-            <OrdxFtOrderItem
-              key={item.utxo}
-              item={item}
-              onCancelOrder={() => onCancelOrder(item)}
-            />
+            <div key={item.utxo}>
+              <OrdxFtOrderItem
+                item={item}
+                onCancelOrder={() => onCancelOrder(item)}
+              />
+            </div>
           ))}
         </div>
       </Content>
