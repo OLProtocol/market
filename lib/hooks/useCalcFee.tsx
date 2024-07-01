@@ -29,7 +29,8 @@ export const useCalcFee = ({
       (160 + totalTxSize) * feeRate + (34 * outputLength + 10) * feeRate,
     );
     let totalFee = feeObj.networkFee + totalInscriptionSize;
-    const oneFee = Number(VITE_TIP_MIN) + Math.ceil(totalInscriptionSize * 0.1);
+    const oneFee =
+      Number(VITE_TIP_MIN) + Math.ceil(totalInscriptionSize * 0.01);
     feeObj.serviceFee = Math.ceil(oneFee);
     feeObj.discountServiceFee = Math.ceil((oneFee * (100 - discount)) / 100);
     feeObj.totalInscriptionSize = totalInscriptionSize;
