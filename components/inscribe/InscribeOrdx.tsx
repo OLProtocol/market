@@ -15,6 +15,7 @@ export const InscribeOrdx = ({ onNext, onChange }: InscribeOrdxProps) => {
   const { t } = useTranslation();
   return (
     <div className="p-4">
+      <div className='text-red-500 text-center'>部署错误，请先不要铸造RarePizza,等重新部署</div>
       <div className="mb-4 flex justify-center">
         <RadioGroup
           orientation="horizontal"
