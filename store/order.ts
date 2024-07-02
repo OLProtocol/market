@@ -77,9 +77,11 @@ export const useOrderStore = create<OrderState>()(
             ) {
               const dis = Date.now() - item.createAt;
               if (dis > 1000 * 60 * 5) {
-                item.status = 'timeout';
+                if (item.status === 'pending') {
+                  item.status = 'timeout';
+                  item.inscription = {};
+                }
                 item.files = [];
-                item.inscription = {};
               }
             }
             return item;
