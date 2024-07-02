@@ -167,7 +167,7 @@ export const InscribeOrdxMint = ({
         totalMinted,
         selfmint,
       } = info || {};
-      const selfMintAmount = permissionInfo?.amount || 0;
+      const selfMintAmount = permissionInfo?.amout || 0;
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
       let _maxAmount;
       let _singleMaxAmount = limit || 0;
@@ -183,7 +183,14 @@ export const InscribeOrdxMint = ({
       setTickLoading(false);
 
       let status = 'Completed';
-      if (isSpecial && startBlock < 0) {
+
+      if (!isSpecial && startBlock < 0) {
+        if (max > 0 && totalMinted < max) {
+          status = 'Minting';
+        } else if (max < 0) {
+          status = 'Minting';
+        }
+      } else if (isSpecial && startBlock < 0) {
         if (max > 0) {
           if (selfmint > 0) {
             status = selfMintAmount > 0 ? 'Minting' : 'Project';
@@ -208,6 +215,7 @@ export const InscribeOrdxMint = ({
       } else {
         status = 'Completed';
       }
+      console.log('status', status);
       if (isSpecial && !specialUtxos.length) {
         setErrorText(`${rarity}类型的特殊聪数量不够`);
         return false;

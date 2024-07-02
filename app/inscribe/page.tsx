@@ -61,7 +61,7 @@ export default function Inscribe() {
     //   value: 'well4',
     // },
   ]);
-  const [ordxData, { set: setOrd2Data }] = useMap<any>({
+  const [ordxData, { set: setOrd2Data, reset: resetOrdx }] = useMap<any>({
     type: 'mint',
     tick: '',
     amount: 1,
@@ -480,6 +480,9 @@ export default function Inscribe() {
     if (list.length === 0) {
       setStep(1);
       resetText();
+      resetName();
+      resetOrdx();
+      setMetadata({});
     }
   }, [list]);
 
