@@ -98,6 +98,7 @@ export default function Inscribe() {
   const [textData, { set: setTextData, reset: resetText }] = useMap({
     type: 'single',
     text: '',
+    utxos: [],
   });
   const [nameData, { set: setNameData, reset: resetName }] = useMap({
     type: 'mint',
@@ -396,12 +397,18 @@ export default function Inscribe() {
       });
     }
     const _files = await generteFiles(list);
+    console.log(textData.utxos);
+    setMetadata({
+      type: 'text',
+      utxos: textData.utxos,
+    });
     setList(_files);
     setStep(2);
   };
-  const textChange = (type: string, value: string) => {
-    setTextData('type', type);
-    setTextData('text', value);
+  const textChange = (data: any) => {
+    setTextData('type', data.type);
+    setTextData('text', data.text);
+    setTextData('utxos', data.utxos);
   };
   const filesChange = async (files: any[]) => {
     const list = files.map((file) => ({
