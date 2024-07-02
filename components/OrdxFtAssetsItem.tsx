@@ -9,7 +9,7 @@ import {
   Image,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
 import { UtxoContent } from './UtxoContent';
@@ -47,10 +47,19 @@ export const OrdxFtAssetsItem = ({
     await onSell?.(item);
     setLoading(false);
   };
-  const showContent = (content_type?: string) => {
+  const content_type = useMemo(
+    () => item?.assets_list?.[0]?.content_type,
+    [item],
+  );
+
+  const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type) return false;
-    return !['text/plain'].some((type) => content_type.indexOf(type) > -1);
+    return (
+      delegate ||
+      !['text/plain'].some((type) => content_type.indexOf(type) > -1)
+    );
   };
+
   if (
     item?.assets_list?.[0]?.assets_type === 'exotic' ||
     showContent(item?.assets?.[0]?.content_type)
@@ -97,7 +106,10 @@ export const OrdxFtAssetsItem = ({
                 showContent(item?.assets_list?.[0]?.content_type) && (
                   <div className="w-full h-full">
                     <UtxoContent
-                      inscriptionId={item?.assets_list?.[0]?.inscriptionId}
+                      inscriptionId={
+                        item?.assets_list?.[0]?.delegate ||
+                        item?.assets_list?.[0]?.inscriptionId
+                      }
                       delay={delay}
                       utxo={item?.utxo}
                     ></UtxoContent>
