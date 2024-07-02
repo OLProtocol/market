@@ -36,7 +36,7 @@ export const FeerateSelectButton = () => {
   }, [data]);
   const { setFeeRate, feeRate } = useCommonStore((state) => state);
   const handleOk = () => {
-    setFeeRate(fee.value);
+    setFeeRate({ value: fee.value, type: fee.type });
     onClose();
   };
 
@@ -44,6 +44,7 @@ export const FeerateSelectButton = () => {
     onClose();
   };
   const feeChange = (fee: any) => {
+    console.log('fee', fee);
     setFee(fee);
   };
   useEffect(() => {
