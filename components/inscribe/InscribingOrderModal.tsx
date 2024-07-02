@@ -85,7 +85,7 @@ export const InscribingOrderModal = ({
     },
   ];
   const vertualGasFee = useMemo(() => {
-    const fee = (148 * 3 + 34 * 3 + 10) * feeRate.value;
+    const fee = (148 * 10 + 34 * 3 + 10) * feeRate.value;
     return fee;
   }, [feeRate]);
   const order = useMemo(() => {
@@ -154,15 +154,6 @@ export const InscribingOrderModal = ({
       }
     pickAmount = Math.max(pickAmount, 1000);
     inputUntxos.push(...filterUnspendUtxos);
-    // if (pickAmount) {
-    //   const { utxos: filterUtxos } = filterUtxosByValue(
-    //     unspendUtxos,
-    //     pickAmount,
-    //     orderUtxos,
-    //   );
-    //   console.log(filterUtxos);
-    //   inputUntxos.push(...filterUtxos);
-    // }
     const outputs = [
       {
         address: order?.inscription.inscriptionAddress,
@@ -217,19 +208,19 @@ export const InscribingOrderModal = ({
   }, [psbtData]);
 
   const totalFee = useMemo(() => {
-    if (!order || !sendFee) {
+    if (!order) {
       return 0;
     }
     const { fee } = order;
-    return fee.totalFee + fee.discountServiceFee + sendFee;
+    return fee.totalFee + fee.discountServiceFee + (sendFee ?? vertualGasFee);
   }, [order?.fee, sendFee]);
 
   const totalNetworkFee = useMemo(() => {
-    if (!order || !sendFee) {
+    if (!order) {
       return 0;
     }
     const { fee } = order;
-    return fee.networkFee + sendFee;
+    return fee.networkFee + (sendFee ?? vertualGasFee);
   }, [order?.fee, sendFee]);
 
   const payOrder = async () => {

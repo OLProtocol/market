@@ -184,7 +184,8 @@ export class Transaction {
   async calNetworkFee() {
     const psbt = await this.createEstimatePsbt();
     const txSize = psbt.extractTransaction(true).virtualSize();
-
+    console.log('txSize', txSize);
+    console.log('txSize', this.feeRate);
     const fee = Math.ceil(txSize * this.feeRate);
     return fee;
   }
