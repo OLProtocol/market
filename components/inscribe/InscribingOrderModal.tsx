@@ -93,16 +93,28 @@ export const InscribingOrderModal = ({
   }, [orderId]);
   const canCalcPsbt = useMemo(() => {
     const unspendUtxos = getUnspendUtxos();
-    const unspendAmount = sum(unspendUtxos, (utxo) => utxo.value);
+
     const orderUtxos = order?.metadata?.utxos || [];
     const orderAmount = orderUtxos.reduce(
       (acc, cur) => acc + cur?.value || 0,
       0,
     );
+    const filterUnspendUtxos = unspendUtxos.filter((v) => {
+      return (
+        orderUtxos.find(
+          (utxo) => utxo.txid === v.txid && utxo.vout === v.vout,
+        ) == undefined
+      );
+    });
+    const unspendAmount = sum(filterUnspendUtxos, (utxo) => utxo.value);
     const serviceFee = order?.fee?.discountServiceFee || 0;
     const totalFee = order?.fee?.totalFee || 0;
+    const totalInscriptionSize = order?.fee?.totalInscriptionSize || 0;
     if (order?.metadata?.isSpecial) {
-      return unspendAmount > totalFee + serviceFee + vertualGasFee;
+      return (
+        unspendAmount >
+        totalFee + serviceFee + vertualGasFee - totalInscriptionSize
+      );
     } else {
       return (
         unspendAmount + orderAmount > totalFee + serviceFee + vertualGasFee
