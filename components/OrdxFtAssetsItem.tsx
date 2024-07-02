@@ -109,10 +109,7 @@ export const OrdxFtAssetsItem = ({
                 ) && (
                   <div className="w-full h-full">
                     <UtxoContent
-                      inscriptionId={
-                        item?.assets_list?.[0]?.delegate ||
-                        item?.assets_list?.[0]?.inscriptionId
-                      }
+                      inscriptionId={item?.assets_list?.[0]?.inscriptionId}
                       delay={delay}
                       utxo={item?.utxo}
                     ></UtxoContent>

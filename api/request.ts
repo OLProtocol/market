@@ -242,6 +242,12 @@ export const getOrderTask = async (tx_id: string) => {
   });
   return res;
 };
+export const getAddressAssetsValue = async (address: string) => {
+  const res = await request('/ordx/GetAddressAssetsValue', {
+    data: { address },
+  });
+  return res;
+};
 
 export const getLastOrderTaskByParameters = async ({
   address,
