@@ -85,7 +85,7 @@ export const InscribingOrderModal = ({
     },
   ];
   const vertualGasFee = useMemo(() => {
-    const fee = (168 * 20 + 34 * 10 + 10) * feeRate.value;
+    const fee = (148 * 3 + 34 * 3 + 10) * feeRate.value;
     return fee;
   }, [feeRate]);
   const order = useMemo(() => {
@@ -124,6 +124,13 @@ export const InscribingOrderModal = ({
       (acc, cur) => acc + cur?.value || 0,
       0,
     );
+    const filterUnspendUtxos = unspendUtxos.filter((v) => {
+      return (
+        orderUtxos.find(
+          (utxo) => utxo.txid === v.txid && utxo.vout === v.vout,
+        ) == undefined
+      );
+    });
     const serviceFee = order?.fee?.discountServiceFee || 0;
     const totalFee = order?.fee?.totalFee || 0;
     const totalInscriptionSize = order?.fee?.totalInscriptionSize || 0;
@@ -146,15 +153,16 @@ export const InscribingOrderModal = ({
         pickAmount = totalSpendAmount;
       }
     pickAmount = Math.max(pickAmount, 1000);
-    if (pickAmount) {
-      const { utxos: filterUtxos } = filterUtxosByValue(
-        unspendUtxos,
-        pickAmount,
-        orderUtxos,
-      );
-      console.log(filterUtxos);
-      inputUntxos.push(...filterUtxos);
-    }
+    inputUntxos.push(...filterUnspendUtxos);
+    // if (pickAmount) {
+    //   const { utxos: filterUtxos } = filterUtxosByValue(
+    //     unspendUtxos,
+    //     pickAmount,
+    //     orderUtxos,
+    //   );
+    //   console.log(filterUtxos);
+    //   inputUntxos.push(...filterUtxos);
+    // }
     const outputs = [
       {
         address: order?.inscription.inscriptionAddress,
@@ -194,6 +202,7 @@ export const InscribingOrderModal = ({
         utxos: psbtData[0],
         outputs: psbtData[1],
         feeRate: feeRate.value,
+        suitable: true,
       };
       const [psbtError, psbt] = await tryit(generateSendBtcPsbt)(params);
       setPsbt(psbt);
@@ -235,12 +244,21 @@ export const InscribingOrderModal = ({
       if (!psbt) {
         return;
       }
-      txid = await sendBtcPsbt(psbt);
+      console.log('psbt', psbt);
+      console.log(psbtData?.[0]);
+      const spendUtxos = psbtData?.[0]?.slice(0, psbt.txInputs.length);
+      console.log('spendUtxos', spendUtxos);
+      txid = await sendBtcPsbt(psbt, currentAccount);
+
       const commitTx = {
         txid,
         vout: 0,
         amount: fee.totalFee,
       };
+      if (spendUtxos?.length) {
+        removeUtxos(spendUtxos);
+        console.log(utxoList);
+      }
       setCommitTx(orderId, commitTx);
       changeStatus(orderId, 'paid');
       setLoading(false);

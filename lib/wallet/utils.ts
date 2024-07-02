@@ -13,6 +13,7 @@ export const calcNetworkFee = async ({
   network,
   address,
   publicKey,
+  suitable = true,
 }: {
   utxos: Utxo[];
   outputs: PsbtOutput[];
@@ -20,6 +21,7 @@ export const calcNetworkFee = async ({
   network: string;
   address: string;
   publicKey: string;
+  suitable?: boolean;
 }) => {
   const btcUtxos = convertUtxosToBtcUtxos({
     utxos,
@@ -37,7 +39,9 @@ export const calcNetworkFee = async ({
     tx.addOutput(v.address, v.value);
   });
   console.log(btcUtxos);
-  await tx.addSufficientUtxosForFee(btcUtxos);
+  await tx.addSufficientUtxosForFee(btcUtxos, {
+    suitable,
+  });
   const fee = await tx.calNetworkFee();
   return fee;
 };
@@ -49,7 +53,7 @@ export const buildTransaction = async ({
   network,
   address,
   publicKey,
-  suitable,
+  suitable = true,
 }: {
   utxos: Utxo[];
   outputs: PsbtOutput[];
