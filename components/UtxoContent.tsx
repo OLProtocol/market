@@ -70,7 +70,9 @@ export function UtxoContent({
   //   };
   // }, []);
   const onLoad = () => {
-    setLoaded(true);
+    setTimeout(() => {
+      setLoaded(true);
+    }, 1000);
   };
   const onError = () => {
     setLoaded(true);
