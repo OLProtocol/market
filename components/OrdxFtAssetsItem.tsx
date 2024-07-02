@@ -55,14 +55,14 @@ export const OrdxFtAssetsItem = ({
   const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type) return false;
     return (
-      delegate ||
+      !!delegate ||
       !['text/plain'].some((type) => content_type.indexOf(type) > -1)
     );
   };
 
   if (
     item?.assets_list?.[0]?.assets_type === 'exotic' ||
-    showContent(item?.assets?.[0]?.content_type)
+    showContent(item?.assets?.[0]?.content_type, item?.assets?.[0]?.delegate)
   ) {
     tickContent = '';
     isText = false;
@@ -103,7 +103,10 @@ export const OrdxFtAssetsItem = ({
                   className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
                 />
               ) : (
-                showContent(item?.assets_list?.[0]?.content_type) && (
+                showContent(
+                  item?.assets_list?.[0]?.content_type,
+                  item?.assets_list?.[0]?.delegate,
+                ) && (
                   <div className="w-full h-full">
                     <UtxoContent
                       inscriptionId={
@@ -117,7 +120,10 @@ export const OrdxFtAssetsItem = ({
                 )
               )}
             </div>
-            {showContent(item?.assets_list?.[0]?.content_type) || !isText ? (
+            {showContent(
+              item?.assets_list?.[0]?.content_type,
+              item?.assets_list?.[0]?.delegate,
+            ) || !isText ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
                 {item?.assets_list?.[0]?.assets_type === 'exotic' ? (
                   <p className="font-medium text-2xl md:text-3xl mb-4">

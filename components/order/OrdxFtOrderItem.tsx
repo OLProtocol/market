@@ -58,10 +58,14 @@ export const OrdxFtOrderItem = ({
     () => currentAddress && item.address !== currentAddress,
     [currentAddress, item.address],
   );
-  const showContent = (content_type?: string) => {
+  const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type) return false;
-    return !['text/plain'].some((type) => content_type.indexOf(type) > -1);
+    return (
+      !!delegate ||
+      !['text/plain'].some((type) => content_type.indexOf(type) > -1)
+    );
   };
+
   const selectHandler = (b: boolean) => {
     if (!canBuy) {
       return;
@@ -104,10 +108,16 @@ export const OrdxFtOrderItem = ({
                   className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
                 />
               ) : (
-                showContent(item?.assets?.[0]?.content_type) && (
+                showContent(
+                  item?.assets?.[0]?.content_type,
+                  item?.assets?.[0]?.delegate,
+                ) && (
                   <div className="h-full w-full">
                     <UtxoContent
-                      inscriptionId={item?.assets?.[0]?.inscription_id}
+                      inscriptionId={
+                        item?.assets?.[0]?.delegate ||
+                        item?.assets?.[0]?.inscription_id
+                      }
                       delay={delay}
                       utxo={item?.utxo}
                     ></UtxoContent>
@@ -115,7 +125,10 @@ export const OrdxFtOrderItem = ({
                 )
               )}
             </div>
-            {showContent(item?.assets?.[0]?.content_type) ? (
+            {showContent(
+              item?.assets?.[0]?.content_type,
+              item?.assets?.[0]?.delegate,
+            ) ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
                 <p className="font-medium text-2xl md:text-3xl mb-1">
                   {thousandSeparator(item?.assets[0].amount)}
