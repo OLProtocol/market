@@ -1,9 +1,10 @@
 import useSWRMutation from 'swr/mutation';
 import { ordx } from '@/api';
+import { Spinner } from '@nextui-org/react';
+
 import { useRef, useState } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
-import { Spin } from 'antd';
 import { generateOrdUrl } from '@/lib/utils';
 import { generateSeed } from '@/lib/utils';
 
@@ -21,6 +22,7 @@ export function UtxoContent({
   const { network } = useReactWalletStore();
   const [seed, setSeed] = useState('');
   const timer = useRef<any>(null);
+  const [loaded, setLoaded] = useState(false);
   const [delayLoading, setDelayLoading] = useState(true);
   const { data, trigger, isMutating } = useSWRMutation(
     `utxo-content-seed-${network}-${utxo}`,
@@ -71,6 +73,12 @@ export function UtxoContent({
       }
     };
   }, []);
+  const onLoad = () => {
+    setLoaded(true);
+  };
+  const onError = () => {
+    setLoaded(true);
+  };
   console.log('delayLoading', delayLoading);
   // const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
   // const seed = useMemo(
@@ -99,9 +107,11 @@ export function UtxoContent({
   return (
     <div className="h-full w-full flex justify-center items-center">
       {delayLoading || isMutating ? (
-        <Spin spinning={isMutating}></Spin>
+        <Spinner />
       ) : contentSrc ? (
         <iframe
+          onLoad={onLoad}
+          onError={onError}
           src={contentSrc}
           className="pointer-events-none max-w-full h-full max-h-full"
         ></iframe>
