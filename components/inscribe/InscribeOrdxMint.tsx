@@ -165,6 +165,7 @@ export const InscribeOrdxMint = ({
         inscriptionId,
         max,
         totalMinted,
+        delegate,
         selfmint,
       } = info || {};
       const selfMintAmount = permissionInfo?.amout || 0;
@@ -246,8 +247,8 @@ export const InscribeOrdxMint = ({
       //   return false;
       // }
       setContentType(contenttype);
-      if (contenttype === 'text/html') {
-        set('relateInscriptionId', inscriptionId);
+      if (contenttype === 'text/html' || !!delegate) {
+        set('relateInscriptionId', delegate || inscriptionId);
         if (!isSpecial) {
           const totalMintAmount = Math.max(data.amount, 330) * data.repeatMint;
           const utxos = selectUtxosByAmount(totalMintAmount);
