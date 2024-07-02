@@ -350,6 +350,9 @@ export const InscribingOrderModal = ({
       isDismissable={false}
       size="3xl"
       isOpen={show}
+      classNames={{
+        base: 'max-h-screen overflow-y-auto my-0 sm:my-0',
+      }}
       onClose={closeHandler}
     >
       <ModalContent>
