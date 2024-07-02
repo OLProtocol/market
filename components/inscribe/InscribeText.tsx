@@ -1,22 +1,31 @@
-import { Radio, RadioGroup, Textarea, Button } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
+import { Input, Textarea, Button } from '@nextui-org/react';
+import { use, useEffect, useState } from 'react';
 import { useMap } from 'react-use';
 import { useTranslation } from 'react-i18next';
 
 interface InscribeTextProps {
   onNext?: () => void;
-  onChange?: (type: string, value: string) => void;
+  onChange?: (data: any) => void;
 }
 export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
   const { t } = useTranslation();
-  const [data, { set }] = useMap({
+  const [utxo, setUtxo] = useState('');
+  const [value, setValue] = useState('');
+  const [data, { set }] = useMap<any>({
     type: 'single',
     text: '',
+    utxos: [],
   });
   useEffect(() => {
-    onChange?.(data.type, data.text);
-  }, [data.type, data.text]);
+    onChange?.(data);
+  }, [data]);
 
+  useEffect(() => {
+    if (utxo && value) {
+      const [txid, vout] = utxo.split(':');
+      set('utxos', [{ utxo, txid, vout: Number(vout), value: Number(value) }]);
+    }
+  }, [utxo, value]);
   return (
     <div>
       <div className="mb-4 text-center">
@@ -24,14 +33,38 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
         {/* <p>{t('pages.inscribe.text.bulk_des')}</p> */}
       </div>
       <div className="mb-4 flex justify-center">
-        {/* <RadioGroup
+        {/* <Ra
           onValueChange={(e) => set('type', e)}
           value={data.type}
           orientation="horizontal"
         >
           <Radio value="single">{t('pages.inscribe.text.single')}</Radio>
           <Radio value="bulk">{t('pages.inscribe.text.bulk')}</Radio>
-        </RadioGroup> */}
+        </Ra
+      dioGroup> */}
+      </div>
+      <div className="mb-2">
+        <Input
+          value={utxo}
+          className="flex-1"
+          onChange={(e) => {
+            console.log(e);
+            setUtxo(e.target.value);
+          }}
+          type="text"
+          placeholder="utxo"
+        />
+      </div>
+      <div className="mb-2">
+        <Input
+          value={value}
+          className="flex-1"
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+          type="text"
+          placeholder="utxo value"
+        />
       </div>
       <div className="mb-2">
         <Textarea
