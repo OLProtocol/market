@@ -1,8 +1,8 @@
 import useSWRMutation from 'swr/mutation';
 import { ordx } from '@/api';
 import { Spinner } from '@nextui-org/react';
-
-import { useRef, useState } from 'react';
+import { tryit } from 'radash';
+import { use, useRef, useState } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { generateOrdUrl } from '@/lib/utils';
@@ -23,20 +23,11 @@ export function UtxoContent({
   const [seed, setSeed] = useState('');
   const timer = useRef<any>(null);
   const [loaded, setLoaded] = useState(false);
-  const [delayLoading, setDelayLoading] = useState(true);
-  const { data, trigger, isMutating } = useSWRMutation(
-    `utxo-content-seed-${network}-${utxo}`,
-    () =>
-      ordx.getSeedByUtxo({
-        utxo: utxo,
-        network,
-      }),
-    {
-      populateCache: true,
-      revalidate: false,
-    },
-  );
+  const [loading, setLoading] = useState(true);
+  // const [delayLoading, setDelayLoading] = useState(true);
+
   const getSeedByUtxo = async () => {
+    setLoading(true);
     // 检查 sessionStorage 中是否已经存在 seed
     const key = `utxo-content-seed-${network}-${utxo}`;
     const cachedSeed = sessionStorage.getItem(key);
@@ -45,41 +36,48 @@ export function UtxoContent({
       return;
     }
 
-    const res = await ordx.getSeedByUtxo({
+    const [error, res] = await tryit(ordx.getSeedByUtxo)({
       utxo: utxo,
       network,
     });
-    console.log(res);
-    const seed = res?.data?.[0]?.seed;
-    if (seed) {
-      setSeed(seed);
-      // 将 seed 存储在 sessionStorage 中
-      sessionStorage.setItem(key, seed);
-    }
-  };
-  useEffect(() => {
-    console.log('delay,', delay);
-    if (delay && delay > 0) {
-      setDelayLoading(true);
-      timer.current = setTimeout(() => {
-        setDelayLoading(false);
-      }, delay);
+    if (error) {
+      console.error(error);
     } else {
-      setDelayLoading(false);
-    }
-    return () => {
-      if (timer.current) {
-        clearTimeout(timer.current);
+      console.log(res);
+      const seed = res?.data?.[0]?.seed;
+      if (seed) {
+        setSeed(seed);
+        // 将 seed 存储在 sessionStorage 中
+        sessionStorage.setItem(key, seed);
       }
-    };
-  }, []);
+    }
+    setLoading(false);
+  };
+  // useEffect(() => {
+  //   console.log('delay,', delay);
+  //   if (delay && delay > 0) {
+  //     setDelayLoading(true);
+  //     timer.current = setTimeout(() => {
+  //       setDelayLoading(false);
+  //     }, delay);
+  //   } else {
+  //     setDelayLoading(false);
+  //   }
+  //   return () => {
+  //     if (timer.current) {
+  //       clearTimeout(timer.current);
+  //     }
+  //   };
+  // }, []);
   const onLoad = () => {
     setLoaded(true);
   };
   const onError = () => {
     setLoaded(true);
   };
-  console.log('delayLoading', delayLoading);
+  const showSpinner = useMemo(() => {
+    return !loaded;
+  }, [loaded]);
   // const seed = useMemo(() => data?.data?.[0]?.seed, [data]);
   // const seed = useMemo(
   //   () => (ranges.length > 0 ? generateSeed(ranges) : 0),
@@ -92,10 +90,7 @@ export function UtxoContent({
         path: `content/${inscriptionId}?seed=${seed}`,
       });
     } else {
-      return generateOrdUrl({
-        network,
-        path: `content/${inscriptionId}`,
-      });
+      return undefined;
     }
   }, [network, inscriptionId, seed]);
   useEffect(() => {
@@ -105,18 +100,19 @@ export function UtxoContent({
   }, [utxo, network]);
 
   return (
-    <div className="h-full w-full flex justify-center items-center">
-      {delayLoading || isMutating ? (
-        <Spinner />
-      ) : contentSrc ? (
+    <div className="h-full w-full">
+      {showSpinner && (
+        <div className="absolute top-0 left-0 w-full h-full dark:bg-gray-800 z-[1] bg-gray-100 flex justify-center items-center">
+          <Spinner />
+        </div>
+      )}
+      {contentSrc && (
         <iframe
           onLoad={onLoad}
           onError={onError}
           src={contentSrc}
           className="pointer-events-none max-w-full h-full max-h-full"
         ></iframe>
-      ) : (
-        '-'
       )}
     </div>
   );
