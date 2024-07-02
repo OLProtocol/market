@@ -168,7 +168,7 @@ export const InscribeOrdxMint = ({
         delegate,
         selfmint,
       } = info || {};
-      const selfMintAmount = permissionInfo?.amout || 0;
+      const selfMintAmount = permissionInfo?.amount || 0;
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
       let _maxAmount;
       let _singleMaxAmount = limit || 0;
