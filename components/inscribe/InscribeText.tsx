@@ -43,7 +43,7 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
         </Ra
       dioGroup> */}
       </div>
-      <div className="mb-2">
+      {/* <div className="mb-2">
         <Input
           value={utxo}
           className="flex-1"
@@ -65,7 +65,7 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
           type="text"
           placeholder="utxo value"
         />
-      </div>
+      </div> */}
       <div className="mb-2">
         <Textarea
           disableAutosize
