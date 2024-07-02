@@ -699,29 +699,30 @@ export const generateSendBtcPsbt = async ({
     network,
     address,
     publicKey,
+    suitable: true,
   });
   return psbt;
 };
-export const sendBtcPsbt = async (psbt) => {
+export const sendBtcPsbt = async (psbt, fromAddress) => {
   const { add: addUtxo, removeUtxos } = useUtxoStore.getState();
   console.log('psbt', psbt);
   const txId = await signAndPushPsbt(psbt);
-  // if (psbt.txOutputs.length > 1) {
-  //   const sliceOutputs = psbt.txOutputs.slice(1);
-  //   sliceOutputs.forEach((output, index) => {
-  //     if (output.address === fromAddress) {
-  //       addUtxo({
-  //         utxo: `${txId}:${index + 1}`,
-  //         value: output.value,
-  //         status: 'unspend',
-  //         location: 'local',
-  //         sort: 1,
-  //         txid: txId,
-  //         vout: index + 1,
-  //       });
-  //     }
-  //   });
-  // }
+  if (psbt.txOutputs.length > 1) {
+    const sliceOutputs = psbt.txOutputs.slice(1);
+    sliceOutputs.forEach((output, index) => {
+      if (output.address === fromAddress) {
+        addUtxo({
+          utxo: `${txId}:${index + 1}`,
+          value: output.value,
+          status: 'unspend',
+          location: 'local',
+          sort: 1,
+          txid: txId,
+          vout: index + 1,
+        });
+      }
+    });
+  }
   // removeUtxos(avialableUtxos);
   return txId;
 };
