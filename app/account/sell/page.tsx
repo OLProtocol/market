@@ -39,6 +39,7 @@ export default function SellPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
+    type,
     list,
     reset,
     unit,
@@ -57,7 +58,7 @@ export default function SellPage() {
       console.log('app.account.sell.page: ticker: ', ticker);
       let ret: Promise<any>;
       try {
-        ret = getAssetsSummary({ assets_name: ticker });
+        ret = getAssetsSummary({ assets_name: ticker, assets_type: type });
         return ret;
       } catch (error) {
         console.log('app.account.sell.page: getAssetsSummary err: ', error);

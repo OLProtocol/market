@@ -10,13 +10,14 @@ import {
   Divider,
   Image,
 } from '@nextui-org/react';
+import useSWR from 'swr';
 import { OrdxAssetsUtxoList } from '@/components/account/OrdxAssetsUtxoList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { OrdxOrderList } from '@/components/account/OrdxOrderList';
-import { notification } from 'antd';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
+import { getAddressAssetsValue } from '@/api';
 import { btcToSats, satsToBitcoin } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 import { BtcPrice } from '@/components/BtcPrice';
@@ -25,7 +26,25 @@ export default function AccountPage() {
   const { t } = useTranslation();
   const { address, balance, network } = useReactWalletStore((state) => state);
   const [totalSatValue, setTotalSatValue] = useState(0);
+  const swrKey = useMemo(() => {
+    return `/ordx/getAddressAssetsValue-${address}-${network}`;
+  }, [address, network]);
 
+  const { data, isLoading, mutate } = useSWR(
+    swrKey,
+    () => getAddressAssetsValue(address),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+  useEffect(() => {
+    console.log(data);
+    if (data?.data) {
+      setTotalSatValue(data.data?.total_value || 0);
+    }
+  }, [data]);
+  console.log('totalSatValue', totalSatValue);
   return (
     <div>
       <div className="min-h-[8rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-8 gap-2 sm:gap-4 mt-4 mb-4">
@@ -60,12 +79,12 @@ export default function AccountPage() {
           <CardBody className="text-left text-md font-thin leading-8">
             <div className="flex">
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-              {(totalSatValue / 100000000).toFixed(8)}
+              {totalSatValue}
             </div>
             <div className="flex text-sm md:font-bold">
               <span className="text-yellow-400 w-5"> &nbsp;$</span>
               <span className="text-gray-400 h-5">
-                <BtcPrice btc={totalSatValue / 100000000} />
+                <BtcPrice btc={totalSatValue} />
               </span>
             </div>
           </CardBody>
