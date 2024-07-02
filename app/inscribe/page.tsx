@@ -475,6 +475,9 @@ export default function Inscribe() {
   const clear = () => {
     clearList();
     resetText();
+    resetName();
+    resetOrdx();
+    setMetadata({});
   };
   useEffect(() => {
     if (list.length === 0) {
