@@ -273,7 +273,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
-        // inscribeHandler();
+        inscribeHandler();
       }, 0);
     } catch (error: any) {
       setLoading(false);
@@ -342,7 +342,7 @@ export const InscribingOrderModal = ({
         txid: commitTxid,
         vout: commitTx.vout,
         amount: commitTx.amount,
-        toAddress: order.toAddress,
+        toAddresses: order.toAddress,
       });
 
       order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
@@ -540,7 +540,11 @@ export const InscribingOrderModal = ({
                   label={index + 1}
                   status={item?.status}
                   value={item.show}
-                  address={order.toAddress[index]}
+                  address={
+                    order.toAddress?.length > 1
+                      ? order.toAddress[index]
+                      : order.toAddress[0]
+                  }
                 />
               ))}
             </div>

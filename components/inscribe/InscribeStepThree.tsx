@@ -1,4 +1,4 @@
-import { Tabs, Tab, Button, Input,Textarea } from '@nextui-org/react';
+import { Tabs, Tab, Button, Input, Textarea } from '@nextui-org/react';
 import { useMemo, useState, useEffect } from 'react';
 import { useMap, useList } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
@@ -32,6 +32,7 @@ export const InscribeStepThree = ({
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
   const { feeRate, discount } = useCommonStore((state) => state);
+  const [errText, setErrText] = useState('');
   const { network, address: currentAccount } = useReactWalletStore();
   const [data, { set }] = useMap({
     toSingleAddress: currentAccount,
@@ -53,7 +54,6 @@ export const InscribeStepThree = ({
   });
   const submit = async () => {
     if (loading) return;
-    setLoading(true);
     const secret = generatePrivateKey();
     const inscription = generateInscription({
       metadata,
@@ -63,10 +63,22 @@ export const InscribeStepThree = ({
       feeRate: feeRate.value,
     });
     const orderId = uuidV4();
-    const toAddresses = selectedTab === 'single'
-      ? [data.toSingleAddress]
-      : data.toMultipleAddresses.split('\n').map(address => address.trim()).filter(address => address !== '');
-      console.log("toAddresses==========="+toAddresses);
+    const toAddresses =
+      selectedTab === 'single'
+        ? [data.toSingleAddress]
+        : data.toMultipleAddresses
+            .split('\n')
+            .map((address) => address.trim())
+            .filter((address) => address !== '');
+    console.log('toAddresses===========' + toAddresses);
+    if (toAddresses.length === 0) {
+      setErrText('提供一个接收地址');
+      return;
+    }
+    if (toAddresses.length > 1 && toAddresses.length !== files.length) {
+      setErrText('地址数量与文件数量不匹配');
+      return;
+    }
     const order: OrderItemType = {
       orderId,
       type,
@@ -74,7 +86,7 @@ export const InscribeStepThree = ({
       secret,
       fee: clacFee,
       metadata,
-      toAddress:toAddresses,
+      toAddress: toAddresses,
       feeRate: feeRate.value,
       files,
       network,
@@ -83,7 +95,6 @@ export const InscribeStepThree = ({
     };
     addOrder(order);
     onAddOrder?.(order);
-    setLoading(false);
   };
   const calcHex = (file: any) => {
     if (file.fileHex) {
@@ -130,7 +141,9 @@ export const InscribeStepThree = ({
       >
         <Tab key="single" title={t('pages.inscribe.step_three.to_single')}>
           <div className="mb-4">
-            <div className="mb-2">{t('pages.inscribe.step_three.to_single')}</div>
+            <div className="mb-2">
+              {t('pages.inscribe.step_three.to_single')}
+            </div>
             <div>
               <Input
                 placeholder="Basic usage"
@@ -142,7 +155,6 @@ export const InscribeStepThree = ({
         </Tab>
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
-            {/* <div className="mb-2">{t('pages.inscribe.step_three.to_multiple')}</div> */}
             <div className="mb-2">Multiple Adddress:</div>
             <div>
               <Textarea
@@ -154,29 +166,6 @@ export const InscribeStepThree = ({
           </div>
         </Tab>
       </Tabs>
-      {/* <div className="mb-4">
-        <div className="mb-2">{t('pages.inscribe.step_three.to_single')}</div>
-        <div>
-          <Input
-            placeholder="Basic usage"
-            value={data.toSingleAddress}
-            onChange={(e) => set('toSingleAddress', e.target.value)}
-          />
-        </div>
-      </div> */}
-      {/* <div className='mb-4'>
-        <div className='mb-3'>{t('pages.inscribe.step_three.select_fee')}</div>
-        <BtcFeeRate onChange={feeRateChange} />
-      </div> */}
-      {/*<div className='mb-4'>
-        <BtcFeeCalc
-          feeRate={feeRate}
-          padding={padding}
-          networkFee={networkFee}
-          total={totalFees}
-          overheadFee={overhead}
-        />
-      </div> */}
       <div className="mb-4">
         <p>{t('pages.inscribe.step_three.address_hint')}</p>
       </div>
@@ -187,6 +176,9 @@ export const InscribeStepThree = ({
           filesLength={files.length}
         />
       </div>
+      {errText && (
+        <div className="text-red-500 text-center my-2">{errText}</div>
+      )}
       <div className="w-60 mx-auto flex justify-center">
         <WalletConnectBus>
           <Button
