@@ -543,6 +543,7 @@ export const returnInscribe = async ({
   vout,
   amount,
   feeRate,
+  networkFee,
   fromAddress,
   secret,
   files,
@@ -551,11 +552,13 @@ export const returnInscribe = async ({
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
-  const gasFee = (180 + 34 + 10) * feeRate;
+  // const gasFee = (180 + 34 + 10) * feeRate;
   const outputs = [
     {
       // We are leaving behind 1000 sats as a fee to the miners.
-      value: Math.floor(amount - gasFee),
+      value: Math.floor(
+        amount - networkFee + (34 * files.length - 1) * feeRate,
+      ),
       // This is the new script that we are locking our funds to.
       scriptPubKey: Address.toScriptPubKey(fromAddress),
     },

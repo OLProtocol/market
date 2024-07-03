@@ -272,7 +272,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
-        inscribeHandler();
+        // inscribeHandler();
       }, 0);
     } catch (error: any) {
       setLoading(false);
@@ -293,6 +293,7 @@ export const InscribingOrderModal = ({
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
       await sleep(3000);
       // await ordx.pollGetTxStatus(commitTxid, order.network);
+      console.log('feeNetwork', fee);
       const txid = await returnInscribe({
         secret: order.secret,
         network: order.network as any,
@@ -300,6 +301,7 @@ export const InscribingOrderModal = ({
         files: order.files,
         metadata: order.metadata,
         txid: commitTxid,
+        networkFee: fee.networkFee,
         feeRate: order.feeRate,
         vout: commitTx.vout,
         amount: commitTx.amount,
@@ -311,6 +313,7 @@ export const InscribingOrderModal = ({
       });
       setLoading(false);
     } catch (error: any) {
+      setLoading(false);
       notification.error({
         message: 'error',
         description: error.message || 'error',
