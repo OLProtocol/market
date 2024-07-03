@@ -21,7 +21,12 @@ import {
   useCommonStore,
   useUtxoStore,
 } from '@/store';
-import { inscribe, generateSendBtcPsbt, sendBtcPsbt } from '@/lib/inscribe';
+import {
+  inscribe,
+  generateSendBtcPsbt,
+  sendBtcPsbt,
+  returnInscribe,
+} from '@/lib/inscribe';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { tryit } from 'radash';
@@ -277,7 +282,42 @@ export const InscribingOrderModal = ({
       });
     }
   };
-
+  const returnInscirbe = async () => {
+    if (!(order && order.commitTx)) {
+      return;
+    }
+    try {
+      setLoading(true);
+      console.log('order', order);
+      const { commitTx, fee } = order;
+      const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
+      await sleep(3000);
+      // await ordx.pollGetTxStatus(commitTxid, order.network);
+      const txid = await returnInscribe({
+        secret: order.secret,
+        network: order.network as any,
+        inscription: order.inscription,
+        files: order.files,
+        metadata: order.metadata,
+        txid: commitTxid,
+        feeRate: order.feeRate,
+        vout: commitTx.vout,
+        amount: commitTx.amount,
+        fromAddress: currentAccount,
+      });
+      notification.success({
+        message: 'Success',
+        description: 'return success',
+      });
+      setLoading(false);
+    } catch (error: any) {
+      notification.error({
+        message: 'error',
+        description: error.message || 'error',
+      });
+      console.error(error);
+    }
+  };
   const inscribeHandler = async () => {
     if (!(order && order.commitTx)) {
       return;
@@ -395,13 +435,20 @@ export const InscribingOrderModal = ({
                     {t('pages.inscribe.pay.step_three.des')}
                   </div>
                 </div>
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center mt-4 gap-4">
                   <Button
                     color="primary"
                     isLoading={loading}
                     onClick={inscribeHandler}
                   >
                     {t('buttons.inscribe')}
+                  </Button>
+                  <Button
+                    color="danger"
+                    isLoading={loading}
+                    onClick={returnInscirbe}
+                  >
+                    返回余额
                   </Button>
                 </div>
                 <div className="text-amber-400 text-base text-center">

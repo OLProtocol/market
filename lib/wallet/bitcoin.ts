@@ -11,3 +11,4 @@
 // export default bitcoinjs;
 import { core } from '../wallet-sdk';
 export const bitcoin = core.bitcoin;
+export const ECPair = core.ECPair;

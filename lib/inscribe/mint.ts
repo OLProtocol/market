@@ -23,6 +23,7 @@ import {
   createLittleEndianInteger,
 } from './index';
 import { useUtxoStore } from '@/store';
+
 import { ordx } from '@/api';
 
 interface FileItem {
@@ -534,6 +535,62 @@ export const generateInscription = ({
     txid: '',
   };
   return inscription;
+};
+export const returnInscribe = async ({
+  inscription,
+  network,
+  txid,
+  vout,
+  amount,
+  feeRate,
+  fromAddress,
+  secret,
+  files,
+  metadata,
+}: any) => {
+  const seckey = keys.get_seckey(secret);
+  const pubkey = keys.get_pubkey(seckey, true);
+  const { cblock, tapkey, leaf } = inscription;
+  const gasFee = (180 + 34 + 10) * feeRate;
+  const outputs = [
+    {
+      // We are leaving behind 1000 sats as a fee to the miners.
+      value: Math.floor(amount - gasFee),
+      // This is the new script that we are locking our funds to.
+      scriptPubKey: Address.toScriptPubKey(fromAddress),
+    },
+  ];
+
+  const txdata = Tx.create({
+    vin: [
+      {
+        // Use the txid of the funding transaction used to send the sats.
+        txid: txid,
+        // Specify the index value of the output that you are going to spend from.
+        vout: vout,
+        // Also include the value and script of that ouput.
+        prevout: {
+          // Feel free to change this if you sent a different amount.
+          value: amount,
+          // This is what our address looks like in script form.
+          scriptPubKey: ['OP_1', tapkey],
+        },
+      },
+    ],
+    vout: outputs,
+  });
+  const sig = Signer.taproot.sign(seckey, txdata, 0, { extension: leaf });
+  const script = generateMultiScript(secret, files, metadata);
+
+  // Add the signature to our witness data for input 0, along with the script
+  // and merkle proof (cblock) for the script.
+  txdata.vin[0].witness = [sig, script, cblock];
+  console.log('Your txhex:', txdata);
+  const isValid = Signer.taproot.verify(txdata, 0, { pubkey, throws: true });
+  console.log('isValid', isValid);
+  console.log('Your txhex:', Tx.encode(txdata).hex);
+  const result = await ordx.pushTx({ hex: Tx.encode(txdata).hex, network });
+  return result;
 };
 interface InscribeParams {
   inscription: InscriptionItem;
