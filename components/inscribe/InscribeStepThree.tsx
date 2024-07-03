@@ -1,4 +1,4 @@
-import { Tabs, Tab, Button, Input } from '@nextui-org/react';
+import { Tabs, Tab, Button, Input,Textarea } from '@nextui-org/react';
 import { useMemo, useState, useEffect } from 'react';
 import { useMap, useList } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
@@ -40,6 +40,7 @@ export const InscribeStepThree = ({
   const [loading, setLoading] = useState(false);
   const { add: addOrder, changeStatus } = useOrderStore((state) => state);
   // const { serviceStatus } = useCommonStore((state) => state);
+  const [selectedTab, setSelectedTab] = useState<string>('single');
 
   const files = useMemo(() => {
     return list;
@@ -62,6 +63,10 @@ export const InscribeStepThree = ({
       feeRate: feeRate.value,
     });
     const orderId = uuidV4();
+    const toAddresses = selectedTab === 'single'
+      ? [data.toSingleAddress]
+      : data.toMultipleAddresses.split('\n').map(address => address.trim()).filter(address => address !== '');
+      console.log("toAddresses==========="+toAddresses);
     const order: OrderItemType = {
       orderId,
       type,
@@ -69,7 +74,7 @@ export const InscribeStepThree = ({
       secret,
       fee: clacFee,
       metadata,
-      toAddress: [data.toSingleAddress],
+      toAddress:toAddresses,
       feeRate: feeRate.value,
       files,
       network,
@@ -92,6 +97,7 @@ export const InscribeStepThree = ({
   useEffect(() => {
     if (currentAccount) {
       set('toSingleAddress', currentAccount);
+      set('toMultipleAddresses', data.toMultipleAddresses);
     }
   }, [currentAccount]);
   return (
@@ -117,7 +123,38 @@ export const InscribeStepThree = ({
           ))}
         </div>
       </div>
-      <div className="mb-4">
+      <Tabs
+        aria-label="address tabs"
+        selectedKey={selectedTab}
+        onSelectionChange={(key) => setSelectedTab(key as string)}
+      >
+        <Tab key="single" title={t('pages.inscribe.step_three.to_single')}>
+          <div className="mb-4">
+            <div className="mb-2">{t('pages.inscribe.step_three.to_single')}</div>
+            <div>
+              <Input
+                placeholder="Basic usage"
+                value={data.toSingleAddress}
+                onChange={(e) => set('toSingleAddress', e.target.value)}
+              />
+            </div>
+          </div>
+        </Tab>
+        <Tab key="multiple" title="To Multiple Adddress">
+          <div className="mb-4">
+            {/* <div className="mb-2">{t('pages.inscribe.step_three.to_multiple')}</div> */}
+            <div className="mb-2">Multiple Adddress:</div>
+            <div>
+              <Textarea
+                placeholder="Enter multiple addresses, one per line"
+                value={data.toMultipleAddresses}
+                onChange={(e) => set('toMultipleAddresses', e.target.value)}
+              />
+            </div>
+          </div>
+        </Tab>
+      </Tabs>
+      {/* <div className="mb-4">
         <div className="mb-2">{t('pages.inscribe.step_three.to_single')}</div>
         <div>
           <Input
@@ -126,7 +163,7 @@ export const InscribeStepThree = ({
             onChange={(e) => set('toSingleAddress', e.target.value)}
           />
         </div>
-      </div>
+      </div> */}
       {/* <div className='mb-4'>
         <div className='mb-3'>{t('pages.inscribe.step_three.select_fee')}</div>
         <BtcFeeRate onChange={feeRateChange} />

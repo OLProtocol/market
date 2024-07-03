@@ -33,6 +33,7 @@ import { tryit } from 'radash';
 import { hideStr } from '@/lib/utils';
 import { FeeShow } from './FeeShow';
 import { useTranslation } from 'react-i18next';
+import { ordx } from '@/api';
 
 interface InscribingOrderMdaolProps {
   show: boolean;
@@ -331,7 +332,7 @@ export const InscribingOrderModal = ({
       const { commitTx, fee } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
       await sleep(10000);
-      // await ordx.pollGetTxStatus(commitTxid, order.network);
+      await ordx.pollGetTxStatus(commitTxid, order.network);
       const txid = await inscribe({
         secret: order.secret,
         network: order.network as any,
@@ -341,9 +342,11 @@ export const InscribingOrderModal = ({
         txid: commitTxid,
         vout: commitTx.vout,
         amount: commitTx.amount,
-        toAddress: order.toAddress[0],
+        toAddress: order.toAddress,
       });
-      addSucccessTxid(orderId, txid);
+
+      order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
+      //addSucccessTxid(orderId, txid);
 
       notification.success({
         message: 'Success',
@@ -537,7 +540,7 @@ export const InscribingOrderModal = ({
                   label={index + 1}
                   status={item?.status}
                   value={item.show}
-                  address={order.toAddress[0]}
+                  address={order.toAddress[index]}
                 />
               ))}
             </div>
