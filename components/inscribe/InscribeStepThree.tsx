@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useMap, useList } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { isTaprootAddress } from '@/lib/wallet';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
 import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
@@ -52,8 +53,19 @@ export const InscribeStepThree = ({
     files,
     discount,
   });
+
+  const checkToAddressIsTaproot = (address: string[]) => {
+    for (const addr of address) {
+      if (!isTaprootAddress(addr, network)) {
+        setErrText(`${addr}不是有效的${network}网络Taproot地址，请更换`);
+        return false;
+      }
+    }
+    return true;
+  };
   const submit = async () => {
     if (loading) return;
+    setErrText('');
     const secret = generatePrivateKey();
     const inscription = generateInscription({
       metadata,
@@ -77,6 +89,10 @@ export const InscribeStepThree = ({
     }
     if (toAddresses.length > 1 && toAddresses.length !== files.length) {
       setErrText('地址数量与文件数量不匹配');
+      return;
+    }
+    const checkStatus = checkToAddressIsTaproot(toAddresses);
+    if (!checkStatus) {
       return;
     }
     const order: OrderItemType = {

@@ -5,6 +5,27 @@ import {
   convertUtxosToBtcUtxos,
   convertBtcUtxosToInputs,
 } from './utxo';
+import { bech32 } from 'bech32';
+import * as bitcoin from 'bitcoinjs-lib';
+
+export const isTaprootAddress = (address, network = 'mainnet') => {
+  try {
+    // 通过 bitcoinjs-lib 检查
+    const decoded = bitcoin.address.fromBech32(address);
+    console.log(decoded);
+    const isBech32m =
+      (decoded.prefix === 'bc' && network !== 'testnet') ||
+      (decoded.prefix === 'tb' && network === 'testnet');
+    const isVersion1 = decoded.version === 1;
+
+    console.log(isBech32m);
+    console.log(isVersion1);
+    return isBech32m && isVersion1;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+};
 
 export const calcNetworkFee = async ({
   utxos,
