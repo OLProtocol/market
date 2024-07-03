@@ -132,8 +132,8 @@ export const InscribeOrdxMint = ({
     return cleanValue;
   };
   const maxRepeat = useMemo(() => {
-    if (data.isSpecial && data.utxos?.[0]?.amount) {
-      const calcRepeat = Math.ceil(data.utxos[0]?.amount / data.amount);
+    if (data.isSpecial && data.utxos?.[0]?.value) {
+      const calcRepeat = Math.ceil(data.utxos[0]?.value / data.amount);
       console.log('calcRepeat', calcRepeat);
       return Math.max(Math.min(calcRepeat, MAX_REPEAT), 1);
     }

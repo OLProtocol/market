@@ -279,10 +279,15 @@ export default function Inscribe() {
           console.log('amt', amt);
 
           const len = rangesArr[i].length;
-          amount =
-            rangesArr[i][len - 1].offset -
-            rangesArr[i][0].offset +
-            rangesArr[i][len - 1].size;
+          if (len === 1) {
+            amount =
+              i === 0
+                ? rangesArr[i][0].offset + rangesArr[i][0].size
+                : rangesArr[i][0].size;
+          } else {
+            throw new Error('not support multi utxos');
+          }
+
           console.log('amount', amount);
           offset = rangesArr[i][0].offset;
         }
