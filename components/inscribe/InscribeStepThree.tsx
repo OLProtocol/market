@@ -91,10 +91,10 @@ export const InscribeStepThree = ({
       setErrText('地址数量与文件数量不匹配');
       return;
     }
-    // const checkStatus = checkToAddressIsTaproot(toAddresses);
-    // if (!checkStatus) {
-    //   return;
-    // }
+    const checkStatus = checkToAddressIsTaproot(toAddresses);
+    if (!checkStatus) {
+      return;
+    }
     const order: OrderItemType = {
       orderId,
       type,
