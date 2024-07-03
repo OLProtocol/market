@@ -332,7 +332,7 @@ export const InscribingOrderModal = ({
       const { commitTx, fee } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
       await sleep(10000);
-      await ordx.pollGetTxStatus(commitTxid, order.network);
+      // await ordx.pollGetTxStatus(commitTxid, order.network);
       const txid = await inscribe({
         secret: order.secret,
         network: order.network as any,
