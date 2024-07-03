@@ -287,7 +287,7 @@ export default function Inscribe() {
           } else {
             throw new Error('not support multi utxos');
           }
-
+          amount = Math.max(amount, 330);
           console.log('amount', amount);
           offset = rangesArr[i][0].offset;
         }
