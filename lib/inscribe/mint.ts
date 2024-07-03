@@ -544,7 +544,7 @@ interface InscribeParams {
   serviceFee?: number;
   secret: any;
   metadata: any;
-  toAddress: string;
+  toAddress: any[];
   network: 'main' | 'testnet';
 }
 export const inscribe = async ({
@@ -562,11 +562,17 @@ export const inscribe = async ({
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
 
+  for(let i=0;i<toAddress.length; i++){
+    console.log('toAddress['+i+']:'+toAddress[i]);
+  }
+ 
+  
+  //console.log('toAddressxxxxx====='+toAddress);
   const outputs = files.map((f) => ({
     // We are leaving behind 1000 sats as a fee to the miners.
     value: f.amount || 546,
     // This is the new script that we are locking our funds to.
-    scriptPubKey: Address.toScriptPubKey(toAddress),
+    scriptPubKey: Address.toScriptPubKey(toAddress[f.index]),
   }));
 
   const txdata = Tx.create({
