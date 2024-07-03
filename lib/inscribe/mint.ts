@@ -604,7 +604,7 @@ interface InscribeParams {
   serviceFee?: number;
   secret: any;
   metadata: any;
-  toAddress: string;
+  toAddresses: string[];
   network: 'main' | 'testnet';
 }
 export const inscribe = async ({
@@ -613,7 +613,7 @@ export const inscribe = async ({
   txid,
   vout,
   amount,
-  toAddress,
+  toAddresses,
   secret,
   files,
   metadata,
@@ -622,12 +622,16 @@ export const inscribe = async ({
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
 
-  const outputs = files.map((f) => ({
-    // We are leaving behind 1000 sats as a fee to the miners.
-    value: f.amount || 546,
-    // This is the new script that we are locking our funds to.
-    scriptPubKey: Address.toScriptPubKey(toAddress),
-  }));
+  const outputs = files.map((f, i) => {
+    const toAddress =
+      toAddresses?.length === 1 ? toAddresses[0] : toAddresses[i];
+    return {
+      // We are leaving behind 1000 sats as a fee to the miners.
+      value: f.amount || 546,
+      // This is the new script that we are locking our funds to.
+      scriptPubKey: Address.toScriptPubKey(toAddress),
+    };
+  });
 
   const txdata = Tx.create({
     vin: [
