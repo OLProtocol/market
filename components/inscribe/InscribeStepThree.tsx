@@ -57,7 +57,7 @@ export const InscribeStepThree = ({
   const checkToAddressIsTaproot = (address: string[]) => {
     for (const addr of address) {
       if (!isTaprootAddress(addr, network)) {
-        setErrText(`${addr}不是有效的${network}网络Taproot地址，请更换`);
+        setErrText(t('pages.inscribe.step_three.error_3'));
         return false;
       }
     }
@@ -84,11 +84,11 @@ export const InscribeStepThree = ({
             .filter((address) => address !== '');
     console.log('toAddresses===========' + toAddresses);
     if (toAddresses.length === 0) {
-      setErrText('提供一个接收地址');
+      setErrText(t('pages.inscribe.step_three.error_1'));
       return;
     }
     if (toAddresses.length > 1 && toAddresses.length !== files.length) {
-      setErrText('地址数量与文件数量不匹配');
+      setErrText(t('pages.inscribe.step_three.error_2'));
       return;
     }
     const checkStatus = checkToAddressIsTaproot(toAddresses);
