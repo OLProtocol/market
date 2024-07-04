@@ -161,6 +161,7 @@ export const OrdxUtxoList = ({
           {list.map((item: any, i) => (
             <div key={item.utxo + item.locked}>
               <OrdxFtAssetsItem
+                assets_name={assets_name}
                 selected={!!sellList.find((i) => i.utxo === item.utxo)}
                 canSelect={canSelect}
                 onSelect={(bol) => selectHandler(bol, item)}

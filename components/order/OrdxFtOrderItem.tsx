@@ -23,6 +23,7 @@ interface Props {
   item: any;
   onBuy?: any;
   delay?: number;
+  assets_name?: string;
   showResale?: boolean;
   onCancelOrder?: () => void;
   canSelect?: boolean;
@@ -36,6 +37,7 @@ export const OrdxFtOrderItem = ({
   canSelect,
   selected,
   onSelect,
+  assets_name,
   onCancelOrder,
   delay,
   showResale = true,
@@ -44,7 +46,7 @@ export const OrdxFtOrderItem = ({
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { t } = useTranslation();
-  // console.warn("content_type==========" + item?.assets[0]?.content_type.toLowerCase());
+  // console.warn("content_type==========" + asset.content_type.toLowerCase());
   const buyHandler = async () => {
     setLoading(true);
     try {
@@ -65,7 +67,12 @@ export const OrdxFtOrderItem = ({
       !['text/plain'].some((type) => content_type.indexOf(type) > -1)
     );
   };
-
+  const asset = useMemo(
+    () =>
+      item?.assets.find((v) => v.assets_name === assets_name) ||
+      item?.assets?.[0],
+    [item?.assets, assets_name],
+  );
   const selectHandler = (b: boolean) => {
     if (!canBuy) {
       return;
@@ -100,21 +107,18 @@ export const OrdxFtOrderItem = ({
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
             <div className="absolute items-center inset-0 z-0">
-              {item?.assets[0]?.assets_type === 'exotic' ? (
+              {asset?.assets_type === 'exotic' ? (
                 <Image
                   radius="full"
-                  src={`/raresats/${item?.assets[0]?.assets_name}.png`}
+                  src={`/raresats/${asset?.assets_name}.png`}
                   alt="logo"
                   className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
                 />
               ) : (
-                showContent(
-                  item?.assets?.[0]?.content_type,
-                  item?.assets?.[0]?.delegate,
-                ) && (
+                showContent(asset?.content_type, asset?.delegate) && (
                   <div className="h-full w-full">
                     <UtxoContent
-                      inscriptionId={item?.assets?.[0]?.inscription_id}
+                      inscriptionId={asset?.inscription_id}
                       delay={delay}
                       utxo={item?.utxo}
                     ></UtxoContent>
@@ -122,10 +126,7 @@ export const OrdxFtOrderItem = ({
                 )
               )}
             </div>
-            {showContent(
-              item?.assets?.[0]?.content_type,
-              item?.assets?.[0]?.delegate,
-            ) ? (
+            {showContent(asset?.content_type, asset?.delegate) ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
                 <p className="font-medium text-2xl md:text-3xl mb-1">
                   {thousandSeparator(item?.assets[0].amount)}
