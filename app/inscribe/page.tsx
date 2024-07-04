@@ -40,7 +40,7 @@ export default function Inscribe() {
   // }, []);
   const { t } = useTranslation();
   const [metadata, setMetadata] = useState<any>({});
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const [tab, setTab] = useState<any>('ordx');
   const [files, setFiles] = useState<any[]>([]);
   const [orderId, setOrderId] = useState<string>();
@@ -486,7 +486,7 @@ export default function Inscribe() {
   };
   useEffect(() => {
     if (list.length === 0) {
-      // setStep(1);
+      setStep(1);
       resetText();
       resetName();
       resetOrdx();
