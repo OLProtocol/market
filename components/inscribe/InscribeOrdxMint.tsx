@@ -110,16 +110,17 @@ export const InscribeOrdxMint = ({
           });
           throw rarityError;
         }
-        utxos = rarityData.data || [];
-        utxos?.sort(
-          (a, b) =>
-            b?.sats?.reduce((acc, cur) => {
-              return acc + cur.size;
-            }, 0) -
-            a?.sats?.reduce((acc, cur) => {
-              return acc + cur.size;
-            }, 0),
-        );
+        utxos = rarityData.data?.filter((v) => v.length === 1) || [];
+
+        // utxos?.sort(
+        //   (a, b) =>
+        //     b?.sats?.reduce((acc, cur) => {
+        //       return acc + cur.size;
+        //     }, 0) -
+        //     a?.sats?.reduce((acc, cur) => {
+        //       return acc + cur.size;
+        //     }, 0),
+        // );
       }
       setUtxoList(utxos);
     }
