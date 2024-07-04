@@ -226,6 +226,7 @@ export const InscribeOrdxMint = ({
         setErrorText(t('pages.inscribe.ordx.error_7', { tick: data.tick }));
         return false;
       }
+
       if (data.amount > _singleMaxAmount) {
         setErrorText(
           t('pages.inscribe.ordx.error_5', { limit: _singleMaxAmount }),
@@ -237,6 +238,13 @@ export const InscribeOrdxMint = ({
         Math.ceil(data.amount * data.repeatMint) > _maxAmount
       ) {
         setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
+        return false;
+      }
+      if (
+        isSpecial &&
+        Math.ceil((data.utxos?.[0]?.value || 0) / data.amount) > data.repeatMint
+      ) {
+        setErrorText(t('pages.inscribe.ordx.error_19'));
         return false;
       }
       setContentType(contenttype);

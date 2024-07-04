@@ -103,6 +103,7 @@
       "error_16": "The Max must must greater than limit",
       "error_17": "{{tick}} cannot minted",
       "error_18": "Not enough balance",
+      "error_19": "The quantity is too large, please split it first",
       "rarity_helper": "Special sat attributes required for mint."
     },
     "step_two": {
