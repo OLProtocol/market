@@ -230,6 +230,7 @@ export const OrdxOrderList = ({
           {list.map((item: any, i) => (
             <div key={item.utxo + i}>
               <OrdxFtOrderItem
+                assets_name={assets_name}
                 showResale={showResale}
                 canSelect={canSelect}
                 delay={i > 5 ? 2000 : 0}
