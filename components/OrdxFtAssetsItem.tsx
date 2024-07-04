@@ -43,7 +43,6 @@ export const OrdxFtAssetsItem = ({
     await onSell?.(item);
     setLoading(false);
   };
-  const content_type = useMemo(() => asset?.content_type, [item]);
 
   const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type) return false;
@@ -53,7 +52,7 @@ export const OrdxFtAssetsItem = ({
     );
   };
   const asset = useMemo(
-    () => item?.assets_list.find((v) => v.assets_name === assets_name),
+    () => item?.assets_list?.find((v) => v?.assets_name === assets_name),
     [item?.assets_list, assets_name],
   );
   let tickContent =
