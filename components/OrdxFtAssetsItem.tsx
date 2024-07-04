@@ -52,7 +52,9 @@ export const OrdxFtAssetsItem = ({
     );
   };
   const asset = useMemo(
-    () => item?.assets_list?.find((v) => v?.assets_name === assets_name),
+    () =>
+      item?.assets_list?.find((v) => v?.assets_name === assets_name) ||
+      item?.assets_list[0],
     [item?.assets_list, assets_name],
   );
   let tickContent =
