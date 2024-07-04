@@ -34,7 +34,12 @@ export const InscribeStepThree = ({
   const { t } = useTranslation();
   const { feeRate, discount } = useCommonStore((state) => state);
   const [errText, setErrText] = useState('');
-  const { network, address: currentAccount } = useReactWalletStore();
+  const {
+    network,
+    address: currentAccount,
+    btcWallet,
+    connector,
+  } = useReactWalletStore();
   const [data, { set }] = useMap({
     toSingleAddress: currentAccount,
     toMultipleAddresses: '',
@@ -121,6 +126,34 @@ export const InscribeStepThree = ({
       return file.hex;
     }
   };
+  const getWalletAddresses = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      let addresses: string[] = [];
+      console.log(btcWallet);
+
+      if (btcWallet?.connector) {
+        if (btcWallet.connector.id === 'unisat') {
+          console.log(connector as any);
+          addresses = await (
+            btcWallet.connector as any
+          ).unisat.requestAccounts();
+        } else if (btcWallet.connector.id === 'okx') {
+          addresses = await (
+            btcWallet.connector as any
+          ).okxwallet.requestAccounts();
+        }
+      }
+      console.log('addresses=' + addresses);
+      // set('toMultipleAddresses', addresses.join('\n'));
+    } catch (error) {
+      console.error(error);
+      // setErrText(t('pages.inscribe.step_three.error_4'));
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     if (currentAccount) {
       set('toSingleAddress', currentAccount);
@@ -172,12 +205,18 @@ export const InscribeStepThree = ({
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
             <div className="mb-2">Multiple Adddress:</div>
-            <div>
+            <div className="flex gap-2">
               <Textarea
                 placeholder="Enter multiple addresses, one per line"
                 value={data.toMultipleAddresses}
                 onChange={(e) => set('toMultipleAddresses', e.target.value)}
               />
+              {/* <Button
+                size="sm"
+                onClick={() => {
+                  getWalletAddresses();
+                }}
+              ></Button> */}
             </div>
           </div>
         </Tab>
