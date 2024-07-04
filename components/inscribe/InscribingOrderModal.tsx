@@ -97,6 +97,13 @@ export const InscribingOrderModal = ({
   const order = useMemo(() => {
     return findOrder(orderId) as OrderItemType;
   }, [orderId]);
+  const balacne = useMemo(() => {
+    const unspendUtxos = getUnspendUtxos();
+    if (!currentAccount || unspendUtxos?.length === 0) {
+      return 0;
+    }
+    return sum(unspendUtxos, (utxo) => utxo.value);
+  }, [utxoList, currentAccount]);
   const canCalcPsbt = useMemo(() => {
     const unspendUtxos = getUnspendUtxos();
 
@@ -414,7 +421,10 @@ export const InscribingOrderModal = ({
             {activeStep === 0 && order.status !== 'timeout' && (
               <div>
                 <div className="text-center mb-2 text-red-600">
-                  {!canCalcPsbt && t('notification.insufficient_balance')}
+                  {!canCalcPsbt && `${t('notification.insufficient_balance')}`}
+                </div>
+                <div className="text-center mb-4">
+                  {t('common.balance')}: {balacne} Sats
                 </div>
                 <div className="flex justify-center">
                   <WalletConnectBus>
