@@ -131,14 +131,7 @@ export const InscribeOrdxMint = ({
     set('tick', cleanValue);
     return cleanValue;
   };
-  const maxRepeat = useMemo(() => {
-    if (data.isSpecial && data.utxos?.[0]?.value) {
-      const calcRepeat = Math.ceil(data.utxos[0]?.value / data.amount);
-      console.log('calcRepeat', calcRepeat);
-      return Math.max(Math.min(calcRepeat, MAX_REPEAT), 1);
-    }
-    return MAX_REPEAT;
-  }, [data.isSpecial, data.utxos, data.amount]);
+
   const checkTick = async () => {
     const tick = cleanTick();
     if (!tick) {
@@ -233,19 +226,19 @@ export const InscribeOrdxMint = ({
         setErrorText(t('pages.inscribe.ordx.error_7', { tick: data.tick }));
         return false;
       }
-      // if (data.amount > _singleMaxAmount) {
-      //   setErrorText(
-      //     t('pages.inscribe.ordx.error_5', { limit: _singleMaxAmount }),
-      //   );
-      //   return false;
-      // }
-      // if (
-      //   _maxAmount !== undefined &&
-      //   Math.ceil(data.amount * data.repeatMint) > _maxAmount
-      // ) {
-      //   setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
-      //   return false;
-      // }
+      if (data.amount > _singleMaxAmount) {
+        setErrorText(
+          t('pages.inscribe.ordx.error_5', { limit: _singleMaxAmount }),
+        );
+        return false;
+      }
+      if (
+        _maxAmount !== undefined &&
+        Math.ceil(data.amount * data.repeatMint) > _maxAmount
+      ) {
+        setErrorText(t('pages.inscribe.ordx.error_5', { limit: _maxAmount }));
+        return false;
+      }
       setContentType(contenttype);
       if (contenttype === 'text/html' || !!delegate) {
         set('relateInscriptionId', delegate || inscriptionId);
@@ -324,6 +317,9 @@ export const InscribeOrdxMint = ({
     set('repeatMint', 1);
     setTickChecked(false);
   };
+  const maxRepeat = useMemo(() => {
+    return MAX_REPEAT;
+  }, [data.isSpecial, data.utxos, data.amount]);
   const handleUtxoChange = (utxoData: any) => {
     setTickChecked(false);
     console.log('utxo', utxoData);
@@ -337,7 +333,12 @@ export const InscribeOrdxMint = ({
         vout,
       },
     ] as any[]);
-    set('repeatMint', 1);
+    const calcRepeat = Math.ceil(utxoData?.value / data.amount);
+    console.log('calcRepeat', calcRepeat);
+    const repeat = Math.max(Math.min(calcRepeat, MAX_REPEAT), 1);
+    console.log('repeat', repeat);
+
+    set('repeatMint', repeat);
   };
   useEffect(() => {
     setTickChecked(false);
@@ -375,7 +376,7 @@ export const InscribeOrdxMint = ({
             type="number"
             className="flex-1"
             value={data.amount?.toString()}
-            isDisabled={tickLoading}
+            isDisabled={tickLoading || data.isSpecial}
             onChange={(e) => {
               amountChange(e.target.value);
             }}
@@ -394,6 +395,7 @@ export const InscribeOrdxMint = ({
                   <Input
                     type="number"
                     value={data.repeatMint.toString()}
+                    isDisabled={data.isSpecial}
                     onChange={(e) => {
                       set(
                         'repeatMint',
@@ -409,6 +411,7 @@ export const InscribeOrdxMint = ({
                     step={1}
                     maxValue={maxRepeat}
                     minValue={1}
+                    isDisabled={data.isSpecial}
                     value={[data.repeatMint]}
                     className="max-w-md"
                     onChange={(e) => {
