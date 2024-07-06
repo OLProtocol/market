@@ -89,7 +89,7 @@ export const OrdxFtOrderItem = ({
     >
       {canSelect && (
         <div
-          className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer"
+          className="absolute top-0 left-0 w-full h-full z-30 cursor-pointer bg-gray-600 bg-opacity-50"
           onClick={() => {
             selectHandler?.(!selected);
           }}
@@ -106,7 +106,7 @@ export const OrdxFtOrderItem = ({
       <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
-            <div className="absolute items-center inset-0 z-0">
+            <div className="absolute items-center inset-0 z-10">
               {asset?.assets_type === 'exotic' ? (
                 <Image
                   radius="full"
@@ -127,13 +127,13 @@ export const OrdxFtOrderItem = ({
               )}
             </div>
             {showContent(asset?.content_type, asset?.delegate) ? (
-              <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-40 flex flex-col justify-end">
+              <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
                 <p className="font-medium text-2xl md:text-3xl mb-1">
                   {thousandSeparator(item?.assets[0].amount)}
                 </p>
               </section>
             ) : (
-              <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-40">
+              <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-20">
                 <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
                   {thousandSeparator(item?.assets[0].amount)}
                 </p>
