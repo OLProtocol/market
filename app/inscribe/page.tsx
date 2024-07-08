@@ -390,14 +390,16 @@ export default function Inscribe() {
         type: 'text',
         amount: 330,
         value: textData.text,
+        offset: 0,
       });
     } else {
       const lines = textData.text.split('\n');
-      lines.forEach((line: string) => {
+      lines.forEach((line: string, i) => {
         list.push({
           type: 'text',
           value: line,
           amount: 330,
+          offset: 330 * i,
         });
       });
     }
