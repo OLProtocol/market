@@ -82,7 +82,17 @@ export default function SellPage() {
     }
   }, [summary]);
   const listItems = async () => {
-    const psbts: string[] = [];
+    for (let i = 0; i < list.length; i++) {
+      const { price } = list[i];
+      const _p = amountUnit === 'btc' ? btcToSats(price) : price;
+      if (Number(_p) < 330) {
+        notification.error({
+          message: t('notification.list_failed_title'),
+          description: t('notification.list_failed_min_amount'),
+        });
+        return;
+      }
+    }
     setLoading(true);
     try {
       const batchOrderPsbt = await buildBatchSellOrder({

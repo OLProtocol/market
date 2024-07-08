@@ -2,6 +2,7 @@
   "system_error": "系统异常，请稍后再试。",
   "insufficient_balance": "余额不足。",
   "list_failed_title": "挂单失败",
+  "list_failed_min_amount": "挂单金额太小，最小挂单金额为330聪。",
   "list_success_title": "挂单成功",
   "list_success_description": "挂单已成功提交，请等待买家购买。",
   "lock_order_failed_title": "锁定挂单失败",

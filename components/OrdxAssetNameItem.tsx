@@ -8,7 +8,7 @@ import {
   Snippet,
 } from '@nextui-org/react';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
 
@@ -41,6 +41,13 @@ export const OrdxAssetNameItem = ({
     await onCancelOrder?.();
     setLoading(false);
   };
+
+  const asset = useMemo(
+    () =>
+      item?.assets_list?.find((v) => v?.assets_type === 'ns') ||
+      item?.assets_list[0],
+    [item?.assets_list],
+  );
   return (
     <Card
       radius="lg"
@@ -62,14 +69,17 @@ export const OrdxAssetNameItem = ({
       )}
       <CardBody className="h-7/10">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase bg-auto bg-left bg-no-repeat bg-[url('/tick/Pearl.png')]">
-          <div className={`label ${isHovered ? 'label-hover' : ''}`}>
+          {/* <div className={`label ${isHovered ? 'label-hover' : ''}`}>
             <span className="flex absolute top-2 left-2 text-center text-gray-200">
               {item?.assets_list[0]?.assets_name}
             </span>
-          </div>
+          </div> */}
           <div className="flex justify-center">
             <section className="text-center pt-8">
-              <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3"></p>
+              <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3 text-wrap break-all">
+                {asset.assets_name}
+                {asset.assets_name}
+              </p>
               <p className="pt-5">
                 <Snippet
                   codeString={item?.utxo}

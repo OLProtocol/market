@@ -137,7 +137,7 @@ export const OrdxNameList = ({
         {!list.length && <Empty className="mt-10" />}
         <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
           {list.map((item: any) => (
-            <div key={item.utxo + item.locked}>
+            <div key={item.utxo + item.locked} className="w-60">
               <OrdxAssetNameItem
                 selected={!!sellList.find((i) => i.utxo === item.utxo)}
                 canSelect={canSelect}
