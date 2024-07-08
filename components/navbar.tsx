@@ -37,7 +37,8 @@ const WalletButton = dynamic(
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
-  const { setHeight, setBtcPrice, setDiscount } = useCommonStore();
+  const { setHeight, setBtcPrice, setDiscount, runtimeEnv, setEnv } =
+    useCommonStore();
   const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
@@ -122,7 +123,7 @@ export const Navbar = () => {
       },
       {
         label: t('pages.inscribe.title'),
-        href: '/inscribe',
+        href: runtimeEnv === 'test' ? '/inscribe.html' : '/inscribe',
         isActive: true,
       },
       {
@@ -132,17 +133,24 @@ export const Navbar = () => {
       },
       {
         label: t('pages.tools.title'),
-        href: '/tools',
+        href: runtimeEnv === 'test' ? '/tools.html' : '/tools',
         isActive: false,
       },
       {
         label: t('pages.my_assets.title'),
-        href: '/account',
+        href: runtimeEnv === 'test' ? '/account.html' : '/account',
         isActive: false,
       },
     ],
-    [i18n.language],
+    [i18n.language, runtimeEnv],
   );
+  useEffect(() => {
+    if (location.hostname.startsWith('test')) {
+      setEnv('test');
+    } else if (location.hostname.indexOf('ordx') > -1) {
+      setEnv('prod');
+    }
+  }, []);
   return (
     <NextUINavbar
       maxWidth="full"
@@ -167,9 +175,9 @@ export const Navbar = () => {
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {navMenus.map((item) => (
             <NavbarItem key={item.href} isActive={isActive(item.href)}>
-              <Link href={item.href} color="foreground">
+              <NextLink href={item.href} color="foreground">
                 {item.label}
-              </Link>
+              </NextLink>
             </NavbarItem>
           ))}
         </ul>
