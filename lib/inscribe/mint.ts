@@ -628,16 +628,15 @@ export const inscribe = async ({
     const toAddress =
       toAddresses?.length === 1 ? toAddresses[0] : toAddresses[i];
     return {
-      // We are leaving behind 1000 sats as a fee to the miners.
-      value: f.amount || 546,
-      // This is the new script that we are locking our funds to.
+      value: f.amount,
       scriptPubKey: Address.toScriptPubKey(toAddress),
     };
   });
+  const totalInscription = files.reduce((acc, cur) => acc + cur.amount, 0);
   if (oneUtxo) {
     outputs = [
       {
-        value: amount,
+        value: totalInscription,
         scriptPubKey: Address.toScriptPubKey(toAddresses[0]),
       },
     ];
@@ -660,6 +659,8 @@ export const inscribe = async ({
     ],
     vout: outputs,
   });
+  console.log('Your txhex:', txdata);
+
   const sig = Signer.taproot.sign(seckey, txdata, 0, { extension: leaf });
   const script = generateMultiScript(secret, files, metadata);
 
