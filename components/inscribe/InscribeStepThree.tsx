@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useMap, useList } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { Checkbox } from '@nextui-org/checkbox';
 import { isTaprootAddress } from '@/lib/wallet';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
@@ -47,18 +48,20 @@ export const InscribeStepThree = ({
   const [loading, setLoading] = useState(false);
   const { add: addOrder, changeStatus } = useOrderStore((state) => state);
   // const { serviceStatus } = useCommonStore((state) => state);
+  const [selected, setSelected] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>('single');
 
   const files = useMemo(() => {
     return list;
   }, [list]);
 
+  const oneUtxo = useMemo(() => selected, [selected]);
   const clacFee = useCalcFee({
     feeRate: feeRate.value,
     files,
     discount,
+    oneUtxo,
   });
-
   const checkToAddressIsTaproot = (address: string[]) => {
     for (const addr of address) {
       if (!isTaprootAddress(addr, network)) {
@@ -105,6 +108,7 @@ export const InscribeStepThree = ({
       type,
       inscription,
       secret,
+      oneUtxo,
       fee: clacFee,
       metadata,
       toAddress: toAddresses,
@@ -183,6 +187,12 @@ export const InscribeStepThree = ({
           ))}
         </div>
       </div>
+      <Checkbox
+        isSelected={selected}
+        onValueChange={(value) => setSelected(value)}
+      >
+        是否把批量铭文铭刻输出一个UTXO
+      </Checkbox>
       <Tabs
         aria-label="address tabs"
         selectedKey={selectedTab}
