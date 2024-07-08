@@ -1,4 +1,4 @@
-import { Input, Textarea, Button } from '@nextui-org/react';
+import { Input, Textarea, Button, RadioGroup, Radio } from '@nextui-org/react';
 import { use, useEffect, useState } from 'react';
 import { useMap } from 'react-use';
 import { useTranslation } from 'react-i18next';
@@ -30,18 +30,17 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
     <div>
       <div className="mb-4 text-center">
         <p>{t('pages.inscribe.text.single_des')}</p>
-        {/* <p>{t('pages.inscribe.text.bulk_des')}</p> */}
+        <p>{t('pages.inscribe.text.bulk_des')}</p>
       </div>
       <div className="mb-4 flex justify-center">
-        {/* <Ra
+        <RadioGroup
           onValueChange={(e) => set('type', e)}
           value={data.type}
           orientation="horizontal"
         >
           <Radio value="single">{t('pages.inscribe.text.single')}</Radio>
           <Radio value="bulk">{t('pages.inscribe.text.bulk')}</Radio>
-        </Ra
-      dioGroup> */}
+        </RadioGroup>
       </div>
       {/* <div className="mb-2">
         <Input
