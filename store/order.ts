@@ -20,6 +20,7 @@ export interface OrderItemType {
   inscription: any;
   secret: string;
   txid?: string;
+  oneUtxo: boolean;
   toAddress: string[];
   network: string;
   files: any[];

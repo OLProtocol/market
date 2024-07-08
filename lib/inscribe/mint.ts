@@ -599,6 +599,7 @@ interface InscribeParams {
   inscription: InscriptionItem;
   txid: string;
   vout: number;
+  oneUtxo: boolean;
   amount: number;
   files: any[];
   serviceFee?: number;
@@ -613,6 +614,7 @@ export const inscribe = async ({
   txid,
   vout,
   amount,
+  oneUtxo,
   toAddresses,
   secret,
   files,
@@ -622,7 +624,7 @@ export const inscribe = async ({
   const pubkey = keys.get_pubkey(seckey, true);
   const { cblock, tapkey, leaf } = inscription;
 
-  const outputs = files.map((f, i) => {
+  let outputs = files.map((f, i) => {
     const toAddress =
       toAddresses?.length === 1 ? toAddresses[0] : toAddresses[i];
     return {
@@ -632,7 +634,14 @@ export const inscribe = async ({
       scriptPubKey: Address.toScriptPubKey(toAddress),
     };
   });
-
+  if (oneUtxo) {
+    outputs = [
+      {
+        value: amount,
+        scriptPubKey: Address.toScriptPubKey(toAddresses[0]),
+      },
+    ];
+  }
   const txdata = Tx.create({
     vin: [
       {

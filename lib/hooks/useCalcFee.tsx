@@ -2,10 +2,12 @@ import { useMemo } from 'react';
 export const useCalcFee = ({
   feeRate,
   files,
+  oneUtxo,
   discount,
 }: {
   feeRate: number;
   discount: number;
+  oneUtxo: boolean;
   files: any[];
 }) => {
   const VITE_TIP_MIN = 1000;
@@ -23,8 +25,7 @@ export const useCalcFee = ({
       0,
     );
     const totalTxSize = files.reduce((acc, cur) => acc + cur.txsize, 0);
-    const outputLength = files.length;
-    console.log((160 + totalTxSize) * feeRate);
+    const outputLength = oneUtxo ? 1 : files.length;
     feeObj.networkFee = Math.ceil(
       (160 + totalTxSize) * feeRate + (34 * outputLength + 10) * feeRate,
     );
