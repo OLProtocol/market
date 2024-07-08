@@ -95,7 +95,11 @@ export const InscribeStepThree = ({
       setErrText(t('pages.inscribe.step_three.error_1'));
       return;
     }
-    if (toAddresses.length > 1 && toAddresses.length !== files.length) {
+    if (
+      !oneUtxo &&
+      toAddresses.length > 1 &&
+      toAddresses.length !== files.length
+    ) {
       setErrText(t('pages.inscribe.step_three.error_2'));
       return;
     }
