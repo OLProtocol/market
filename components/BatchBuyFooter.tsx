@@ -92,13 +92,12 @@ export const BatchBuyFooter = ({
   const serviceFee = useMemo(() => {
     const minServiceDecimal = new Decimal(minServiceFee);
     const _s = list.reduce((a, b) => {
-      const decimalA = new Decimal(a);
       let decimalB = new Decimal(Number(btcToSats(b.price)));
-      decimalB = decimalB.mul(new Decimal(0.01));
+      decimalB = decimalB.mul(new Decimal(0.01)).ceil();
 
-      const totalSercice = decimalA.plus(decimalB);
+      const totalSercice = a.plus(decimalB);
       return totalSercice;
-    }, 0);
+    }, new Decimal(0));
     return _s.plus(minServiceDecimal).toNumber();
   }, [list]);
   const insufficientBalanceStatus = useMemo(
@@ -138,13 +137,6 @@ export const BatchBuyFooter = ({
       return;
     }
     if (!insufficientBalanceStatus) {
-      console.log(
-        'calcFee',
-        (170 * (list.length + 1) +
-          34 * (list.length * 2 + dummyLength + 2) +
-          10) *
-          feeRate.value,
-      );
       setNetworkFee(
         Math.ceil(
           (170 * (list.length + 1) +
@@ -153,6 +145,7 @@ export const BatchBuyFooter = ({
             feeRate.value,
         ),
       );
+      setCalcLoading(false);
       return;
     }
     setCalcLoading(true);
