@@ -342,7 +342,7 @@ export const InscribeOrdxMint = ({
         vout,
       },
     ] as any[]);
-    const calcRepeat = Math.ceil(utxoData?.value / data.amount);
+    const calcRepeat = Math.ceil(utxoData?.amount / data.amount);
     console.log('calcRepeat', calcRepeat);
     const repeat = Math.max(Math.min(calcRepeat, MAX_REPEAT), 1);
     console.log('repeat', repeat);
