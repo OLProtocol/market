@@ -1,6 +1,7 @@
 {
   "tick": "Ticker",
-  "assets_name": "assetsName",
+  "assets_name": "Assets Name",
+  "domain_name": "Domain Name",
   "deploy": "Deploy",
   "mint": "Mint",
   "file": "File",
