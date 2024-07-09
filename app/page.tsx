@@ -167,13 +167,15 @@ export default function Home() {
               {(columnKey) => {
                 if (columnKey === 'assets_name') {
                   const tick = getKeyValue(item, 'assets_name');
+                  const nickname = getKeyValue(item, 'nickname');
+                  const logo = getKeyValue(item, 'logo');
                   return (
                     <TableCell>
                       <div className="flex text-sm md:text-base items-left">
-                        {/^[a-zA-Z]$/.test(tick.slice(0, 1)) ? (
+                        {logo ? (
                           <Image
                             radius="full"
-                            src={`/tick-ico/${tick.slice(0, 1).toUpperCase()}.png`}
+                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}${logo}`}
                             alt="logo"
                             className="w-14 h-14 p-2 rounded-full bg-gray-950"
                           />
@@ -183,7 +185,7 @@ export default function Home() {
                             className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
                           />
                         )}
-                        <span className="pt-4">{getTickLabel(tick)}</span>
+                        <span className="pt-4">{nickname ? nickname: getTickLabel(tick)}</span>
                       </div>
                     </TableCell>
                   );
