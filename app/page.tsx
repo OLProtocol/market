@@ -81,44 +81,52 @@ export default function Home() {
     setSortField(e.column);
     setSortOrder(e.direction === 'ascending' ? 0 : 1);
   };
-  const columns = [
-    { key: 'assets_name', label: t('common.assets_name'), allowsSorting: true },
-    {
-      key: 'lowest_price',
-      label: t('common.lowest_price'),
-      allowsSorting: true,
-    },
-    {
-      key: 'lowest_price_change',
-      label: t('common.price_change'),
-      allowsSorting: true,
-    },
-    {
-      key: 'tx_total_volume',
-      label: t('common.tx_total_volume'),
-      allowsSorting: true,
-    },
-    {
-      key: 'market_cap',
-      label: t('common.total_amount'),
-      allowsSorting: true,
-    },
-    {
-      key: 'tx_order_count',
-      label: t('common.tx_order_count'),
-      allowsSorting: true,
-    },
-    {
-      key: 'holder_count',
-      label: t('common.holder_count'),
-      allowsSorting: true,
-    },
-    {
-      key: 'onsell_order_count',
-      label: t('common.order_num'),
-      allowsSorting: true,
-    },
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        key: 'assets_name',
+        label:
+          type === 'ns' ? t('common.domain_name') : t('common.assets_name'),
+        allowsSorting: true,
+      },
+      {
+        key: 'lowest_price',
+        label: t('common.lowest_price'),
+        allowsSorting: true,
+      },
+      {
+        key: 'lowest_price_change',
+        label: t('common.price_change'),
+        allowsSorting: true,
+      },
+      {
+        key: 'tx_total_volume',
+        label: t('common.tx_total_volume'),
+        allowsSorting: true,
+      },
+      {
+        key: 'market_cap',
+        label: t('common.total_amount'),
+        allowsSorting: true,
+      },
+      {
+        key: 'tx_order_count',
+        label: t('common.tx_order_count'),
+        allowsSorting: true,
+      },
+      {
+        key: 'holder_count',
+        label: t('common.holder_count'),
+        allowsSorting: true,
+      },
+      {
+        key: 'onsell_order_count',
+        label: t('common.order_num'),
+        allowsSorting: true,
+      },
+    ],
+    [i18n.language, type],
+  );
 
   return (
     <div className="pt-4">
@@ -185,7 +193,9 @@ export default function Home() {
                             className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
                           />
                         )}
-                        <span className="pt-4">{nickname ? nickname: getTickLabel(tick)}</span>
+                        <span className="pt-4">
+                          {nickname ? nickname : getTickLabel(tick)}
+                        </span>
                       </div>
                     </TableCell>
                   );
