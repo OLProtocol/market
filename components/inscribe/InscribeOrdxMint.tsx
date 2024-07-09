@@ -110,7 +110,10 @@ export const InscribeOrdxMint = ({
           });
           throw rarityError;
         }
-        utxos = rarityData.data?.filter((v) => v?.sats?.length === 1) || [];
+        utxos =
+          rarityData.data?.filter(
+            (v) => v?.sats?.length === 1 || v.amount === v.value,
+          ) || [];
 
         // utxos?.sort(
         //   (a, b) =>
