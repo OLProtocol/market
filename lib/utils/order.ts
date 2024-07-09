@@ -386,6 +386,6 @@ export const calcBuyOrderFee = async ({
   await psbtTx.addSufficientUtxosForFee(btcUtxos, {
     suitable: false,
   });
-
+  console.log(psbtTx);
   return await psbtTx.calNetworkFee();
 };
