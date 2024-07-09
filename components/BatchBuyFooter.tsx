@@ -141,11 +141,20 @@ export const BatchBuyFooter = ({
       return;
     }
     if (!insufficientBalanceStatus) {
-      setNetworkFee(
+      console.log(
+        'calcFee',
         (170 * (list.length + 1) +
           34 * (list.length * 2 + dummyLength + 2) +
           10) *
           feeRate.value,
+      );
+      setNetworkFee(
+        Math.ceil(
+          (170 * (list.length + 1) +
+            34 * (list.length * 2 + dummyLength + 2) +
+            10) *
+            feeRate.value,
+        ),
       );
       return;
     }
