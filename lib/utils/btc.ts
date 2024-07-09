@@ -17,15 +17,20 @@ export const parseUtxo = (utxo: string) => {
   };
 };
 
+// export const satsToBitcoin = (sats) => {
+//   if (sats >= 100000000) sats = sats * 10;
+//   let string =
+//     String(sats).padStart(8, '0').slice(0, -9) +
+//     '.' +
+//     String(sats).padStart(8, '0').slice(-9);
+//   if (string.substring(0, 1) == '.') string = '0' + string;
+//   return string;
+// };
 export const satsToBitcoin = (sats) => {
-  if (sats >= 100000000) sats = sats * 10;
-  let string =
-    String(sats).padStart(8, '0').slice(0, -9) +
-    '.' +
-    String(sats).padStart(8, '0').slice(-9);
-  if (string.substring(0, 1) == '.') string = '0' + string;
-  return string;
+  let bitcoin = sats / 100000000;
+  return bitcoin.toFixed(8); 
 };
+
 export const btcToSats = (btc: string) => {
   let [whole, decimal] = btc.toString().split('.');
   if (!decimal) decimal = '0';
