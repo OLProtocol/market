@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { generateMultiScript } from '@/lib/inscribe/mint';
 export const useCalcFee = ({
   feeRate,
   files,
@@ -11,7 +12,6 @@ export const useCalcFee = ({
   files: any[];
 }) => {
   const VITE_TIP_MIN = 1000;
-  console.log(files);
   const clacFee = useMemo(() => {
     const feeObj: any = {
       networkFee: 0,
@@ -27,7 +27,7 @@ export const useCalcFee = ({
     const totalTxSize = files.reduce((acc, cur) => acc + cur.txsize, 0);
     const outputLength = oneUtxo ? 1 : files.length;
     feeObj.networkFee = Math.ceil(
-      (160 + totalTxSize) * feeRate + (34 * outputLength + 10) * feeRate,
+      (100 + totalTxSize + 31 * outputLength + 10) * feeRate,
     );
     let totalFee = feeObj.networkFee + totalInscriptionSize;
     const oneFee =

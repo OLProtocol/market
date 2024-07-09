@@ -375,7 +375,11 @@ export const getAddressBySescet = (sescet: string, network: string) => {
   return Address.p2tr.fromPubKey(pubkey, network as any);
 };
 
-const generateMultiScript = (secret: string, files: FileItem[], meta: any) => {
+export const generateMultiScript = (
+  secret: string,
+  files: FileItem[],
+  meta: any,
+) => {
   const seckey = keys.get_seckey(secret);
   const pubkey = keys.get_pubkey(seckey, true);
   const ec = new TextEncoder();
@@ -506,24 +510,26 @@ export const generateInscription = ({
   const script = generateMultiScript(secret, files, metadata);
   const leaf = Tap.encodeScript(script);
   const [tapkey, cblock] = Tap.getPubKey(pubkey, { target: leaf });
+  console.log('leaf:', Script.encode(script));
   const inscriptionAddress = Address.p2tr.fromPubKey(tapkey, network);
   console.log('network:', network);
   console.log('Inscription address: ', inscriptionAddress);
   console.log('Tapkey:', tapkey);
   let txsize = 0;
-  for (let i = 0; i < files.length; i++) {
-    const content = hexToBytes(files[i].hex);
+  txsize = 64 + 33 + Script.encode(script).length;
+  // for (let i = 0; i < files.length; i++) {
+  //   const content = hexToBytes(files[i].hex);
 
-    let prefix = 160;
+  //   let prefix = 160;
 
-    if (files[i].sha256 != '') {
-      prefix = feeRate > 1 ? 546 : 700;
-    }
+  //   if (files[i].sha256 != '') {
+  //     prefix = feeRate > 1 ? 546 : 700;
+  //   }
 
-    txsize = prefix + Math.floor(content.length / 4);
+  //   txsize = prefix + Math.floor(content.length / 4);
 
-    console.log('TXSIZE', txsize);
-  }
+  //   console.log('TXSIZE', txsize);
+  // }
   inscription = {
     script: script,
     leaf: leaf,
