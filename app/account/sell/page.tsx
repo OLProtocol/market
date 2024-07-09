@@ -240,25 +240,19 @@ export default function SellPage() {
                 <TableRow key={item.utxo}>
                   <TableCell>
                     <div className="mb-2 flex flex-wrap items-center gap-4">
-                      {item.tickers?.map((v) => (
-                        <div key={v.ticker}>
+                      {item.assets_list?.map((v) => (
+                        <div key={v.assets_name}>
                           <div>
-                            <span className="text-gray-400">Ticker：</span>
-                            <span>{v.ticker}</span>
+                            <span className="text-gray-400">
+                              {v.assets_type === 'ns' ? 'Name' : 'Ticker'}：
+                            </span>
+                            <span>{v.assets_name}</span>
                           </div>
                           <div>
                             <span className="text-gray-400">
                               {t('common.asset_num')}：
                             </span>
                             <span>{v.amount}</span>
-                          </div>
-                        </div>
-                      ))}
-                      {item.nslist?.map((v) => (
-                        <div key={v.name}>
-                          <div>
-                            <span className="text-gray-400">Name：</span>
-                            <span>{v.name}</span>
                           </div>
                         </div>
                       ))}
