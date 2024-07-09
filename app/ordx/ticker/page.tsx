@@ -19,7 +19,7 @@ export default function Page() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
-  const { address } = useReactWalletStore((state) => state);
+  const { address, network } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
   const assets_type = params.get('assets_type') as string;
   const { data } = useSWR(`getAssetsSummary`, () => {
@@ -35,6 +35,7 @@ export default function Page() {
   };
 
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
+  console.log(summary);
   const headList = useMemo(() => {
     return [
       {
@@ -95,10 +96,10 @@ export default function Page() {
     <div>
       <div className="min-h-40 flex flex-col py-2">
         <div className="flex-1 flex items-center mb-4 gap-4">
-          {/^[a-zA-Z]$/.test(ticker.slice(0, 1)) ? (
+          {summary?.logo ? (
             <Image
               radius="full"
-              src={`/tick-ico/${ticker.slice(0, 1).toUpperCase()}.png`}
+              src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}${summary.logo}`}
               alt="logo"
               className="w-20 h-20 p-2 rounded-full bg-gray-900"
             />
@@ -111,7 +112,9 @@ export default function Page() {
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
               <div className="text-2xl md:text-3xl font-medium text-gary-500">
-                {getTickLabel(summary?.assets_name)}
+                {summary?.nickname
+                  ? summary?.nickname
+                  : getTickLabel(summary?.assets_name)}
               </div>
             </div>
             <WalletConnectBus text={t('buttons.list_sale')}>
