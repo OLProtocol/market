@@ -99,7 +99,7 @@ export default function Page() {
           {summary?.logo ? (
             <Image
               radius="full"
-              src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}${summary.logo}`}
+              src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${summary.logo}`}
               alt="logo"
               className="w-20 h-20 p-2 rounded-full bg-gray-900"
             />
