@@ -56,12 +56,7 @@ export const InscribeStepThree = ({
   }, [list]);
 
   const oneUtxo = useMemo(() => selected, [selected]);
-  const clacFee = useCalcFee({
-    feeRate: feeRate.value,
-    files,
-    discount,
-    oneUtxo,
-  });
+
   const checkToAddressIsTaproot = (address: string[]) => {
     for (const addr of address) {
       if (!isTaprootAddress(addr, network)) {
@@ -71,6 +66,9 @@ export const InscribeStepThree = ({
     }
     return true;
   };
+  const totalInscriptionSize = useMemo(() => {
+    return files.reduce((acc, cur) => acc + cur.amount, 0);
+  }, [files]);
   const submit = async () => {
     if (loading) return;
     setErrText('');
@@ -89,10 +87,6 @@ export const InscribeStepThree = ({
       network,
       feeRate: feeRate.value,
     });
-    const totalInscriptionSize = files.reduce(
-      (acc, cur) => acc + cur.amount,
-      0,
-    );
     const outputLength = oneUtxo ? 1 : files.length;
 
     const baseSize = 84;
@@ -298,7 +292,7 @@ export const InscribeStepThree = ({
       </div>
       <div>
         <FeeShow
-          totalInscriptionSize={clacFee.totalInscriptionSize}
+          totalInscriptionSize={totalInscriptionSize}
           feeRate={feeRate.value}
           filesLength={files.length}
         />
