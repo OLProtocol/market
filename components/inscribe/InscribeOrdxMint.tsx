@@ -243,7 +243,8 @@ export const InscribeOrdxMint = ({
       }
       if (
         isSpecial &&
-        Math.ceil((data.utxos?.[0]?.value || 0) / data.amount) > data.repeatMint
+        Math.ceil((data.utxos?.[0]?.amount || 0) / data.amount) >
+          data.repeatMint
       ) {
         setErrorText(t('pages.inscribe.ordx.error_19'));
         return false;

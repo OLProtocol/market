@@ -183,7 +183,6 @@ export default function Home() {
                             className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
                           />
                         )}
-                        &nbsp;&nbsp;
                         <span className="pt-4">{getTickLabel(tick)}</span>
                       </div>
                     </TableCell>
