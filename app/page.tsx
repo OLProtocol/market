@@ -183,7 +183,7 @@ export default function Home() {
                         {logo ? (
                           <Image
                             radius="full"
-                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}${logo}`}
+                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}
                             alt="logo"
                             className="w-14 h-14 p-2 rounded-full bg-gray-950"
                           />
