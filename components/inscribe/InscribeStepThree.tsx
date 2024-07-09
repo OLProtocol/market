@@ -75,6 +75,13 @@ export const InscribeStepThree = ({
     if (loading) return;
     setErrText('');
     const secret = generatePrivateKey();
+    const feeObj: any = {
+      networkFee: 0,
+      serviceFee: 0,
+      totalFee: 0,
+      discountServiceFee: 0,
+      totalInscriptionSize: 0,
+    };
     const inscription = generateInscription({
       metadata,
       secret,
@@ -82,6 +89,52 @@ export const InscribeStepThree = ({
       network,
       feeRate: feeRate.value,
     });
+    const totalInscriptionSize = files.reduce(
+      (acc, cur) => acc + cur.amount,
+      0,
+    );
+    const outputLength = oneUtxo ? 1 : files.length;
+
+    const baseSize = 84;
+    const totalSize = baseSize + inscription.txsize;
+    const weight = baseSize * 3 + totalSize;
+    const txHeaderSize = 12; // 版本号 + 输入计数 + 输出计数 + 锁定时间 + 见证标记和标志
+    const inputSize = 41; // 每个输入的大小
+    const outputSize = 52; // 每个输出的大小
+    const witnessSize = inscription.txsize; // 每个输入的见证数据大小
+
+    const numInputs = 1;
+
+    // 计算原始大小
+    const rawSize =
+      txHeaderSize +
+      inputSize * numInputs +
+      outputSize * outputLength +
+      witnessSize;
+
+    // 计算剥离大小
+    const strippedSize =
+      txHeaderSize + inputSize * numInputs + outputSize * outputLength;
+
+    // 计算总权重
+    const totalWeight = strippedSize * 4 + witnessSize * numInputs;
+
+    // 计算虚拟大小
+    const vSize = totalWeight / 4;
+    console.log(`witnessSize: ${witnessSize} bytes`);
+    console.log(`Raw size: ${rawSize} bytes`);
+    console.log(`Stripped size: ${strippedSize} bytes`);
+    console.log(`Total weight: ${totalWeight} WU`);
+    console.log(`Virtual size: ${vSize} vBytes`);
+
+    feeObj.networkFee = Math.ceil(vSize * feeRate.value);
+    let totalFee = feeObj.networkFee + totalInscriptionSize;
+    const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
+    feeObj.serviceFee = Math.ceil(oneFee);
+    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - discount)) / 100);
+    feeObj.totalInscriptionSize = totalInscriptionSize;
+    feeObj.totalFee = totalFee;
+
     const orderId = uuidV4();
     const toAddresses =
       selectedTab === 'single'
@@ -113,7 +166,7 @@ export const InscribeStepThree = ({
       inscription,
       secret,
       oneUtxo,
-      fee: clacFee,
+      fee: feeObj,
       metadata,
       toAddress: toAddresses,
       feeRate: feeRate.value,

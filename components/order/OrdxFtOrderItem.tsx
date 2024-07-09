@@ -81,6 +81,7 @@ export const OrdxFtOrderItem = ({
     }
     onSelect?.(b);
   };
+  console.log('assets_type', assets_type);
 
   return (
     <Card
@@ -141,31 +142,35 @@ export const OrdxFtOrderItem = ({
                     ? asset?.assets_name
                     : thousandSeparator(asset?.amount)}
                 </p>
-                <p className="pt-12 md:pb-2 md:text-sm">
-                  <span className="font-bold text-amber-400">
-                    {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
-                  </span>
-                  <span className="font-mono text-gray-100">
-                    &nbsp;sats/{asset?.assets_name}
-                  </span>
-                </p>
-                <p className="md:text-sm">
-                  <span className="font-mono text-gray-100">
-                    $
-                    <BtcPrice
-                      btc={asset?.unit_price / asset?.unit_amount / 100000000}
-                    />
-                    &nbsp; /{asset?.assets_name}
-                  </span>
-                </p>
+                {assets_type !== 'ns' && (
+                  <>
+                    <p className="pt-12 md:pb-2 md:text-sm">
+                      <span className="font-bold text-amber-400">
+                        {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
+                      </span>
+                      <span className="font-mono text-gray-100">
+                        &nbsp;sats/{asset?.assets_name}
+                      </span>
+                    </p>
+                    <p className="md:text-sm">
+                      <span className="font-mono text-gray-100">
+                        $
+                        <BtcPrice
+                          btc={
+                            asset?.unit_price / asset?.unit_amount / 100000000
+                          }
+                        />
+                        &nbsp; /{asset?.assets_name}
+                      </span>
+                    </p>
+                  </>
+                )}
               </section>
             )}
-          </div>
+          </div>{' '}
           {assets_type !== 'ns' && (
-            <div className="grid justify-items-start ... z-40">
-              <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
-                {asset?.assets_name}
-              </div>
+            <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100 z-10">
+              {asset?.assets_name}
             </div>
           )}
         </div>
