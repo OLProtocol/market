@@ -231,6 +231,7 @@ export const OrdxOrderList = ({
             <div key={item.utxo + i}>
               <OrdxFtOrderItem
                 assets_name={assets_name}
+                assets_type={assets_type}
                 showResale={showResale}
                 canSelect={canSelect}
                 delay={i > 5 ? 2000 : 0}

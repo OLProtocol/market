@@ -23,6 +23,7 @@ interface Props {
   item: any;
   onBuy?: any;
   delay?: number;
+  assets_type?: string;
   assets_name?: string;
   showResale?: boolean;
   onCancelOrder?: () => void;
@@ -38,6 +39,7 @@ export const OrdxFtOrderItem = ({
   selected,
   onSelect,
   assets_name,
+  assets_type,
   onCancelOrder,
   delay,
   showResale = true,
@@ -129,45 +131,43 @@ export const OrdxFtOrderItem = ({
             {showContent(asset?.content_type, asset?.delegate) ? (
               <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
                 <p className="font-medium text-2xl md:text-3xl mb-1">
-                  {thousandSeparator(item?.assets[0].amount)}
+                  {thousandSeparator(asset?.amount)}
                 </p>
               </section>
             ) : (
               <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-20">
                 <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
-                  {thousandSeparator(item?.assets[0].amount)}
+                  {assets_type === 'ns'
+                    ? asset?.assets_name
+                    : thousandSeparator(asset?.amount)}
                 </p>
                 <p className="pt-12 md:pb-2 md:text-sm">
                   <span className="font-bold text-amber-400">
-                    {(
-                      item?.assets[0].unit_price / item?.assets[0].unit_amount
-                    ).toFixed(2)}
+                    {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
                   </span>
                   <span className="font-mono text-gray-100">
-                    &nbsp;sats/{item?.assets[0].assets_name}
+                    &nbsp;sats/{asset?.assets_name}
                   </span>
                 </p>
                 <p className="md:text-sm">
                   <span className="font-mono text-gray-100">
                     $
                     <BtcPrice
-                      btc={
-                        item?.assets[0].unit_price /
-                        item?.assets[0].unit_amount /
-                        100000000
-                      }
+                      btc={asset?.unit_price / asset?.unit_amount / 100000000}
                     />
-                    &nbsp; /{item?.assets[0].assets_name}
+                    &nbsp; /{asset?.assets_name}
                   </span>
                 </p>
               </section>
             )}
           </div>
-          <div className="grid justify-items-start ... z-40">
-            <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
-              {item?.assets[0].assets_name}
+          {assets_type !== 'ns' && (
+            <div className="grid justify-items-start ... z-40">
+              <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
+                {asset?.assets_name}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </CardBody>
       <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:h-[6.5rem]  md:w-[16rem]">
