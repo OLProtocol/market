@@ -37,6 +37,6 @@ export const useCalcFee = ({
     feeObj.totalInscriptionSize = totalInscriptionSize;
     feeObj.totalFee = totalFee;
     return feeObj;
-  }, [feeRate, files, discount]);
+  }, [feeRate, files, discount, oneUtxo]);
   return clacFee;
 };

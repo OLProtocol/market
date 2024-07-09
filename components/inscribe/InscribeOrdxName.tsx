@@ -63,7 +63,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     return checkStatus;
   };
   const nameSuffixs = [
-    { label: 'no suffix', key: '.ordx' },
+    { label: 'any suffix', key: '.ordx' },
     { label: '.x', key: '.x' },
     { label: '.btc', key: '.btc' },
     { label: '.sats', key: '.sats' },
