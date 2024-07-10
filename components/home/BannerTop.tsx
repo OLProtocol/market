@@ -1,12 +1,18 @@
 // components/BannerTop
 import { Button, Image } from '@nextui-org/react';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { ordxSWR } from '@/api';
+import { useRouter } from 'next/navigation';
 import CountdownTimer from '@/components/CountdownTimer';
 import ProgressBar from '@/components/ProgressBar';
 
 const BannerTop = () => {
+  const router = useRouter();
   const startDate = new Date('2024-07-02T03:58:00');
   const targetDate = new Date('2024-07-23T11:14:00');
+  const { data: heightData } = ordxSWR.useBtcHeight('livenet');
+  console.log(heightData);
+
   const formattedStartDate = startDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -19,8 +25,13 @@ const BannerTop = () => {
     day: 'numeric',
   });
 
+  const toMint = () => {
+    router.push('/inscribe?type=ordx&ticker=RarePizza');
+  };
   const startBlockHeight = 850282;
-  const currentBlockHeight = 851347;
+  const currentBlockHeight = useMemo(() => {
+    return heightData?.data.height || 0;
+  }, [heightData]);
   const endBlockHeight = 853358;
 
   return (
@@ -44,6 +55,7 @@ const BannerTop = () => {
                   className="text-tiny h-10 w-60 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
                   variant="flat"
                   radius="sm"
+                  onClick={toMint}
                 >
                   MINT NOW
                 </Button>
@@ -62,7 +74,9 @@ const BannerTop = () => {
                     <h6>
                       Block:<span>{currentBlockHeight.toLocaleString()} </span>
                     </h6>
-                    <h6 className="pr-40">Holders:2236 / Minted: 28957577</h6>
+                    <h6 className="pr-40 keep-all">
+                      Holders:2236 / Minted: 28957577
+                    </h6>
                     <h6>
                       Block:<span>{endBlockHeight.toLocaleString()} </span>
                     </h6>
