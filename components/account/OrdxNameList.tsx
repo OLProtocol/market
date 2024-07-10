@@ -28,8 +28,8 @@ export const OrdxNameList = ({
   const { address, network } = useReactWalletStore((state) => state);
   const {
     add: addSell,
-    changeTicker,
-    changeType,
+    changeAssetsName,
+    changeAssetsType,
     reset,
     list: sellList,
     remove: removeSell,
@@ -74,8 +74,8 @@ export const OrdxNameList = ({
   };
   const addHandler = (item: any) => {
     const tickerAmount = 1;
-    changeType('ns');
-    changeTicker(item.ticker);
+    changeAssetsType('ns');
+    changeAssetsName(item.ticker);
     addSell({
       ...item,
       unit_price: '2',
@@ -135,7 +135,7 @@ export const OrdxNameList = ({
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4 justify-center">
           {list.map((item: any) => (
             <div key={item.utxo + item.locked} className="w-60">
               <OrdxAssetNameItem

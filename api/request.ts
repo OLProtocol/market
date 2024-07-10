@@ -145,10 +145,10 @@ export const submitOrder = async ({ address, raw }: any) => {
   });
   return res;
 };
-export const submitBatchOrders = async ({ address, raws }: any) => {
+export const submitBatchOrders = async ({ address, orders }: any) => {
   const res = await request('/ordx/SubmitBatchOrders', {
     method: 'POST',
-    data: { address, raw: raws },
+    data: { address, order_query: orders },
   });
   return res;
 };

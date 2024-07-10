@@ -28,8 +28,8 @@ export const OrdxUtxoList = ({
   const { address, network } = useReactWalletStore((state) => state);
   const {
     add: addSell,
-    changeTicker,
-    changeType,
+    changeAssetsName,
+    changeAssetsType,
     reset,
     list: sellList,
     remove: removeSell,
@@ -86,8 +86,8 @@ export const OrdxUtxoList = ({
         item.tickers?.find((v) => v.ticker === assets_name)?.amount || 0;
     }
     console.log(new Decimal('2').mul(new Decimal(tickerAmount)).toString());
-    changeType(assets_type);
-    changeTicker(assets_name);
+    changeAssetsType(assets_type);
+    changeAssetsName(assets_name);
     addSell({
       ...item,
       unit_price: '2',
@@ -157,7 +157,7 @@ export const OrdxUtxoList = ({
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
           {list.map((item: any, i) => (
             <div key={item.utxo + item.locked}>
               <OrdxFtAssetsItem
