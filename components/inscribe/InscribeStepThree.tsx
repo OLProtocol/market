@@ -187,7 +187,10 @@ export const InscribeStepThree = ({
   };
   const cycleFill = () => {
     const addresses = data.toMultipleAddresses;
-    const addressList = addresses.split('\n').map((address) => address.trim());
+    const addressList = addresses
+      .split('\n')
+      .map((address) => address.trim())
+      .filter((a) => a !== '');
     const len = list.length || 10;
     const newAddressList: string[] = [];
     if (addressList.length < len) {
@@ -303,7 +306,9 @@ export const InscribeStepThree = ({
               ></Button> */}
             <div className="flex">
               <Button color={'primary'} onClick={cycleFill}>
-                循环上面地址至{list.length}个
+                {t('pages.inscribe.step_three.cycle_fill', {
+                  len: list.length,
+                })}
               </Button>
             </div>
           </div>
