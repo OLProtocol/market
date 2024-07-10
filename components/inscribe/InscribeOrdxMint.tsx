@@ -13,6 +13,7 @@ import { useUtxoStore } from '@/store';
 import { useCommonStore } from '@/store';
 import { tryit, min } from 'radash';
 import { UtxoSelectTable } from './UtxoSelectTable';
+import { useSearchParams } from 'next/navigation';
 // import { CopyButton } from '@/components/CopyButton';
 
 interface InscribeOrdxMintProps {
@@ -25,6 +26,8 @@ export const InscribeOrdxMint = ({
   onNext,
   onChange,
 }: InscribeOrdxMintProps) => {
+  const params = useSearchParams();
+  const paramsTicker = (params.get('ticker') as string) || '';
   const { address: currentAccount, network, connected } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
@@ -33,7 +36,7 @@ export const InscribeOrdxMint = ({
   const [data, { set }] = useMap<any>({
     type: 'mint',
     mode: 'fair',
-    tick: '',
+    tick: paramsTicker,
     amount: 1,
     limit: 0,
     repeatMint: 1,
@@ -363,7 +366,7 @@ export const InscribeOrdxMint = ({
     if (connected) {
       onTickBlur();
     }
-  }, [connected]);
+  }, [connected, paramsTicker]);
   return (
     <div>
       <div className="mb-4">
