@@ -271,19 +271,21 @@ export const InscribeStepThree = ({
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
             <div className="mb-2">Multiple Adddress:</div>
-            <div className="flex gap-2">
-              <Textarea
-                placeholder="Enter multiple addresses, one per line"
-                value={data.toMultipleAddresses}
-                onChange={(e) => set('toMultipleAddresses', e.target.value)}
-              />
-              {/* <Button
+            <Textarea
+              placeholder="Enter multiple addresses, one per line"
+              value={data.toMultipleAddresses}
+              onChange={(e) => set('toMultipleAddresses', e.target.value)}
+              className="mb-2"
+            />
+            {/* <Button
                 size="sm"
                 onClick={() => {
                   getWalletAddresses();
                 }}
               ></Button> */}
-            </div>
+            {/* <div className="flex">
+              <Button className=''>把上面地址循环至{list.length}个地址</Button>
+            </div> */}
           </div>
         </Tab>
       </Tabs>

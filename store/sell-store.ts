@@ -24,10 +24,8 @@ export interface UtxoAssetItem {
 
 interface SellState {
   unit: 'btc' | 'sats';
-  ticker: string;
   assets_type: string;
   assets_name: string;
-  type: string;
   amountUnit: 'btc' | 'sats';
   list: UtxoAssetItem[];
   add: (item: UtxoAssetItem) => void;
@@ -37,8 +35,8 @@ interface SellState {
   ) => void;
   changePrice: (utxo: string, price: string) => void;
   changeUnit: (unit: 'btc' | 'sats') => void;
-  changeTicker: (ticker: string) => void;
-  changeType: (t: string) => void;
+  changeAssetsName: (ticker: string) => void;
+  changeAssetsType: (t: string) => void;
   changeAmountUnit: (unit: 'btc' | 'sats') => void;
   remove: (utxo: string) => void;
   reset: () => void;
@@ -48,10 +46,8 @@ export const useSellStore = create<SellState>()(
   devtools((set, get) => ({
     unit: 'sats',
     amountUnit: 'btc',
-    ticker: '',
     assets_type: '',
     assets_name: '',
-    type: 'ticker',
     list: [
       // {
       //   utxo: 'c1751e4beb5472305875f2b7ed30f8805c5f8027c393e884fad86be2fc6bc00c:0',
@@ -69,19 +65,19 @@ export const useSellStore = create<SellState>()(
       // },
     ],
     changePrice(utxo, price) {
-      const { list, ticker, amountUnit, unit, type } = get();
+      const { list, assets_type, amountUnit, unit, assets_name } = get();
       const newList = list.map((item) => {
         let amount = 0;
-        if (type === 'ticker') {
-          amount =
-            item.assets_list?.find((t) => t.assets_name === ticker)?.amount ||
-            0;
-        } else if (type === 'exotic') {
+        if (assets_type === 'ns') {
+          amount = 1;
+        } else if (assets_type === 'exotic') {
           amount =
             item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
             0;
-        } else if (type === 'ns') {
-          amount = 1;
+        } else {
+          amount =
+            item.assets_list?.find((v) => v.assets_name === assets_name)
+              ?.amount || 0;
         }
         if (price === '' || isNaN(Number(price))) {
           return {
@@ -113,14 +109,14 @@ export const useSellStore = create<SellState>()(
         list: newList,
       });
     },
-    changeTicker(ticker) {
+    changeAssetsName(ticker) {
       set({
-        ticker,
+        assets_name: ticker,
       });
     },
-    changeType(t) {
+    changeAssetsType(t) {
       set({
-        type: t,
+        assets_type: t,
       });
     },
     changeStatus(utxo, status) {
@@ -140,23 +136,23 @@ export const useSellStore = create<SellState>()(
       });
     },
     changeUnit(unit) {
-      const { list, ticker, amountUnit, type } = get();
+      const { list, assets_type, amountUnit, assets_name } = get();
       const newList = list.map((item) => {
         const unitPrice =
           unit === 'btc'
             ? satsToBitcoin(item.unit_price).toString()
             : btcToSats(item.unit_price).toString();
         let amount = 0;
-        if (type === 'ticker') {
-          amount =
-            item.assets_list?.find((t) => t.assets_name === ticker)?.amount ||
-            0;
-        } else if (type === 'exotic') {
+        if (assets_type === 'ns') {
+          amount = 1;
+        } else if (assets_type === 'exotic') {
           amount =
             item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
             0;
-        } else if (type === 'ns') {
-          amount = 1;
+        } else {
+          amount =
+            item.assets_list?.find((v) => v.assets_name === assets_name)
+              ?.amount || 0;
         }
 
         const satsPrice =
@@ -180,7 +176,7 @@ export const useSellStore = create<SellState>()(
       });
     },
     changeAmountUnit(unit) {
-      const { list, ticker } = get();
+      const { list } = get();
       const newList = list.map((item) => {
         return {
           ...item,
@@ -196,19 +192,19 @@ export const useSellStore = create<SellState>()(
       });
     },
     add: (item) => {
-      const { list, ticker, type } = get();
+      const { list, assets_type, assets_name } = get();
       if (!list.find((i) => i.utxo === item.utxo)) {
         let amount = 0;
-        if (type === 'ticker') {
-          amount =
-            item.assets_list?.find((t) => t.assets_name === ticker)?.amount ||
-            0;
-        } else if (type === 'exotic') {
+        if (assets_type === 'ns') {
+          amount = 1;
+        } else if (assets_type === 'exotic') {
           amount =
             item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
             0;
-        } else if (type === 'ns') {
-          amount = 1;
+        } else {
+          amount =
+            item.assets_list?.find((v) => v.assets_name === assets_name)
+              ?.amount || 0;
         }
         let amountPrice = new Decimal(item.unit_price)
           .mul(new Decimal(amount))
@@ -236,7 +232,8 @@ export const useSellStore = create<SellState>()(
     },
     reset: () => {
       set({
-        ticker: '',
+        assets_name: '',
+        assets_type: '',
         unit: 'sats',
         amountUnit: 'btc',
         list: [],

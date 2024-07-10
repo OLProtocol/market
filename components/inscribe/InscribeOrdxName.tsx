@@ -80,7 +80,11 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     }
   };
   const nameChange = (name: string) => {
-    set('name', name?.replace('.', '').trim());
+    if (data.suffix === '.ordx') {
+      set('name', name?.trim());
+    } else {
+      set('name', name?.replace('.', '')?.trim());
+    }
   };
   useEffect(() => {
     setChecked(false);

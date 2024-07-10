@@ -39,11 +39,11 @@ export default function SellPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
-    type,
+    assets_name,
+    assets_type,
     list,
     reset,
     unit,
-    ticker,
     amountUnit,
     changeAmountUnit,
     changeUnit,
@@ -53,12 +53,12 @@ export default function SellPage() {
   console.log('app.account.sell.page: list: ', list);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
-    `getAssetsSummary-${ticker}`,
+    `getAssetsSummary-${assets_name}-${assets_type}`,
     () => {
-      console.log('app.account.sell.page: ticker: ', ticker);
+      console.log('app.account.sell.page: ticker: ', assets_name);
       let ret: Promise<any>;
       try {
-        ret = getAssetsSummary({ assets_name: ticker, assets_type: type });
+        ret = getAssetsSummary({ assets_name, assets_type });
         return ret;
       } catch (error) {
         console.log('app.account.sell.page: getAssetsSummary err: ', error);
@@ -69,7 +69,6 @@ export default function SellPage() {
   useEffect(() => {
     if (summary.lowest_price) {
       for (const item of list) {
-        // console.log('lowest price', item.utxo, summary.lowest_price);
         if (unit === 'btc') {
           changePrice(
             item.utxo,
@@ -83,7 +82,7 @@ export default function SellPage() {
   }, [summary]);
   const listItems = async () => {
     for (let i = 0; i < list.length; i++) {
-      const { price } = list[i];
+      const { price, assets_list } = list[i];
       const _p = amountUnit === 'btc' ? btcToSats(price) : price;
       if (Number(_p) < 330) {
         notification.error({
@@ -106,9 +105,23 @@ export default function SellPage() {
       console.log('Batch Order raw', signedPsbts);
       if (signedPsbts) {
         const psbts = splitBatchSignedPsbt(signedPsbts, network);
+        const orders = list.map((v, j) => {
+          const { assets_list } = v;
+          let asset;
+          if (assets_type === 'ticker') {
+            asset = assets_list.find((v) => v.assets_name === assets_name)[0];
+          } else {
+            asset = assets_list.find((v) => v.assets_type === assets_type)[0];
+          }
+          return {
+            assets_name: asset.assets_name,
+            assets_type: asset.assets_type,
+            raw: psbts[j],
+          };
+        });
         const res = await submitBatchOrders({
           address,
-          raws: psbts,
+          orders: psbts,
         });
         if (res.code === 200) {
           notification.success({
