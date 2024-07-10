@@ -226,7 +226,7 @@ export const OrdxOrderList = ({
             ></SortDropdown>
           </div>
         )}
-        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
           {list.map((item: any, i) => (
             <div key={item.utxo + i}>
               <OrdxFtOrderItem

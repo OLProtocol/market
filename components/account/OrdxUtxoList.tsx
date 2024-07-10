@@ -157,7 +157,7 @@ export const OrdxUtxoList = ({
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] flex flex-wrap gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
           {list.map((item: any, i) => (
             <div key={item.utxo + item.locked}>
               <OrdxFtAssetsItem

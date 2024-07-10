@@ -21,3 +21,7 @@
   background-color: rgba(169, 85, 247, 0.459); /* 悬停时的背景色 */
   color: rgba(255, 255, 255, 0.822);
 }
+.flex-after-content::after {
+  content: "";
+  flex: auto;
+}
