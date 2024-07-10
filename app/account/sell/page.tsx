@@ -109,9 +109,9 @@ export default function SellPage() {
           const { assets_list } = v;
           let asset;
           if (assets_type === 'ticker') {
-            asset = assets_list.find((v) => v.assets_name === assets_name)[0];
+            asset = assets_list.find((a) => a.assets_name === assets_name);
           } else {
-            asset = assets_list.find((v) => v.assets_type === assets_type)[0];
+            asset = assets_list.find((a) => a.assets_type === assets_type);
           }
           return {
             assets_name: asset.assets_name,
@@ -121,7 +121,7 @@ export default function SellPage() {
         });
         const res = await submitBatchOrders({
           address,
-          orders: psbts,
+          orders: orders,
         });
         if (res.code === 200) {
           notification.success({
