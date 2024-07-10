@@ -118,7 +118,7 @@ export const Navbar = () => {
     () => [
       {
         label: t('pages.market.title'),
-        href: '/',
+        href: '/market',
         isActive: true,
       },
       {
@@ -129,6 +129,7 @@ export const Navbar = () => {
       {
         label: t('pages.explorer.title'),
         href: `${process.env.NEXT_PUBLIC_ORDX_WEBSITE_HOST}/#/explorer`,
+        target: '_blank',
         isActive: true,
       },
       {
@@ -175,7 +176,11 @@ export const Navbar = () => {
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
           {navMenus.map((item) => (
             <NavbarItem key={item.href} isActive={isActive(item.href)}>
-              <NextLink href={item.href} color="foreground">
+              <NextLink
+                href={item.href}
+                target={item.target}
+                color="foreground"
+              >
                 {item.label}
               </NextLink>
             </NavbarItem>
