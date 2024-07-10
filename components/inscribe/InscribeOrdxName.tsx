@@ -79,6 +79,11 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       onNext?.();
     }
   };
+  const onBlur = async () => {
+    if (data.suffix === '.ordx') {
+      set('name', data.name.trim().replace(/\.$/, ''));
+    }
+  };
   const nameChange = (name: string) => {
     if (data.suffix === '.ordx') {
       set('name', name?.trim());
@@ -113,6 +118,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             onChange={(e) => {
               nameChange(e.target.value);
             }}
+            onBlur={onBlur}
             maxLength={32}
             type="text"
             placeholder={t('pages.inscribe.name.name_placeholder')}

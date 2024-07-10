@@ -66,10 +66,16 @@ export const InscribeStepThree = ({
     }
     return true;
   };
-  const addressList = useMemo(() => {}, [
-    data.toMultipleAddresses,
-    data.toSingleAddress,
-  ]);
+  const toAddressList = useMemo(() => {
+    if (selectedTab === 'single') {
+      return [data.toSingleAddress];
+    } else {
+      return data.toMultipleAddresses
+        .split('\n')
+        .map((address) => address.trim())
+        .filter((address) => address !== '');
+    }
+  }, [data.toMultipleAddresses, data.toSingleAddress, selectedTab]);
   const totalInscriptionSize = useMemo(() => {
     return files.reduce((acc, cur) => acc + cur.amount, 0);
   }, [files]);
@@ -134,13 +140,7 @@ export const InscribeStepThree = ({
     feeObj.totalFee = totalFee;
 
     const orderId = uuidV4();
-    const toAddresses =
-      selectedTab === 'single'
-        ? [data.toSingleAddress]
-        : data.toMultipleAddresses
-            .split('\n')
-            .map((address) => address.trim())
-            .filter((address) => address !== '');
+    const toAddresses = toAddressList;
     console.log('toAddresses===========' + toAddresses);
     if (toAddresses.length === 0) {
       setErrText(t('pages.inscribe.step_three.error_1'));
@@ -194,8 +194,8 @@ export const InscribeStepThree = ({
       for (let i = 0; i < len; i++) {
         newAddressList.push(addressList[i % addressList.length]);
       }
+      set('toMultipleAddresses', newAddressList.join('\n'));
     }
-    set('toMultipleAddresses', newAddressList.join('\n'));
   };
   const getWalletAddresses = async () => {
     if (loading) return;
@@ -286,7 +286,9 @@ export const InscribeStepThree = ({
         </Tab>
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
-            <div className="mb-2">Multiple Adddress:</div>
+            <div className="mb-2">
+              Multiple Adddress ({toAddressList.length}):
+            </div>
             <Textarea
               placeholder="Enter multiple addresses, one per line"
               value={data.toMultipleAddresses}
@@ -300,8 +302,8 @@ export const InscribeStepThree = ({
                 }}
               ></Button> */}
             <div className="flex">
-              <Button onClick={cycleFill}>
-                把上面地址循环至{list.length}个地址
+              <Button color={'primary'} onClick={cycleFill}>
+                循环上面地址至{list.length}个
               </Button>
             </div>
           </div>
