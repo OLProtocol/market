@@ -66,6 +66,10 @@ export const InscribeStepThree = ({
     }
     return true;
   };
+  const addressList = useMemo(() => {}, [
+    data.toMultipleAddresses,
+    data.toSingleAddress,
+  ]);
   const totalInscriptionSize = useMemo(() => {
     return files.reduce((acc, cur) => acc + cur.amount, 0);
   }, [files]);
@@ -181,6 +185,18 @@ export const InscribeStepThree = ({
       return file.hex;
     }
   };
+  const cycleFill = () => {
+    const addresses = data.toMultipleAddresses;
+    const addressList = addresses.split('\n').map((address) => address.trim());
+    const len = list.length || 10;
+    const newAddressList: string[] = [];
+    if (addressList.length < len) {
+      for (let i = 0; i < len; i++) {
+        newAddressList.push(addressList[i % addressList.length]);
+      }
+    }
+    set('toMultipleAddresses', newAddressList.join('\n'));
+  };
   const getWalletAddresses = async () => {
     if (loading) return;
     setLoading(true);
@@ -212,7 +228,7 @@ export const InscribeStepThree = ({
   useEffect(() => {
     if (currentAccount) {
       set('toSingleAddress', currentAccount);
-      set('toMultipleAddresses', data.toMultipleAddresses);
+      // set('toMultipleAddresses', data.toMultipleAddresses);
     }
   }, [currentAccount]);
   return (
@@ -283,9 +299,11 @@ export const InscribeStepThree = ({
                   getWalletAddresses();
                 }}
               ></Button> */}
-            {/* <div className="flex">
-              <Button className=''>把上面地址循环至{list.length}个地址</Button>
-            </div> */}
+            <div className="flex">
+              <Button onClick={cycleFill}>
+                把上面地址循环至{list.length}个地址
+              </Button>
+            </div>
           </div>
         </Tab>
       </Tabs>
