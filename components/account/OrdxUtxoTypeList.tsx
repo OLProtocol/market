@@ -29,30 +29,10 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     },
   );
   const list = useMemo(() => {
-    if (!data) {
+    if (!data?.data) {
       return [];
     }
-    let ret = [{ assetsName: 'Name', assert: 'Name', balance: 0 }];
-    for (let i = 0; i < data?.data?.length; i++) {
-      const item = data?.data[i];
-
-      let assert =
-        item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
-      let assetsName =
-        item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
-      if (item?.assets_type === 'ticker') {
-        assetsName = item?.assets_name ? item?.assets_name : '';
-      }
-      // if(item?.assets_type != 'ticker' && item?.assets_type != 'exotic'){
-      //   assetsName =  NsAssetTitle;
-      // }
-      ret.push({
-        assetsName: assetsName,
-        assert: assert,
-        balance: item?.balance,
-      });
-    }
-
+    let ret = data?.data;
     return ret;
   }, [data]);
   useEffect(() => {
@@ -72,7 +52,7 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   };
 
   return (
-    <div className="py-2 sm:py-4">
+    <div className="">
       <Tabs
         variant="light"
         aria-label="Tabs variants"
@@ -88,8 +68,8 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
       >
         {list?.map((item) => (
           <Tab
-            key={item.assert}
-            title={`${item.assetsName}${!!item.balance ? `(${item.balance})` : ''}`}
+            key={item.assets_name}
+            title={`${item.assets_name}${!!item.balance ? `(${item.balance})` : ''}`}
           />
         ))}
       </Tabs>

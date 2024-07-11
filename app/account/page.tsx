@@ -46,71 +46,7 @@ export default function AccountPage() {
   }, [data]);
   console.log('totalSatValue', totalSatValue);
   return (
-    <div>
-      <div className="min-h-[8rem] grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-8 gap-2 sm:gap-4 mt-4 mb-4">
-        <Card isHoverable className="px-2">
-          <CardHeader>
-            <span className="text-base md:text-lg font-mono text-gray-400">
-              BTC balance
-            </span>
-          </CardHeader>
-          <Divider className="divide-inherit divide-dashed" />
-          <CardBody className="text-left text-md font-thin leading-8">
-            <div className="flex">
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-              {satsToBitcoin(balance.total)}
-            </div>
-            <div className="flex text-sm md:font-bold">
-              <span className="text-yellow-400 w-5"> &nbsp;$</span>
-              <span className="text-gray-400 h-5">
-                <BtcPrice btc={balance.total / 100000000} />
-              </span>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card isHoverable className="px-2">
-          <CardHeader>
-            <span className="text-base md:text-lg font-mono text-gray-400">
-              Sat20 value
-            </span>
-          </CardHeader>
-          <Divider className="divide-inherit divide-dashed" />
-          <CardBody className="text-left text-md font-thin leading-8">
-            <div className="flex">
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-              {totalSatValue}
-            </div>
-            <div className="flex text-sm md:font-bold">
-              <span className="text-yellow-400 w-5"> &nbsp;$</span>
-              <span className="text-gray-400 h-5">
-                <BtcPrice btc={totalSatValue} />
-              </span>
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card isHoverable className="px-2">
-          <CardHeader>
-            <span className="text-base md:text-lg font-mono text-gray-400">
-              Ordinals NFT value
-            </span>
-          </CardHeader>
-          <Divider />
-          <CardBody className="text-left text-md font-thin leading-8">
-            <div className="flex">
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-              {(totalSatValue / 100000000).toFixed(8)}
-            </div>
-            <div className="flex text-sm md:font-bold">
-              <span className="text-yellow-400 w-5"> &nbsp;$</span>
-              <span className="text-gray-400 h-5">
-                <BtcPrice btc={totalSatValue / 100000000} />
-              </span>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+    <div className="py-4">
       <Tabs
         aria-label="Options"
         color="primary"
