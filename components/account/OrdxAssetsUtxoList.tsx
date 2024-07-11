@@ -3,32 +3,38 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { OrdxUtxoTypeList } from '@/components/account/OrdxUtxoTypeList';
+import { OrdxCategoryTab } from './OrdxCategoryTab';
 import { OrdxNameList } from './OrdxNameList';
 import { OrdxUtxoList } from './OrdxUtxoList';
 
 export const OrdxAssetsUtxoList = () => {
   const router = useRouter();
-  const [assertType, setAssertType] = useState<string>('Name');
-  const [assertName, setAssertName] = useState<string>('Name');
+  const [assertType, setAssertType] = useState<string>('ticker');
+  const [assertName, setAssertName] = useState<string>('');
 
   const onAssertChange = (data: string) => {
-    const parts = data.split(':');
-    console.log('onAssertChange', data, parts);
-    setAssertType(parts[0]);
-    setAssertName(parts[1]);
+    setAssertName(data);
+  };
+  const onCategoryChange = (t: string) => {
+    setAssertType(t);
   };
   console.log('assertType', assertType);
   console.log('assertName', assertName);
   return (
-    <div>
-      <div>
-        <OrdxUtxoTypeList onChange={onAssertChange} />
+    <div className="py-4">
+      <div className="mb-4">
+        <OrdxCategoryTab onChange={onCategoryChange} />
       </div>
-      {assertType === 'Name' && (
-        <OrdxNameList assetsName={''} assetsType={''} />
+      {assertType === 'ns' && (
+        <OrdxNameList assetsName={assertName} assetsType={assertType} />
       )}
-      {assertType !== 'Name' && (
-        <OrdxUtxoList assetsName={assertName} assetsType={assertType} />
+      {assertType !== 'ns' && (
+        <>
+          <div>
+            <OrdxUtxoTypeList onChange={onAssertChange} />
+          </div>
+          <OrdxUtxoList assetsName={assertName} assetsType={assertType} />
+        </>
       )}
     </div>
   );
