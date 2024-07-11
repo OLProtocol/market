@@ -393,7 +393,10 @@ export default function Inscribe() {
         offset: 0,
       });
     } else {
-      const lines = textData.text.split('\n');
+      const lines = textData.text
+        .split('\n')
+        .map((a) => a.trim())
+        .filter((v) => !!v);
       lines.forEach((line: string, i) => {
         list.push({
           type: 'text',

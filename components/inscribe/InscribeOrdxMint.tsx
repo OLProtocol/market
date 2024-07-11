@@ -13,6 +13,7 @@ import { useUtxoStore } from '@/store';
 import { useCommonStore } from '@/store';
 import { tryit, min } from 'radash';
 import { UtxoSelectTable } from './UtxoSelectTable';
+import { useSearchParams } from 'next/navigation';
 // import { CopyButton } from '@/components/CopyButton';
 
 interface InscribeOrdxMintProps {
@@ -25,6 +26,8 @@ export const InscribeOrdxMint = ({
   onNext,
   onChange,
 }: InscribeOrdxMintProps) => {
+  const params = useSearchParams();
+  const paramsTicker = (params.get('ticker') as string) || '';
   const { address: currentAccount, network, connected } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
@@ -33,7 +36,7 @@ export const InscribeOrdxMint = ({
   const [data, { set }] = useMap<any>({
     type: 'mint',
     mode: 'fair',
-    tick: '',
+    tick: paramsTicker,
     amount: 1,
     limit: 0,
     repeatMint: 1,
@@ -111,10 +114,31 @@ export const InscribeOrdxMint = ({
           throw rarityError;
         }
         utxos =
-          rarityData.data?.filter(
-            (v) => v?.sats?.length === 1 || v.amount === v.value,
-          ) || [];
-
+          rarityData.data
+            ?.filter((v) => v.sats?.length === 1 || v.amount === v.value)
+            ?.map((v) => ({
+              ...v,
+              amount: v.sats?.reduce((acc, cur) => {
+                return acc + cur.size;
+              }, 0),
+            })) || [];
+        // utxos = [
+        //   {
+        //     utxo: '42ed1fb54166ca76c221ad0f6527b1c42a9591180b055dfa066da157a3966490:1',
+        //     value: 1234,
+        //     amount: 1234,
+        //     sats: [
+        //       {
+        //         start: 282004177596903,
+        //         size: 1234,
+        //         offset: 0,
+        //         satributes: ['pizza'],
+        //         block: 56400,
+        //         time: 0,
+        //       },
+        //     ],
+        //   },
+        // ];
         // utxos?.sort(
         //   (a, b) =>
         //     b?.sats?.reduce((acc, cur) => {
@@ -363,7 +387,7 @@ export const InscribeOrdxMint = ({
     if (connected) {
       onTickBlur();
     }
-  }, [connected]);
+  }, [connected, paramsTicker]);
   return (
     <div>
       <div className="mb-4">
