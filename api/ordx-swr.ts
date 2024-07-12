@@ -16,6 +16,21 @@ const useSatTypes = ({ network }: any) => {
     isLoading: isLoading,
   };
 };
+
+export const useOrdxInfo = ({ tick, network }: any) => {
+  const { data, error, isMutating, trigger, reset } = useSWRMutation(
+    `ord2-info-${tick}-${network}`,
+    () => ordx.getOrdxInfo({ tick, network }),
+  );
+  return {
+    data,
+    trigger,
+    reset,
+    error,
+    isLoading: isMutating,
+  };
+};
+
 export const useBtcHeight = (network: string) => {
   const { data, error, isLoading } = useSWR(
     `height-${network}`,
@@ -34,4 +49,5 @@ export const useBtcHeight = (network: string) => {
 export const ordxSWR = {
   useSatTypes,
   useBtcHeight,
+  useOrdxInfo,
 };

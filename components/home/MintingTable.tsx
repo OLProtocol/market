@@ -16,8 +16,9 @@ import ProgressBar from '@/components/ProgressBar';
 import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import { ordxSWR } from '@/api/ordx-swr';
+import { thousandSeparator } from '@/lib/utils';
 
-export const MintingTable = () => {
+export const MintingTable = ({ rarepizza, jades }: any) => {
   const { data: heightData } = ordxSWR.useBtcHeight('livenet');
 
   const startBlockHeight = 850282;
@@ -46,7 +47,7 @@ export const MintingTable = () => {
     <section className="bg-[#060818] text-white md:pb-6 rounded-lg">
       <table className="w-full border-collapse">
         <thead className="h-16 bg-gray-800/50">
-          <tr className='px-2 text-sm md:text-xl'>
+          <tr className="px-2 text-sm md:text-xl">
             <th>No.</th>
             <th>Ticker</th>
             {/* <th>Block</th> */}
@@ -56,22 +57,20 @@ export const MintingTable = () => {
             <th>Action</th>
           </tr>
         </thead>
-        <tbody className='text-center'>
-          <tr className='h-16 md:h-18 py-4 text-sm md:text-xl border-b-1 border-slate-800'>
+        <tbody className="text-center">
+          <tr className="h-16 md:h-18 py-4 text-sm md:text-xl border-b-1 border-slate-800">
             <td>1</td>
-            <td>              
-              RarePizza
-            </td>
+            <td>RarePizza</td>
             {/* <td>850282 - 853358 <br />
               2024-07-02 03:58 ~ 2024-07-23 11:48
             </td> */}
-            <td>2,591</td>
-            <td>32,007,479</td>
+            <td>{thousandSeparator(rarepizza?.holdersCount)}</td>
+            <td>{thousandSeparator(rarepizza?.totalMinted)}</td>
             <td>
               <ProgressBar
-                start={startBlockHeight}
+                start={rarepizza?.startBlock}
                 current={currentBlockHeight}
-                target={endBlockHeight}
+                target={rarepizza?.endBlock}
                 isdisplay={false}
               />
             </td>
@@ -83,20 +82,20 @@ export const MintingTable = () => {
                 onClick={() => toMint({ type: 'ordx', ticker: 'rarepizza' })}
               >
                 Mint
-              </Button> </td>
+              </Button>{' '}
+            </td>
           </tr>
-          <tr className='h-16 md:h-18 py-4 text-sm md:text-xl border-b-1 border-slate-800'>
+          <tr className="h-16 md:h-18 py-4 text-sm md:text-xl border-b-1 border-slate-800">
             <td>2</td>
-            <td>
-              Jades</td>
+            <td>Jades</td>
             {/* <td> - </td> */}
-            <td> 3 </td>
-            <td> 5 </td>
+            <td>{thousandSeparator(jades?.holdersCount)}</td>
+            <td>{thousandSeparator(jades?.totalMinted)}</td>
             <td>
               <ProgressBar
-                start='1000000'
-                current='1500000'
-                target='10000000'
+                start="1000000"
+                current="1500000"
+                target="10000000"
                 isdisplay={false}
               />
             </td>
@@ -108,20 +107,20 @@ export const MintingTable = () => {
                 onClick={() => toMint({ type: 'ordx', ticker: 'jades' })}
               >
                 Mint
-              </Button> </td>
+              </Button>{' '}
+            </td>
           </tr>
-          <tr className='h-16 md:h-18 py-4 text-xm md:text-xl border-b-1 border-slate-800'>
+          <tr className="h-16 md:h-18 py-4 text-xm md:text-xl border-b-1 border-slate-800">
             <td>3</td>
-            <td>
-              Name</td>
+            <td>Name</td>
             {/* <td> - </td> */}
             <td> - </td>
             <td> - </td>
             <td>
               <ProgressBar
-                start='1000000'
-                current='1500000'
-                target='10000000'
+                start="1000000"
+                current="1500000"
+                target="10000000"
                 isdisplay={false}
               />
             </td>
@@ -133,7 +132,8 @@ export const MintingTable = () => {
                 onClick={() => toMint({ type: 'name', ticker: '' })}
               >
                 Mint
-              </Button> </td>
+              </Button>{' '}
+            </td>
           </tr>
         </tbody>
       </table>
