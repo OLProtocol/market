@@ -279,14 +279,25 @@ export default function Inscribe() {
           console.log('amt', amt);
 
           const len = rangesArr[i].length;
-          if (len === 1) {
-            amount =
-              i === 0
-                ? rangesArr[i][0].offset + rangesArr[i][0].size
-                : rangesArr[i][0].size;
+          if (i === 0) {
+            amount = rangesArr[i][len - 1].offset + rangesArr[i][len - 1].size;
+          } else if (len === 1) {
+            amount = rangesArr[i][0].size;
           } else {
-            throw new Error('not support multi utxos');
+            amount =
+              rangesArr[i][len - 1].offset -
+              rangesArr[i][0].offset +
+              rangesArr[i][len - 1].size;
           }
+
+          // if (len === 1) {
+          //   amount =
+          //     i === 0
+          //       ? rangesArr[i][0].offset + rangesArr[i][0].size
+          //       : rangesArr[i][0].size;
+          // } else {
+          //   throw new Error('not support multi utxos');
+          // }
           amount = Math.max(amount, 330);
           console.log('amount', amount);
           offset = rangesArr[i][0].offset;
