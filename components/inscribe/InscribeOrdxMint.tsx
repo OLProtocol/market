@@ -114,14 +114,12 @@ export const InscribeOrdxMint = ({
           throw rarityError;
         }
         utxos =
-          rarityData.data
-            ?.filter((v) => v.sats?.length === 1 || v.amount === v.value)
-            ?.map((v) => ({
-              ...v,
-              amount: v.sats?.reduce((acc, cur) => {
-                return acc + cur.size;
-              }, 0),
-            })) || [];
+          rarityData.data?.map((v) => ({
+            ...v,
+            amount: v.sats?.reduce((acc, cur) => {
+              return acc + cur.size;
+            }, 0),
+          })) || [];
         // utxos = [
         //   {
         //     utxo: '42ed1fb54166ca76c221ad0f6527b1c42a9591180b055dfa066da157a3966490:1',
