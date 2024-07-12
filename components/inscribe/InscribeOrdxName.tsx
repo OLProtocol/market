@@ -32,8 +32,10 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   const checkName = async () => {
     let checkStatus = true;
     setLoading(true);
+    const fullName =
+      data.suffix === '.ordx' ? data.name : data.name + data.suffix;
     const [error, res] = await tryit(ordx.getNsName)({
-      name: data.name,
+      name: fullName,
       network,
     });
     setLoading(false);
