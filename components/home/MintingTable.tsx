@@ -52,7 +52,7 @@ export const MintingTable = () => {
             {/* <th>Block</th> */}
             <th>Holders</th>
             <th>Minted</th>
-            <th>Staus</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
