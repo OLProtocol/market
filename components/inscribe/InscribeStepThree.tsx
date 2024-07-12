@@ -257,16 +257,6 @@ export const InscribeStepThree = ({
           ))}
         </div>
       </div>
-      {files.length > 1 && (
-        <div className="mb-4">
-          <Checkbox
-            isSelected={selected}
-            onValueChange={(value) => setSelected(value)}
-          >
-            {t('pages.inscribe.step_three.output_one_utxo')}
-          </Checkbox>
-        </div>
-      )}
 
       <Tabs
         aria-label="address tabs"
@@ -286,6 +276,16 @@ export const InscribeStepThree = ({
               />
             </div>
           </div>
+          {files.length > 1 && (
+            <div className="mb-4">
+              <Checkbox
+                isSelected={selected}
+                onValueChange={(value) => setSelected(value)}
+              >
+                {t('pages.inscribe.step_three.output_one_utxo')}
+              </Checkbox>
+            </div>
+          )}
         </Tab>
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
