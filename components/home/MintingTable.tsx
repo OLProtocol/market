@@ -53,7 +53,7 @@ export const MintingTable = ({ rarepizza, jades }: any) => {
             {/* <th>Block</th> */}
             <th>Holders</th>
             <th>Minted</th>
-            <th>Staus</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
