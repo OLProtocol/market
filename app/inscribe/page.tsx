@@ -21,27 +21,19 @@ import {
   generateSeed,
   splitUtxosByValue,
 } from '@/lib/inscribe';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { OrderList } from '@/components/inscribe/OrderList';
 // import { useCommonStore } from '@/store';
 type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
 export default function Inscribe() {
-  // const { state } = useLocation();
-  // const toast = useToast();
-  // useEffect(() => {
-  //   toast({
-  //     title: '网维护中',
-  //     status: 'warning',
-  //     position: 'top',
-  //     duration: 100000,
-  //     isClosable: true,
-  //   });
-  // }, []);
+  const params = useSearchParams();
+  const paramsType = (params.get('type') as string) || 'ordx';
   const { t } = useTranslation();
   const [metadata, setMetadata] = useState<any>({});
   const [step, setStep] = useState(1);
-  const [tab, setTab] = useState<any>('ordx');
+  const [tab, setTab] = useState<any>(paramsType);
   const [files, setFiles] = useState<any[]>([]);
   const [orderId, setOrderId] = useState<string>();
   const [modalShow, setModalShow] = useState(false);
@@ -391,6 +383,7 @@ export default function Inscribe() {
       utxos: ordxData.utxos,
     });
     const _files = await generteFiles(list);
+    console.log(_files);
     setList(_files);
     setStep(2);
   };

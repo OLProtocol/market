@@ -50,7 +50,7 @@ export const removeObjectEmptyValue = (obj: any) => {
 };
 
 export const thousandSeparator = (num: number) => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return num?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
 export const getTimeByHeight = async (height: number, network: string) => {
