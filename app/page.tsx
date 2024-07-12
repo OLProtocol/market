@@ -9,7 +9,10 @@ export default function Home() {
       <div className="mb-4">
         <BannerTop />
       </div>
+      <div className='mb-4 w-full round-lg'>
       <MintingTable />
+      </div>
+      
     </div>
   );
 }
