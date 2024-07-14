@@ -279,6 +279,7 @@ export const InscribeStepThree = ({
           {files.length > 1 && (
             <div className="mb-4">
               <Checkbox
+                isDisabled
                 isSelected={selected}
                 onValueChange={(value) => setSelected(value)}
               >

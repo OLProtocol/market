@@ -107,7 +107,7 @@ export const MintingTable = ({ rarepizza, jades }: any) => {
                 onClick={() => toMint({ type: 'ordx', ticker: 'jades' })}
               >
                 Mint
-              </Button>{' '}
+              </Button>
             </td>
           </tr>
           <tr className="h-16 md:h-18 py-4 text-xm md:text-xl border-b-1 border-slate-800">
