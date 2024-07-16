@@ -1,10 +1,4 @@
-import {
-  Select,
-  SelectItem,
-  RadioGroup,
-  Input,
-  Button,
-} from '@nextui-org/react';
+import { Textarea, Button } from '@nextui-org/react';
 import { useEffect, useState, useMemo } from 'react';
 import { useMap } from 'react-use';
 import { ordx } from '@/api';
@@ -24,77 +18,81 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   const [errorText, setErrorText] = useState('');
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [data, { set }] = useMap({
+  const [data, { set }] = useMap<any>({
     type: 'mint',
     name: '',
+    names: [],
     suffix: '',
   });
   const checkName = async () => {
     let checkStatus = true;
     setLoading(true);
-    const fullName =
-      data.suffix === '.ordx' ? data.name : data.name + data.suffix;
-    const [error, res] = await tryit(ordx.getNsName)({
-      name: fullName,
-      network,
-    });
-    setLoading(false);
-    const { data: nameData } = res || {};
+    const lines = data.name
+      .split('\n')
+      .map((a) => a.trim())
+      .filter((v) => !!v);
 
-    if (data.suffix) {
-      const textSize = clacTextSize(data.name + data.suffix);
-
-      if (textSize > 32) {
-        checkStatus = false;
-        setErrorText(t('pages.inscribe.name.error_1'));
-        return checkStatus;
+    const errArr: string[] = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const textSize = clacTextSize(line);
+      if (textSize < 3 || textSize == 4 || textSize > 32) {
+        errArr.push(line);
+      } else if (
+        line.endsWith('.') ||
+        line.startsWith('.') ||
+        line.split('.').length > 2
+      ) {
+        errArr.push(line);
       }
     }
-    const textSize = clacTextSize(data.name);
-    if (!data.suffix && (textSize < 3 || textSize == 4 || textSize > 32)) {
-      checkStatus = false;
-      setErrorText(t('pages.inscribe.name.error_1'));
-      return checkStatus;
+    // const [error, res] = await tryit(ordx.getNsName)({
+    //   name: fullName,
+    //   network,
+    // });
+    setLoading(false);
+    // const { data: nameData } = res || {};
+    if (errArr.length > 0) {
+      const errorText = errArr
+        .map((v) => `Name "${v}" is not valid.`)
+        .join('\n');
+      console.log(errorText);
+
+      setErrorText(errorText);
+      return false;
     }
-    if (nameData) {
-      checkStatus = false;
-      setErrorText(t('pages.inscribe.name.error_2', { name: data.name }));
-      return checkStatus;
-    }
+    console.log(lines);
+
+    set('names', lines);
     console.log(checkStatus);
     return checkStatus;
   };
-  const nameSuffixs = [
-    { label: 'any suffix', key: '.ordx' },
-    { label: '.x', key: '.x' },
-    { label: '.btc', key: '.btc' },
-    { label: '.sats', key: '.sats' },
-    { label: '.pizza', key: '.pizza' },
-  ];
+  // const nameSuffixs = [
+  //   { label: 'any suffix', key: '.ordx' },
+  //   { label: '.x', key: '.x' },
+  //   { label: '.btc', key: '.btc' },
+  //   { label: '.sats', key: '.sats' },
+  //   { label: '.pizza', key: '.pizza' },
+  // ];
   const selectedKeys = useMemo(
     () => (data.suffix ? [data.suffix] : []),
     [data.suffix],
   );
-  const nextHanlder = async () => {
-    const status = await checkName();
-    if (status) {
+  const nextHandler = async () => {
+    setErrorText('');
+    if (!checked) {
+      const checkStatus = await checkName();
+      setChecked(checkStatus);
+    } else {
       onNext?.();
     }
   };
-  const onBlur = async () => {
-    if (data.suffix === '.ordx') {
-      set('name', data.name.trim().replace(/\.$/, ''));
-    }
-  };
-  const nameChange = (name: string) => {
-    if (data.suffix === '.ordx') {
-      set('name', name?.trim());
-    } else {
-      set('name', name?.replace('.', '')?.trim());
-    }
-  };
+  // const onBlur = async () => {
+  //   if (data.suffix === '.ordx') {
+  //     set('name', data.name.trim().replace(/\.$/, ''));
+  //   }
+  // };
   useEffect(() => {
-    setChecked(false);
     onChange?.(data);
   }, [data]);
 
@@ -106,15 +104,23 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
           {t('pages.inscribe.name.description_1')}
         </p>
       </div>
-      <div className="mb-2">
+      <div className="mb-4">
+        <div className="mb-2">
+          {/* <div className="w-52">{t('pages.inscribe.name.input_name')}</div> */}
+          <Textarea
+            disableAutosize
+            rows={5}
+            placeholder={t('pages.inscribe.name.name_placeholder')}
+            value={data.name}
+            onChange={(e) => set('name', e.target.value)}
+          />
+        </div>
         {errorText && (
-          <div className="mb-2 text-xl text-center text-red-500">
+          <div className="mb-2 text-xl text-center text-red-500 whitespace-pre-wrap overflow-y-auto max-h-40">
             {errorText}
           </div>
         )}
-        <div className="flex items-center mb-4">
-          <div className="w-52">{t('pages.inscribe.name.input_name')}</div>
-          <Input
+        {/* <Input
             value={data.name}
             className="flex-1"
             onChange={(e) => {
@@ -138,8 +144,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
                 ))}
               </Select>
             }
-          />
-        </div>
+          /> */}
       </div>
       <div className="w-60 mx-auto flex justify-center">
         <WalletConnectBus>
@@ -147,7 +152,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             className="mx-auto block"
             color="primary"
             isDisabled={!data.name || loading}
-            onClick={nextHanlder}
+            onClick={nextHandler}
           >
             {checked ? t('buttons.next') : 'Check'}
           </Button>
