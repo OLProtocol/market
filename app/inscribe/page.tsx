@@ -225,6 +225,7 @@ export default function Inscribe() {
   const ordxNext = async () => {
     const list: any = [];
     let hasDeployFile = false;
+    let specialOffsetAmount = 0;
     if (ordxData.type === 'mint') {
       let offset = 0;
       let rangesArr: any[][] = [];
@@ -273,6 +274,10 @@ export default function Inscribe() {
           const len = rangesArr[i].length;
           if (i === 0) {
             amount = rangesArr[i][len - 1].offset + rangesArr[i][len - 1].size;
+            if (rangesArr[i][0].offset >= 330) {
+              specialOffsetAmount = rangesArr[i][0].offset;
+              amount -= specialOffsetAmount;
+            }
           } else if (len === 1) {
             amount = rangesArr[i][0].size;
           } else {
@@ -380,8 +385,15 @@ export default function Inscribe() {
       hasDeployFile,
       ordxType: list[0].ordxType,
       isSpecial: list[0].isSpecial,
+      specialOffsetAmount,
       utxos: ordxData.utxos,
     });
+    console.log('specialOffsetAmount', specialOffsetAmount);
+    if (specialOffsetAmount > 0) {
+      list.forEach((v) => {
+        v.offset = v.offset - specialOffsetAmount;
+      });
+    }
     const _files = await generteFiles(list);
     console.log(_files);
     setList(_files);
