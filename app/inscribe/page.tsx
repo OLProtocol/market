@@ -92,9 +92,10 @@ export default function Inscribe() {
     text: '',
     utxos: [],
   });
-  const [nameData, { set: setNameData, reset: resetName }] = useMap({
+  const [nameData, { set: setNameData, reset: resetName }] = useMap<any>({
     type: 'mint',
     name: '',
+    names: [],
     suffix: '.ordx',
   });
   const brc20Change = (data: any) => {
@@ -108,6 +109,7 @@ export default function Inscribe() {
   const ordxNameChange = (data: any) => {
     setNameData('type', data.type);
     setNameData('name', data.name);
+    setNameData('names', data.names);
     setNameData('suffix', data.suffix);
   };
   const ordxChange = (data: any) => {
@@ -207,16 +209,18 @@ export default function Inscribe() {
   };
   const ordxNameNext = async () => {
     const list: any = [];
-    const { suffix, name } = nameData;
+    const { suffix, names } = nameData;
     if (nameData.type === 'mint') {
-      const _name = name.toString().trim();
-      const value = suffix === '.ordx' ? _name : `${name}${suffix}`;
-      list.push({
-        type: 'ordx_name',
-        name: `mint`,
-        amount: 330,
-        value: value,
-      });
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const _name = name.toString().trim();
+        list.push({
+          type: 'ordx_name',
+          name: `mint`,
+          amount: 330,
+          value: _name,
+        });
+      }
     }
     const _files = await generteFiles(list);
     setList(_files);
