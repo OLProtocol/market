@@ -1,6 +1,6 @@
 'use client';
 
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { hideStr, satsToBitcoin } from '@/lib/utils';
 import { Snippet } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';

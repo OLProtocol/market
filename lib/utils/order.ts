@@ -2,7 +2,7 @@ import { Address, Script } from '@cmdcode/tapscript';
 import { btcToSats } from '@/lib/utils';
 import { parseUtxo } from './btc';
 import { tryit } from 'radash';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
 import {
   bitcoin,

@@ -12,7 +12,7 @@ import {
 } from '@nextui-org/react';
 
 import { notification } from 'antd';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useState } from 'react';
 
 interface WalletSelectModalProps {

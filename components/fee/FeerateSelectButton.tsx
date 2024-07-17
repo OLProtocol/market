@@ -16,7 +16,7 @@ import { BtcFeeRate } from './BtcFeeRate';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
 import { ordx } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 export const FeerateSelectButton = () => {
   const { t } = useTranslation();

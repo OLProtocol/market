@@ -7,7 +7,7 @@ import { satsToBitcoin } from '@/lib';
 import { useTranslation } from 'react-i18next';
 import { BtcFeeRate } from './fee/BtcFeeRate';
 import useSWR from 'swr';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { ordx } from '@/api';
 
 interface Props {
