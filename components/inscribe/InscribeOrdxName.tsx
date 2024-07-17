@@ -54,8 +54,9 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       names: lines,
       network,
     });
+    console.log(error, res);
     setLoading(false);
-    if (error || res?.data) {
+    if (error || !res?.data) {
       notification.error({
         message: t('notification.system_error'),
       });
