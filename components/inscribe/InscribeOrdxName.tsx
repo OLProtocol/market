@@ -12,7 +12,7 @@ import { tryit } from 'radash';
 import { clacTextSize } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface InscribeTextProps {
   onNext?: () => void;

@@ -28,7 +28,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { getUtxoByValue, ordxSWR, getBTCPrice, getFeeDiscount } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 const WalletButton = dynamic(
   () => import('../components/wallet/WalletConnectButton') as any,
