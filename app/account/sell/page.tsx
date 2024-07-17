@@ -28,7 +28,7 @@ import {
   btcToSats,
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { getAssetsSummary, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';

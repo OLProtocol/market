@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import { Empty, notification } from 'antd';
 import { getOrders, lockOrder, unlockOrder, cancelOrder } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { BatchBuyFooter } from '@/components/BatchBuyFooter';

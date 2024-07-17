@@ -1,6 +1,6 @@
 'use client';
 import { Button } from '@nextui-org/react';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
