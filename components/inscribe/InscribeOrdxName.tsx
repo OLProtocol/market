@@ -36,25 +36,41 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       return false;
     }
     setLoading(true);
-    const errArr: string[] = [];
+    let mintedArr: string[] = [];
+    const checkedArr: string[] = [];
+    let formatErrArr: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const textSize = clacTextSize(line);
       if (textSize < 3 || textSize == 4 || textSize > 32) {
-        errArr.push(line);
+        formatErrArr.push(line);
       } else if (
         line.endsWith('.') ||
         line.startsWith('.') ||
         line.split('.').length > 2
       ) {
-        errArr.push(line);
+        formatErrArr.push(line);
+      } else if (checkedArr.includes(line)) {
+        formatErrArr.push(line);
+      }
+      if (!checkedArr.includes(line)) {
+        checkedArr.push(line);
       }
     }
+    if (formatErrArr.length > 0) {
+      const errorText = formatErrArr
+        .map((v) => `Name "${v}" is not valid.`)
+        .join('\n');
+      console.log(errorText);
+
+      setErrorText(errorText);
+      return false;
+    }
+    console.log(formatErrArr);
     const [error, res] = await tryit(ordx.checkNsNames)({
       names: lines,
       network,
     });
-    console.log(error, res);
     setLoading(false);
     if (error || !res?.data) {
       notification.error({
@@ -63,10 +79,13 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       throw error;
     }
     const checkArr = res?.data || [];
-    const checkErrArr = checkArr.filter((v: any) => v.result !== 0);
+    formatErrArr = checkArr
+      .filter((v: any) => v.result === -1)
+      .map((v) => v.name);
+    mintedArr = checkArr.filter((v: any) => v.result === 1).map((v) => v.name);
     // const { data: nameData } = res || {};
-    if (errArr.length > 0) {
-      const errorText = errArr
+    if (formatErrArr.length > 0) {
+      const errorText = formatErrArr
         .map((v) => `Name "${v}" is not valid.`)
         .join('\n');
       console.log(errorText);
@@ -74,10 +93,10 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       setErrorText(errorText);
       return false;
     }
-    console.log(checkErrArr);
-    if (checkErrArr.length > 0) {
-      const errorText = checkErrArr
-        .map((v: any) => `Name "${v.name}" is already taken.`)
+    console.log(mintedArr);
+    if (mintedArr.length > 0) {
+      const errorText = mintedArr
+        .map((v: any) => `Name "${v}" is already taken.`)
         .join('\n');
       setErrorText(errorText);
       return false;
@@ -170,7 +189,6 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
           <Button
             className="mx-auto block"
             color="primary"
-            isDisabled={!data.name || loading}
             onClick={nextHandler}
           >
             {checked ? t('buttons.next') : 'Check'}
