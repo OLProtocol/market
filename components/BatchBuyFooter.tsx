@@ -18,7 +18,7 @@ import {
   satsToBitcoin,
 } from '@/lib';
 import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface Props {
   list: any[];

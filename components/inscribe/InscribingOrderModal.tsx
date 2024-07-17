@@ -11,7 +11,7 @@ import {
 } from '@nextui-org/react';
 import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { sleep, sum } from 'radash';
 import { filterUtxosByValue, calcNetworkFee } from '@/lib/wallet';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';

@@ -1,6 +1,6 @@
 import { removeObjectEmptyValue } from '@/lib/utils';
 import { useCommonStore } from '@/store';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { generateMempoolUrl } from '@/lib/utils';
 
 export const request = async (path: string, options: any = {}) => {

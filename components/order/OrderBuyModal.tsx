@@ -24,7 +24,7 @@ import { SIGHASH_SINGLE_ANYONECANPAY, DUMMY_UTXO_VALUE } from '@/lib/constants';
 import { calcUtxosVirtualGas } from '@/lib/utils/btc';
 
 import { getUtxoByValue, buyOrder, unlockOrder } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useState } from 'react';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';

@@ -1,7 +1,7 @@
 import { Input, Slider } from '@nextui-org/react';
 import { useState, useMemo, useEffect, use } from 'react';
 import { BtcFeeRateItem } from './BtcFeeRateItem';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 
 interface BtcFeeRate {
