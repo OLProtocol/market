@@ -84,7 +84,6 @@ const WalletConnectButton = () => {
     try {
       await check();
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
-        await check();
         try {
           console.log('checkSignature');
           console.log(windowState);

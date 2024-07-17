@@ -160,6 +160,7 @@ export const InscribingOrderModal = ({
     const totalFee = order?.fee?.totalFee || 0;
     const totalInscriptionSize = order?.fee?.totalInscriptionSize || 0;
     const isSpecial = order?.metadata?.isSpecial || false;
+    const specialOffsetAmount = order?.metadata?.specialOffsetAmount || 0;
     const inputUntxos: any[] = orderUtxos.map((v) => ({
       txid: v.txid,
       vout: v.vout,
@@ -178,13 +179,20 @@ export const InscribingOrderModal = ({
         pickAmount = totalSpendAmount;
       }
     pickAmount = Math.max(pickAmount, 1000);
+    const outputs: any[] = [];
     inputUntxos.push(...filterUnspendUtxos);
-    const outputs = [
-      {
-        address: order?.inscription.inscriptionAddress,
-        value: totalFee,
-      },
-    ];
+    if (specialOffsetAmount > 0 && isSpecial) {
+      outputs.push({
+        address: currentAccount,
+        value: specialOffsetAmount,
+      });
+    }
+
+    outputs.push({
+      address: order?.inscription.inscriptionAddress,
+      value: totalFee,
+    });
+
     if (isSpecial && orderAmount - totalFee > 330) {
       outputs.push({
         address: currentAccount,
@@ -255,7 +263,7 @@ export const InscribingOrderModal = ({
     setLoading(true);
 
     try {
-      const { fee } = order;
+      const { fee, metadata } = order;
       let txid;
       if (!psbt) {
         return;
@@ -265,10 +273,13 @@ export const InscribingOrderModal = ({
       const spendUtxos = psbtData?.[0]?.slice(0, psbt.txInputs.length);
       console.log('spendUtxos', spendUtxos);
       txid = await sendBtcPsbt(psbt, currentAccount);
-
+      let vout = 0;
+      if (metadata?.specialOffsetAmount > 0) {
+        vout = 1;
+      }
       const commitTx = {
         txid,
-        vout: 0,
+        vout,
         amount: fee.totalFee,
       };
       if (spendUtxos?.length) {
