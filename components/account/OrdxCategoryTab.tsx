@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { Icon } from '@iconify/react';
-import { getAddressAssetsValue } from '@/api';
+import { getAddressAssetsSummary } from '@/api';
 import { satsToBitcoin } from '@/lib/utils';
 import { BtcPrice } from '@/components/BtcPrice';
 
@@ -15,50 +15,49 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
   const { t } = useTranslation();
   const { address, balance, network } = useReactWalletStore((state) => state);
 
-  const [totalSatValue, setTotalSatValue] = useState(0);
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressAssetsValue-${address}-${network}`;
+    return `/ordx/getAddressAssetsSummary-${address}-${network}`;
   }, [address, network]);
 
   const { data, isLoading, mutate } = useSWR(
     swrKey,
-    () => getAddressAssetsValue(address),
+    () => getAddressAssetsSummary(address),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     },
   );
   const list = useMemo(() => {
+    const tickerInfo = data?.data?.find((v) => v.assets_type === 'ticker');
+    const exoticInfo = data?.data?.find((v) => v.assets_type === 'exotic');
+    const nftInfo = data?.data?.find((v) => v.assets_type === 'nft');
+    const nsInfo = data?.data?.find((v) => v.assets_type === 'ns');
+    console.log(data);
     return [
       {
         label: 'SAT20 Token',
         key: 'ticker',
-        value: 1000000,
+        value: tickerInfo?.total_value || 0,
       },
       {
         label: 'Rare Sats',
         key: 'exotic',
-        value: 1000,
+        value: exoticInfo?.total_value || 0,
       },
       {
         label: 'Pure Name',
         key: 'ns',
-        value: 10000,
+        value: nsInfo?.total_value || 0,
       },
       {
         label: 'Ordinals NFT',
         key: 'ordinals',
-        value: 100000,
+        value: nftInfo?.total_value || 0,
       },
     ];
-  }, []);
-  const [selected, setSelected] = useState(list[0].key);
-  useEffect(() => {
-    console.log(data);
-    if (data?.data) {
-      setTotalSatValue(data.data?.total_value || 0);
-    }
   }, [data]);
+  const [selected, setSelected] = useState(list[0].key);
+
   useEffect(() => {
     if (selected) {
       onChange?.(selected);
@@ -93,12 +92,12 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
           <CardBody className="text-left text-md font-thin leading-8">
             <div className="flex">
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-              {satsToBitcoin(item.value)}
+              {item.value}
             </div>
             <div className="flex text-sm md:font-bold">
               <span className="text-yellow-400 w-5"> &nbsp;$</span>
               <span className="text-gray-400 h-5">
-                <BtcPrice btc={satsToBitcoin(item.value)} />
+                <BtcPrice btc={item.value} />
               </span>
             </div>
           </CardBody>

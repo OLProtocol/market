@@ -17,6 +17,7 @@ interface Props {
   item: any;
   assets_name: string;
   onSell?: (item: any) => void;
+  onTransfer?: (item: any) => void;
   onCancelOrder?: () => void;
   selected?: boolean;
   canSelect?: boolean;
@@ -26,6 +27,7 @@ interface Props {
 export const OrdxFtAssetsItem = ({
   item,
   onSell,
+  onTransfer,
   onCancelOrder,
   selected,
   assets_name,
@@ -168,20 +170,34 @@ export const OrdxFtAssetsItem = ({
             assets: {thousandSeparator(asset?.amount)}
           </span>
         </div> */}
-        <div className="flex item-center pb-1">
+        <div className="flex item-center pb-1 gap-2">
           {item.order_id === 0 ? (
-            <Button
-              // fullWidth
-              variant="ghost"
-              size="md"
-              isLoading={loading}
-              // color="primary"
-              radius="sm"
-              onClick={sellHandler}
-              className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
-            >
-              {t('buttons.list_sale')}
-            </Button>
+            <>
+              <Button
+                // fullWidth
+                variant="ghost"
+                size="md"
+                isLoading={loading}
+                // color="primary"
+                radius="sm"
+                onClick={sellHandler}
+                className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+              >
+                {t('buttons.list_sale')}
+              </Button>
+              <Button
+                // fullWidth
+                variant="ghost"
+                size="md"
+                isLoading={loading}
+                // color="primary"
+                radius="sm"
+                onClick={() => onTransfer?.(item)}
+                className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+              >
+                transfer
+              </Button>
+            </>
           ) : (
             <Button
               className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
