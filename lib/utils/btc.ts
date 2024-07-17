@@ -7,7 +7,7 @@ import {
 import { addresToScriptPublicKey } from '@/lib/utils/order';
 import { sortBy, reverse, cloneDeep } from 'lodash';
 import { bitcoin, toPsbtNetwork, NetworkType } from '../wallet';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 export const parseUtxo = (utxo: string) => {
   const [txid, vout] = utxo.split(':');

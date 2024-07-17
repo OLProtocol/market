@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { notification, Empty } from 'antd';
 import { getOrdxAssets, cancelOrder, ordx } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSellStore } from '@/store';
 import { Pagination } from '@/components/Pagination';
