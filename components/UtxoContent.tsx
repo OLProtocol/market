@@ -4,7 +4,7 @@ import { Spinner } from '@nextui-org/react';
 import { tryit } from 'radash';
 import { use, useRef, useState } from 'react';
 import { useEffect, useMemo } from 'react';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { generateOrdUrl } from '@/lib/utils';
 import { generateSeed } from '@/lib/utils';
 
