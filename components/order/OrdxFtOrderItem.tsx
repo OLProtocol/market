@@ -12,7 +12,7 @@ import {
 } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { UtxoContent } from '@/components/UtxoContent';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

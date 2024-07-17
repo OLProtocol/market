@@ -2,7 +2,7 @@
 
 import { Input, Slider, Button } from '@nextui-org/react';
 import { notification } from 'antd';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-use';

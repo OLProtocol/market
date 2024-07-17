@@ -14,7 +14,7 @@ import useSWR from 'swr';
 import { OrdxAssetsUtxoList } from '@/components/account/OrdxAssetsUtxoList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { OrdxOrderList } from '@/components/account/OrdxOrderList';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
 import { getAddressAssetsValue } from '@/api';
