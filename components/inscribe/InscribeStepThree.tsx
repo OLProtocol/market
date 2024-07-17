@@ -135,7 +135,7 @@ export const InscribeStepThree = ({
 
     // 计算总权重
     const totalWeight = strippedSize * 4 + witnessSize * numInputs;
-
+    let _discount = discount;
     // 计算虚拟大小
     const vSize = totalWeight / 4;
     console.log(`witnessSize: ${witnessSize} bytes`);
@@ -147,6 +147,9 @@ export const InscribeStepThree = ({
     feeObj.networkFee = Math.ceil(vSize * feeRate.value);
     let totalFee = feeObj.networkFee + totalInscriptionSize;
     const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
+    if (metadata.type === 'name') {
+      _discount = 100;
+    }
     feeObj.serviceFee = Math.ceil(oneFee);
     feeObj.discountServiceFee = Math.ceil((oneFee * (100 - discount)) / 100);
     feeObj.totalInscriptionSize = totalInscriptionSize;
@@ -177,6 +180,8 @@ export const InscribeStepThree = ({
       inscription,
       secret,
       oneUtxo,
+      tight: tightSelected,
+      discount: _discount,
       fee: feeObj,
       metadata,
       toAddress: toAddresses,
