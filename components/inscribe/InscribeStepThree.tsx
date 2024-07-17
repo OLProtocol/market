@@ -33,7 +33,7 @@ export const InscribeStepThree = ({
   onRemoveAll,
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
-  const { feeRate, discount } = useCommonStore((state) => state);
+  const { feeRate, discount, btcHeight } = useCommonStore((state) => state);
   const [errText, setErrText] = useState('');
   const {
     network,
@@ -147,11 +147,11 @@ export const InscribeStepThree = ({
     feeObj.networkFee = Math.ceil(vSize * feeRate.value);
     let totalFee = feeObj.networkFee + totalInscriptionSize;
     const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
-    if (metadata.type === 'name') {
+    if (metadata.type === 'name' && btcHeight <= 853358) {
       _discount = 100;
     }
     feeObj.serviceFee = Math.ceil(oneFee);
-    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - discount)) / 100);
+    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
     feeObj.totalInscriptionSize = totalInscriptionSize;
     feeObj.totalFee = totalFee;
 
