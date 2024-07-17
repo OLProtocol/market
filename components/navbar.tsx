@@ -211,7 +211,7 @@ export const Navbar = () => {
         <NavbarItem className="">
           <WalletButton />
         </NavbarItem>
-        <NavbarItem className="sm:hidden">
+        <NavbarItem className="lg:hidden">
           <NavbarMenuToggle />
         </NavbarItem>
         {/* <NavbarItem className="hidden md:flex">
