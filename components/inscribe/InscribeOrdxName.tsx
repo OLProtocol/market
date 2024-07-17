@@ -46,11 +46,13 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
         errArr.push(line);
       }
     }
-    // const [error, res] = await tryit(ordx.getNsName)({
-    //   name: fullName,
-    //   network,
-    // });
+    const [error, res] = await tryit(ordx.checkNsNames)({
+      names: lines,
+      network,
+    });
     setLoading(false);
+    const checkArr = res?.data || [];
+    const checkErrArr = checkArr.filter((v: any) => v.result !== 0);
     // const { data: nameData } = res || {};
     if (errArr.length > 0) {
       const errorText = errArr
@@ -61,8 +63,14 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       setErrorText(errorText);
       return false;
     }
-    console.log(lines);
-
+    console.log(checkErrArr);
+    if (checkErrArr.length > 0) {
+      const errorText = checkErrArr
+        .map((v: any) => `Name "${v.name}" is already taken.`)
+        .join('\n');
+      setErrorText(errorText);
+      return false;
+    }
     set('names', lines);
     console.log(checkStatus);
     return checkStatus;
@@ -87,11 +95,11 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       onNext?.();
     }
   };
-  // const onBlur = async () => {
-  //   if (data.suffix === '.ordx') {
-  //     set('name', data.name.trim().replace(/\.$/, ''));
-  //   }
-  // };
+  const nameChange = (value: string) => {
+    set('name', value);
+    setErrorText('');
+    setChecked(false);
+  };
   useEffect(() => {
     onChange?.(data);
   }, [data]);
@@ -112,7 +120,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             rows={5}
             placeholder={t('pages.inscribe.name.name_placeholder')}
             value={data.name}
-            onChange={(e) => set('name', e.target.value)}
+            onChange={(e) => nameChange(e.target.value)}
           />
         </div>
         {errorText && (
