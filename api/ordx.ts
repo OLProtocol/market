@@ -267,6 +267,12 @@ export const getNsName = async ({ name, network }: any) => {
   const { data } = await axios.get(generateUrl(`ns/name/${name}`, network));
   return data;
 };
+export const checkNsNames = async ({ names, network }: any) => {
+  const { data } = await axios.post(generateUrl(`ns/check`, network), {
+    Names: names,
+  });
+  return data;
+};
 
 async function pollGetTxStatus(
   txid: string,
@@ -334,6 +340,7 @@ export const ordx = {
   getHeightInfo,
   getNsListByAddress,
   getNsName,
+  checkNsNames,
   getBestHeight,
   getTickerPermission,
   pushTx,
