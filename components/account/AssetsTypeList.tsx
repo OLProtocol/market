@@ -2,27 +2,31 @@
 
 import useSWR from 'swr';
 import { Tabs, Tab } from '@nextui-org/react';
-import { getAddressOrdxList } from '@/api';
+import { getAddressAssetsList } from '@/api';
 import { useReactWalletStore } from 'btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-interface OrdxUtxoTypeListProps {
+interface AssetsTypeListProps {
   onChange?: (ticker: string) => void;
+  assets_type: string;
 }
-export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
+export const AssetsTypeList = ({
+  onChange,
+  assets_type,
+}: AssetsTypeListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
 
   const [selected, setSelected] = useState<string>();
 
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressOrdxList-${address}-${network}`;
-  }, [address, network]);
+    return `/ordx/getAddressAssetsList-${address}-${network}-${assets_type}`;
+  }, [address, network, assets_type]);
 
   const { data, isLoading, mutate } = useSWR(
     swrKey,
-    () => getAddressOrdxList({ address }),
+    () => getAddressAssetsList(address, assets_type),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
@@ -36,10 +40,9 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
     return ret;
   }, [data]);
   useEffect(() => {
-    console.log('list changed', list);
     if (list.length > 0) {
-      setSelected(list[0].assert);
-      onChange?.(list[0].assert);
+      setSelected(list[0].assets_name);
+      onChange?.(list[0].assets_name);
     }
   }, [list]);
 
