@@ -606,6 +606,7 @@ interface InscribeParams {
   txid: string;
   vout: number;
   oneUtxo: boolean;
+  tight: boolean;
   amount: number;
   files: any[];
   serviceFee?: number;
@@ -621,6 +622,7 @@ export const inscribe = async ({
   vout,
   amount,
   oneUtxo,
+  tight,
   toAddresses,
   secret,
   files,
@@ -639,7 +641,7 @@ export const inscribe = async ({
     };
   });
   const totalInscription = files.reduce((acc, cur) => acc + cur.amount, 0);
-  if (oneUtxo) {
+  if (oneUtxo || tight) {
     outputs = [
       {
         value: totalInscription,
