@@ -18,7 +18,7 @@ import { Pagination } from '@/components/Pagination';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { hideStr } from '@/lib';
 import { generateMempoolUrl } from '@/lib/utils';
 

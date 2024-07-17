@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import { Tabs, Tab } from '@nextui-org/react';
 import { getAddressOrdxList } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
