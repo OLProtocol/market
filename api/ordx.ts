@@ -9,6 +9,8 @@ import axios from 'axios';
 import mempool from './mempool';
 const generateUrl = (url: string, network?: string) => {
   url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/${url}`;
+  console.log('hostname', location.hostname);
+
   if (location.hostname.indexOf('test') > -1) {
     url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {

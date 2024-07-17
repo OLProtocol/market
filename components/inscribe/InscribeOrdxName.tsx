@@ -1,6 +1,7 @@
 import { Textarea, Button } from '@nextui-org/react';
 import { useEffect, useState, useMemo } from 'react';
 import { useMap } from 'react-use';
+import { notification } from 'antd';
 import { ordx } from '@/api';
 import { tryit } from 'radash';
 import { clacTextSize } from '@/lib/inscribe';
@@ -26,12 +27,15 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   });
   const checkName = async () => {
     let checkStatus = true;
-    setLoading(true);
+
     const lines = data.name
       .split('\n')
       .map((a) => a.trim())
       .filter((v) => !!v);
-
+    if (lines.length === 0) {
+      return false;
+    }
+    setLoading(true);
     const errArr: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -51,6 +55,12 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       network,
     });
     setLoading(false);
+    if (error || res?.data) {
+      notification.error({
+        message: t('notification.system_error'),
+      });
+      throw error;
+    }
     const checkArr = res?.data || [];
     const checkErrArr = checkArr.filter((v: any) => v.result !== 0);
     // const { data: nameData } = res || {};
