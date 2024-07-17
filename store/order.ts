@@ -88,6 +88,7 @@ export const useOrderStore = create<OrderState>()(
               item.inscription = {};
               item.files = [];
             }
+            newList.push(item);
           }
           set({
             list: newList,
