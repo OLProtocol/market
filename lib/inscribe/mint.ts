@@ -644,7 +644,7 @@ export const inscribe = async ({
   if (oneUtxo || tight) {
     outputs = [
       {
-        value: totalInscription,
+        value: Math.max(330, totalInscription),
         scriptPubKey: Address.toScriptPubKey(toAddresses[0]),
       },
     ];
