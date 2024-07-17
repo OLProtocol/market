@@ -46,10 +46,10 @@ export default function TransferTool() {
     color: '#353535',
   };
 
-  const optionStyle = {
-    backgroundColor: '#2f2f2f',
-    color: '#353535',
-  };
+  // const optionStyle = {
+  //   backgroundColor: '#2f2f2f',
+  //   color: '#353535',
+  // };
 
   const [inputList, { set: setInputList }] = useMap<any>({
     items: [
@@ -542,104 +542,109 @@ export default function TransferTool() {
     getAllTickers();
   }, [address, refresh]);
   return (
-    <div className="flex flex-col max-w-7xl mx-auto pt-8">
+    <div className="flex flex-col max-w-7xl mx-auto pt-4">
       <Card>
-        <CardHeader>
+        <CardHeader className="h-16 uppercase font-bold">
           <h1>{t('pages.tools.transaction.title')}</h1>
         </CardHeader>
         <Divider />
         <CardBody>
           <div>
             <div>
-              <h6>{t('pages.tools.transaction.input')}</h6>
+              <h6>{t('pages.tools.transaction.input')} UTXO</h6>
             </div>
             <div className="pt-2">
               {inputList.items.map((item, i) => (
-                <div className="flex gap-2 pb-2" key={i}>
-                  <AntSelect
-                    placeholder="Select Ticker"
-                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"
-                    dropdownStyle={dropdownStyle}
-                    value={item.value?.ticker ? item.value?.ticker : undefined}
-                    options={
-                      tickerList?.map((utxo) => ({
-                        label: (
-                          <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
-                            {getTickLabel(utxo.ticker)}
-                          </div>
-                        ),
-                        value: utxo.ticker,
-                      })) || []
-                    }
-                    onChange={(e) => handleTickerSelectChange(item.id, e)}
-                  ></AntSelect>
-                  <AntSelect
-                    placeholder="Select UTXO"
-                    className="w-[40%] h-10 bg-gray-800 border border-gray-700 focus:border-blue-500 hover:border-blue-600"
-                    dropdownStyle={dropdownStyle}
-                    value={
-                      inputList.items[i]?.value?.utxo
-                        ? inputList.items[i]?.value?.utxo
-                        : undefined
-                    }
-                    options={
-                      inputList.items[i]?.options?.utxos.map((utxo) => ({
-                        label: (
-                          <div className="w-full p-0 m-0 text-gray-400 hover:text-blue-600">
-                            {utxo.assetamount && utxo.assetamount + ' Asset/'}
-                            {utxo.value +
-                              ' sats - ' +
-                              hideStr(utxo.txid + ':' + utxo.vout)}
-                          </div>
-                        ),
-                        value: utxo.txid + ':' + utxo.vout,
-                      })) || []
-                    }
-                    onChange={(e) => handleUtxoSelectChange(item.id, e)}
-                  ></AntSelect>
-                  <Input
-                    key={'input-sat-' + item.id}
-                    className={'w-[20%]'}
-                    placeholder="0"
-                    value={
-                      item.value.unit === 'sats'
-                        ? item.value.sats
-                        : item.value.sats / 100000000
-                    }
-                    endContent={
-                      <div className="flex items-center">
-                        <select
-                          className="outline-none border-0 bg-transparent text-default-400 text-small"
-                          value={item.value.unit}
-                          onChange={(e) =>
-                            handleInputUnitSelectChange(item.id, e)
-                          }
-                        >
-                          <option>sats</option>
-                          <option>btc</option>
-                        </select>
-                      </div>
-                    }
-                  />
-                  <Button radius="full" onClick={addInputItem}>
-                    <Image
-                      radius="full"
-                      src="../icon/add.svg"
-                      alt="logo"
-                      className="w-10 h-10 p-1 rounded-full "
+                <div
+                  className="pb-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                  key={i}
+                >
+                  <div className="col-span-2">
+                    {i + 1}. &nbsp;
+                    <AntSelect
+                      placeholder="Select Ticker"
+                      className="h-10 w-36 md:w-64"
+                      value={
+                        item.value?.ticker ? item.value?.ticker : undefined
+                      }
+                      options={
+                        tickerList?.map((utxo) => ({
+                          label: (
+                            <div className="w-full p-0 m-0">
+                              {getTickLabel(utxo.ticker)}
+                            </div>
+                          ),
+                          value: utxo.ticker,
+                        })) || []
+                      }
+                      onChange={(e) => handleTickerSelectChange(item.id, e)}
                     />
-                  </Button>
-                  <Button
-                    radius="full"
-                    onClick={() => removeInputItem(item.id)}
-                  >
-                    <Image
-                      radius="full"
-                      src="../icon/del.svg"
-                      alt="logo"
-                      className="w-10 h-10 p-1 rounded-full"
+                    <AntSelect
+                      placeholder="Select UTXO"
+                      className="h-10 w-36 md:w-80 pl-1 md:pl-2"
+                      value={
+                        inputList.items[i]?.value?.utxo
+                          ? inputList.items[i]?.value?.utxo
+                          : undefined
+                      }
+                      options={
+                        inputList.items[i]?.options?.utxos.map((utxo) => ({
+                          label: (
+                            <div className="w-full p-0 m-0">
+                              {utxo.assetamount && utxo.assetamount + ' Asset/'}
+                              {utxo.value +
+                                ' sats - ' +
+                                hideStr(utxo.txid + ':' + utxo.vout)}
+                            </div>
+                          ),
+                          value: utxo.txid + ':' + utxo.vout,
+                        })) || []
+                      }
+                      onChange={(e) => handleUtxoSelectChange(item.id, e)}
                     />
-                  </Button>
+                  </div>
+                  <div className="w-36 md:w-48">
+                    <Input
+                      key={'input-sat-' + item.id}
+                      placeholder="0"
+                      value={
+                        item.value.unit === 'sats'
+                          ? item.value.sats
+                          : item.value.sats / 100000000
+                      }
+                      endContent={
+                        <div className="flex items-center">
+                          <select
+                            title="select1"
+                            className="outline-none border-0 bg-transparent text-default-400 text-small"
+                            value={item.value.unit}
+                            onChange={(e) =>
+                              handleInputUnitSelectChange(item.id, e)
+                            }
+                          >
+                            <option>sats</option>
+                            <option>btc</option>
+                          </select>
+                        </div>
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2 w-full sm:w-auto">
+                    <Button
+                      radius="full"
+                      className="text-green-500 md:w-20"
+                      onClick={addInputItem}
+                    >
+                      Add<span className="text-xl font-bold">+</span>
+                    </Button>
+                    <Button
+                      radius="full"
+                      className="text-green-500 md:w-20"
+                      onClick={() => removeInputItem(item.id)}
+                    >
+                      Del<span className="text-xl font-bold">-</span>
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -647,128 +652,137 @@ export default function TransferTool() {
           <Divider className="my-4" />
           <div>
             <div>
-              <h6>{t('pages.tools.transaction.output')}</h6>
+              <h6>{t('pages.tools.transaction.output')} UTXO</h6>
             </div>
             <div className="pt-2">
               {outputList.items.map((item, i) => (
-                <div className="flex gap-2 pb-2" key={i}>
-                  <div className="flex w-[70%]">
+                <div
+                  className="pb-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                  key={i}
+                >
+                  <div className="flex col-span-2 justify-center items-center">
+                    {' '}
+                    {i + 1}.
                     <Input
                       placeholder="BTC Address"
                       value={item.value.address}
                       onChange={(e) => setBtcAddress(item.id, e.target.value)}
+                      className="w-64 md:w-full"
                     />
                     <Tooltip content="Fill the BTC address of the current account">
-                      <Button onClick={() => setBtcAddress(item.id, address)}>
+                      <Button
+                        onClick={() => setBtcAddress(item.id, address)}
+                        className="w-12"
+                      >
                         <Image
                           radius="full"
                           src="../icon/copy.svg"
                           alt="logo"
-                          className="w-10 h-10 p-1 rounded-full "
+                          className="w-10 h-10 p-1 rounded-full"
                         />
                       </Button>
                     </Tooltip>
                   </div>
-                  <Input
-                    key={'output-sat-' + item.id}
-                    className={'w-[20%]'}
-                    style={{ height: '48px' }}
-                    placeholder="0"
-                    value={
-                      item.value.unit === 'sats'
-                        ? item.value.sats
-                        : item.value.sats / 100000000
-                    }
-                    onChange={(e) => {
-                      setOutputSats(item.id, e.target.value);
-                      console.log('onBlur is skipped');
-                    }}
-                    onBlur={(e) => {
-                      outputSatsOnBlur(e);
-                    }}
-                    endContent={
-                      <div className="flex items-center">
-                        <select
-                          className="outline-none border-0 bg-transparent text-default-400 text-small"
-                          value={item.value.unit}
-                          onChange={(e) =>
-                            handleOutputUnitSelectChange(item.id, e)
-                          }
-                        >
-                          <option>sats</option>
-                          <option>btc</option>
-                        </select>
-                      </div>
-                    }
-                  />
-                  <Button radius="full" onClick={addOuputItem}>
-                    <Image
-                      radius="full"
-                      src="../icon/add.svg"
-                      alt="logo"
-                      className="w-10 h-10 p-1 rounded-full "
+                  <div className="w-36 md:w-48 md:px-2 justify-center items-center">
+                    <Input
+                      key={'output-sat-' + item.id}
+                      style={{ height: '48px' }}
+                      placeholder="0"
+                      value={
+                        item.value.unit === 'sats'
+                          ? item.value.sats
+                          : item.value.sats / 100000000
+                      }
+                      onChange={(e) => {
+                        setOutputSats(item.id, e.target.value);
+                        console.log('onBlur is skipped');
+                      }}
+                      onBlur={(e) => {
+                        outputSatsOnBlur(e);
+                      }}
+                      endContent={
+                        <div className="flex items-center">
+                          <select
+                            title="select2"
+                            className="outline-none border-0 bg-transparent text-default-400 text-small"
+                            value={item.value.unit}
+                            onChange={(e) =>
+                              handleOutputUnitSelectChange(item.id, e)
+                            }
+                          >
+                            <option>sats</option>
+                            <option>btc</option>
+                          </select>
+                        </div>
+                      }
                     />
-                  </Button>
-                  <Button
-                    radius="full"
-                    onClick={() => removeOutputItem(item.id)}
-                  >
-                    <Image
+                  </div>
+
+                  <div className="flex items-center space-x-2 w-full sm:w-auto">
+                    <Button
                       radius="full"
-                      src="../icon/del.svg"
-                      alt="logo"
-                      className="w-10 h-10 p-1 rounded-full "
-                    />
-                  </Button>
+                      className="text-green-500"
+                      onClick={addOuputItem}
+                    >
+                      Add<span className="text-xl font-bold">+</span>
+                    </Button>
+                    <Button
+                      radius="full"
+                      className="text-green-500"
+                      onClick={() => removeOutputItem(item.id)}
+                    >
+                      Del<span className="text-xl font-bold">-</span>
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
           <Divider className="my-4" />
-          <div>
+          <div className="gap-2 pb-2">
             <div className="flex gap-2 pb-2">
               <h6>{t('pages.tools.transaction.balance')}</h6>
+              <br />
               <span className="text-gray-400 text-sm font-light pt-1">
                 ({t('pages.tools.transaction.balance_des')})
               </span>
             </div>
             <div>
               <div className="flex gap-2 pb-2">
-                <Input
-                  width={'60%'}
-                  value={address}
-                  startContent={
-                    <div className="pointer-events-none flex items-center w-3/12">
-                      <span className="text-default-500 text-small">
-                        Current Address
-                      </span>
-                    </div>
-                  }
-                />
-
-                <Input
-                  key={'balance-sat'}
-                  className={'w-[30%]'}
-                  style={{ height: '48px' }}
-                  placeholder="0"
-                  value={
-                    balance.unit === 'sats'
-                      ? balance.sats
-                      : balance.sats / 100000000
-                  }
-                  endContent={
-                    <div className="flex items-center">
-                      <select
-                        className="outline-none border-0 bg-transparent text-default-400 text-small"
-                        value={balance.unit}
-                        onChange={(e) => handleBalanceUnitSelectChange(e)}
-                      >
-                        <option>sats</option>
-                        <option>btc</option>
-                      </select>
-                    </div>
-                  }
-                />
+                <div className="w-44 md:w-[50%]">
+                  <Input
+                    // width={'60%'}
+                    value={address}
+                    placeholder="Current Address"
+                    className="w-44 md:w-full"
+                  />
+                </div>
+                <div className="pl-1 w-36 md:w-48">
+                  <Input
+                    key={'balance-sat'}
+                    className={'w-36'}
+                    style={{ height: '48px' }}
+                    placeholder="0"
+                    value={
+                      balance.unit === 'sats'
+                        ? balance.sats
+                        : balance.sats / 100000000
+                    }
+                    endContent={
+                      <div className="flex items-center">
+                        <select
+                          title="select3"
+                          className="outline-none border-0 bg-transparent text-default-400 text-small"
+                          value={balance.unit}
+                          onChange={(e) => handleBalanceUnitSelectChange(e)}
+                        >
+                          <option>sats</option>
+                          <option>btc</option>
+                        </select>
+                      </div>
+                    }
+                  />
+                </div>
                 <ButtonGroup className={'w-[10%]'}>{/* 占位 */}</ButtonGroup>
               </div>
             </div>

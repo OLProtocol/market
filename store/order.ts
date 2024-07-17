@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import localForage from 'localforage';
 // import { InscribeType } from '@/types';
 // import { savePaidOrder } from '@/api';
 
@@ -71,24 +72,22 @@ export const useOrderStore = create<OrderState>()(
           });
         },
         checkAllList: () => {
-          const list = get().list.map((item) => {
-            if (
-              item.status === 'pending' ||
-              item.status === 'inscribe_success'
-            ) {
-              const dis = Date.now() - item.createAt;
-              if (dis > 1000 * 60 * 5) {
-                if (item.status === 'pending') {
-                  item.status = 'timeout';
-                  item.inscription = {};
-                }
-                item.files = [];
-              }
+          const len = get().list.length;
+          const newList: OrderItemType[] = [];
+          for (let i = 0; i < len; i++) {
+            const item = get().list[i];
+            const dis = Date.now() - item.createAt;
+            if (dis > 1000 * 60 * 60 * 24 * 7) {
+              continue;
             }
-            return item;
-          });
+            if (item.status === 'pending' && dis > 1000 * 60 * 5) {
+              item.status = 'timeout';
+              item.inscription = {};
+              item.files = [];
+            }
+          }
           set({
-            list,
+            list: newList,
           });
         },
         addSucccessTxid: (orderId, txid) => {
@@ -173,6 +172,7 @@ export const useOrderStore = create<OrderState>()(
       }),
       {
         name: 'order-store',
+        storage: createJSONStorage(() => localForage),
       },
     ),
   ),

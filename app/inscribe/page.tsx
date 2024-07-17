@@ -21,27 +21,19 @@ import {
   generateSeed,
   splitUtxosByValue,
 } from '@/lib/inscribe';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { OrderList } from '@/components/inscribe/OrderList';
 // import { useCommonStore } from '@/store';
 type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
 export default function Inscribe() {
-  // const { state } = useLocation();
-  // const toast = useToast();
-  // useEffect(() => {
-  //   toast({
-  //     title: '网维护中',
-  //     status: 'warning',
-  //     position: 'top',
-  //     duration: 100000,
-  //     isClosable: true,
-  //   });
-  // }, []);
+  const params = useSearchParams();
+  const paramsType = (params.get('type') as string) || 'ordx';
   const { t } = useTranslation();
   const [metadata, setMetadata] = useState<any>({});
   const [step, setStep] = useState(1);
-  const [tab, setTab] = useState<any>('ordx');
+  const [tab, setTab] = useState<any>(paramsType);
   const [files, setFiles] = useState<any[]>([]);
   const [orderId, setOrderId] = useState<string>();
   const [modalShow, setModalShow] = useState(false);
@@ -100,9 +92,10 @@ export default function Inscribe() {
     text: '',
     utxos: [],
   });
-  const [nameData, { set: setNameData, reset: resetName }] = useMap({
+  const [nameData, { set: setNameData, reset: resetName }] = useMap<any>({
     type: 'mint',
     name: '',
+    names: [],
     suffix: '.ordx',
   });
   const brc20Change = (data: any) => {
@@ -116,6 +109,7 @@ export default function Inscribe() {
   const ordxNameChange = (data: any) => {
     setNameData('type', data.type);
     setNameData('name', data.name);
+    setNameData('names', data.names);
     setNameData('suffix', data.suffix);
   };
   const ordxChange = (data: any) => {
@@ -215,16 +209,18 @@ export default function Inscribe() {
   };
   const ordxNameNext = async () => {
     const list: any = [];
-    const { suffix, name } = nameData;
+    const { suffix, names } = nameData;
     if (nameData.type === 'mint') {
-      const _name = name.toString().trim();
-      const value = suffix === '.ordx' ? _name : `${name}${suffix}`;
-      list.push({
-        type: 'ordx_name',
-        name: `mint`,
-        amount: 330,
-        value: value,
-      });
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const _name = name.toString().trim();
+        list.push({
+          type: 'ordx_name',
+          name: `mint`,
+          amount: 330,
+          value: _name,
+        });
+      }
     }
     const _files = await generteFiles(list);
     setList(_files);
@@ -233,6 +229,7 @@ export default function Inscribe() {
   const ordxNext = async () => {
     const list: any = [];
     let hasDeployFile = false;
+    let specialOffsetAmount = 0;
     if (ordxData.type === 'mint') {
       let offset = 0;
       let rangesArr: any[][] = [];
@@ -279,14 +276,29 @@ export default function Inscribe() {
           console.log('amt', amt);
 
           const len = rangesArr[i].length;
-          if (len === 1) {
-            amount =
-              i === 0
-                ? rangesArr[i][0].offset + rangesArr[i][0].size
-                : rangesArr[i][0].size;
+          if (i === 0) {
+            amount = rangesArr[i][len - 1].offset + rangesArr[i][len - 1].size;
+            if (rangesArr[i][0].offset >= 330) {
+              specialOffsetAmount = rangesArr[i][0].offset;
+              amount -= specialOffsetAmount;
+            }
+          } else if (len === 1) {
+            amount = rangesArr[i][0].size;
           } else {
-            throw new Error('not support multi utxos');
+            amount =
+              rangesArr[i][len - 1].offset -
+              rangesArr[i][0].offset +
+              rangesArr[i][len - 1].size;
           }
+
+          // if (len === 1) {
+          //   amount =
+          //     i === 0
+          //       ? rangesArr[i][0].offset + rangesArr[i][0].size
+          //       : rangesArr[i][0].size;
+          // } else {
+          //   throw new Error('not support multi utxos');
+          // }
           amount = Math.max(amount, 330);
           console.log('amount', amount);
           offset = rangesArr[i][0].offset;
@@ -377,9 +389,17 @@ export default function Inscribe() {
       hasDeployFile,
       ordxType: list[0].ordxType,
       isSpecial: list[0].isSpecial,
+      specialOffsetAmount,
       utxos: ordxData.utxos,
     });
+    console.log('specialOffsetAmount', specialOffsetAmount);
+    if (specialOffsetAmount > 0) {
+      list.forEach((v) => {
+        v.offset = v.offset - specialOffsetAmount;
+      });
+    }
     const _files = await generteFiles(list);
+    console.log(_files);
     setList(_files);
     setStep(2);
   };

@@ -167,7 +167,9 @@ export const Navbar = () => {
               radius="none"
               src="/logo.png"
               alt="logo"
-              className="w-14 h-14"
+              classNames={{
+                wrapper: 'w-14 h-14 min-w-14',
+              }}
             />
             <p className="font-bold text-purple-500/90">SAT20Market</p>
           </NextLink>
@@ -232,7 +234,7 @@ export const Navbar = () => {
             <NavbarMenuItem>
               <div className="flex items-center gap-4">
                 <FeerateSelectButton />
-                <ThemeSwitch />
+                {/* <ThemeSwitch /> */}
                 <LanguageSelect />
               </div>
             </NavbarMenuItem>

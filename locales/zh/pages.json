@@ -116,6 +116,7 @@
       "address_hint": "请注意，铭文交易会将铭文直接发送到接收地址。",
       "to_single": "至单个地址",
       "output_one_utxo": "是否把批量铭文铭刻输出一个UTXO",
+      "tight_one_utxo": "是否把批量铭文紧密铭刻输出一个UTXO",
       "cycle_fill": "循环上面地址至{{len}}个",
       "error_1": "请提供一个接收地址。",
       "error_2": "提供的接收地址数量与铸造数量不匹配。",

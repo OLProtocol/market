@@ -49,6 +49,7 @@ export const InscribeStepThree = ({
   const { add: addOrder, changeStatus } = useOrderStore((state) => state);
   // const { serviceStatus } = useCommonStore((state) => state);
   const [selected, setSelected] = useState(false);
+  const [tightSelected, setTightSelected] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>('single');
 
   const files = useMemo(() => {
@@ -77,11 +78,23 @@ export const InscribeStepThree = ({
     }
   }, [data.toMultipleAddresses, data.toSingleAddress, selectedTab]);
   const totalInscriptionSize = useMemo(() => {
-    return files.reduce((acc, cur) => acc + cur.amount, 0);
-  }, [files]);
+    return tightSelected
+      ? Math.max(330, files.length)
+      : files.reduce((acc, cur) => acc + cur.amount, 0);
+  }, [files, tightSelected]);
   const submit = async () => {
     if (loading) return;
     setErrText('');
+    const _files: any[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      if (tightSelected) {
+        f.amount = 1;
+        f.offset = i;
+      }
+      _files.push(f);
+    }
+    console.log('_files', _files);
     const secret = generatePrivateKey();
     const feeObj: any = {
       networkFee: 0,
@@ -93,11 +106,11 @@ export const InscribeStepThree = ({
     const inscription = generateInscription({
       metadata,
       secret,
-      files,
+      files: _files,
       network,
       feeRate: feeRate.value,
     });
-    const outputLength = oneUtxo ? 1 : files.length;
+    const outputLength = oneUtxo || tightSelected ? 1 : files.length;
 
     const baseSize = 84;
     const totalSize = baseSize + inscription.txsize;
@@ -168,7 +181,7 @@ export const InscribeStepThree = ({
       metadata,
       toAddress: toAddresses,
       feeRate: feeRate.value,
-      files,
+      files: _files,
       network,
       status: 'pending',
       createAt: Date.now().valueOf(),
@@ -257,16 +270,6 @@ export const InscribeStepThree = ({
           ))}
         </div>
       </div>
-      {files.length > 1 && (
-        <div className="mb-4">
-          <Checkbox
-            isSelected={selected}
-            onValueChange={(value) => setSelected(value)}
-          >
-            {t('pages.inscribe.step_three.output_one_utxo')}
-          </Checkbox>
-        </div>
-      )}
 
       <Tabs
         aria-label="address tabs"
@@ -286,6 +289,26 @@ export const InscribeStepThree = ({
               />
             </div>
           </div>
+          {files.length > 1 && (
+            <>
+              <div className="mb-4">
+                <Checkbox
+                  isSelected={selected}
+                  onValueChange={(value) => setSelected(value)}
+                >
+                  {t('pages.inscribe.step_three.output_one_utxo')}
+                </Checkbox>
+              </div>
+              <div className="mb-4">
+                <Checkbox
+                  isSelected={tightSelected}
+                  onValueChange={(value) => setTightSelected(value)}
+                >
+                  {t('pages.inscribe.step_three.tight_one_utxo')}
+                </Checkbox>
+              </div>
+            </>
+          )}
         </Tab>
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
