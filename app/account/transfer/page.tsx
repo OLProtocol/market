@@ -256,7 +256,7 @@ export default function SellPage() {
       <Button
         color="primary"
         isLoading={loading}
-        className="w-full"
+        className="mx-auto max-w-full w-56 block"
         onClick={transferHandler}
       >
         {t('common.transfer')}
