@@ -17,21 +17,57 @@ export const parseUtxo = (utxo: string) => {
   };
 };
 
-export const satsToBitcoin = (sats) => {
-  if (sats >= 100000000) sats = sats * 10;
-  let string =
-    String(sats).padStart(8, '0').slice(0, -9) +
-    '.' +
-    String(sats).padStart(8, '0').slice(-9);
-  if (string.substring(0, 1) == '.') string = '0' + string;
-  return string;
+export const satsToBitcoin = (sats): number => {
+  if (typeof sats === 'string') {
+    sats = sats.trim();
+  }
+
+  if (isNaN(Number(sats))) {
+    console.warn('Input is not a valid number, defaulting to 0');
+    sats = 0;
+  }
+
+  let satoshis = Number(sats);
+
+  // Ensure the number is non-negative
+  if (satoshis < 0) {
+    console.warn('Input must be a non-negative number, defaulting to 0');
+    satoshis = 0;
+  }
+
+  // Round to the nearest integer to handle decimal Satoshis
+  satoshis = Math.round(satoshis);
+
+  // Convert Satoshis to BTC
+  const btc = satoshis / 1e8;
+
+  return btc;
 };
 
-export const btcToSats = (btc: string) => {
-  let [whole, decimal] = btc.toString().split('.');
-  if (!decimal) decimal = '0';
-  return parseInt(whole) * 100000000 + parseInt(decimal.padEnd(8, '0'));
+export const btcToSats = (btc: string | number): number => {
+  if (typeof btc === 'string') {
+    btc = btc.trim();
+  }
+
+  if (isNaN(Number(btc))) {
+    console.warn('Input is not a valid number, defaulting to 0');
+    btc = 0;
+  }
+
+  let btcAmount = Number(btc);
+
+  // Ensure the number is non-negative
+  if (btcAmount < 0) {
+    console.warn('Input must be a non-negative number, defaulting to 0');
+    btcAmount = 0;
+  }
+
+  // Convert BTC to Satoshis and handle precision issues by rounding
+  const sats = Math.round(btcAmount * 1e8);
+
+  return sats;
 };
+
 export const safeOutputValue = (
   value: number | Decimal,
   isMs = false,

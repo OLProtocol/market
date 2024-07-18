@@ -154,13 +154,25 @@ export const hexToBytes = (hex) => {
   );
 };
 export const satsToBitcoin = (sats) => {
-  if (sats >= 100000000) sats = sats * 10;
-  let string =
-    String(sats).padStart(8, '0').slice(0, -9) +
-    '.' +
-    String(sats).padStart(8, '0').slice(-9);
-  if (string.substring(0, 1) == '.') string = '0' + string;
-  return string;
+  if (typeof sats === 'string') {
+    sats = sats.trim();
+  }
+
+  if (isNaN(sats)) {
+    throw new Error('Input is not a valid number');
+  }
+
+  const satoshis = Number(sats);
+
+  // Ensure the number is non-negative
+  if (satoshis < 0) {
+    throw new Error('Input must be a non-negative number');
+  }
+
+  // Convert Satoshis to BTC
+  const btc = satoshis / 1e8;
+
+  return btc;
 };
 
 export const clacHexSize = (hex: string) => {

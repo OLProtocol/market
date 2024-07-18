@@ -2,64 +2,47 @@
 
 import useSWR from 'swr';
 import { Tabs, Tab } from '@nextui-org/react';
-import { getAddressOrdxList } from '@/api';
+import { getAddressAssetsList } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-interface OrdxUtxoTypeListProps {
+interface AssetsTypeListProps {
   onChange?: (ticker: string) => void;
+  assets_type: string;
 }
-export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
+export const AssetsTypeList = ({
+  onChange,
+  assets_type,
+}: AssetsTypeListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
-
+  console.log(address);
   const [selected, setSelected] = useState<string>();
 
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressOrdxList-${address}-${network}`;
-  }, [address, network]);
+    return `/ordx/getAddressAssetsList-${address}-${network}-${assets_type}`;
+  }, [address, network, assets_type]);
 
   const { data, isLoading, mutate } = useSWR(
     swrKey,
-    () => getAddressOrdxList({ address }),
+    () => getAddressAssetsList(address, assets_type),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     },
   );
   const list = useMemo(() => {
-    if (!data) {
+    if (!data?.data) {
       return [];
     }
-    let ret = [{ assetsName: 'Name', assert: 'Name', balance: 0 }];
-    for (let i = 0; i < data?.data?.length; i++) {
-      const item = data?.data[i];
-
-      let assert =
-        item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
-      let assetsName =
-        item?.assets_type + (item?.assets_name ? ':' + item?.assets_name : '');
-      if (item?.assets_type === 'ticker') {
-        assetsName = item?.assets_name ? item?.assets_name : '';
-      }
-      // if(item?.assets_type != 'ticker' && item?.assets_type != 'exotic'){
-      //   assetsName =  NsAssetTitle;
-      // }
-      ret.push({
-        assetsName: assetsName,
-        assert: assert,
-        balance: item?.balance,
-      });
-    }
-
+    let ret = data?.data;
     return ret;
   }, [data]);
   useEffect(() => {
-    console.log('list changed', list);
     if (list.length > 0) {
-      setSelected(list[0].assert);
-      onChange?.(list[0].assert);
+      setSelected(list[0].assets_name);
+      onChange?.(list[0].assets_name);
     }
   }, [list]);
 
@@ -72,7 +55,7 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
   };
 
   return (
-    <div className="py-2 sm:py-4">
+    <div className="">
       <Tabs
         variant="light"
         aria-label="Tabs variants"
@@ -88,8 +71,8 @@ export const OrdxUtxoTypeList = ({ onChange }: OrdxUtxoTypeListProps) => {
       >
         {list?.map((item) => (
           <Tab
-            key={item.assert}
-            title={`${item.assetsName}${!!item.balance ? `(${item.balance})` : ''}`}
+            key={item.assets_name}
+            title={`${item.assets_name}${!!item.balance ? `(${item.balance})` : ''}`}
           />
         ))}
       </Tabs>

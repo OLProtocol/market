@@ -13,17 +13,12 @@ import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { useList } from 'react-use';
-import { satsToBitcoin } from '@/lib';
 import { Decimal } from 'decimal.js';
 interface Props {
-  assetsName: string;
-  assetsType: string;
+  assets_name: string;
+  assets_type: string;
 }
-export const OrdxUtxoList = ({
-  assetsName: assets_name,
-  assetsType: assets_type,
-}: Props) => {
-  console.log(assets_name, assets_type);
+export const AssetsList = ({ assets_name, assets_type }: Props) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
   const {
@@ -34,6 +29,7 @@ export const OrdxUtxoList = ({
     list: sellList,
     remove: removeSell,
   } = useSellStore((state) => state);
+  const [type, setType] = useState('sell');
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
@@ -71,6 +67,9 @@ export const OrdxUtxoList = ({
 
   const toSell = () => {
     router.push('/account/sell');
+  };
+  const toTransfer = () => {
+    router.push('/account/transfer');
   };
   const sellHandler = async (item: any) => {
     addHandler(item);
@@ -167,7 +166,14 @@ export const OrdxUtxoList = ({
                 onSelect={(bol) => selectHandler(bol, item)}
                 item={item}
                 delay={i > 5 ? 2000 : 0}
-                onSell={() => sellHandler(item)}
+                onTransfer={() => {
+                  setType('transfer');
+                  sellHandler(item);
+                }}
+                onSell={() => {
+                  setType('sell');
+                  sellHandler(item);
+                }}
                 onCancelOrder={() => onCancelOrder(item)}
               />
             </div>
@@ -186,7 +192,14 @@ export const OrdxUtxoList = ({
           />
         </div>
       )}
-      {canSelect && <BatchSellFooter toSell={toSell} onClose={onBatchClose} />}
+      {canSelect && (
+        <BatchSellFooter
+          actionType={type}
+          toTransfer={toTransfer}
+          toSell={toSell}
+          onClose={onBatchClose}
+        />
+      )}
     </div>
   );
 };
