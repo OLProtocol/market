@@ -296,22 +296,22 @@ export const InscribeStepThree = ({
           </div>
           {files.length > 1 && (
             <>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <Checkbox
                   isSelected={selected}
                   onValueChange={(value) => setSelected(value)}
                 >
                   {t('pages.inscribe.step_three.output_one_utxo')}
                 </Checkbox>
-              </div>
-              <div className="mb-4">
+              </div> */}
+              {/* <div className="mb-4">
                 <Checkbox
                   isSelected={tightSelected}
                   onValueChange={(value) => setTightSelected(value)}
                 >
                   {t('pages.inscribe.step_three.tight_one_utxo')}
                 </Checkbox>
-              </div>
+              </div> */}
             </>
           )}
         </Tab>
