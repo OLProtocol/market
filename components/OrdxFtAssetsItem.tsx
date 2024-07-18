@@ -185,7 +185,7 @@ export const OrdxFtAssetsItem = ({
               >
                 {t('buttons.list_sale')}
               </Button>
-              <Button
+              {/* <Button
                 // fullWidth
                 variant="ghost"
                 size="md"
@@ -196,7 +196,7 @@ export const OrdxFtAssetsItem = ({
                 className="text-tiny h-8 flex-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
               >
                 {t('common.transfer')}
-              </Button>
+              </Button> */}
             </div>
           ) : (
             <Button
