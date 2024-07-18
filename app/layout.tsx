@@ -87,7 +87,9 @@ export default function RootLayout({
                   <Link href="https://twitter.com/sat20market/" target="_blank">
                     <Avatar
                       showFallback
-                      fallback={<Image src="/twitter.png" />}
+                      fallback={
+                        <Image src="/twitter.png" alt="sat20 twitter" />
+                      }
                     />
                   </Link>
                 </li>
