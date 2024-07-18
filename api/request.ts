@@ -249,6 +249,23 @@ export const getAddressAssetsValue = async (address: string) => {
   return res;
 };
 
+export const getAddressAssetsSummary = async (address: string) => {
+  const res = await request('/ordx/GetAddressAssetsSummary', {
+    data: { address },
+  });
+  return res;
+};
+
+export const getAddressAssetsList = async (
+  address: string,
+  assets_type: string,
+) => {
+  const res = await request('/ordx/GetAddressAssetsList', {
+    data: { address, assets_type },
+  });
+  return res;
+};
+
 export const getLastOrderTaskByParameters = async ({
   address,
   parameters,
