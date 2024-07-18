@@ -16,7 +16,7 @@ import { getHistory } from '@/api';
 import { useMemo, useState } from 'react';
 import { hideStr, resolveMempoolTxLink } from '@/lib/utils';
 import { Icon } from '@iconify/react';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Pagination } from '@/components/Pagination';
 import { SortDropdown } from '@/components/SortDropdown';
 import { useRouter } from 'next/navigation';

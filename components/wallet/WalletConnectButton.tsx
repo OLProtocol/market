@@ -11,8 +11,8 @@ import { useEffect, useState } from 'react';
 import {
   WalletConnectReact,
   useReactWalletStore,
-} from 'btc-connect/dist/react';
-import 'btc-connect/dist/style/index.css';
+} from '@sat20/btc-connect/dist/react';
+import '@sat20/btc-connect/dist/style/index.css';
 import { useTheme } from 'next-themes';
 import { hideStr } from '@/lib/utils';
 import { message } from '@/lib/wallet-sdk';
@@ -34,6 +34,7 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
+  console.log('address', address);
   const { reset } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const toMyAssets = () => {

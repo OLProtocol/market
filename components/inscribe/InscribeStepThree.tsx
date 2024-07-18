@@ -8,7 +8,7 @@ import { isTaprootAddress } from '@/lib/wallet';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
 import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useCalcFee } from '@/lib/hooks';
 import { OrderItemType, useCommonStore, useOrderStore } from '@/store';
 
@@ -33,7 +33,7 @@ export const InscribeStepThree = ({
   onRemoveAll,
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
-  const { feeRate, discount } = useCommonStore((state) => state);
+  const { feeRate, discount, btcHeight } = useCommonStore((state) => state);
   const [errText, setErrText] = useState('');
   const {
     network,
@@ -135,7 +135,7 @@ export const InscribeStepThree = ({
 
     // 计算总权重
     const totalWeight = strippedSize * 4 + witnessSize * numInputs;
-
+    let _discount = discount;
     // 计算虚拟大小
     const vSize = totalWeight / 4;
     console.log(`witnessSize: ${witnessSize} bytes`);
@@ -147,8 +147,11 @@ export const InscribeStepThree = ({
     feeObj.networkFee = Math.ceil(vSize * feeRate.value);
     let totalFee = feeObj.networkFee + totalInscriptionSize;
     const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
+    if (metadata.type === 'name' && btcHeight <= 853358) {
+      _discount = 100;
+    }
     feeObj.serviceFee = Math.ceil(oneFee);
-    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - discount)) / 100);
+    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
     feeObj.totalInscriptionSize = totalInscriptionSize;
     feeObj.totalFee = totalFee;
 
@@ -177,6 +180,8 @@ export const InscribeStepThree = ({
       inscription,
       secret,
       oneUtxo,
+      tight: tightSelected,
+      discount: _discount,
       fee: feeObj,
       metadata,
       toAddress: toAddresses,

@@ -28,7 +28,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { getUtxoByValue, ordxSWR, getBTCPrice, getFeeDiscount } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 const WalletButton = dynamic(
   () => import('../components/wallet/WalletConnectButton') as any,
@@ -211,7 +211,7 @@ export const Navbar = () => {
         <NavbarItem className="">
           <WalletButton />
         </NavbarItem>
-        <NavbarItem className="sm:hidden">
+        <NavbarItem className="lg:hidden">
           <NavbarMenuToggle />
         </NavbarItem>
         {/* <NavbarItem className="hidden md:flex">

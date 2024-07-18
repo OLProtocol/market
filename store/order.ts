@@ -21,7 +21,9 @@ export interface OrderItemType {
   inscription: any;
   secret: string;
   txid?: string;
+  discount?: number;
   oneUtxo: boolean;
+  tight: boolean;
   toAddress: string[];
   network: string;
   files: any[];
@@ -77,6 +79,7 @@ export const useOrderStore = create<OrderState>()(
           for (let i = 0; i < len; i++) {
             const item = get().list[i];
             const dis = Date.now() - item.createAt;
+            console.log('dis', dis);
             if (dis > 1000 * 60 * 60 * 24 * 7) {
               continue;
             }
@@ -85,6 +88,7 @@ export const useOrderStore = create<OrderState>()(
               item.inscription = {};
               item.files = [];
             }
+            newList.push(item);
           }
           set({
             list: newList,
@@ -172,7 +176,7 @@ export const useOrderStore = create<OrderState>()(
       }),
       {
         name: 'order-store',
-        storage: createJSONStorage(() => localForage),
+        // storage: createJSONStorage(() => localForage),
       },
     ),
   ),

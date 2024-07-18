@@ -1,12 +1,13 @@
 import { Textarea, Button } from '@nextui-org/react';
 import { useEffect, useState, useMemo } from 'react';
 import { useMap } from 'react-use';
+import { notification } from 'antd';
 import { ordx } from '@/api';
 import { tryit } from 'radash';
 import { clacTextSize } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface InscribeTextProps {
   onNext?: () => void;
@@ -26,36 +27,38 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   });
   const checkName = async () => {
     let checkStatus = true;
-    setLoading(true);
+
     const lines = data.name
       .split('\n')
       .map((a) => a.trim())
       .filter((v) => !!v);
-
-    const errArr: string[] = [];
+    if (lines.length === 0) {
+      return false;
+    }
+    setLoading(true);
+    let mintedArr: string[] = [];
+    const checkedArr: string[] = [];
+    let formatErrArr: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const textSize = clacTextSize(line);
       if (textSize < 3 || textSize == 4 || textSize > 32) {
-        errArr.push(line);
+        formatErrArr.push(line);
       } else if (
         line.endsWith('.') ||
         line.startsWith('.') ||
         line.split('.').length > 2
       ) {
-        errArr.push(line);
+        formatErrArr.push(line);
+      } else if (checkedArr.includes(line)) {
+        formatErrArr.push(line);
+      }
+      if (!checkedArr.includes(line)) {
+        checkedArr.push(line);
       }
     }
-    const [error, res] = await tryit(ordx.checkNsNames)({
-      names: lines,
-      network,
-    });
-    setLoading(false);
-    const checkArr = res?.data || [];
-    const checkErrArr = checkArr.filter((v: any) => v.result !== 0);
-    // const { data: nameData } = res || {};
-    if (errArr.length > 0) {
-      const errorText = errArr
+    if (formatErrArr.length > 0) {
+      const errorText = formatErrArr
         .map((v) => `Name "${v}" is not valid.`)
         .join('\n');
       console.log(errorText);
@@ -63,10 +66,37 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       setErrorText(errorText);
       return false;
     }
-    console.log(checkErrArr);
-    if (checkErrArr.length > 0) {
-      const errorText = checkErrArr
-        .map((v: any) => `Name "${v.name}" is already taken.`)
+    console.log(formatErrArr);
+    const [error, res] = await tryit(ordx.checkNsNames)({
+      names: lines,
+      network,
+    });
+    setLoading(false);
+    if (error || !res?.data) {
+      notification.error({
+        message: t('notification.system_error'),
+      });
+      throw error;
+    }
+    const checkArr = res?.data || [];
+    formatErrArr = checkArr
+      .filter((v: any) => v.result === -1)
+      .map((v) => v.name);
+    mintedArr = checkArr.filter((v: any) => v.result === 1).map((v) => v.name);
+    // const { data: nameData } = res || {};
+    if (formatErrArr.length > 0) {
+      const errorText = formatErrArr
+        .map((v) => `Name "${v}" is not valid.`)
+        .join('\n');
+      console.log(errorText);
+
+      setErrorText(errorText);
+      return false;
+    }
+    console.log(mintedArr);
+    if (mintedArr.length > 0) {
+      const errorText = mintedArr
+        .map((v: any) => `Name "${v}" is already taken.`)
         .join('\n');
       setErrorText(errorText);
       return false;
@@ -159,7 +189,6 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
           <Button
             className="mx-auto block"
             color="primary"
-            isDisabled={!data.name || loading}
             onClick={nextHandler}
           >
             {checked ? t('buttons.next') : 'Check'}
