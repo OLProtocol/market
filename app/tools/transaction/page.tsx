@@ -28,7 +28,7 @@ import {
   Image,
 } from '@nextui-org/react';
 import { notification } from 'antd';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useList, useMap } from 'react-use';

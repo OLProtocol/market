@@ -11,7 +11,7 @@ import {
 } from '@nextui-org/react';
 import { Steps, Tag, Progress, notification } from 'antd';
 import { InscribeOrderItem } from './InscribeOrderItem';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { sleep, sum } from 'radash';
 import { filterUtxosByValue, calcNetworkFee } from '@/lib/wallet';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
@@ -347,13 +347,14 @@ export const InscribingOrderModal = ({
     try {
       setLoading(true);
       console.log('order', order);
-      const { commitTx, fee, oneUtxo } = order;
+      const { commitTx, fee, oneUtxo, tight } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
       await sleep(10000);
       // await ordx.pollGetTxStatus(commitTxid, order.network);
       const txid = await inscribe({
         secret: order.secret,
         oneUtxo,
+        tight,
         network: order.network as any,
         inscription: order.inscription,
         files: order.files,
@@ -526,7 +527,7 @@ export const InscribingOrderModal = ({
             feeRate={feeRate.value}
             totalInscriptionSize={order.fee.totalInscriptionSize}
             serviceFee={order.fee.serviceFee}
-            discount={discount}
+            discount={order?.discount}
             discountServiceFee={order.fee.discountServiceFee}
             // filesLength={order.inscriptions.length}
             totalFee={totalFee}

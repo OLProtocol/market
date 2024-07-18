@@ -209,7 +209,7 @@ export default function Inscribe() {
   };
   const ordxNameNext = async () => {
     const list: any = [];
-    const { suffix, names } = nameData;
+    const { names } = nameData;
     if (nameData.type === 'mint') {
       for (let i = 0; i < names.length; i++) {
         const name = names[i];
@@ -218,10 +218,14 @@ export default function Inscribe() {
           type: 'ordx_name',
           name: `mint`,
           amount: 330,
+          offset: 330 * i,
           value: _name,
         });
       }
     }
+    setMetadata({
+      type: 'name',
+    });
     const _files = await generteFiles(list);
     setList(_files);
     setStep(2);

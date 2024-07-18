@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import { Tabs, Tab } from '@nextui-org/react';
 import { getAddressAssetsList } from '@/api';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ export const AssetsTypeList = ({
   assets_type,
 }: AssetsTypeListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
-
+  console.log(address);
   const [selected, setSelected] = useState<string>();
 
   const swrKey = useMemo(() => {

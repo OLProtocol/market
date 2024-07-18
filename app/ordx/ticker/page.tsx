@@ -6,7 +6,7 @@ import { getAssetsSummary } from '@/api';
 import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';

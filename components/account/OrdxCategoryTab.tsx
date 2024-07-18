@@ -2,7 +2,7 @@ import { Card, CardHeader, CardBody, Divider } from '@nextui-org/react';
 import useSWR from 'swr';
 import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { getAddressAssetsSummary } from '@/api';
 import { satsToBitcoin } from '@/lib/utils';

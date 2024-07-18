@@ -30,7 +30,7 @@ import {
   btcToSats,
 } from '@/lib/utils';
 import { Decimal } from 'decimal.js';
-import { useReactWalletStore } from 'btc-connect/dist/react';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { getAssetsSummary, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
@@ -151,7 +151,7 @@ export default function SellPage() {
     }
   };
   return (
-    <div className="py-2">
+    <div className="py-2 max-w-3xl mx-auto">
       <div className="md:flex justify-between gap-4">
         <div className="flex-1 mb-2 md:mb-0">
           <Table aria-label="Example static collection table">
@@ -238,7 +238,11 @@ export default function SellPage() {
                   className="mb-2"
                 />
                 <div className="flex">
-                  <Button color={'primary'} onClick={cycleFill}>
+                  <Button
+                    color={'primary'}
+                    onClick={cycleFill}
+                    className="w-full"
+                  >
                     {t('pages.inscribe.step_three.cycle_fill', {
                       len: list.length,
                     })}
@@ -248,19 +252,15 @@ export default function SellPage() {
             </Tab>
           </Tabs>
         </div>
-        <Card className="w-60">
-          <CardFooter>
-            <Button
-              color="primary"
-              isLoading={loading}
-              className="w-full"
-              onClick={transferHandler}
-            >
-              {t('buttons.list_sale')}
-            </Button>
-          </CardFooter>
-        </Card>
       </div>
+      <Button
+        color="primary"
+        isLoading={loading}
+        className="w-full"
+        onClick={transferHandler}
+      >
+        {t('common.transfer')}
+      </Button>
     </div>
   );
 }
