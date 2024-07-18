@@ -12,9 +12,16 @@ import { Icon } from '@iconify/react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { hideStr, thousandSeparator } from '@/lib/utils';
-import { UtxoContent } from './UtxoContent';
+
+import { NameItem } from './NameItem';
+import { Sat20Item } from './Sat20Item';
+import { Sat20ItemConent } from './Sat20ItemConent';
+import { RareSatsItem } from './RareSatsItem';
+import { OrdinalsNftItem } from './OrdinalsNftItem';
+
 interface Props {
   item: any;
+  assets_type;
   assets_name: string;
   onSell?: (item: any) => void;
   onTransfer?: (item: any) => void;
@@ -24,13 +31,14 @@ interface Props {
   onSelect?: (b: boolean) => void;
   delay?: number;
 }
-export const OrdxFtAssetsItem = ({
+export const AssetsItem = ({
   item,
   onSell,
   onTransfer,
   onCancelOrder,
   selected,
   assets_name,
+  assets_type,
   canSelect,
   onSelect,
   delay,
@@ -45,20 +53,31 @@ export const OrdxFtAssetsItem = ({
     await onSell?.(item);
     setLoading(false);
   };
-
-  const showContent = (content_type?: string, delegate?: string) => {
-    if (!content_type) return false;
-    return (
-      !!delegate ||
-      !['text/plain'].some((type) => content_type.indexOf(type) > -1)
-    );
-  };
   const asset = useMemo(
     () =>
       item?.assets_list?.find((v) => v?.assets_name === assets_name) ||
       item?.assets_list[0],
     [item?.assets_list, assets_name],
   );
+  const showContent = (content_type?: string, delegate?: string) => {
+    if (!content_type || assets_type !== 'ticker') return false;
+    return (
+      !!delegate ||
+      !['text/plain'].some((type) => content_type.indexOf(type) > -1)
+    );
+  };
+  const isSat20Content = useMemo(() => {
+    if (!asset?.content_type || assets_type !== 'ticker') return false;
+    return (
+      !!asset?.delegate ||
+      !['text/plain'].some((type) => asset?.content_type.indexOf(type) > -1)
+    );
+  }, [asset]);
+
+  const isSat20Ticker = useMemo(() => {
+    if (assets_type !== 'ticker') return false;
+    return !isSat20Content;
+  }, [asset, isSat20Content]);
   let tickContent =
     "{'p':'ordx','op':'mint','tick':'" +
     asset?.assets_name +
@@ -97,60 +116,12 @@ export const OrdxFtAssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16rem] md:h-[16rem] top-0 bottom-0 left-0">
-        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
-          <div className="flex-1 justify-center h-full overflow-hidden top- left-1">
-            <div className="absolute items-center inset-0 z-0">
-              {asset?.assets_type === 'exotic' ? (
-                <Image
-                  radius="full"
-                  src={`/raresats/${asset?.assets_name}.png`}
-                  alt="logo"
-                  className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
-                />
-              ) : (
-                showContent(asset?.content_type, asset?.delegate) && (
-                  <div className="w-full h-full">
-                    <UtxoContent
-                      inscriptionId={asset?.inscriptionId}
-                      delay={delay}
-                      utxo={item?.utxo}
-                    ></UtxoContent>
-                  </div>
-                )
-              )}
-            </div>
-            {showContent(asset?.content_type, asset?.delegate) || !isText ? (
-              <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
-                {asset?.assets_type === 'exotic' ? (
-                  <p className="font-medium text-2xl md:text-3xl mb-4">
-                    {thousandSeparator(asset?.amount)}
-                  </p>
-                ) : (
-                  <p className="font-medium text-2xl md:text-3xl mb-1">
-                    {thousandSeparator(asset?.amount)}
-                  </p>
-                )}
-              </section>
-            ) : isText ? (
-              <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-40">
-                <p className="font-medium pt-3 text-2xl md:text-3xl md:pt-3">
-                  {thousandSeparator(asset?.amount)}
-                </p>
-                <p className="pt-12 md:pb-2 md:text-xs">
-                  <span className="font-mono text-gray-100">{tickContent}</span>
-                </p>
-              </section>
-            ) : (
-              ''
-            )}
-          </div>
-          <div className="grid justify-items-start ... z-40">
-            <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
-              {asset?.assets_name}
-            </div>
-          </div>
-        </div>
+      <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16rem] md:h-[16rem] p-0">
+        {asset?.assets_type === 'ns' && <NameItem asset={asset} />}
+        {isSat20Ticker && <Sat20Item asset={asset} />}
+        {isSat20Content && <Sat20ItemConent asset={asset} utxo={item?.utxo} />}
+        {asset?.assets_type === 'exotic' && <RareSatsItem asset={asset} />}
+        {asset?.assets_type === 'nft' && <OrdinalsNftItem asset={asset} />}
       </CardBody>
 
       <CardFooter className="block item-center bg-gray-800 h-[6rem] md:h-[6.5rem]">
@@ -163,13 +134,6 @@ export const OrdxFtAssetsItem = ({
         >
           <span className="font-thin md:pl-8">{hideStr(item?.utxo, 6)}</span>
         </Snippet>
-
-        {/* <div className="pb-1 md:pb-2">
-          {asset?.assets_name}
-          <span className="relative pl-4 font-medium text-lg md:text-xl">
-            assets: {thousandSeparator(asset?.amount)}
-          </span>
-        </div> */}
         <div className="flex item-center pb-1 gap-2">
           {item.order_id === 0 ? (
             <div className="flex items-center gap-2 flex-1">

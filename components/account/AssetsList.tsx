@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSellStore } from '@/store';
 import { Pagination } from '@/components/Pagination';
 import { Content } from '@/components/Content';
-import { OrdxFtAssetsItem } from '@/components/OrdxFtAssetsItem';
+import { AssetsItem } from '@/components/assets/AssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { useList } from 'react-use';
@@ -159,8 +159,9 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
         <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
           {list.map((item: any, i) => (
             <div key={item.utxo + item.locked}>
-              <OrdxFtAssetsItem
+              <AssetsItem
                 assets_name={assets_name}
+                assets_type={assets_type}
                 selected={!!sellList.find((i) => i.utxo === item.utxo)}
                 canSelect={canSelect}
                 onSelect={(bol) => selectHandler(bol, item)}

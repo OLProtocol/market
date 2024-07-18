@@ -55,7 +55,7 @@ export const AssetsTypeList = ({
   };
 
   return (
-    <div className="">
+    <div className="mb-4">
       <Tabs
         variant="light"
         aria-label="Tabs variants"
