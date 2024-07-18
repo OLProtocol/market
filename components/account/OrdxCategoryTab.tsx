@@ -51,7 +51,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
       },
       {
         label: 'Ordinals NFT',
-        key: 'ordinals',
+        key: 'nft',
         value: nftInfo?.total_value || 0,
       },
     ];
@@ -76,7 +76,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         <Card
           isHoverable
           isPressable
-          className={`px-2 w-48 max-w-full ${selected === item.key ? 'bg-gray-100' : ''}`}
+          className={`px-2 w-48 max-w-full ${selected === item.key ? 'bg-gradient-to-r from-pink-500 to-indigo-500' : ''}`}
           key={item.key}
           onPress={() => {
             console.log(item.key);

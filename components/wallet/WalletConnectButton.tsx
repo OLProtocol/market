@@ -5,6 +5,7 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
+  Snippet,
 } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -165,6 +166,19 @@ const WalletConnectButton = () => {
           </PopoverTrigger>
           <PopoverContent className="p-2">
             <div className="flex flex-col gap-2">
+              <div>
+                <Snippet
+                  codeString={address}
+                  className="bg-transparent text-lg md:text-2xl font-thin items-center"
+                  symbol=""
+                  variant="flat"
+                >
+                  <span className="text-base font-thin text-slate-400">
+                    {hideStr(address, 6)}
+                  </span>
+                </Snippet>
+              </div>
+
               <Button className="w-full" onClick={toHistory}>
                 {t('buttons.to_history')}
               </Button>
