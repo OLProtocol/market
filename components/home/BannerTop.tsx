@@ -71,7 +71,7 @@ const BannerTop = ({ detail }: any) => {
                     <h6 className="pr-30 keep-all">
                       Current:{' '}
                       <span className="text-green-500">
-                        {detail?.endBlock?.toLocaleString()}
+                        {currentBlockHeight?.toLocaleString()}
                       </span>
                     </h6>
                     <h6>
