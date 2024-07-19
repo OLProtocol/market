@@ -78,7 +78,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
           className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-[#4361ee] to-[#2b35b8] ' : ''}`}
           key={item.key}
           onPress={() => {
-            setSelected(item.key);
+            item.key !== 'nft' && setSelected(item.key);
           }}
         >
           <CardHeader>
