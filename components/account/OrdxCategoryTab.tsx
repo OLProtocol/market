@@ -70,12 +70,12 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
   }, [selected]);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+    <div className="grid grid-cols-2 max-w-4xl md:grid-cols-4 gap-2 md:gap-4">
       {list.map((item) => (
         <Card
           isHoverable
           isPressable
-          className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-[#4361ee] to-[#160f6b] ' : ''}`}
+          className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-[#4361ee] to-[#2b35b8] ' : ''}`}
           key={item.key}
           onPress={() => {
             setSelected(item.key);

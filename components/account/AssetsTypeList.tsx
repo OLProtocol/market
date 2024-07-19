@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { Tabs, Tab } from '@nextui-org/react';
+import { Select, SelectItem, Tabs, Tab } from '@nextui-org/react';
 import { getAddressAssetsList } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,7 +18,7 @@ export const AssetsTypeList = ({
 }: AssetsTypeListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
   console.log(address);
-  const [selected, setSelected] = useState<string>();
+  const [selectKey, setSelectKey] = useState('');
 
   const swrKey = useMemo(() => {
     return `/ordx/getAddressAssetsList-${address}-${network}-${assets_type}`;
@@ -41,41 +41,33 @@ export const AssetsTypeList = ({
   }, [data]);
   useEffect(() => {
     if (list.length > 0) {
-      setSelected(list[0].assets_name);
+      setSelectKey(list[0].assets_name);
       onChange?.(list[0].assets_name);
     }
   }, [list]);
 
-  const changeHandler = (k: any) => {
-    if (selected === k) {
-      return;
-    }
-    setSelected(k);
-    onChange?.(k);
+  const onSelectionChange = (keys: any) => {
+    const _v = Array.from(keys.values())[0] as string;
+    setSelectKey(_v);
+    onChange?.(_v);
   };
-
+  console.log(selectKey);
   return (
     <div className="mb-4">
-      <Tabs
-        variant="light"
-        aria-label="Tabs variants"
-        color="warning"
-        radius="full"
-        size="lg"
-        selectedKey={selected}
-        classNames={{
-          tabList: 'flex-wrap rounded-none',
-          tab: 'w-min',
-        }}
-        onSelectionChange={changeHandler}
+      <Select
+        showScrollIndicators={false}
+        isLoading={isLoading}
+        className="w-full max-w-sm"
+        selectionMode="single"
+        selectedKeys={[selectKey]}
+        onSelectionChange={onSelectionChange}
       >
-        {list?.map((item) => (
-          <Tab
-            key={item.assets_name}
-            title={`${item.assets_name}${!!item.balance ? `(${item.balance})` : ''}`}
-          />
+        {list.map((item) => (
+          <SelectItem key={item.assets_name} value={item.assets_name}>
+            {`${item.assets_name}${!!item.balance ? `(${item.balance})` : ''}`}
+          </SelectItem>
         ))}
-      </Tabs>
+      </Select>
     </div>
   );
 };
