@@ -97,6 +97,7 @@ export const AssetsItem = ({
     await onCancelOrder?.();
     setLoading(false);
   };
+
   return (
     <Card
       radius="lg"
