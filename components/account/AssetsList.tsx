@@ -156,7 +156,7 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
         {!list.length && <Empty className="mt-10" />}
-        <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap justify-center gap-4 md:gap-6 mb-4">
           {list.map((item: any, i) => (
             <div key={item.utxo + item.locked}>
               <AssetsItem
