@@ -42,7 +42,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const textSize = clacTextSize(line);
-      if (textSize < 3 || textSize == 4 || textSize > 32) {
+      if (textSize < 3 || textSize > 32) {
         formatErrArr.push(line);
       } else if (
         line.endsWith('.') ||

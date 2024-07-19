@@ -55,9 +55,9 @@
       "description": "Register a name on BTC",
       "description_1": "Supports suffixes: for example, .btc, .x, .pizza, and no suffix. ",
       "description_2": "Free minting: you can free mint names with the supported suffixes above until block 853358.",
-      "name_placeholder": "Name must be 3, 5-32 bytes long",
+      "name_placeholder": "Name must be 3-32 bytes long",
       "select_placeholder": "Select Suffix",
-      "error_1": "Name must be 3, 5-32 bytes long",
+      "error_1": "Name must be 3-32 bytes long",
       "error_2": "{{name}} has been minted"
     },
     "files": {
