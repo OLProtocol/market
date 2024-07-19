@@ -52,21 +52,25 @@ export const AssetsTypeList = ({
     onChange?.(_v);
   };
   return (
-    <div className="mb-4">
-      <Select
-        showScrollIndicators={false}
-        isLoading={isLoading}
-        className="w-full max-w-sm"
-        selectionMode="single"
-        selectedKeys={[selectKey]}
-        onSelectionChange={onSelectionChange}
-      >
-        {list.map((item) => (
-          <SelectItem key={item.assets_name} value={item.assets_name}>
-            {`${getLabelForAssets(item.assets_name, assets_type)}${!!item.balance ? `(${item.balance})` : ''}`}
-          </SelectItem>
-        ))}
-      </Select>
-    </div>
+    <>
+      {assets_type == 'nft' && (
+        <div className="mb-4">
+          <Select
+            showScrollIndicators={false}
+            isLoading={isLoading}
+            className="w-full max-w-sm"
+            selectionMode="single"
+            selectedKeys={[selectKey]}
+            onSelectionChange={onSelectionChange}
+          >
+            {list.map((item) => (
+              <SelectItem key={item.assets_name} value={item.assets_name}>
+                {`${getLabelForAssets(item.assets_name, assets_type)}${!!item.balance ? `(${item.balance})` : ''}`}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+      )}
+    </>
   );
 };
