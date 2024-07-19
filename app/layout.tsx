@@ -6,11 +6,8 @@ import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
 import '@/locales';
-import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider, theme } from 'antd';
 import { Avatar, Image, Link } from '@nextui-org/react';
 import ParticleEffect from '@/components/ParticleEffect';
-import { useMemo } from 'react';
 
 // export const metadata: Metadata = {
 //   title: {
