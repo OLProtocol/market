@@ -87,7 +87,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
             </span>
           </CardHeader>
           <Divider className="divide-inherit divide-dashed" />
-          <CardBody className="text-left text-md font-thin leading-8">
+          <CardBody className="text-left text-md leading-8">
             <div className="flex">
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
               {item.value}
