@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { Decimal } from 'decimal.js';
-import { btcToSats, satsToBitcoin } from '@/lib';
+import { btcToSats, satsToBitcoin } from '@/lib/utils';
 
 export interface UtxoAssetItem {
   utxo: string;
