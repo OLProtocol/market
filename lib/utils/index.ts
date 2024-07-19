@@ -6,6 +6,14 @@ import { add, format } from 'date-fns';
 import { flat } from 'radash';
 import crypto from 'crypto';
 
+export const getLabelForAssets = (assets_name: string, assets_type: string) => {
+  const assetsMap = {
+    ns: {
+      un: 'Pure Name',
+    },
+  };
+  return assetsMap[assets_type]?.[assets_name] || assets_name;
+};
 export const getTickLabel = (tick?: string) => {
   if (tick === undefined) return undefined;
   const tickMap = {

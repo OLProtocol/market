@@ -1,15 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  Tabs,
-  Tab,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-  Image,
-} from '@nextui-org/react';
+import { Tabs, Tab } from '@nextui-org/react';
 import useSWR from 'swr';
 import { OrdxAssetsUtxoList } from '@/components/account/OrdxAssetsUtxoList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
@@ -18,9 +10,6 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
 import { getAddressAssetsValue } from '@/api';
-import { btcToSats, satsToBitcoin } from '@/lib/utils';
-import { Icon } from '@iconify/react';
-import { BtcPrice } from '@/components/BtcPrice';
 
 export default function AccountPage() {
   const { t } = useTranslation();

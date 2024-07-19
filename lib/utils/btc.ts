@@ -4,7 +4,7 @@ import {
   MS_BRC20_UTXO_VALUE,
   DUMMY_UTXO_VALUE,
 } from '@/lib/constants';
-import { addresToScriptPublicKey } from '@/lib/utils/order';
+import { addresToScriptPublicKey } from './order';
 import { sortBy, reverse, cloneDeep } from 'lodash';
 import { bitcoin, toPsbtNetwork, NetworkType } from '../wallet';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
