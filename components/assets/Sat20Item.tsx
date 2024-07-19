@@ -19,7 +19,7 @@ export const Sat20Item = ({ asset }: Props) => {
       <div className="left-0 top-0 flex z-10 absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
         {asset?.assets_name}
       </div>
-      <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-40">
+      <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-10">
         <p className="font-medium pt-3 text-2xl md:text-3xl md:pt-3">
           {thousandSeparator(asset?.amount)}
         </p>
