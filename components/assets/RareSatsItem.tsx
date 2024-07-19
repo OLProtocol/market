@@ -1,4 +1,5 @@
 import { Image } from '@nextui-org/react';
+import { hideStr, thousandSeparator } from '@/lib/utils';
 interface Props {
   asset: any;
 }
@@ -16,6 +17,9 @@ export const RareSatsItem = ({ asset }: Props) => {
         src={`/raresats/${asset?.assets_name}.png`}
         alt="logo"
       />
+      <div className="font-medium  font-mono text-2xl md:text-3xl mb-1 absolute bottom-0 left-0 z-10 w-full text-center">
+        {thousandSeparator(asset?.amount)}
+      </div>
     </div>
   );
 };

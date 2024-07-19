@@ -13,9 +13,10 @@ import {
   WalletConnectReact,
   useReactWalletStore,
 } from '@sat20/btc-connect/dist/react';
+import { Icon } from '@iconify/react';
 import '@sat20/btc-connect/dist/style/index.css';
 import { useTheme } from 'next-themes';
-import { hideStr } from '@/lib/utils';
+import { hideStr, satsToBitcoin } from '@/lib/utils';
 import { message } from '@/lib/wallet-sdk';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -36,8 +37,9 @@ const WalletConnectButton = () => {
     network,
   } = useReactWalletStore((state) => state);
   console.log('address', address);
-  const { reset } = useUtxoStore();
+  const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
+  const [utxoAmount, setUtxoAmount] = useState(0);
   const toMyAssets = () => {
     router.push('/account');
   };
@@ -45,6 +47,11 @@ const WalletConnectButton = () => {
     console.log('check', connected);
     check();
   }, []);
+  useEffect(() => {
+    const unspendUtxos = getUnspendUtxos();
+    const amount = unspendUtxos.reduce((acc, cur) => acc + cur.value, 0);
+    setUtxoAmount(amount);
+  }, [UtxoList]);
   const onConnectSuccess = async (wallet: any) => {
     if (!signature) {
       console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
@@ -178,7 +185,11 @@ const WalletConnectButton = () => {
                   </span>
                 </Snippet>
               </div>
-
+              <div className="flex items-center justify-end gap-2 px-4 text-abse">
+                <span>Balance：</span>
+                <span>{satsToBitcoin(utxoAmount)} BTC</span>
+                <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
+              </div>
               <Button className="w-full" onClick={toHistory}>
                 {t('buttons.to_history')}
               </Button>
