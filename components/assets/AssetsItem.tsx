@@ -100,7 +100,7 @@ export const AssetsItem = ({
   return (
     <Card
       radius="lg"
-      className="card-hover forced-colors:hidden border-none w-[12rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative outline-2 hover:outline-offset-2 hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
+      className="card-hover forced-colors:hidden w-[12rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative border-1 border-solid border-transparent hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
