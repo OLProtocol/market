@@ -3,8 +3,8 @@ interface Props {
 }
 export const NameItem = ({ asset }: Props) => {
   return (
-    <div className="w-full h-full text-xs tracking-widest antialiased md:text-base uppercase flex items-center justify-center">
-      <p className="font-medium pt-2 text-2xl md:text-3xl md:pt-3 text-wrap break-all">
+    <div className="w-full h-full uppercase flex items-center justify-center">
+      <p className="font-medium pt-2 text-xl md:text-2xl md:pt-3 text-wrap break-all p-4">
         {asset.assets_name}
       </p>
     </div>
