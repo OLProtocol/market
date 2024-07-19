@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import { Select, SelectItem, Tabs, Tab } from '@nextui-org/react';
+import { getLabelForAssets } from '@/lib/utils';
 import { getAddressAssetsList } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -17,7 +18,6 @@ export const AssetsTypeList = ({
   assets_type,
 }: AssetsTypeListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
-  console.log(address);
   const [selectKey, setSelectKey] = useState('');
 
   const swrKey = useMemo(() => {
@@ -51,7 +51,6 @@ export const AssetsTypeList = ({
     setSelectKey(_v);
     onChange?.(_v);
   };
-  console.log(selectKey);
   return (
     <div className="mb-4">
       <Select
@@ -64,7 +63,7 @@ export const AssetsTypeList = ({
       >
         {list.map((item) => (
           <SelectItem key={item.assets_name} value={item.assets_name}>
-            {`${item.assets_name}${!!item.balance ? `(${item.balance})` : ''}`}
+            {`${getLabelForAssets(item.assets_name, assets_type)}${!!item.balance ? `(${item.balance})` : ''}`}
           </SelectItem>
         ))}
       </Select>

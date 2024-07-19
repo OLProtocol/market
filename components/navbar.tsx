@@ -116,11 +116,11 @@ export const Navbar = () => {
   };
   const navMenus = useMemo(
     () => [
-      {
-        label: t('pages.home.title'),
-        href: '/',
-        isActive: true,
-      },
+      // {
+      //   label: t('pages.home.title'),
+      //   href: '/',
+      //   isActive: true,
+      // },
       {
         label: t('pages.market.title'),
         href: '/market',
