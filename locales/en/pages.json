@@ -3,6 +3,9 @@
     "title": "SAT20 Market",
     "version_update_title": "There is a new version, do you want to update it?"
   },
+  "home": {
+    "title": "Home"
+  },
   "market": {
     "title": "MarketPlace"
   },
