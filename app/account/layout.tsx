@@ -15,19 +15,7 @@ export default function AccountLayout({
   return (
     <section>
       <WalletConnectBus className="mx-auto mt-20 block">
-        <div>
-          <Snippet
-            codeString={address}
-            className="bg-transparent text-lg md:text-2xl font-thin"
-            symbol=""
-            variant="flat"
-          >
-            <span className="text-base font-thin text-slate-400">
-              {hideStr(address, 6)}
-            </span>
-          </Snippet>
-        </div>
-        <div className="">{children}</div>
+        {children}
       </WalletConnectBus>
     </section>
   );

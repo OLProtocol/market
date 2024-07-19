@@ -15,7 +15,7 @@ import { hideStr, thousandSeparator } from '@/lib/utils';
 
 import { NameItem } from './NameItem';
 import { Sat20Item } from './Sat20Item';
-import { Sat20ItemConent } from './Sat20ItemConent';
+import { Sat20ContentItem } from './Sat20ContentItem';
 import { RareSatsItem } from './RareSatsItem';
 import { OrdinalsNftItem } from './OrdinalsNftItem';
 
@@ -119,7 +119,7 @@ export const AssetsItem = ({
       <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16rem] md:h-[16rem] p-0">
         {asset?.assets_type === 'ns' && <NameItem asset={asset} />}
         {isSat20Ticker && <Sat20Item asset={asset} />}
-        {isSat20Content && <Sat20ItemConent asset={asset} utxo={item?.utxo} />}
+        {isSat20Content && <Sat20ContentItem asset={asset} utxo={item?.utxo} />}
         {asset?.assets_type === 'exotic' && <RareSatsItem asset={asset} />}
         {asset?.assets_type === 'nft' && <OrdinalsNftItem asset={asset} />}
       </CardBody>

@@ -23,7 +23,7 @@ export const Sat20Item = ({ asset }: Props) => {
         <p className="font-medium pt-3 text-2xl md:text-3xl md:pt-3">
           {thousandSeparator(asset?.amount)}
         </p>
-        <p className="pt-12 md:pb-2 md:text-xs">
+        <p className="pt-12 md:pb-2 md:text-xs p-4">
           <span className="font-mono text-gray-100">{tickContent}</span>
         </p>
       </section>

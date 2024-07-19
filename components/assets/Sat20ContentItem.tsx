@@ -6,7 +6,7 @@ interface Props {
   asset: any;
   utxo?: string;
 }
-export const Sat20ItemConent = ({ asset, utxo }: Props) => {
+export const Sat20ContentItem = ({ asset, utxo }: Props) => {
   return (
     <div className="w-full h-full relative antialiased  tracking-widest">
       <div className="left-0 top-0 flex z-10 absolute p-2 rounded-br-[1rem] text-xs md:text-base text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100">
