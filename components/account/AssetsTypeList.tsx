@@ -53,7 +53,7 @@ export const AssetsTypeList = ({
   };
   return (
     <>
-      {assets_type == 'nft' && (
+      {assets_type !== 'nft' && (
         <div className="mb-4">
           <Select
             showScrollIndicators={false}
