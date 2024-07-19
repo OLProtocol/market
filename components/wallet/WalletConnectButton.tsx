@@ -169,7 +169,19 @@ const WalletConnectButton = () => {
       <>
         <Popover placement="bottom">
           <PopoverTrigger>
-            <Button>{hideStr(address, 4, '**')}</Button>
+            <Button
+              className="px-0"
+              endContent={
+                <div className="px-2 h-full flex justify-center items-center  bg-gray-600">
+                  {address?.slice(-4)}
+                </div>
+              }
+            >
+              <div className="flex items-center gap-1 pl-2">
+                <span>{satsToBitcoin(utxoAmount)}</span>
+                <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
+              </div>
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="p-2">
             <div className="flex flex-col gap-2">
@@ -181,15 +193,15 @@ const WalletConnectButton = () => {
                   variant="flat"
                 >
                   <span className="text-base font-thin text-slate-400">
-                    {hideStr(address, 6)}
+                    {hideStr(address, 4)}
                   </span>
                 </Snippet>
               </div>
-              <div className="flex items-center justify-end gap-2 px-4 text-abse">
+              {/* <div className="flex items-center justify-end gap-2 px-4 text-abse">
                 <span>Balance：</span>
                 <span>{satsToBitcoin(utxoAmount)} BTC</span>
                 <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
-              </div>
+              </div> */}
               <Button className="w-full" onClick={toHistory}>
                 {t('buttons.to_history')}
               </Button>

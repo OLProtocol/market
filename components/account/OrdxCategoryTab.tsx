@@ -75,7 +75,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         <Card
           isHoverable
           isPressable
-          className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-pink-500 to-indigo-500' : ''}`}
+          className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-[#4361ee] to-[#160f6b] ' : ''}`}
           key={item.key}
           onPress={() => {
             setSelected(item.key);

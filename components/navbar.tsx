@@ -171,7 +171,9 @@ export const Navbar = () => {
                 wrapper: 'w-14 h-14 min-w-14',
               }}
             />
-            <p className="font-bold text-purple-500/90">SAT20Market</p>
+            <p className="font-bold text-purple-500/90 hidden md:block">
+              SAT20Market
+            </p>
           </NextLink>
         </NavbarBrand>
 
