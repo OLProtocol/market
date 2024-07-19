@@ -69,17 +69,15 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
     }
   }, [selected]);
 
-  console.log(selected);
   return (
-    <div className="flex flex-wrap gap-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
       {list.map((item) => (
         <Card
           isHoverable
           isPressable
-          className={`px-2 w-48 max-w-full ${selected === item.key ? 'bg-gradient-to-r from-pink-500 to-indigo-500' : ''}`}
+          className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-pink-500 to-indigo-500' : ''}`}
           key={item.key}
           onPress={() => {
-            console.log(item.key);
             setSelected(item.key);
           }}
         >
