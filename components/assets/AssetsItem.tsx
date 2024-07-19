@@ -100,7 +100,7 @@ export const AssetsItem = ({
   return (
     <Card
       radius="lg"
-      className="card-hover forced-colors:hidden w-[12rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative border-1 border-solid border-transparent hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
+      className="card-hover forced-colors:hidden w-[10rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative border-1 border-solid border-transparent hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -116,7 +116,7 @@ export const AssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16rem] md:h-[16rem] p-0">
+      <CardBody className="radius-lg w-[10rem] h-[10rem] md:w-[16rem] md:h-[16rem] p-0">
         {asset?.assets_type === 'ns' && <NameItem asset={asset} />}
         {isSat20Ticker && <Sat20Item asset={asset} />}
         {isSat20Content && <Sat20ContentItem asset={asset} utxo={item?.utxo} />}
