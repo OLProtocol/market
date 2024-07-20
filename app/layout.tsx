@@ -7,7 +7,7 @@ import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
 import '@/locales';
 import { Avatar, Image, Link } from '@nextui-org/react';
-import ParticleEffect from '@/components/ParticleEffect';
+// import ParticleEffect from '@/components/ParticleEffect';
 
 // export const metadata: Metadata = {
 //   title: {
@@ -73,7 +73,7 @@ export default function RootLayout({
               }}
             > */}
           <div className="relative flex flex-col h-screen">
-            <ParticleEffect /> {/* Add the ParticleEffect component here */}
+            {/* <ParticleEffect /> Add the ParticleEffect component here */}
             <Navbar />
             <main className="mx-auto w-full px-2 md:px-4 flex-grow">
               {children}
