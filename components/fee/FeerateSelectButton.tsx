@@ -27,7 +27,6 @@ export const FeerateSelectButton = () => {
   const { data, isLoading } = useSWR(`getRecommendedFees-${network}`, () =>
     getRecommendedFees(),
   );
-  console.log('data', data);
   const feeRateData = useMemo(() => {
     if (data?.code === 200) {
       return data.data;
