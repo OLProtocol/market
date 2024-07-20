@@ -25,6 +25,13 @@ export const BtcFeeRate = ({
   const [minFee, setMinFee] = useState(1);
   const [maxFee, setMaxFee] = useState(500);
 
+  //   {
+  //     "fastestFee": 4,
+  //     "halfHourFee": 4,
+  //     "hourFee": 4,
+  //     "economyFee": 2,
+  //     "minimumFee": 1
+  // }
   const clickHandler = (_type: string, value: number) => {
     if (type === _type) {
       return;
@@ -37,25 +44,29 @@ export const BtcFeeRate = ({
   };
   const setRecommendFee = async () => {
     console.log('setRecommendFee', feeRateData);
-    const defaultFee = network === 'testnet' ? 1 : 50;
-    feeRateData?.forEach(({ title, feeRate }) => {
-      if (feeRate) {
-        feeRate = Number(feeRate);
-      }
-      if (feeRate < 1.02) {
-        feeRate = 1.02;
-      }
-      if (title === 'Slow') {
-        setEconomyValue(feeRate || defaultFee);
-      } else if (title === 'Normal') {
-        setNormalValue(feeRate || defaultFee);
-        console.log(feeRate);
-        onChange?.(feeRate || defaultFee);
-      } else if (title === 'Fast') {
-        // setMaxFee(Number(parseInt(feeRate || defaultFee)));
-        setCustomValue(Math.ceil(feeRate || defaultFee));
-      }
-    });
+    const defaultFee = network === 'testnet' ? 1 : 10;
+    setEconomyValue(feeRateData?.economyFee || defaultFee);
+    setNormalValue(feeRateData?.halfHourFee || defaultFee);
+    setCustomValue(feeRateData?.fastestFee || defaultFee);
+    setMinFee(feeRateData?.minimumFee || 1);
+    // feeRateData?.forEach(({ title, feeRate }) => {
+    //   if (feeRate) {
+    //     feeRate = Number(feeRate);
+    //   }
+    //   if (feeRate < 1.02) {
+    //     feeRate = 1.02;
+    //   }
+    //   if (title === 'Slow') {
+    //     setEconomyValue(feeRate || defaultFee);
+    //   } else if (title === 'Normal') {
+    //     setNormalValue(feeRate || defaultFee);
+    //     console.log(feeRate);
+    //     onChange?.(feeRate || defaultFee);
+    //   } else if (title === 'Fast') {
+    //     // setMaxFee(Number(parseInt(feeRate || defaultFee)));
+    //     setCustomValue(Math.ceil(feeRate || defaultFee));
+    //   }
+    // });
 
     setType('Normal');
   };
@@ -63,7 +74,7 @@ export const BtcFeeRate = ({
     return [
       {
         label: 'Economy',
-        name: t('common.fee_slow'),
+        name: t('common.fee_economy'),
         value: economyValue,
       },
       {
