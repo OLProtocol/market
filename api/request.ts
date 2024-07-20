@@ -208,6 +208,10 @@ export const getChargedTask = async (tx_id: string) => {
   });
   return res;
 };
+export const getRecommendedFees = async () => {
+  const res = await request('/ordx/GetRecommendedFees');
+  return res;
+};
 
 export const getChargedTaskList = async ({
   address,

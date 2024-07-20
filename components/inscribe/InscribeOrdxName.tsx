@@ -127,7 +127,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   };
   const nameChange = (value: string) => {
     set('name', value);
-    setErrorText('');
+    // setErrorText('');
     setChecked(false);
   };
   useEffect(() => {
