@@ -36,7 +36,6 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
-  console.log('address', address);
   const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const [utxoAmount, setUtxoAmount] = useState(0);
