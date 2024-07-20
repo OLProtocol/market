@@ -15,7 +15,7 @@ import { useCommonStore } from '@/store';
 import { BtcFeeRate } from './BtcFeeRate';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
-import { ordx } from '@/api';
+import { getRecommendedFees } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 export const FeerateSelectButton = () => {
@@ -24,14 +24,15 @@ export const FeerateSelectButton = () => {
   const { isOpen, onClose, onOpenChange, onOpen } = useDisclosure();
   const [fee, setFee] = useState({ value: 1, type: 'Normal' });
 
-  const { data, isLoading } = useSWR(`fetchChainFeeRate-${network}`, () =>
-    ordx.fetchChainFeeRate(network as any),
+  const { data, isLoading } = useSWR(`getRecommendedFees-${network}`, () =>
+    getRecommendedFees(),
   );
+  console.log('data', data);
   const feeRateData = useMemo(() => {
-    if (data?.code === 0) {
-      return data.data.list;
+    if (data?.code === 200) {
+      return data.data;
     } else {
-      return [];
+      return {};
     }
   }, [data]);
   const { setFeeRate, feeRate } = useCommonStore((state) => state);
@@ -49,11 +50,10 @@ export const FeerateSelectButton = () => {
   };
   useEffect(() => {
     console.log('feeRateData', feeRateData);
-    if (feeRateData?.length) {
-      const normalFee = feeRateData.find((item) => item.title === 'Normal');
-      let feeRate = normalFee?.feeRate;
+    if (feeRateData?.halfHourFee) {
+      let feeRate = feeRateData?.halfHourFee;
       if (feeRate) {
-        feeRate = Math.max(Number(feeRate), 1.02);
+        feeRate = feeRateData?.halfHourFee;
         setFeeRate({ value: feeRate || 1, type: 'Normal' });
       }
     }
