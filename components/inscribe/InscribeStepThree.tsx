@@ -294,7 +294,7 @@ export const InscribeStepThree = ({
               />
             </div>
           </div>
-          {files.length > 1 && (
+          {/* {files.length > 1 && (
             <>
               <div className="mb-4">
                 <Checkbox
@@ -313,7 +313,7 @@ export const InscribeStepThree = ({
                 </Checkbox>
               </div>
             </>
-          )}
+          )} */}
         </Tab>
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
