@@ -28,18 +28,18 @@ export const BatchCart = ({
   const { list, remove } = useBuyStore();
   const [fee, setFee] = useState({ value: 1, type: 'Normal' });
 
-  const { data, isLoading } = useSWR(`fetchChainFeeRate-${network}`, () =>
-    ordx.fetchChainFeeRate(network as any),
-  );
+  // const { data, isLoading } = useSWR(`fetchChainFeeRate-${network}`, () =>
+  //   ordx.fetchChainFeeRate(network as any),
+  // );
 
-  const { setFeeRate, feeRate } = useCommonStore((state) => state);
-  const feeRateData = useMemo(() => {
-    if (data.code === 0) {
-      return data.data.list;
-    } else {
-      return [];
-    }
-  }, [data]);
+  // const { setFeeRate, feeRate } = useCommonStore((state) => state);
+  // const feeRateData = useMemo(() => {
+  //   if (data.code === 0) {
+  //     return data.data.list;
+  //   } else {
+  //     return [];
+  //   }
+  // }, [data]);
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
