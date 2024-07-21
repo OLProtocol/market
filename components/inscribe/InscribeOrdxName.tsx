@@ -206,6 +206,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
           <Button
             className="mx-auto block"
             color="primary"
+            isLoading={loading}
             onClick={nextHandler}
           >
             {checked ? t('buttons.next') : 'Check'}
