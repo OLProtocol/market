@@ -40,62 +40,61 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     let mintedArr: string[] = [];
     const checkedArr: string[] = [];
     let formatErrArr: string[] = [];
-    // for (let i = 0; i < lines.length; i++) {
-    //   const line = lines[i];
-    //   const textSize = clacTextSize(line);
-    //   if (textSize < 3 || textSize > 32) {
-    //     formatErrArr.push(line);
-    //   } else if (
-    //     line.endsWith('.') ||
-    //     line.startsWith('.') ||
-    //     line.split('.').length > 2
-    //   ) {
-    //     formatErrArr.push(line);
-    //   } else if (checkedArr.includes(line)) {
-    //     formatErrArr.push(line);
-    //   }
-    //   if (!checkedArr.includes(line)) {
-    //     checkedArr.push(line);
-    //   }
-    // }
-    // if (formatErrArr.length > 0) {
-    //   const errorText = formatErrArr
-    //     .map((v) => `Name "${v}" is not valid.`)
-    //     .join('\n');
-    //   console.log(errorText);
-    //   setRemoveArr(formatErrArr);
-    //   setErrorText(errorText);
-    //   return false;
-    // }
-    // console.log(formatErrArr);
-    // const [error, res] = await tryit(ordx.checkNsNames)({
-    //   names: lines,
-    //   network,
-    // });
-    // setLoading(false);
-    // if (error || !res?.data) {
-    //   notification.error({
-    //     message: t('notification.system_error'),
-    //   });
-    //   throw error;
-    // }
-    // const checkArr = res?.data || [];
-    // formatErrArr = checkArr
-    //   .filter((v: any) => v.result === -1)
-    //   .map((v) => v.name);
-    // mintedArr = checkArr.filter((v: any) => v.result === 1).map((v) => v.name);
-    // // const { data: nameData } = res || {};
-    // if (formatErrArr.length > 0) {
-    //   const errorText = formatErrArr
-    //     .map((v) => `Name "${v}" is not valid.`)
-    //     .join('\n');
-    //   console.log(errorText);
-
-    //   setErrorText(errorText);
-    //   setRemoveArr(formatErrArr);
-    //   return false;
-    // }
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const textSize = clacTextSize(line);
+      if (textSize < 3 || textSize > 32) {
+        formatErrArr.push(line);
+      } else if (
+        line.endsWith('.') ||
+        line.startsWith('.') ||
+        line.split('.').length > 2
+      ) {
+        formatErrArr.push(line);
+      } else if (checkedArr.includes(line)) {
+        formatErrArr.push(line);
+      }
+      if (!checkedArr.includes(line)) {
+        checkedArr.push(line);
+      }
+    }
+    if (formatErrArr.length > 0) {
+      const errorText = formatErrArr
+        .map((v) => `Name "${v}" is not valid.`)
+        .join('\n');
+      console.log(errorText);
+      setRemoveArr(formatErrArr);
+      setErrorText(errorText);
+      return false;
+    }
+    console.log(formatErrArr);
+    const [error, res] = await tryit(ordx.checkNsNames)({
+      names: lines,
+      network,
+    });
     setLoading(false);
+    if (error || !res?.data) {
+      notification.error({
+        message: t('notification.system_error'),
+      });
+      throw error;
+    }
+    const checkArr = res?.data || [];
+    formatErrArr = checkArr
+      .filter((v: any) => v.result === -1)
+      .map((v) => v.name);
+    mintedArr = checkArr.filter((v: any) => v.result === 1).map((v) => v.name);
+    // const { data: nameData } = res || {};
+    if (formatErrArr.length > 0) {
+      const errorText = formatErrArr
+        .map((v) => `Name "${v}" is not valid.`)
+        .join('\n');
+      console.log(errorText);
+
+      setErrorText(errorText);
+      setRemoveArr(formatErrArr);
+      return false;
+    }
     console.log(mintedArr);
     if (mintedArr.length > 0) {
       const errorText = mintedArr
