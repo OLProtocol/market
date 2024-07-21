@@ -19,6 +19,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   const [errorText, setErrorText] = useState('');
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [removeArr, setRemoveArr] = useState<string[]>([]);
   const [data, { set }] = useMap<any>({
     type: 'mint',
     name: '',
@@ -62,7 +63,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
         .map((v) => `Name "${v}" is not valid.`)
         .join('\n');
       console.log(errorText);
-
+      setRemoveArr(formatErrArr);
       setErrorText(errorText);
       return false;
     }
@@ -91,6 +92,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       console.log(errorText);
 
       setErrorText(errorText);
+      setRemoveArr(formatErrArr);
       return false;
     }
     console.log(mintedArr);
@@ -99,6 +101,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
         .map((v: any) => `Name "${v}" is already taken.`)
         .join('\n');
       setErrorText(errorText);
+      setRemoveArr(mintedArr);
       return false;
     }
     set('names', lines);
@@ -124,6 +127,17 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     } else {
       onNext?.();
     }
+  };
+  const removeHandler = () => {
+    const lines = data.name
+      .split('\n')
+      .map((a) => a.trim())
+      .filter((v) => !!v);
+    const newLines = lines.filter((v) => !removeArr.includes(v));
+    set('name', newLines.join('\n'));
+    setRemoveArr([]);
+    setErrorText('');
+    setChecked(false);
   };
   const nameChange = (value: string) => {
     set('name', value);
@@ -187,7 +201,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             }
           /> */}
       </div>
-      <div className="w-60 mx-auto flex justify-center">
+      <div className="w-60 mx-auto flex justify-center gap-4">
         <WalletConnectBus>
           <Button
             className="mx-auto block"
@@ -197,6 +211,11 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             {checked ? t('buttons.next') : 'Check'}
           </Button>
         </WalletConnectBus>
+        {removeArr.length > 0 && (
+          <Button className="mx-auto " color="danger" onClick={removeHandler}>
+            Remove Error Name
+          </Button>
+        )}
       </div>
     </div>
   );
