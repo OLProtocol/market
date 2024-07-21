@@ -194,6 +194,9 @@ export const InscribeStepThree = ({
     addOrder(order);
     onAddOrder?.(order);
   };
+  const showTight = ['localhost', 'test'].some(
+    (n) => location.hostname.indexOf(n) > -1,
+  );
   const calcHex = (file: any) => {
     if (file.fileHex) {
       return file.hex + file.fileHex;
@@ -294,7 +297,7 @@ export const InscribeStepThree = ({
               />
             </div>
           </div>
-          {/* {files.length > 1 && (
+          {files.length > 1 && showTight && (
             <>
               <div className="mb-4">
                 <Checkbox
@@ -313,7 +316,7 @@ export const InscribeStepThree = ({
                 </Checkbox>
               </div>
             </>
-          )} */}
+          )}
         </Tab>
         <Tab key="multiple" title="To Multiple Adddress">
           <div className="mb-4">
