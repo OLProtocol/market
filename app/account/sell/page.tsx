@@ -48,12 +48,11 @@ export default function SellPage() {
     changeAmountUnit,
     changeUnit,
     changePrice,
-    changeStatus,
   } = useSellStore((state) => state);
   console.log('app.account.sell.page: list: ', list);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
-    `getAssetsSummary-${assets_name}-${assets_type}`,
+    `getAssetsSummary-${assets_name}-${assets_type}-${network}`,
     () => {
       console.log('app.account.sell.page: ticker: ', assets_name);
       let ret: Promise<any>;
@@ -63,6 +62,10 @@ export default function SellPage() {
       } catch (error) {
         console.log('app.account.sell.page: getAssetsSummary err: ', error);
       }
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     },
   );
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
@@ -185,7 +188,6 @@ export default function SellPage() {
       }, 0) || 0,
     [list],
   );
-  console.log(unit, list);
   return (
     <div className="py-2">
       <div className="md:flex justify-between gap-4">
@@ -215,6 +217,7 @@ export default function SellPage() {
                   <Select
                     size="sm"
                     color="primary"
+                    isDisabled={isSummaryLoading}
                     selectedKeys={[unit]}
                     onChange={(e) => onUnitChange(e.target.value as any)}
                     className="w-28"
@@ -234,6 +237,7 @@ export default function SellPage() {
                   <Select
                     size="sm"
                     color="primary"
+                    isDisabled={isSummaryLoading}
                     selectedKeys={[amountUnit]}
                     onChange={(e) => onAmountUnitChange(e.target.value as any)}
                     className="w-28"
@@ -293,6 +297,7 @@ export default function SellPage() {
                     <Input
                       type="number"
                       placeholder="0.00"
+                      isDisabled={isSummaryLoading}
                       value={list[i].unit_price}
                       onValueChange={(e) => changePrice(item.utxo, e)}
                       onBlur={() => inputBlur(item.utxo)}
