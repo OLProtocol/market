@@ -24,8 +24,12 @@ export const FeerateSelectButton = () => {
   const { isOpen, onClose, onOpenChange, onOpen } = useDisclosure();
   const [fee, setFee] = useState({ value: 1, type: 'Normal' });
 
-  const { data, isLoading } = useSWR(`getRecommendedFees-${network}`, () =>
-    getRecommendedFees(),
+  const { data, isLoading } = useSWR(
+    `getRecommendedFees-${network}`,
+    () => getRecommendedFees(),
+    {
+      refreshInterval: 1000 * 60 * 10, // 10 minutes
+    },
   );
   const feeRateData = useMemo(() => {
     if (data?.code === 200) {
