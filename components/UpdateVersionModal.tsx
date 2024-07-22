@@ -10,8 +10,10 @@ import { version } from '@/assets/version';
 import { getAppVersion } from '@/api';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
+import { useCommonStore } from '@/store';
 
 export const UpdateVersionModal = () => {
+  const { setAppVersion } = useCommonStore();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const showModal = () => {
@@ -42,6 +44,9 @@ export const UpdateVersionModal = () => {
     );
     setOpen(false);
   };
+  useEffect(() => {
+    setAppVersion(version);
+  }, []);
   return (
     <Modal
       backdrop="blur"

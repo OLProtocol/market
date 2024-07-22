@@ -6,6 +6,7 @@ import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
 import '@/locales';
+import { useCommonStore } from '@/store';
 import { Avatar, Image, Link } from '@nextui-org/react';
 // import ParticleEffect from '@/components/ParticleEffect';
 
@@ -31,6 +32,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { appVersion } = useCommonStore();
   const contentList = [
     'https://ord-testnet4.ordx.space/content/68bcab296d2d81537f8e1032cd75043a54c9d14ddb468283fc78b24c7101b105i0?seed=85f086ce2d0de811',
     'https://ord-testnet4.ordx.space/content/0d8c75aa700204623dbf763632a0ff2f6be67d036ce36a793a060da4d1885104i0',
@@ -79,7 +81,7 @@ export default function RootLayout({
               {children}
             </main>
             <footer id="footer">
-              <ul className="flex justify-center gap-4 text-gray-500">
+              <ul className="flex justify-center gap-4 items-center text-gray-500">
                 <li>
                   <Link href="https://twitter.com/sat20market/" target="_blank">
                     <Avatar
@@ -90,7 +92,8 @@ export default function RootLayout({
                     />
                   </Link>
                 </li>
-                <li className="pt-2 text-sm">Copyrights&copy;2024</li>
+                <li className="text-sm">Copyrights&copy;2024</li>
+                <li>V 1.0.{appVersion}</li>
               </ul>
             </footer>
           </div>
