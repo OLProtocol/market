@@ -93,7 +93,7 @@ export default function RootLayout({
                   </Link>
                 </li>
                 <li className="text-sm">Copyrights&copy;2024</li>
-                <li>V 1.0.{appVersion}</li>
+                <li>V1.0.{appVersion}</li>
               </ul>
             </footer>
           </div>
