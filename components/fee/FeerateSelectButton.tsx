@@ -48,7 +48,6 @@ export const FeerateSelectButton = () => {
     setFee(fee);
   };
   useEffect(() => {
-    console.log('feeRateData', feeRateData);
     if (feeRateData?.halfHourFee) {
       let feeRate = feeRateData?.halfHourFee;
       if (feeRate) {

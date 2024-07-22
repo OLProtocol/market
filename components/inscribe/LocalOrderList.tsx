@@ -23,7 +23,9 @@ interface DataType {
 }
 export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
   const { t } = useTranslation();
-  const { list, checkAllList } = useOrderStore((state) => state);
+  const { list, checkAllList, addLocalOrders } = useOrderStore(
+    (state) => state,
+  );
   const clickHandler = ({ orderId }) => {
     const item = list.find((v) => v.orderId === orderId);
     if (item) {
@@ -68,8 +70,23 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
     item && clickHandler(item);
   };
   useEffect(() => {
+    setTimeout(() => {
+      const orderStoreData = localStorage.getItem('order-store');
+
+      if (orderStoreData) {
+        const orderStoreState = JSON.parse(orderStoreData);
+        const localOrderList = orderStoreState.state?.list;
+        if (localOrderList?.length) {
+          console.log('localOrderList', localOrderList);
+
+          addLocalOrders(localOrderList);
+        }
+      }
+    }, 1000);
+
     checkAllList();
   }, []);
+
   return (
     // <Table
     //   columns={columns}

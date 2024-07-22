@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 import localForage from 'localforage';
+import { unique } from 'radash';
 // import { InscribeType } from '@/types';
 // import { savePaidOrder } from '@/api';
 
@@ -49,6 +50,7 @@ interface OrderState {
   saveLength: number;
   setList: (l: OrderItemType[]) => void;
   add: (item: OrderItemType) => void;
+  addLocalOrders: (l: OrderItemType[]) => void;
   changeStatus: (orderId: string, status: OrderStatus) => void;
   checkAllList: () => void;
   addSucccessTxid: (orderId: string, txid: string) => void;
@@ -73,14 +75,25 @@ export const useOrderStore = create<OrderState>()(
             list: [...get().list, l],
           });
         },
+        addLocalOrders: (l) => {
+          let newList = [...get().list, ...l];
+          newList = unique(newList, (f) => f.orderId);
+          console.log('newList', newList);
+
+          set({
+            list: newList,
+          });
+        },
         checkAllList: () => {
           const len = get().list.length;
           const newList: OrderItemType[] = [];
+
           for (let i = 0; i < len; i++) {
             const item = get().list[i];
             const dis = Date.now() - item.createAt;
             console.log('dis', dis);
             if (dis > 1000 * 60 * 60 * 24 * 7) {
+              console.log('超时订单', item.orderId);
               continue;
             }
             if (item.status === 'pending' && dis > 1000 * 60 * 5) {
@@ -90,6 +103,8 @@ export const useOrderStore = create<OrderState>()(
             }
             newList.push(item);
           }
+          console.log('newList', newList);
+
           set({
             list: newList,
           });
@@ -176,7 +191,7 @@ export const useOrderStore = create<OrderState>()(
       }),
       {
         name: 'order-store',
-        // storage: createJSONStorage(() => localForage),
+        storage: createJSONStorage(() => localForage),
       },
     ),
   ),
