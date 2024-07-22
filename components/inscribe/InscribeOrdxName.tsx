@@ -175,31 +175,6 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             {errorText}
           </div>
         )}
-        {/* <Input
-            value={data.name}
-            className="flex-1"
-            onChange={(e) => {
-              nameChange(e.target.value);
-            }}
-            onBlur={onBlur}
-            maxLength={32}
-            type="text"
-            placeholder={t('pages.inscribe.name.name_placeholder')}
-            endContent={
-              <Select
-                size="sm"
-                placeholder={t('pages.inscribe.name.select_placeholder')}
-                color="primary"
-                className="w-48"
-                selectedKeys={selectedKeys}
-                onChange={(e) => set('suffix', e.target.value as any)}
-              >
-                {nameSuffixs.map((v) => (
-                  <SelectItem key={v.key}>{v.label}</SelectItem>
-                ))}
-              </Select>
-            }
-          /> */}
       </div>
       <div className="w-60 mx-auto flex justify-center gap-4">
         <WalletConnectBus>
