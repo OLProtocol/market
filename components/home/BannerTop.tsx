@@ -11,7 +11,7 @@ const BannerTop = ({ detail }: any) => {
   const router = useRouter();
   const today = new Date();
   const startDate = new Date('2024-07-02T03:58:00');
-  const targetDate = new Date('2024-07-23T11:14:00');
+  const targetDate = new Date('2024-07-22T19:05:00');
   const { data: heightData } = ordxSWR.useBtcHeight('livenet');
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', {
