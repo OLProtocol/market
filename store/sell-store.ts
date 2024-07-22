@@ -66,48 +66,90 @@ export const useSellStore = create<SellState>()(
     ],
     changePrice(utxo, price) {
       const { list, assets_type, amountUnit, unit, assets_name } = get();
-      const newList = list.map((item) => {
-        let amount = 0;
-        if (assets_type === 'ns') {
-          amount = 1;
-        } else if (assets_type === 'exotic') {
-          amount =
-            item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
-            0;
-        } else {
-          amount =
-            item.assets_list?.find((v) => v.assets_name === assets_name)
-              ?.amount || 0;
-        }
-        if (price === '' || isNaN(Number(price))) {
-          return {
-            ...item,
-            unit_price: '',
-            price: '',
-          };
-        }
-        const unitPrice = unit === 'btc' ? btcToSats(price).toString() : price;
-        let amountPrice: any = new Decimal(unitPrice)
-          .mul(new Decimal(amount))
-          .toNumber();
-        amountPrice = Math.ceil(amountPrice).toString();
-        amountPrice =
-          amountUnit === 'btc'
-            ? satsToBitcoin(amountPrice.toString()).toString()
-            : amountPrice;
+      const findItem = list.find((item) => item.utxo === utxo);
+      const newList: UtxoAssetItem[] = [];
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
         if (item.utxo === utxo) {
-          return {
-            ...item,
-            unit_price: price,
-            price: amountPrice,
-          };
+          let amount = 0;
+          if (assets_type === 'ns') {
+            amount = 1;
+          } else if (assets_type === 'exotic') {
+            amount =
+              item.assets_list?.find((v) => v.assets_type === 'exotic')
+                ?.amount || 0;
+          } else {
+            amount =
+              item.assets_list?.find((v) => v.assets_name === assets_name)
+                ?.amount || 0;
+          }
+          if (price === '' || isNaN(Number(price))) {
+            item.unit_price = '';
+            item.price = '';
+          } else {
+            const unitPrice =
+              unit === 'btc' ? btcToSats(price).toString() : price;
+            let amountPrice: any = new Decimal(unitPrice)
+              .mul(new Decimal(amount))
+              .toNumber();
+            amountPrice = Math.ceil(amountPrice).toString();
+            amountPrice =
+              amountUnit === 'btc'
+                ? satsToBitcoin(amountPrice.toString()).toString()
+                : amountPrice;
+            item.unit_price = unitPrice;
+            item.price = amountPrice;
+          }
         }
-        return item;
-      });
-
+        newList.push(item);
+      }
       set({
         list: newList,
       });
+
+      // const newList = list.map((item) => {
+      //   let amount = 0;
+      //   if (assets_type === 'ns') {
+      //     amount = 1;
+      //   } else if (assets_type === 'exotic') {
+      //     amount =
+      //       item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
+      //       0;
+      //   } else {
+      //     amount =
+      //       item.assets_list?.find((v) => v.assets_name === assets_name)
+      //         ?.amount || 0;
+      //   }
+
+      //   const unitPrice = unit === 'btc' ? btcToSats(price).toString() : price;
+      //   let amountPrice: any = new Decimal(unitPrice)
+      //     .mul(new Decimal(amount))
+      //     .toNumber();
+      //   amountPrice = Math.ceil(amountPrice).toString();
+      //   amountPrice =
+      //     amountUnit === 'btc'
+      //       ? satsToBitcoin(amountPrice.toString()).toString()
+      //       : amountPrice;
+      //   if (item.utxo === utxo) {
+      //     if (price === '' || isNaN(Number(price))) {
+      //       return {
+      //         ...item,
+      //         unit_price: '',
+      //         price: '',
+      //       };
+      //     }
+      //     return {
+      //       ...item,
+      //       unit_price: price,
+      //       price: amountPrice,
+      //     };
+      //   }
+      //   return item;
+      // });
+
+      // set({
+      //   list: newList,
+      // });
     },
     changeAssetsName(ticker) {
       set({
