@@ -12,6 +12,7 @@ interface CommonState {
   appVersion: number;
   signature?: string;
   runtimeEnv: string;
+  setAppVersion: (version: number) => void;
   setEnv: (env: string) => void;
   setBtcPrice: (b: number) => void;
   setHeight: (h: number) => void;
@@ -38,6 +39,11 @@ export const useCommonStore = create<CommonState>()(
         setEnv: (env) => {
           set({
             runtimeEnv: env,
+          });
+        },
+        setAppVersion: (version) => {
+          set({
+            appVersion: version,
           });
         },
         setSignature: (signature) => {
