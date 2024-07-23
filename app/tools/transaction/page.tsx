@@ -284,11 +284,16 @@ export default function TransferTool() {
     const detail = res.data.detail;
 
     detail.map(async (item) => {
+      if (!item.ticker) {
+        return;
+      }
       res = await getOrdxAddressHolders({
         start: 0,
-        limit: 10000,
+        // limit: 10000,
+        limit: 100,
         address: address,
         ticker: item.ticker,
+        assetsType: item.type,
         network: network,
       });
       const utxosOfTicker: any[] = [];
@@ -539,7 +544,9 @@ export default function TransferTool() {
         },
       },
     ]);
-    getAllTickers();
+    if (address) {
+      getAllTickers();
+    }
   }, [address, refresh]);
   return (
     <div className="flex flex-col max-w-7xl mx-auto pt-4">
