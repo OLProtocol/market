@@ -292,7 +292,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
-        // inscribeHandler();
+        inscribeHandler();
       }, 0);
     } catch (error: any) {
       setLoading(false);
