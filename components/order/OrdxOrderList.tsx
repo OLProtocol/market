@@ -93,6 +93,12 @@ export const OrdxOrderList = ({
     reset();
     mutate(swrKey);
   };
+  const removeHandler = async (u: string) => {
+    const item = list.find((i) => i.utxo === u);
+    if (item) {
+      const res = await unlockHandler(item);
+    }
+  };
   const onCancelOrder = async (item: any) => {
     if (item.locker === '1') {
       notification.error({
@@ -270,6 +276,7 @@ export const OrdxOrderList = ({
       {canSelect && (
         <BatchBuyFooter
           list={list}
+          onRemove={removeHandler}
           onClose={batchCloseHandler}
           onSuccess={batchSuccessHandler}
         />
