@@ -11,12 +11,12 @@ export const HomeTypeTabs = ({ value, onChange }: HomeTypeTabsProps) => {
       key: 'ticker',
     },
     {
-      label: 'Rare',
-      key: 'exotic',
-    },
-    {
       label: 'Names',
       key: 'ns',
+    },
+    {
+      label: 'Rare',
+      key: 'exotic',
     },
     {
       label: 'Collection',

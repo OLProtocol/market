@@ -11,9 +11,16 @@ export default function Home() {
     tick: 'rarepizza',
     network: 'livenet',
   });
+  const { data: nsListStatusData } = ordxSWR.useNsListStatus({
+    network: 'livenet',
+  });
   const rarePizzaDetail = useMemo(
     () => rarePizzaData?.data || {},
     [rarePizzaData],
+  );
+  const nsDetail = useMemo(
+    () => nsListStatusData?.data || {},
+    [nsListStatusData],
   );
 
   const { data: jadesData, trigger: getJades } = ordxSWR.useOrdxInfo({
@@ -29,13 +36,17 @@ export default function Home() {
   return (
     <div className="py-4">
       <div>
-        <BannerTop detail={rarePizzaDetail} />        
+        <BannerTop detail={rarePizzaDetail} />
       </div>
-{/*       <div>
+      {/*       <div>
         <NamesTop/>
       </div> */}
       <div className="mb-4 w-full round-lg">
-        <MintingTable rarepizza={rarePizzaDetail} jades={jadesDetail} />
+        <MintingTable
+          rarepizza={rarePizzaDetail}
+          jades={jadesDetail}
+          nsDetail={nsDetail}
+        />
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ import { useMemo } from 'react';
 import { ordxSWR } from '@/api/ordx-swr';
 import { thousandSeparator } from '@/lib/utils';
 
-export const MintingTable = ({ rarepizza, jades }: any) => {
+export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
   const { data: heightData } = ordxSWR.useBtcHeight('livenet');
 
   const startBlockHeight = 850282;
@@ -78,7 +78,7 @@ export const MintingTable = ({ rarepizza, jades }: any) => {
               <Button
                 className="flex-1 text-xs h-7 w-16 md:text-2xl font-bold md:h-10 md:w-32  bg-indigo-500/50 md:uppercase"
                 variant="flat"
-                radius="sm"               
+                radius="sm"
               >
                 completed
               </Button>{' '}
@@ -114,7 +114,7 @@ export const MintingTable = ({ rarepizza, jades }: any) => {
             <td>Name</td>
             {/* <td> - </td> */}
             <td> - </td>
-            <td> - </td>
+            <td>{nsDetail?.total} </td>
             <td>
               <ProgressBar
                 start="1000000"

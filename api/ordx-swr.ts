@@ -30,6 +30,17 @@ export const useOrdxInfo = ({ tick, network }: any) => {
     isLoading: isMutating,
   };
 };
+export const useNsListStatus = ({ tick, network }: any) => {
+  const { data, error, isLoading } = useSWR(
+    `ord2-info-${tick}-${network}`,
+    () => ordx.getNsListStatus({ tick, network }),
+  );
+  return {
+    data,
+    error,
+    isLoading,
+  };
+};
 
 export const useBtcHeight = (network: string) => {
   const { data, error, isLoading } = useSWR(
@@ -50,4 +61,5 @@ export const ordxSWR = {
   useSatTypes,
   useBtcHeight,
   useOrdxInfo,
+  useNsListStatus,
 };
