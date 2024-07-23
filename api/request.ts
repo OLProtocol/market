@@ -336,11 +336,13 @@ export const getSats = async ({ address, network }: any) => {
 export const getOrdxAddressHolders = async ({
   address,
   ticker,
+  assetsType,
   network,
   start,
   limit,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${assetsType}?start=${start}&limit=${limit}`;
+  // const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
   const res = await fetch(url);
   return res.json();
 };
