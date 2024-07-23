@@ -102,6 +102,7 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
       removeSell(item.utxo);
     }
   };
+
   const onBatchClose = () => {
     setCanSelect(false);
     reset();

@@ -23,7 +23,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 interface Props {
   list: any[];
   toBuy?: () => void;
-
+  onRemove: (u: string) => any;
   onSuccess?: () => void;
   onClose?: () => void;
 }
@@ -31,6 +31,7 @@ export const BatchBuyFooter = ({
   list: assetsList,
   onSuccess,
   onClose,
+  onRemove,
 }: Props) => {
   let minServiceFee = 0;
   if (
@@ -271,6 +272,7 @@ export const BatchBuyFooter = ({
           networkFee={networkFee}
           serviceFee={serviceFee}
           calcLoading={calcLoading}
+          onRemove={onRemove}
         />
       )}
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-[99]">

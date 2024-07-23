@@ -16,12 +16,14 @@ interface Props {
   networkFee: number;
   dummyNetworkFee?: number;
   serviceFee: number;
+  onRemove: (u: string) => void;
 }
 export const BatchCart = ({
   splitDummyBol,
   calcLoading,
   networkFee,
   serviceFee,
+  onRemove,
 }: Props) => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
@@ -56,8 +58,9 @@ export const BatchCart = ({
   //   setFeeRate(fee);
   // };
 
-  const removeHandler = (u: string) => {
-    remove(u);
+  const removeHandler = async (u: string) => {
+    await onRemove(u);
+    // remove(u);
   };
 
   return (
