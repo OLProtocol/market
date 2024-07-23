@@ -31,9 +31,9 @@ export default function Home() {
       <div>
         <BannerTop detail={rarePizzaDetail} />        
       </div>
-      <div>
+{/*       <div>
         <NamesTop/>
-      </div>
+      </div> */}
       <div className="mb-4 w-full round-lg">
         <MintingTable rarepizza={rarePizzaDetail} jades={jadesDetail} />
       </div>
