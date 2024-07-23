@@ -81,6 +81,15 @@ const getNsListByAddress = async ({ address, network }: any) => {
   );
   return data;
 };
+const getNsListStatus = async ({ network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`ns/status?start=0&limit=1`, network),
+    {
+      timeout: 10000,
+    },
+  );
+  return data;
+};
 
 const getOrdxSummary = async ({ address, network }: any) => {
   const { data } = await axios.get(
@@ -349,4 +358,5 @@ export const ordx = {
   getTickDeploy,
   fetchChainFeeRate,
   getTxHex,
+  getNsListStatus,
 };

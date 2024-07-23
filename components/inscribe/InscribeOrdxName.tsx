@@ -163,8 +163,11 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
         <div className="mb-2">
           {/* <div className="w-52">{t('pages.inscribe.name.input_name')}</div> */}
           <Textarea
+            disableAnimation
             disableAutosize
-            rows={5}
+            classNames={{
+              input: 'resize-y min-h-[140px]',
+            }}
             placeholder={t('pages.inscribe.name.name_placeholder')}
             value={data.name}
             onChange={(e) => nameChange(e.target.value)}
@@ -179,7 +182,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       <div className="w-60 mx-auto flex justify-center gap-4">
         <WalletConnectBus>
           <Button
-            className="mx-auto block"
+            className="mx-auto"
             color="primary"
             isLoading={loading}
             onClick={nextHandler}
