@@ -147,7 +147,7 @@ export const InscribeStepThree = ({
     feeObj.networkFee = Math.ceil(vSize * feeRate.value);
     let totalFee = feeObj.networkFee + totalInscriptionSize;
     const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
-    if (metadata.type === 'name' && btcHeight <= 853358) {
+    if (metadata.type === 'name' && btcHeight <= 856000) {
       _discount = 100;
     }
     feeObj.serviceFee = Math.ceil(oneFee);
