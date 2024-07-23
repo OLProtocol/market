@@ -28,7 +28,7 @@ import {
   returnInscribe,
 } from '@/lib/inscribe';
 import { generateMempoolUrl } from '@/lib/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { tryit } from 'radash';
 import { hideStr } from '@/lib/utils';
 import { FeeShow } from './FeeShow';
@@ -55,6 +55,7 @@ export const InscribingOrderModal = ({
     removeUtxos,
   } = useUtxoStore();
   const [sendFee, setSendFee] = useState<number>();
+  const [retryCount, setRetryCount] = useState(0);
   const [psbt, setPsbt] = useState<any>();
   const { feeRate, discount } = useCommonStore();
   const {
@@ -291,7 +292,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       setActiveStep(1);
       setTimeout(() => {
-        inscribeHandler();
+        // inscribeHandler();
       }, 0);
     } catch (error: any) {
       setLoading(false);
@@ -340,7 +341,10 @@ export const InscribingOrderModal = ({
       console.error(error);
     }
   };
-  const inscribeHandler = async () => {
+  const inscribeButtonHandler = async () => {
+    await inscribeHandler(true);
+  };
+  const inscribeHandler = async (btnStatus = false) => {
     if (!(order && order.commitTx)) {
       return;
     }
@@ -378,7 +382,9 @@ export const InscribingOrderModal = ({
       onFinished?.();
     } catch (error: any) {
       console.error(error);
-
+      if (btnStatus) {
+        setRetryCount(retryCount + 1);
+      }
       setLoading(false);
       changeStatus(orderId, 'inscribe_fail');
       notification.error({
@@ -468,17 +474,19 @@ export const InscribingOrderModal = ({
                   <Button
                     color="primary"
                     isLoading={loading}
-                    onClick={inscribeHandler}
+                    onClick={inscribeButtonHandler}
                   >
                     {t('buttons.inscribe')}
                   </Button>
-                  <Button
-                    color="danger"
-                    isLoading={loading}
-                    onClick={returnInscirbe}
-                  >
-                    返回余额
-                  </Button>
+                  {retryCount > 10 && (
+                    <Button
+                      color="danger"
+                      isLoading={loading}
+                      onClick={returnInscirbe}
+                    >
+                      返回余额
+                    </Button>
+                  )}
                 </div>
                 <div className="text-amber-400 text-base text-center">
                   {t('pages.inscribe.order.continue')}
