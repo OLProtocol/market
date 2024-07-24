@@ -286,9 +286,6 @@ export const InscribeStepThree = ({
       >
         <Tab key="single" title={t('pages.inscribe.step_three.to_single')}>
           <div className="mb-4">
-            <div className="mb-2">
-              {t('pages.inscribe.step_three.to_single')}
-            </div>
             <div>
               <Input
                 placeholder="Basic usage"
@@ -318,7 +315,7 @@ export const InscribeStepThree = ({
             </>
           )}
         </Tab>
-        <Tab key="multiple" title="To Multiple Adddress">
+        <Tab key="multiple" title={t('pages.inscribe.step_three.to_multiple')}>
           <div className="mb-4">
             <div className="mb-2">
               Multiple Adddress ({toAddressList.length}):

@@ -1,6 +1,8 @@
 {
   "system_error": "System Error",
   "insufficient_balance": "Insufficient balance",
+  "transfer_success_title": "Transfer success",
+  "transfer_error_title": "Transfer failed",
   "list_failed_title": "Listed failed",
   "list_failed_min_amount": "The order amount is too small. The minimum order amount is 330 sats.",
   "list_success_title": "Listed successfully",

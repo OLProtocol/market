@@ -1,9 +1,6 @@
 'use client';
 
 import {
-  Card,
-  CardBody,
-  CardFooter,
   Button,
   Input,
   Table,
@@ -15,124 +12,93 @@ import {
   Tabs,
   Tab,
   Textarea,
-  SelectItem,
-  Spinner,
   Snippet,
 } from '@nextui-org/react';
 import { notification } from 'antd';
-import { useSellStore } from '@/store';
-import { use, useEffect, useMemo, useState } from 'react';
-import {
-  satsToBitcoin,
-  splitBatchSignedPsbt,
-  buildBatchSellOrder,
-  hideStr,
-  btcToSats,
-} from '@/lib/utils';
-import { Decimal } from 'decimal.js';
+import { useCommonStore, useSellStore } from '@/store';
+import { useMemo, useState } from 'react';
+import { isTaprootAddress } from '@/lib/wallet';
+import { buildTransferPsbt, hideStr } from '@/lib/utils';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { getAssetsSummary, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
-import useSWR from 'swr';
+import { useUtxoStore } from '@/store';
 
 export default function SellPage() {
   const { t } = useTranslation();
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const {
-    assets_name,
-    assets_type,
-    list,
-    reset,
-    unit,
-    amountUnit,
-    changeAmountUnit,
-    changeUnit,
-    changePrice,
-    changeStatus,
-  } = useSellStore((state) => state);
+  const { list } = useSellStore();
+  const { feeRate } = useCommonStore();
+  const { getUnspendUtxos } = useUtxoStore();
   const [selectedTab, setSelectedTab] = useState('single');
+  const { network, btcWallet } = useReactWalletStore((state) => state);
   const [singleAddress, setSingleAddress] = useState('');
+  const [errText, setErrText] = useState('');
   const [multipleAddresses, setMultipleAddresses] = useState('');
   console.log('app.account.sell.page: list: ', list);
-  const { network, address, btcWallet } = useReactWalletStore((state) => state);
-  const toAddressList = useMemo(() => {
+
+  const checkToAddressIsTaproot = (address: string[]) => {
+    for (const addr of address) {
+      if (!isTaprootAddress(addr, network)) {
+        setErrText(t('pages.inscribe.step_three.error_3'));
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const toAddressList = useMemo<any[]>(() => {
     if (selectedTab === 'single') {
-      return [singleAddress];
+      return Array.from({ length: list.length })
+        .fill(singleAddress.trim())
+        .filter((v) => !!v);
     } else {
       return multipleAddresses
         .split('\n')
         .map((address) => address.trim())
         .filter((address) => address !== '');
     }
-  }, [multipleAddresses, singleAddress, selectedTab]);
+  }, [multipleAddresses, singleAddress, selectedTab, list]);
 
   const transferHandler = async () => {
-    for (let i = 0; i < list.length; i++) {
-      const { price, assets_list } = list[i];
-      const _p = amountUnit === 'btc' ? btcToSats(price) : price;
-      if (Number(_p) < 330) {
-        notification.error({
-          message: t('notification.list_failed_title'),
-          description: t('notification.list_failed_min_amount'),
-        });
-        return;
-      }
+    if (toAddressList.length === 0) {
+      setErrText(t('pages.transfer.error_1'));
+      return;
+    }
+    if (toAddressList.length !== list.length) {
+      setErrText(t('pages.transfer.error_2'));
+      return;
+    }
+    const checkStatus = checkToAddressIsTaproot(toAddressList);
+    if (!checkStatus) {
+      return;
     }
     setLoading(true);
+    const utxos = getUnspendUtxos();
     try {
-      const batchOrderPsbt = await buildBatchSellOrder({
+      const batchOrderPsbt = await buildTransferPsbt({
         inscriptionUtxos: list,
-        address,
+        addresses: toAddressList,
         network,
-        unit: amountUnit,
+        utxos: utxos,
+        feeRate: feeRate.value,
       });
-      console.log('Batch Order PSBT', batchOrderPsbt);
-      const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
-      console.log('Batch Order raw', signedPsbts);
-      if (signedPsbts) {
-        const psbts = splitBatchSignedPsbt(signedPsbts, network);
-        const orders = list.map((v, j) => {
-          const { assets_list } = v;
-          let asset;
-          if (assets_type === 'ticker') {
-            asset = assets_list.find((a) => a.assets_name === assets_name);
-          } else {
-            asset = assets_list.find((a) => a.assets_type === assets_type);
-          }
-          return {
-            assets_name: asset.assets_name,
-            assets_type: asset.assets_type,
-            raw: psbts[j],
-          };
-        });
-        const res = await submitBatchOrders({
-          address,
-          orders: orders,
-        });
-        if (res.code === 200) {
-          notification.success({
-            message: t('notification.list_success_title'),
-            description: t('notification.list_success_description'),
-          });
-          reset();
-          router.back();
-        } else {
-          notification.error({
-            message: t('notification.list_failed_title'),
-            description: res.msg,
-          });
-        }
+      console.log(batchOrderPsbt);
+      if (!btcWallet) {
+        throw new Error('No wallet connected');
       }
-      setLoading(false);
+      const signedPsbts = await btcWallet.signPsbt(batchOrderPsbt.toHex());
+      await btcWallet.pushPsbt(signedPsbts);
+      notification.error({
+        message: t('notification.transfer_success_title'),
+      });
     } catch (error: any) {
-      setLoading(false);
       console.error('List failed', error);
       notification.error({
-        message: t('notification.list_failed_title'),
+        message: t('notification.transfer_error_title'),
         description: error.message,
       });
+    } finally {
+      setLoading(false);
     }
   };
   const cycleFill = () => {
@@ -151,8 +117,8 @@ export default function SellPage() {
     }
   };
   return (
-    <div className="py-2 max-w-3xl mx-auto">
-      <div className="md:flex justify-between gap-4">
+    <div className="py-2 max-w-4xl mx-auto">
+      <div className="md:flex justify-between gap-4 mb-4">
         <div className="flex-1 mb-2 md:mb-0">
           <Table aria-label="Example static collection table">
             <TableHeader>
@@ -206,7 +172,7 @@ export default function SellPage() {
             </TableBody>
           </Table>
         </div>
-        <div>
+        <div className="w-96 max-w-full">
           <Tabs
             aria-label="address tabs"
             selectedKey={selectedTab}
@@ -214,9 +180,6 @@ export default function SellPage() {
           >
             <Tab key="single" title={t('pages.inscribe.step_three.to_single')}>
               <div className="mb-4">
-                <div className="mb-2">
-                  {t('pages.inscribe.step_three.to_single')}
-                </div>
                 <div>
                   <Input
                     placeholder="Basic usage"
@@ -226,7 +189,10 @@ export default function SellPage() {
                 </div>
               </div>
             </Tab>
-            <Tab key="multiple" title="To Multiple Adddress">
+            <Tab
+              key="multiple"
+              title={t('pages.inscribe.step_three.to_multiple')}
+            >
               <div className="mb-4">
                 <div className="mb-2">
                   Multiple Adddress ({toAddressList.length}):
@@ -253,6 +219,10 @@ export default function SellPage() {
           </Tabs>
         </div>
       </div>
+      {!!errText && (
+        <div className="text-red-500 text-center mb-4">{errText}</div>
+      )}
+
       <Button
         color="primary"
         isLoading={loading}
