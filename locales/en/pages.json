@@ -50,6 +50,11 @@
     "not_support": "Viewing the transferred balance is temporarily unavailable.",
     "ordx_version": "OrdX Version"
   },
+  "transfer": {
+    "title": "Transfer",
+    "error_1": "Please provide a receiving address.",
+    "error_2": "The number of provided receiving addresses does not match the transfer quantity. "
+  },
   "inscribe": {
     "title": "Inscribe",
     "name": {
@@ -119,6 +124,7 @@
       "select_fee": "Select the network fee you want to pay:",
       "address_hint": "Please note the inscribing transaction delivers the inscription to the receiving address directly.",
       "to_single": "To Single Address",
+      "to_multiple": "To to_multiple Addresses",
       "output_one_utxo": "Whether to output a UTXO for batch inscriptions",
       "tight_one_utxo": "Whether tight to output a UTXO for batch inscriptions",
       "cycle_fill": "Loop through the above addresses to {{len}}",

@@ -50,6 +50,11 @@
     "not_support": "暂时不支持查看转移后的余额。",
     "ordx_version": "OrdX 版本"
   },
+  "'transfer": {
+    "title": "转移",
+    "error_1": "请提供一个接收地址。",
+      "error_2": "提供的接收地址数量与转移数量不匹配。"
+  },
   "inscribe": {
     "title": "铭文",
     "name": {
@@ -119,6 +124,7 @@
       "select_fee": "选择要支付的网络费用:",
       "address_hint": "请注意，铭文交易会将铭文直接发送到接收地址。",
       "to_single": "至单个地址",
+      "to_multiple": "至多个地址",
       "output_one_utxo": "是否把批量铭文铭刻输出一个UTXO",
       "tight_one_utxo": "是否把批量铭文紧密铭刻输出一个UTXO",
       "cycle_fill": "循环上面地址至{{len}}个",

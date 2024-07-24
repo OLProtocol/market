@@ -85,6 +85,51 @@ export const buildBatchSellOrder = async ({
   return batchSell.toHex();
 };
 
+export const buildTransferPsbt = async ({
+  inscriptionUtxos,
+  utxos,
+  addresses,
+  feeRate,
+}: any) => {
+  const { btcWallet, network, address, publicKey } =
+    useReactWalletStore.getState();
+
+  const len = inscriptionUtxos.length;
+  let toAddress: any[] = [];
+
+  if (addresses.length === 1) {
+    toAddress = Array.from({ length: len }).fill(addresses[0]);
+  }
+  const inputUtxoss: any[] = [];
+  const outputs: any[] = [];
+  for (let i = 0; i < len; i++) {
+    const item = inscriptionUtxos[i];
+    const [txid, vout] = item.utxo.split(':');
+    inputUtxoss.push({
+      txid,
+      vout: parseInt(vout),
+      value: item.value,
+    });
+    outputs.push({
+      address: toAddress[i],
+      value: item.value,
+    });
+  }
+  inputUtxoss.push(...utxos);
+  console.log(inputUtxoss);
+
+  const psbt = await buildTransaction({
+    utxos: inputUtxoss,
+    outputs,
+    feeRate,
+    network,
+    address,
+    publicKey,
+    suitable: true,
+  });
+  return psbt;
+};
+
 export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
   console.log('split batch signed psbt', signedHex);
   const psbtNetwork = toPsbtNetwork(

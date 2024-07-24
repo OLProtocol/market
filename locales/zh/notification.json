@@ -1,6 +1,8 @@
 {
   "system_error": "系统异常，请稍后再试。",
   "insufficient_balance": "余额不足。",
+  "transfer_success_title": "转移成功",
+  "transfer_error_title": "转移失败",
   "list_failed_title": "挂单失败",
   "list_failed_min_amount": "挂单金额太小，最小挂单金额为330聪。",
   "list_success_title": "挂单成功",
