@@ -106,50 +106,6 @@ export const useSellStore = create<SellState>()(
       set({
         list: newList,
       });
-
-      // const newList = list.map((item) => {
-      //   let amount = 0;
-      //   if (assets_type === 'ns') {
-      //     amount = 1;
-      //   } else if (assets_type === 'exotic') {
-      //     amount =
-      //       item.assets_list?.find((v) => v.assets_type === 'exotic')?.amount ||
-      //       0;
-      //   } else {
-      //     amount =
-      //       item.assets_list?.find((v) => v.assets_name === assets_name)
-      //         ?.amount || 0;
-      //   }
-
-      //   const unitPrice = unit === 'btc' ? btcToSats(price).toString() : price;
-      //   let amountPrice: any = new Decimal(unitPrice)
-      //     .mul(new Decimal(amount))
-      //     .toNumber();
-      //   amountPrice = Math.ceil(amountPrice).toString();
-      //   amountPrice =
-      //     amountUnit === 'btc'
-      //       ? satsToBitcoin(amountPrice.toString()).toString()
-      //       : amountPrice;
-      //   if (item.utxo === utxo) {
-      //     if (price === '' || isNaN(Number(price))) {
-      //       return {
-      //         ...item,
-      //         unit_price: '',
-      //         price: '',
-      //       };
-      //     }
-      //     return {
-      //       ...item,
-      //       unit_price: price,
-      //       price: amountPrice,
-      //     };
-      //   }
-      //   return item;
-      // });
-
-      // set({
-      //   list: newList,
-      // });
     },
     changeAssetsName(ticker) {
       set({
