@@ -198,12 +198,16 @@ export default function SellPage() {
                   Multiple Adddress ({toAddressList.length}):
                 </div>
                 <Textarea
+                  disableAnimation
+                  disableAutosize
+                  classNames={{
+                    input: 'resize-y min-h-[140px]',
+                  }}
                   placeholder="Enter multiple addresses, one per line"
                   value={multipleAddresses}
                   onChange={(e) => setMultipleAddresses(e.target.value)}
-                  className="mb-2"
                 />
-                <div className="flex">
+                <div className="flex mt-2">
                   <Button
                     color={'primary'}
                     onClick={cycleFill}
