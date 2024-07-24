@@ -43,52 +43,7 @@ export const useSellStore = create<SellState>()(
     amountUnit: 'btc',
     assets_type: '',
     assets_name: '',
-    list: [
-      {
-        utxo: '063e5c101778e3cfe596c555d6fec86d6cd8c90c23c36562e20225122e23c0c4:1',
-        value: 1000,
-        assets_list: [
-          {
-            assets_type: 'ticker',
-            assets_name: 'rarepizza',
-            amount: 1000,
-            inscriptionId:
-              '6c551dae1941e71c459731651e21fef18a7630bcf3fbb28516efc9b91f76de05i479',
-            content_type: 'text/plain;charset=utf-8',
-            delegate: '',
-          },
-        ],
-        order_id: 0,
-        order_type: 0,
-        currency: '',
-        price: '0.00002',
-        locked: 0,
-        unit_price: '2',
-        status: 'pending',
-      },
-      {
-        utxo: 'ec81dc5b2e62d8bd205da8681995eabcdf2e48a06f17f61abf409b774285831c:0',
-        value: 1600,
-        assets_list: [
-          {
-            assets_type: 'ticker',
-            assets_name: 'rarepizza',
-            amount: 1000,
-            inscriptionId:
-              'ec81dc5b2e62d8bd205da8681995eabcdf2e48a06f17f61abf409b774285831ci0',
-            content_type: 'text/plain;charset=utf-8',
-            delegate: '',
-          },
-        ],
-        order_id: 0,
-        order_type: 0,
-        currency: '',
-        price: '0.00002',
-        locked: 0,
-        unit_price: '2',
-        status: 'pending',
-      },
-    ],
+    list: [],
     changePrice(utxo, price) {
       const { list, assets_type, amountUnit, unit, assets_name } = get();
       const findItem = list.find((item) => item.utxo === utxo);
