@@ -99,6 +99,8 @@ export const buildTransferPsbt = async ({
 
   if (addresses.length === 1) {
     toAddress = Array.from({ length: len }).fill(addresses[0]);
+  } else {
+    toAddress = addresses.slice(0, len);
   }
   const inputUtxoss: any[] = [];
   const outputs: any[] = [];
@@ -116,7 +118,7 @@ export const buildTransferPsbt = async ({
     });
   }
   inputUtxoss.push(...utxos);
-  console.log(inputUtxoss);
+  console.log(outputs);
 
   const psbt = await buildTransaction({
     utxos: inputUtxoss,

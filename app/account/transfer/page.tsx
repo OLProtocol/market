@@ -118,7 +118,7 @@ export default function SellPage() {
   };
   return (
     <div className="py-2 max-w-4xl mx-auto">
-      <div className="md:flex justify-between gap-4 mb-4">
+      <div className="flex flex-col justify-between gap-4 mb-4">
         <div className="flex-1 mb-2 md:mb-0">
           <Table aria-label="Example static collection table">
             <TableHeader>
