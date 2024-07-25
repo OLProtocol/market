@@ -81,6 +81,9 @@ export default function TransferTool() {
 
   const [tickerList, { set: setTickerList }] = useList<any>([]);
 
+  const [ordxUtxoLimit, setOrdxUtxoLimit] = useState(100);
+  const [plainUtxoLimit, setPlainUtxoLimit] = useState(100);
+
   const handleTickerSelectChange = (itemId, ticker) => {
     // const ticker = e.target.value;
     inputList.items[itemId - 1].value.ticker = ticker;
@@ -125,7 +128,6 @@ export default function TransferTool() {
     }
     description += utxoObj.value + ' sats';
     inputList.items[itemId - 1].value.description = description;
-
     setInputList('items', inputList.items);
     calculateBalance();
   };
@@ -133,14 +135,12 @@ export default function TransferTool() {
   const handleInputUnitSelectChange = (itemId, e) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
-
     setInputList('items', inputList.items);
   };
 
   const handleOutputUnitSelectChange = (itemId: number, e: any) => {
     const unit = e.target.value;
     inputList.items[itemId - 1].value.unit = unit;
-
     setInputList('items', inputList.items);
   };
 
@@ -166,7 +166,6 @@ export default function TransferTool() {
         utxos: [],
       },
     };
-
     setInputList('items', [...inputList.items, newItem]);
   };
 
@@ -176,7 +175,6 @@ export default function TransferTool() {
       tmpItems.forEach((item, index) => {
         item.id = index + 1;
       });
-
       setInputList('items', tmpItems);
     }
   };
@@ -284,21 +282,34 @@ export default function TransferTool() {
     const detail = res.data.detail;
 
     detail.map(async (item) => {
-      if (!item.ticker) {
+      // if (!item.ticker) {
+      //   return;
+      // }
+
+      if (item.type === 'e') {
         return;
+      }
+      if (item.type === 'o') {
+        return;
+      }
+
+      let tickerOrAssetsType = item.type;
+      if (item.type === 'f') {
+        tickerOrAssetsType = item.ticker;
       }
       res = await getOrdxAddressHolders({
         start: 0,
         // limit: 10000,
-        limit: 100,
+        limit: ordxUtxoLimit,
         address: address,
-        ticker: item.ticker,
-        assetsType: item.type,
+        tickerOrAssetsType: tickerOrAssetsType,
         network: network,
       });
       const utxosOfTicker: any[] = [];
+      let total = 0;
       if (res.code === 0) {
         const details = res.data.detail;
+        total = res.data.total;
         details.map((detail) => {
           const utxo = {
             txid: detail.utxo.split(':')[0],
@@ -309,8 +320,10 @@ export default function TransferTool() {
           utxosOfTicker.push(utxo);
         });
       }
+
       tickers.push({
         ticker: item.ticker,
+        total: total,
         utxos: utxosOfTicker,
       });
     });
@@ -331,7 +344,6 @@ export default function TransferTool() {
       });
       return;
     }
-
     return {
       ticker: t('pages.tools.transaction.available_utxo'),
       utxos: res.data,
