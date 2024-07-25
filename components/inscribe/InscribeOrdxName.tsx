@@ -36,7 +36,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     if (lines.length === 0) {
       return false;
     }
-    setLoading(true);
+
     let mintedArr: string[] = [];
     const checkedArr: string[] = [];
     let formatErrArr: string[] = [];
@@ -67,6 +67,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       setErrorText(errorText);
       return false;
     }
+
     console.log(formatErrArr);
     const [error, res] = await tryit(ordx.checkNsNames)({
       names: lines,
