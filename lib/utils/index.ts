@@ -17,9 +17,10 @@ export const getLabelForAssets = (assets_name: string, assets_type: string) => {
 export const getTickLabel = (tick?: string) => {
   if (tick === undefined) return undefined;
   const tickMap = {
-    n: 'Name',
+    // n: 'Name',
     // o: 'Ordinals NFT',// 要求暂不显示
     // e: 'Rare',
+    btc: 'PN-btc',
   };
   return tickMap[tick] || tick;
 };
