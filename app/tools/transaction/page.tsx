@@ -288,23 +288,21 @@ export default function TransferTool() {
 
       if (item.type === 'e') {
         return;
-        // console.log('item', item);
       }
-
       if (item.type === 'o') {
         return;
       }
+
+      let tickerOrAssetsType = item.type;
       if (item.type === 'f') {
-        item.type = item.ticker;
-        // console.log('item', item);
+        tickerOrAssetsType = item.ticker;
       }
       res = await getOrdxAddressHolders({
         start: 0,
         // limit: 10000,
         limit: ordxUtxoLimit,
         address: address,
-        ticker: item.ticker,
-        assetsType: item.type,
+        tickerOrAssetsType: tickerOrAssetsType,
         network: network,
       });
       const utxosOfTicker: any[] = [];
@@ -443,7 +441,6 @@ export default function TransferTool() {
   };
   const getAllTickers = async () => {
     const tickers = await getTickers();
-    console.log('tickers', tickers);
     const avialableTicker = await getAvialableTicker();
     tickers?.push(avialableTicker);
     const rareSatTickers = await getRareSatTicker();
