@@ -140,8 +140,8 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
 
   useEffect(() => {
     if (assets_type || assets_name) {
-      resetList();
-      setCanSelect(false);
+      // resetList();
+      // setCanSelect(false);
       trigger();
     }
   }, [page, size]);
