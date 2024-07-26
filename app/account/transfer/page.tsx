@@ -83,12 +83,13 @@ export default function SellPage() {
         feeRate: feeRate.value,
       });
       console.log(batchOrderPsbt);
+      gi;
       if (!btcWallet) {
         throw new Error('No wallet connected');
       }
       const signedPsbts = await btcWallet.signPsbt(batchOrderPsbt.toHex());
       await btcWallet.pushPsbt(signedPsbts);
-      notification.error({
+      notification.success({
         message: t('notification.transfer_success_title'),
       });
     } catch (error: any) {
