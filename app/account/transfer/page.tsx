@@ -83,7 +83,6 @@ export default function SellPage() {
         feeRate: feeRate.value,
       });
       console.log(batchOrderPsbt);
-      gi;
       if (!btcWallet) {
         throw new Error('No wallet connected');
       }
