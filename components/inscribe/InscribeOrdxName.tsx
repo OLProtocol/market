@@ -1,5 +1,5 @@
 import { Textarea, Button } from '@nextui-org/react';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, use } from 'react';
 import { useMap } from 'react-use';
 import { notification } from 'antd';
 import { ordx } from '@/api';
@@ -26,6 +26,13 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     names: [],
     suffix: '',
   });
+  const nameList = useMemo(() => {
+    const lines = data.name
+      .split('\n')
+      .map((a) => a.trim())
+      .filter((v) => !!v);
+    return lines;
+  }, [data.name]);
   const checkName = async () => {
     let checkStatus = true;
 
@@ -67,7 +74,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       setErrorText(errorText);
       return false;
     }
-
+    setLoading(true);
     console.log(formatErrArr);
     const [error, res] = await tryit(ordx.checkNsNames)({
       names: lines,
@@ -188,7 +195,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
             isLoading={loading}
             onClick={nextHandler}
           >
-            {checked ? t('buttons.next') : 'Check'}
+            {checked ? t('buttons.next') : 'Check'} （{nameList.length}）
           </Button>
         </WalletConnectBus>
         {removeArr.length > 0 && (
