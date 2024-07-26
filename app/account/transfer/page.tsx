@@ -82,7 +82,6 @@ export default function SellPage() {
         utxos: utxos,
         feeRate: feeRate.value,
       });
-      console.log(batchOrderPsbt);
       if (!btcWallet) {
         throw new Error('No wallet connected');
       }
