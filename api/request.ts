@@ -7,7 +7,7 @@ export const request = async (path: string, options: any = {}) => {
   const { publicKey, connected, network, disconnect } =
     useReactWalletStore.getState();
   const { signature, reset, setSignature } = useCommonStore.getState();
-  const { headers = {}, method = 'GET', data } = options;
+  const { headers = {}, method = 'GET', data, formData } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
   // let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
@@ -19,8 +19,12 @@ export const request = async (path: string, options: any = {}) => {
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
   } else if (method === 'POST') {
-    options.body = JSON.stringify(data);
-    headers['Content-Type'] = 'application/json';
+    if (data) {
+      options.body = JSON.stringify(data);
+      headers['Content-Type'] = 'application/json';
+    } else if (formData) {
+      options.body = formData;
+    }
   }
   if (connected && signature) {
     headers['Publickey'] = publicKey;
@@ -236,6 +240,29 @@ export const addOrderTask = async ({
   const res = await request('/ordx/AddOrderTask', {
     method: 'POST',
     data: { address, fees, parameters, txid, type },
+  });
+  return res;
+};
+
+export const addMintRecord = async ({ address, txid, record_data }: any) => {
+  const formData = new FormData();
+  formData.append('address', address);
+  formData.append('txid', txid);
+  formData.append('record_data', record_data);
+  const res = await request('/ordx/AddMintRecord', {
+    method: 'POST',
+    formData,
+  });
+  return res;
+};
+
+export const deleteMintRecord = async ({ address, txid }: any) => {
+  const res = await request('/ordx/DeleteMintRecord', {
+    method: 'POST',
+    data: {
+      address,
+      txid,
+    },
   });
   return res;
 };

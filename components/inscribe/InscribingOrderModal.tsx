@@ -14,6 +14,7 @@ import { InscribeOrderItem } from './InscribeOrderItem';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { sleep, sum } from 'radash';
 import { filterUtxosByValue, calcNetworkFee } from '@/lib/wallet';
+import { addMintRecord } from '@/api';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import {
   useOrderStore,
@@ -27,6 +28,7 @@ import {
   sendBtcPsbt,
   returnInscribe,
 } from '@/lib/inscribe';
+import { deleteMintRecord } from '@/api';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { tryit } from 'radash';
@@ -289,10 +291,18 @@ export const InscribingOrderModal = ({
       }
       setCommitTx(orderId, commitTx);
       changeStatus(orderId, 'paid');
-      setLoading(false);
       setActiveStep(1);
+      await tryit(addMintRecord)({
+        address: currentAccount,
+        txid,
+        record_data: JSON.stringify({
+          ...order,
+          commitTx,
+        }),
+      });
+      setLoading(false);
       setTimeout(() => {
-        inscribeHandler();
+        // inscribeHandler();
       }, 0);
     } catch (error: any) {
       setLoading(false);
@@ -377,6 +387,10 @@ export const InscribingOrderModal = ({
         description: 'Inscribe Success',
       });
       changeStatus(orderId, 'inscribe_success');
+      await tryit(deleteMintRecord)({
+        address: currentAccount,
+        txid: commitTxid,
+      });
       setLoading(false);
       setActiveStep(2);
       onFinished?.();

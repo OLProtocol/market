@@ -43,7 +43,12 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     if (lines.length === 0) {
       return false;
     }
-
+    if (lines.length > 1000) {
+      notification.error({
+        message: t('pages.inscribe.name.error_3'),
+      });
+      return false;
+    }
     let mintedArr: string[] = [];
     const checkedArr: string[] = [];
     let formatErrArr: string[] = [];

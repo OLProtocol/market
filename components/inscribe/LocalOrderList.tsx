@@ -82,9 +82,28 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
         historyList = historyList.concat(localOrderList);
       }
     }
-    addLocalOrders(historyList);
-    await inscribeOrderHistory.setList(historyList);
-    checkAllList();
+    const len = historyList.length;
+    const newList: any[] = [];
+    for (let i = 0; i < len; i++) {
+      const item = historyList[i];
+      const dis = Date.now() - item.createAt;
+      console.log('dis', dis);
+      if (
+        ['pending', 'inscribe_success', 'timeout'].includes(item.status) &&
+        dis > 1000 * 60 * 60 * 24 * 7
+      ) {
+        console.log('超时订单', item.orderId);
+        continue;
+      }
+      if (item.status === 'pending' && dis > 1000 * 60 * 5) {
+        item.status = 'timeout';
+        item.inscription = {};
+        item.files = [];
+      }
+      newList.push(item);
+    }
+    addLocalOrders(newList);
+    await inscribeOrderHistory.setList(newList);
   };
   useEffect(() => {
     // setTimeout(() => {
