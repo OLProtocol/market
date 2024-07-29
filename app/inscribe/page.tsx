@@ -548,12 +548,11 @@ export default function Inscribe() {
   //   }
   // }, [state]);
   return (
-    <>
-      {/* <BtcHeightAlert /> */}
+    <div className="py-4">
       <div className="flex flex-col max-w-[48rem] mx-auto pt-8">
-        <h1 className="text-lg font-bold text-center mb-4">
+        {/* <h1 className="text-lg font-bold text-center mb-4">
           {t('pages.inscribe.title')}
-        </h1>
+        </h1> */}
         <div className="">
           <div className="flex justify-center mb-4">
             <ButtonGroup>
@@ -623,6 +622,6 @@ export default function Inscribe() {
           />
         )}
       </div>
-    </>
+    </div>
   );
 }

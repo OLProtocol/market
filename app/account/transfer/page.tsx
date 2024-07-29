@@ -122,7 +122,7 @@ export default function SellPage() {
           <Table aria-label="Example static collection table">
             <TableHeader>
               <TableColumn className="text-sm md:text-base">
-                {t('common.item')}
+                {t('common.item')}({list.length})
               </TableColumn>
             </TableHeader>
             <TableBody>
@@ -143,13 +143,11 @@ export default function SellPage() {
                               {t('common.asset_num')}：
                             </span>
                             <span>{v.amount}</span>
+                            <span className="text-gray-400 ml-4 ">Sats:</span>
+                            {item.value}
                           </div>
                         </div>
                       ))}
-                    </div>
-                    <div>
-                      <span className="text-gray-400 mr-4">Sats:</span>
-                      {item.value}
                     </div>
                     <div className="flex items-center">
                       <span className="text-gray-400">Utxo：</span>
@@ -171,9 +169,10 @@ export default function SellPage() {
             </TableBody>
           </Table>
         </div>
-        <div className="w-96 max-w-full">
+        <div className="max-w-full">
           <Tabs
             aria-label="address tabs"
+            className="w-full"
             selectedKey={selectedTab}
             onSelectionChange={(key) => setSelectedTab(key as string)}
           >
@@ -202,6 +201,7 @@ export default function SellPage() {
                   classNames={{
                     input: 'resize-y min-h-[140px]',
                   }}
+                  className="w-full"
                   placeholder="Enter multiple addresses, one per line"
                   value={multipleAddresses}
                   onChange={(e) => setMultipleAddresses(e.target.value)}

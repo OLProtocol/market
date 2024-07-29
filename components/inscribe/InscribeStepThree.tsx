@@ -9,9 +9,11 @@ import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
 import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { notification } from 'antd';
+import { inscribeOrderHistory } from '@/lib/storage';
 import { useCalcFee } from '@/lib/hooks';
 import { OrderItemType, useCommonStore, useOrderStore } from '@/store';
-
+import { tryit } from 'radash';
 import { useTranslation } from 'react-i18next';
 
 interface Brc20SetpOneProps {
@@ -191,8 +193,18 @@ export const InscribeStepThree = ({
       status: 'pending',
       createAt: Date.now().valueOf(),
     };
-    addOrder(order);
-    onAddOrder?.(order);
+
+    const [err] = await tryit(inscribeOrderHistory.addItem)(order);
+    if (err) {
+      console.log(err);
+      notification.error({
+        message: t('pages.inscribe.step_three.error_5'),
+        description: err.message,
+      });
+      return;
+    }
+    // addOrder(order);
+    // onAddOrder?.(order);
   };
   const showTight = ['localhost', 'test'].some(
     (n) => location.hostname.indexOf(n) > -1,
