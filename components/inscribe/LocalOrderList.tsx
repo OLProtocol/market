@@ -12,6 +12,8 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { hideStr } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { inscribeOrderHistory } from '@/lib/storage';
+import localforage from 'localforage';
 
 interface LocalOrderListProps {
   onOrderClick?: (item: OrderItemType) => void;
@@ -69,22 +71,36 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
     const item = dataSource.find((v) => v.orderId === k);
     item && clickHandler(item);
   };
-  useEffect(() => {
-    setTimeout(() => {
-      const orderStoreData = localStorage.getItem('order-store');
-
-      if (orderStoreData) {
-        const orderStoreState = JSON.parse(orderStoreData);
-        const localOrderList = orderStoreState.state?.list;
-        if (localOrderList?.length) {
-          console.log('localOrderList', localOrderList);
-
-          addLocalOrders(localOrderList);
-        }
+  const getHistoryList = async () => {
+    let historyList = await inscribeOrderHistory.getList();
+    const orderStoreData = (await localforage.getItem('order-store')) as string;
+    if (orderStoreData) {
+      const orderStoreState = JSON.parse(orderStoreData);
+      const localOrderList = orderStoreState.state?.list;
+      if (localOrderList?.length) {
+        console.log('localOrderList', localOrderList);
+        historyList = historyList.concat(localOrderList);
       }
-    }, 1000);
-
+    }
+    addLocalOrders(historyList);
+    await inscribeOrderHistory.setList(historyList);
     checkAllList();
+  };
+  useEffect(() => {
+    // setTimeout(() => {
+    //   const orderStoreData = localStorage.getItem('order-store');
+
+    //   if (orderStoreData) {
+    //     const orderStoreState = JSON.parse(orderStoreData);
+    //     const localOrderList = orderStoreState.state?.list;
+    //     if (localOrderList?.length) {
+    //       console.log('localOrderList', localOrderList);
+
+    //       addLocalOrders(localOrderList);
+    //     }
+    //   }
+    // }, 1000);
+    getHistoryList();
   }, []);
 
   return (

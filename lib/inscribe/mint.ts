@@ -493,7 +493,6 @@ export const generateMultiScript = (
 */
 export const generateInscription = ({
   files,
-  feeRate,
   secret,
   network = 'main',
   metadata,
@@ -517,21 +516,8 @@ export const generateInscription = ({
   console.log('Tapkey:', tapkey);
   let txsize = 0;
   txsize = 64 + 33 + Script.encode(script).length;
-  // for (let i = 0; i < files.length; i++) {
-  //   const content = hexToBytes(files[i].hex);
-
-  //   let prefix = 160;
-
-  //   if (files[i].sha256 != '') {
-  //     prefix = feeRate > 1 ? 546 : 700;
-  //   }
-
-  //   txsize = prefix + Math.floor(content.length / 4);
-
-  //   console.log('TXSIZE', txsize);
-  // }
   inscription = {
-    script: script,
+    // script: script,
     leaf: leaf,
     tapkey: tapkey,
     cblock: cblock,
