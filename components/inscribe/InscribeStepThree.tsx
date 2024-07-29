@@ -203,8 +203,8 @@ export const InscribeStepThree = ({
       });
       return;
     }
-    // addOrder(order);
-    // onAddOrder?.(order);
+    addOrder(order);
+    onAddOrder?.(order);
   };
   const showTight = ['localhost', 'test'].some(
     (n) => location.hostname.indexOf(n) > -1,

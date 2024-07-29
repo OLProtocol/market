@@ -91,7 +91,10 @@ export const useOrderStore = create<OrderState>()(
           const item = get().list[i];
           const dis = Date.now() - item.createAt;
           console.log('dis', dis);
-          if (dis > 1000 * 60 * 60 * 24 * 7) {
+          if (
+            ['pending', 'inscribe_success', 'timeout'].includes(item.status) &&
+            dis > 1000 * 60 * 60 * 24 * 7
+          ) {
             console.log('超时订单', item.orderId);
             continue;
           }
