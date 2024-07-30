@@ -88,17 +88,17 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
       const item = historyList[i];
       const dis = Date.now() - item.createAt;
       console.log('dis', dis);
-      // if (
-      //   ['pending', 'inscribe_success', 'timeout'].includes(item.status) &&
-      //   dis > 1000 * 60 * 60 * 24 * 7
-      // ) {
-      //   console.log('超时订单', item.orderId);
-      //   continue;
-      // }
+      if (
+        ['pending', 'inscribe_success', 'timeout'].includes(item.status) &&
+        dis > 1000 * 60 * 60 * 24 * 7
+      ) {
+        console.log('超时订单', item.orderId);
+        continue;
+      }
       if (item.status === 'pending' && dis > 1000 * 60 * 5) {
         item.status = 'timeout';
-        item.inscription = {};
-        item.files = [];
+        // item.inscription = {};
+        // item.files = [];
       }
       newList.push(item);
     }
