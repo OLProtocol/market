@@ -37,10 +37,8 @@ class InscribeOrderHistory {
   };
   addItem = async (order: any) => {
     const list = await this.getList();
-    if (list.findIndex((l) => l.order_id === order.order_id) < 0) {
-      list.push(order);
-      return this.setList(list);
-    }
+    list.push(order);
+    return this.setList(list);
   };
 }
 const inscribeOrderHistory = new InscribeOrderHistory();
