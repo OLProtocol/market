@@ -290,7 +290,7 @@ export const InscribingOrderModal = ({
         console.log(utxoList);
       }
       setCommitTx(orderId, commitTx);
-      changeStatus(orderId, 'paid');
+      await changeStatus(orderId, 'paid');
       setActiveStep(1);
       await tryit(addMintRecord)({
         address: currentAccount,
@@ -386,7 +386,7 @@ export const InscribingOrderModal = ({
         message: 'Success',
         description: 'Inscribe Success',
       });
-      changeStatus(orderId, 'inscribe_success');
+      await changeStatus(orderId, 'inscribe_success');
       await tryit(deleteMintRecord)({
         address: currentAccount,
         txid: commitTxid,
@@ -400,7 +400,7 @@ export const InscribingOrderModal = ({
         setRetryCount(retryCount + 1);
       }
       setLoading(false);
-      changeStatus(orderId, 'inscribe_fail');
+      await changeStatus(orderId, 'inscribe_fail');
       notification.error({
         message: 'Error',
         description: error.message || 'error',

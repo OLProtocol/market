@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
-import localForage from 'localforage';
+import { inscribeOrderHistory } from '@/lib/storage';
 import { unique } from 'radash';
+import { tryit } from 'radash';
 // import { InscribeType } from '@/types';
 // import { savePaidOrder } from '@/api';
 
@@ -142,24 +143,26 @@ export const useOrderStore = create<OrderState>()(
           list,
         });
       },
-      changeInscriptionStatus: (orderId, index, status: OrderStatus) => {
+      changeInscriptionStatus: async (orderId, index, status: OrderStatus) => {
         const list = get().list.map((item) => {
           if (item.orderId === orderId) {
             item.inscription.status = status;
           }
           return item;
         });
+        await inscribeOrderHistory.setList(list);
         set({
           list,
         });
       },
-      changeStatus: (orderId, status: OrderStatus) => {
+      changeStatus: async (orderId, status: OrderStatus) => {
         const list = get().list.map((item) => {
           if (item.orderId === orderId) {
             item.status = status;
           }
           return item;
         });
+        await tryit(inscribeOrderHistory.setList)(list);
         set({
           list,
         });
