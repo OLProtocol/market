@@ -93,7 +93,7 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
         dis > 1000 * 60 * 60 * 24 * 7
       ) {
         console.log('超时订单', item.orderId);
-        continue;
+        // continue;
       }
       if (item.status === 'pending' && dis > 1000 * 60 * 5) {
         item.status = 'timeout';
