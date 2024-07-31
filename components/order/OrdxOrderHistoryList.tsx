@@ -241,12 +241,12 @@ export const OrdxOrderHistoryList = ({
           {list.map((item: any, i) => (
             <TableRow key={item.utxo + i} className="text-sm md:text-base">
               {(columnKey) => {
+                const v = getKeyValue(item, columnKey);
                 if (
                   columnKey === 'utxo' ||
                   columnKey === 'txaddress' ||
                   columnKey === 'address'
                 ) {
-                  const v = getKeyValue(item, columnKey);
                   return (
                     <TableCell className="text-center font-light">
                       {v ? (
@@ -265,33 +265,31 @@ export const OrdxOrderHistoryList = ({
                     </TableCell>
                   );
                 } else if (columnKey === 'txid') {
+                  console.log(v);
                   return (
                     <TableCell className="text-center font-light">
-                      <a
-                        href={resolveMempoolTxLink(
-                          getKeyValue(item, columnKey),
-                          network,
-                        )}
-                        target="_blank"
-                      >
-                        <Icon icon="ph:share-fill" />
-                      </a>
+                      {v ? (
+                        <a
+                          href={resolveMempoolTxLink(v, network)}
+                          target="_blank"
+                        >
+                          <Icon icon="ph:share-fill" />
+                        </a>
+                      ) : (
+                        '-'
+                      )}
                     </TableCell>
                   );
                 } else if (columnKey === 'txtime') {
                   return (
                     <TableCell className="text-center font-light text-sm md:text-base">
-                      <span>
-                        {new Date(
-                          Number(getKeyValue(item, columnKey)),
-                        ).toLocaleString()}
-                      </span>
+                      <span>{new Date(Number(v)).toLocaleString()}</span>
                     </TableCell>
                   );
                 } else if (columnKey === 'result_text') {
                   return (
                     <TableCell className="text-center font-light text-sm md:text-base">
-                      {getKeyValue(item, columnKey)}
+                      {v}
                     </TableCell>
                   );
                 } else if (columnKey === 'price') {
@@ -305,7 +303,7 @@ export const OrdxOrderHistoryList = ({
                           />
                         )}
 
-                        {getKeyValue(item, columnKey)}
+                        {v}
                         {item.currency !== 'BTC' && ' ' + item.currency}
                       </div>
                     </TableCell>
@@ -325,9 +323,7 @@ export const OrdxOrderHistoryList = ({
                     'Magic Eden': '/icon/m-me.png',
                     OKX: '/icon/m-okx.png',
                   };
-                  const src =
-                    sourceMap[getKeyValue(item, columnKey)] ||
-                    '/icon/m-sat20.png';
+                  const src = sourceMap[v] || '/icon/m-sat20.png';
                   return (
                     <TableCell className="text-center font-light text-sm md:text-base">
                       <Image src={src} alt="me logo" className="w-6 h-6" />
@@ -336,7 +332,7 @@ export const OrdxOrderHistoryList = ({
                 } else {
                   return (
                     <TableCell className="text-center font-light text-sm md:text-base">
-                      {getKeyValue(item, columnKey)}
+                      {v}
                       {/* {`${getKeyValue(item, columnKey)}${
                         columnKey === 'price' ? ' ' + item.currency : ''
                       }`} */}
