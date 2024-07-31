@@ -266,6 +266,27 @@ export const deleteMintRecord = async ({ address, txid }: any) => {
   });
   return res;
 };
+export const lockBulkOrder = async ({ address, orderIds }: any) => {
+  const res = await request('/ordx/LockBulkOrder', {
+    method: 'POST',
+    data: {
+      address,
+      order_id: orderIds,
+    },
+  });
+  return res;
+};
+
+export const unlockBulkOrder = async ({ address, orderIds }: any) => {
+  const res = await request('/ordx/UnlockBulkOrder', {
+    method: 'POST',
+    data: {
+      address,
+      order_id: orderIds,
+    },
+  });
+  return res;
+};
 
 export const getOrderTask = async (tx_id: string) => {
   const res = await request('/ordx/GetOrderTask', {

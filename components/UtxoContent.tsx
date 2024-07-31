@@ -1,6 +1,6 @@
 import useSWRMutation from 'swr/mutation';
 import { ordx } from '@/api';
-import { Spinner } from '@nextui-org/react';
+import { Spinner, Image } from '@nextui-org/react';
 import { tryit } from 'radash';
 import { use, useRef, useState } from 'react';
 import { useEffect, useMemo } from 'react';
@@ -13,11 +13,13 @@ interface UtxoContentProps {
   utxo?: string;
   ranges?: any[];
   delay?: number;
+  defaultImage?: string;
 }
 export function UtxoContent({
   inscriptionId,
   utxo,
   delay = 0,
+  defaultImage,
 }: UtxoContentProps) {
   const { network } = useReactWalletStore();
   const [seed, setSeed] = useState('');
@@ -104,9 +106,17 @@ export function UtxoContent({
   return (
     <div className="h-full w-full">
       {showSpinner && (
-        <div className="absolute top-0 left-0 w-full h-full dark:bg-gray-800 z-[1] bg-gray-100 flex justify-center items-center">
-          <Spinner />
-        </div>
+        <>
+          {!!defaultImage ? (
+            <div className="absolute top-0 left-0 w-full h-full z-[1] flex justify-center items-center">
+              <Image src={defaultImage} alt="loading image" radius="none" />
+            </div>
+          ) : (
+            <div className="absolute top-0 left-0 w-full h-full dark:bg-gray-800 z-[1] bg-gray-100 flex justify-center items-center">
+              <Spinner />
+            </div>
+          )}
+        </>
       )}
       {contentSrc && (
         <iframe

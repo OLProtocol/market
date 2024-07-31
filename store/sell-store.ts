@@ -89,6 +89,7 @@ export const useSellStore = create<SellState>()(
       //   status: 'pending',
       // },
     ],
+
     changePrice(utxo, price) {
       const { list, assets_type, amountUnit, unit, assets_name } = get();
       const findItem = list.find((item) => item.utxo === utxo);
