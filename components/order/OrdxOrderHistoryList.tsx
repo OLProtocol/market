@@ -146,7 +146,7 @@ export const OrdxOrderHistoryList = ({
       },
       {
         key: 'sourcename',
-        label: t('common.tx'),
+        label: t('common.source'),
         allowsSorting: false,
         align: 'center',
       },
