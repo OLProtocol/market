@@ -17,6 +17,7 @@ export interface BuyUtxoAssetItem {
 interface BuyState {
   list: any[];
   add: (item: any) => void;
+  setList: (list: any[]) => void;
   changeStatus: (
     utxo: string,
     status: 'pending' | 'confirmed' | 'failed',
@@ -40,6 +41,11 @@ export const useBuyStore = create<BuyState>()(
       //   ],
       // },
     ],
+    setList: (list) => {
+      set({
+        list,
+      });
+    },
     changePrice(utxo, price) {
       const { list } = get();
       const newList = list.map((item) => {

@@ -35,7 +35,6 @@ import { tryit } from 'radash';
 import { hideStr } from '@/lib/utils';
 import { FeeShow } from './FeeShow';
 import { useTranslation } from 'react-i18next';
-import { ordx } from '@/api';
 
 interface InscribingOrderMdaolProps {
   show: boolean;
@@ -426,10 +425,27 @@ export const InscribingOrderModal = ({
     });
   };
   useEffect(() => {
+    const onBeforeunload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    if (loading) {
+      window.addEventListener('beforeunload', onBeforeunload);
+    } else {
+      window.removeEventListener('beforeunload', onBeforeunload);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeunload);
+    };
+  }, [loading]);
+  useEffect(() => {
     checkStatus();
   }, []);
   const closeHandler = () => {
-    onClose?.();
+    if (!loading) {
+      onClose?.();
+    }
   };
   return (
     <Modal

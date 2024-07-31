@@ -13,6 +13,7 @@ export const Sat20ContentItem = ({ asset, utxo }: Props) => {
         {asset?.assets_name}
       </div>
       <UtxoContent
+        defaultImage="/ordx-utxo-content-default.jpg"
         inscriptionId={asset?.inscriptionId}
         utxo={utxo}
       ></UtxoContent>

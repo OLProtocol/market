@@ -2,12 +2,14 @@ import { Button, Input, Slider } from '@nextui-org/react';
 import { useBuyStore } from '@/store';
 import { Icon } from '@iconify/react';
 import { BatchCart } from './BatchCart';
-import { useState, useMemo, use, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { notification } from 'antd';
 import { Decimal } from 'decimal.js';
 import { useCommonStore } from '@/store';
+import { useDebounce } from 'react-use';
 import {
   buildDummyUtxos,
   DUMMY_UTXO_VALUE,
@@ -17,7 +19,7 @@ import {
   calcBuyOrderFee,
   satsToBitcoin,
 } from '@/lib';
-import { getUtxoByValue, bulkBuyOrder, unlockOrder } from '@/api';
+import { getUtxoByValue, bulkBuyOrder, lockBulkOrder } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface Props {
@@ -40,29 +42,43 @@ export const BatchBuyFooter = ({
   ) {
     minServiceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
-  const [selectSize, setSelectSize] = useState(0);
   const [loading, setLoading] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
-  const { list } = useBuyStore();
+  const { list, setList } = useBuyStore();
+  const [selectSize, setSelectSize] = useState(list.length || 0);
   const { t } = useTranslation();
   const [show, setShow] = useState(true);
   const [networkFee, setNetworkFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
   const { address, network } = useReactWalletStore();
+
+  const lockOrderIds = useMemo(() => {
+    return list.map((v) => v.order_id);
+  }, [list]);
+
   const { data, isLoading } = useSWR(
     `getUtxoByValue-${address}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 }),
+    () => getUtxoByValue({ address, network, value: 0 }),
+  );
+
+  const {
+    data: lockData,
+    isMutating: lockLoading,
+    trigger: lockTrigger,
+  } = useSWRMutation(
+    `getUtxoByValue-${address}-${network}-${JSON.stringify(lockOrderIds)}`,
+    () => lockBulkOrder({ address, orderIds: lockOrderIds }),
   );
   const orderLength = useMemo(() => list.length || 0, [list]);
   const dummyLength = useMemo(() => orderLength + 1, [orderLength]);
 
   const canSelectLength = useMemo(() => {
     return Math.min(
-      assetsList.filter((i) => i.locker === '0' && i.address !== address)
-        .length,
-      10,
+      assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
+      1000,
     );
   }, [assetsList]);
+  console.log('canSelectLength', canSelectLength);
 
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
@@ -170,15 +186,11 @@ export const BatchBuyFooter = ({
       feeRate: feeRate.value,
       network: network,
     });
-    console.log('networkFee', networkFee);
-    console.log(feeRate);
     setCalcLoading(false);
     setNetworkFee(networkFee);
   };
   useEffect(() => {
-    // if (canSpendableUtxos.length && dummyLength) {
     calcFee();
-    // }
   }, [
     dummyLength,
     serviceFee,
@@ -187,6 +199,41 @@ export const BatchBuyFooter = ({
     totalPrice,
     feeRate.value,
   ]);
+  useDebounce(
+    () => {
+      if (list.length) {
+        lockTrigger();
+      }
+    },
+    1000,
+    [list],
+  );
+  useDebounce(
+    () => {
+      let _list = structuredClone(list);
+      const len = _list.length;
+      if (selectSize < len) {
+        _list = _list.slice(0, selectSize);
+      } else if (selectSize > len) {
+        for (let i = 0; i < assetsList.length; i++) {
+          const item = assetsList[i];
+          if (_list.length >= selectSize) {
+            break;
+          }
+          if (
+            item.locked === 0 &&
+            item.address !== address &&
+            _list.findIndex((v) => v.order_id === item.order_id) === -1
+          ) {
+            _list.push(item);
+          }
+        }
+      }
+      setList(_list);
+    },
+    300,
+    [selectSize],
+  );
   const buyHandler = async () => {
     try {
       if (!utxos.length) {
@@ -203,7 +250,6 @@ export const BatchBuyFooter = ({
         spendedUtxos,
       } = await findDummyUtxos();
 
-      console.log('canSpendableUtxos', canSpendableUtxos);
       const spendableUtxos = canSpendableUtxos.filter((v) => {
         const l = !!spendedUtxos.find(
           (s) => s.txid === v.txid && s.vout === v.vout,
@@ -278,26 +324,25 @@ export const BatchBuyFooter = ({
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-[99]">
         <div className="flex justify-between items-center w-full h-full px-4">
           <div className="flex-1 flex items-center flex-wrap gap-4">
-            {/* <div>扫货</div>
             <div className="flex items-center gap-4 w-60">
+              <Input
+                type="number"
+                className="w-20"
+                value={selectSize.toString()}
+                onValueChange={(e) => setSelectSize(Number(e))}
+              />
               <Slider
                 size="sm"
                 step={1}
                 maxValue={canSelectLength}
                 minValue={0}
-                value={selectSize}
+                value={[selectSize]}
                 className="flex-1"
                 onChange={(e) => {
-                  sizeChangeHandler(e as number);
+                  setSelectSize(isNaN(e[0]) ? 0 : e[0]);
                 }}
               />
-              <Input
-                type="number"
-                className="w-20"
-                value={selectSize.toString()}
-                onValueChange={(e) => sizeChangeHandler(Number(e))}
-              />
-            </div> */}
+            </div>
           </div>
           <div className="flex gap-2 items-center">
             <div>

@@ -44,7 +44,7 @@ export const OrdxOrderList = ({
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(12);
+  const [size, setSize] = useState(64);
   const [sort, setSort] = useState(1);
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
@@ -127,18 +127,18 @@ export const OrdxOrderList = ({
   };
   const buyHandler = async (item) => {
     try {
-      const orderDetail = await lockOrder({
-        address: storeAddress,
-        order_id: item.order_id,
-      });
-      if (!orderDetail?.data?.raw) {
-        notification.error({
-          message: t('notification.lock_order_failed_title'),
-          description: orderDetail.msg,
-        });
-        return;
-      }
-      addBuy({ ...item, status: 'pending', raw: orderDetail.data.raw });
+      // const orderDetail = await lockOrder({
+      //   address: storeAddress,
+      //   order_id: item.order_id,
+      // });
+      // if (!orderDetail?.data?.raw) {
+      //   notification.error({
+      //     message: t('notification.lock_order_failed_title'),
+      //     description: orderDetail.msg,
+      //   });
+      //   return;
+      // }
+      addBuy({ ...item, status: 'pending' });
     } catch (error: any) {
       console.log(error);
       notification.error({
@@ -234,7 +234,7 @@ export const OrdxOrderList = ({
         )}
         <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
           {list.map((item: any, i) => (
-            <div key={item.utxo + i}>
+            <div key={item.order_id}>
               <OrdxFtOrderItem
                 assets_name={assets_name}
                 assets_type={assets_type}

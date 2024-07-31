@@ -81,7 +81,6 @@ export const OrdxFtOrderItem = ({
     }
     onSelect?.(b);
   };
-  console.log('assets_type', assets_type);
 
   return (
     <Card
@@ -121,6 +120,7 @@ export const OrdxFtOrderItem = ({
                 showContent(asset?.content_type, asset?.delegate) && (
                   <div className="h-full w-full">
                     <UtxoContent
+                      defaultImage="/ordx-utxo-content-default.jpg"
                       inscriptionId={asset?.inscription_id}
                       delay={delay}
                       utxo={item?.utxo}

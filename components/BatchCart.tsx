@@ -70,7 +70,7 @@ export const BatchCart = ({
         <span>Total: {totalPrice} BTC</span>
       </div>
       <Divider className="my-2" />
-      <div>
+      <div className="max-h-96 overflow-y-auto pr-2">
         {list.map((item) => (
           <div
             key={item.order_id}
