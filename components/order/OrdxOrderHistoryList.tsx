@@ -11,6 +11,7 @@ import {
   TableCell,
   getKeyValue,
   Snippet,
+  Image,
 } from '@nextui-org/react';
 import { getHistory } from '@/api';
 import { useMemo, useState } from 'react';
@@ -139,6 +140,12 @@ export const OrdxOrderHistoryList = ({
       },
       {
         key: 'txid',
+        label: t('common.tx'),
+        allowsSorting: false,
+        align: 'center',
+      },
+      {
+        key: 'sourcename',
         label: t('common.tx'),
         allowsSorting: false,
         align: 'center',
@@ -311,6 +318,19 @@ export const OrdxOrderHistoryList = ({
                   return (
                     <TableCell className="text-center font-light text-sm md:text-base">
                       {ticker}
+                    </TableCell>
+                  );
+                } else if (columnKey === 'sourcename') {
+                  const sourceMap = {
+                    'Magic Eden': '/icon/m-me.png',
+                    OKX: '/icon/m-okx.png',
+                  };
+                  const src =
+                    sourceMap[getKeyValue(item, columnKey)] ||
+                    '/icon/m-sat20.png';
+                  return (
+                    <TableCell className="text-center font-light text-sm md:text-base">
+                      <Image src={src} alt="me logo" className="w-6 h-6" />
                     </TableCell>
                   );
                 } else {
