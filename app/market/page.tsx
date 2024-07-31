@@ -193,7 +193,7 @@ export default function Market() {
                             className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
                           />
                         )}
-                        <span className="pt-4">
+                        <span className="pt-4 ml-2">
                           {nickname ? nickname : getTickLabel(tick)}
                         </span>
                       </div>
