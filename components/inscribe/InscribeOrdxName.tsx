@@ -43,7 +43,7 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     if (lines.length === 0) {
       return false;
     }
-    if (lines.length > 1000) {
+    if (lines.length > 2000) {
       notification.error({
         message: t('pages.inscribe.name.error_3'),
       });
