@@ -23,6 +23,7 @@
     "@nextui-org/react": "^2.2.10",
     "@nextui-org/system": "2.0.15",
     "@nextui-org/theme": "2.1.17",
+    "@okxweb3/coin-bitcoin": "^1.0.23",
     "@react-aria/ssr": "^3.8.0",
     "@react-aria/visually-hidden": "^3.8.6",
     "@sat20/btc-connect": "^1.4.12",
