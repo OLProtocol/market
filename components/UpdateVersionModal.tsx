@@ -19,7 +19,7 @@ export const UpdateVersionModal = () => {
   const showModal = () => {
     setOpen(true);
   };
-  useSWR(`getAppVersion`, () => getAppVersion(), {
+  useSWR(`getAppVersion-${version}`, () => getAppVersion(), {
     refreshInterval: 1000 * 60 * 2,
     onSuccess: (appVersion) => {
       console.log(appVersion);
