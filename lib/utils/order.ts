@@ -222,7 +222,7 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
   };
 };
 export const buildBuyOrder = async ({
-  orders,
+  raws,
   utxos,
   serviceFee,
   feeRate,
@@ -271,8 +271,8 @@ export const buildBuyOrder = async ({
   const sellInputs: PsbtInput[] = [];
   const sellOutputs: any[] = [];
   const buyOutputs: any[] = [];
-  for (let i = 0; i < orders.length; i++) {
-    const { raw } = orders[i];
+  for (let i = 0; i < raws.length; i++) {
+    const { raw } = raws[i];
     const sellPsbt = bitcoin.Psbt.fromHex(raw, {
       network: psbtNetwork,
     });
@@ -315,7 +315,7 @@ export const buildBuyOrder = async ({
     psbtTx.addOutput(address, DUMMY_UTXO_VALUE);
   }
   await psbtTx.addSufficientUtxosForFee(btcUtxos, {
-    suitable: false,
+    suitable: true,
   });
   console.log(psbtTx);
   const buyPsbt = psbtTx.toPsbt();
@@ -391,7 +391,7 @@ export const generateBuyInputsAndOutputs = async ({
   };
 };
 export const calcBuyOrderFee = async ({
-  orders,
+  raws,
   utxos,
   serviceFee,
   feeRate,
@@ -439,8 +439,8 @@ export const calcBuyOrderFee = async ({
   const sellInputs: PsbtInput[] = [];
   const sellOutputs: any[] = [];
   const buyOutputs: any[] = [];
-  for (let i = 0; i < orders.length; i++) {
-    const { raw } = orders[i];
+  for (let i = 0; i < raws.length; i++) {
+    const { raw } = raws[i];
     const sellPsbt = bitcoin.Psbt.fromHex(raw, {
       network: psbtNetwork,
     });

@@ -87,15 +87,19 @@ export const InscribeStepThree = ({
   const submit = async () => {
     if (loading) return;
     setErrText('');
-    const _files: any[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i];
+    const _files: any[] = files.map((f, i) => {
+      let a = f.amount;
+      let o = f.offset;
       if (tightSelected) {
-        f.amount = 1;
-        f.offset = i;
+        a = 1;
+        o = i;
       }
-      _files.push(f);
-    }
+      return {
+        ...f,
+        amount: a,
+        offset: o,
+      };
+    });
     console.log('_files', _files);
     const secret = generatePrivateKey();
     const feeObj: any = {

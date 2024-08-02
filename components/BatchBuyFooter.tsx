@@ -18,14 +18,20 @@ import {
   buildBuyOrder,
   calcBuyOrderFee,
   satsToBitcoin,
+  getSuitableUtxos,
 } from '@/lib';
-import { getUtxoByValue, bulkBuyOrder, lockBulkOrder } from '@/api';
+import {
+  getUtxoByValue,
+  bulkBuyOrder,
+  lockBulkOrder,
+  unlockBulkOrder,
+  unlockOrder,
+} from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface Props {
   list: any[];
   toBuy?: () => void;
-  onRemove: (u: string) => any;
   onSuccess?: () => void;
   onClose?: () => void;
 }
@@ -33,7 +39,6 @@ export const BatchBuyFooter = ({
   list: assetsList,
   onSuccess,
   onClose,
-  onRemove,
 }: Props) => {
   let minServiceFee = 0;
   if (
@@ -42,12 +47,16 @@ export const BatchBuyFooter = ({
   ) {
     minServiceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
+  const [raws, setRaws] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
-  const { list, setList } = useBuyStore();
+  const { list, setList, remove: removeBuy } = useBuyStore();
   const [selectSize, setSelectSize] = useState(list.length || 0);
   const { t } = useTranslation();
   const [show, setShow] = useState(true);
+  const [removeOrderIds, setRemoveOrderIds] = useState<
+    { raw: string; order_id: string }[]
+  >([]);
   const [networkFee, setNetworkFee] = useState(0);
   const { feeRate } = useCommonStore((state) => state);
   const { address, network } = useReactWalletStore();
@@ -72,20 +81,23 @@ export const BatchBuyFooter = ({
   const orderLength = useMemo(() => list.length || 0, [list]);
   const dummyLength = useMemo(() => orderLength + 1, [orderLength]);
 
+  useEffect(() => {
+    if (lockData?.code === 200) {
+      setRaws(lockData.data?.filter((v) => !!v.raw) || []);
+    }
+  }, [lockData]);
   const canSelectLength = useMemo(() => {
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
       1000,
     );
   }, [assetsList]);
-  console.log('canSelectLength', canSelectLength);
 
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
   );
-  console.log('dummyUtxos', dummyUtxos);
   const splitDummyBol = useMemo(
     () => dummyLength > dummyUtxos.length,
     [dummyLength, dummyUtxos],
@@ -121,6 +133,43 @@ export const BatchBuyFooter = ({
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
   );
+  // useEffect(() => {
+  //   if (utxos.length) {
+  //     const outputs = [
+  //       {
+  //         address,
+  //         value: 4229912,
+  //       },
+  //       // {
+  //       //   address,
+  //       //   value: DUMMY_UTXO_VALUE,
+  //       // },
+  //       // {
+  //       //   address,
+  //       //   value: DUMMY_UTXO_VALUE,
+  //       // },
+  //       // {
+  //       //   address,
+  //       //   value: DUMMY_UTXO_VALUE,
+  //       // },
+  //       // {
+  //       //   address,
+  //       //   value: DUMMY_UTXO_VALUE,
+  //       // },
+  //       // {
+  //       //   address,
+  //       //   value: DUMMY_UTXO_VALUE,
+  //       // },
+  //     ];
+  //     getSuitableUtxos({
+  //       utxos,
+  //       outputs,
+  //       feeRate: feeRate.value,
+  //       address,
+  //       network,
+  //     });
+  //   }
+  // }, [utxos]);
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
     // const spendableDummyUtxos = dummyUtxos?.slice(0, 1) || [];
@@ -179,7 +228,7 @@ export const BatchBuyFooter = ({
     );
 
     const networkFee = await calcBuyOrderFee({
-      orders: list,
+      raws,
       utxos: filterConsumUtxos,
       dummyUtxos: newDummyUtxos,
       serviceFee: serviceFee,
@@ -210,9 +259,21 @@ export const BatchBuyFooter = ({
   );
   useDebounce(
     () => {
+      if (removeOrderIds.length) {
+        unlockBulkOrder({ address, orderIds: removeOrderIds });
+      }
+    },
+    1000,
+    [removeOrderIds],
+  );
+  useDebounce(
+    () => {
       let _list = structuredClone(list);
       const len = _list.length;
+      setRemoveOrderIds([]);
       if (selectSize < len) {
+        const removeOrder = _list.slice(selectSize, len);
+        setRemoveOrderIds(removeOrder.map((v) => v.order_id));
         _list = _list.slice(0, selectSize);
       } else if (selectSize > len) {
         for (let i = 0; i < assetsList.length; i++) {
@@ -234,6 +295,26 @@ export const BatchBuyFooter = ({
     300,
     [selectSize],
   );
+  const unlockHandler = async (item) => {
+    try {
+      const res = await unlockOrder({
+        address,
+        order_id: item.order_id,
+      });
+      removeBuy(item.utxo);
+    } catch (error: any) {
+      notification.error({
+        message: t('notification.order_unlock_failed_title'),
+        description: error.message,
+      });
+    }
+  };
+  const onRemoveItem = async (u: string) => {
+    const item = list.find((i) => i.utxo === u);
+    if (item) {
+      const res = await unlockHandler(item);
+    }
+  };
   const buyHandler = async () => {
     try {
       if (!utxos.length) {
@@ -271,7 +352,7 @@ export const BatchBuyFooter = ({
           DUMMY_UTXO_VALUE * dummyLength,
       );
       const buyRaw = await buildBuyOrder({
-        orders: list,
+        raws,
         utxos: filterConsumUtxos,
         dummyUtxos: newDummyUtxos,
         serviceFee: serviceFee,
@@ -318,7 +399,7 @@ export const BatchBuyFooter = ({
           networkFee={networkFee}
           serviceFee={serviceFee}
           calcLoading={calcLoading}
-          onRemove={onRemove}
+          onRemove={onRemoveItem}
         />
       )}
       <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-[99]">
