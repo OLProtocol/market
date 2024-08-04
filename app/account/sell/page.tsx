@@ -207,8 +207,8 @@ export default function SellPage() {
   return (
     <div className="py-2">
       <div className="md:flex justify-between gap-4">
-        <div className="flex-1 mb-2 md:mb-0">
-          <div className="flex gap-4 mb-2 flex-col md:flex-row md:items-center">
+        <div className="flex-1 mb-2">
+          <div className="flex flex-col gap-4 mb-2 md:flex-row md:items-center  ">
             {isSummaryLoading ? (
               <Spinner />
             ) : (
@@ -223,7 +223,7 @@ export default function SellPage() {
                 </div>
               </div>
             )}
-            <div className="w-80 flex items-center gap-1 md:w-full">
+            <div className="w-80 flex items-center gap-1 sm:w-full">
               <Input
                 type="number"
                 placeholder="Custome Global Unit Price"
@@ -358,7 +358,7 @@ export default function SellPage() {
             </TableBody>
           </Table>
         </div>
-        <Card className="md:w-60 ">
+        <Card className="sm:w-60 ">
           <CardBody>
             <div>
               {t('common.total')}: {list.length}
