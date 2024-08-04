@@ -33,6 +33,7 @@ import { getAssetsSummary, submitBatchOrders } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
+import { useDebounce } from 'react-use';
 
 export default function SellPage() {
   const { t } = useTranslation();
@@ -49,6 +50,8 @@ export default function SellPage() {
     changeUnit,
     changePrice,
   } = useSellStore((state) => state);
+  const [globalStatus, setGlobalStatus] = useState(false);
+  const [globalProice, setGlobalPrice] = useState<any>();
   console.log('app.account.sell.page: list: ', list);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
   const { data, isLoading: isSummaryLoading } = useSWR(
@@ -83,6 +86,19 @@ export default function SellPage() {
       }
     }
   }, [summary]);
+
+  useDebounce(
+    () => {
+      if (globalStatus) {
+        let _g = globalProice ? Number(globalProice) : 0;
+        for (let i = 0; i < list.length; i++) {
+          changePrice(list[i].utxo, _g.toString());
+        }
+      }
+    },
+    300,
+    [globalStatus, globalProice],
+  );
   const listItems = async () => {
     for (let i = 0; i < list.length; i++) {
       const { price, assets_list } = list[i];
@@ -192,20 +208,49 @@ export default function SellPage() {
     <div className="py-2">
       <div className="md:flex justify-between gap-4">
         <div className="flex-1 mb-2 md:mb-0">
-          {isSummaryLoading ? (
-            <Spinner />
-          ) : (
-            <div className="mb-2 flex items-center gap-6">
-              <div className="flex items-center gap-4">
-                {/* <span>{t('common.tick')}:</span>
+          <div className="flex items-center gap-4 mb-2">
+            {isSummaryLoading ? (
+              <Spinner />
+            ) : (
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
+                  {/* <span>{t('common.tick')}:</span>
                 <span>{ticker}</span> */}
+                </div>
+                <div className="flex items-center gap-4">
+                  <span>{t('common.lowest_price')}:</span>
+                  <span>{summary.lowest_price} Sats</span>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span>{t('common.lowest_price')}:</span>
-                <span>{summary.lowest_price} Sats</span>
-              </div>
+            )}
+            <div className="w-80 flex items-center gap-1">
+              <Input
+                type="number"
+                placeholder="Custome Global Unit Price"
+                value={globalProice}
+                onValueChange={(e) => {
+                  setGlobalStatus(true);
+                  setGlobalPrice(e);
+                }}
+              />
+              <Select
+                size="sm"
+                color="primary"
+                isDisabled={isSummaryLoading}
+                selectedKeys={[unit]}
+                onChange={(e) => onUnitChange(e.target.value as any)}
+                className="w-28"
+              >
+                <SelectItem key="btc" value="btc">
+                  BTC
+                </SelectItem>
+                <SelectItem key="sats" value="sats">
+                  sats
+                </SelectItem>
+              </Select>
             </div>
-          )}
+          </div>
+
           <Table aria-label="Example static collection table">
             <TableHeader>
               <TableColumn className="text-sm md:text-base">
@@ -299,7 +344,11 @@ export default function SellPage() {
                       placeholder="0.00"
                       isDisabled={isSummaryLoading}
                       value={list[i].unit_price}
-                      onValueChange={(e) => changePrice(item.utxo, e)}
+                      onValueChange={(e) => {
+                        setGlobalStatus(false);
+                        setGlobalPrice(undefined);
+                        changePrice(item.utxo, e);
+                      }}
                       onBlur={() => inputBlur(item.utxo)}
                     />
                   </TableCell>

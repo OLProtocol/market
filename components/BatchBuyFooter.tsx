@@ -257,6 +257,9 @@ export const BatchBuyFooter = ({
     1000,
     [list],
   );
+  useEffect(() => {
+    setSelectSize(list.length);
+  }, [list]);
   useDebounce(
     () => {
       if (removeOrderIds.length) {
@@ -415,7 +418,6 @@ export const BatchBuyFooter = ({
               <Slider
                 size="sm"
                 step={1}
-                maxValue={canSelectLength}
                 minValue={0}
                 value={[selectSize]}
                 className="flex-1"
