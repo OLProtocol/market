@@ -87,7 +87,7 @@ export const OrdxFtOrderItem = ({
       isPressable
       radius="lg"
       // className="border-none w-full h-[14rem] md:h-[18rem] relative"
-      className="forced-colors:hidden border-none w-[12rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative hover:border-1 hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
+      className="forced-colors:hidden border-none w-[10rem] h-[16rem] md:w-[16rem] md:h-[22.6rem] relative hover:border-1 hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
     >
       {canSelect && (
         <div
@@ -105,7 +105,7 @@ export const OrdxFtOrderItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[12rem] h-[12rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
+      <CardBody className="radius-lg w-[10rem] h-[10rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
         <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
           <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
             <div className="absolute items-center inset-0 z-10">
@@ -130,11 +130,31 @@ export const OrdxFtOrderItem = ({
               )}
             </div>
             {showContent(asset?.content_type, asset?.delegate) ? (
-              <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
-                <p className="font-medium text-2xl md:text-3xl mb-1">
-                  {thousandSeparator(asset?.amount)}
-                </p>
-              </section>
+              <>
+                <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
+                  {' '}
+                  <p className="pt-12 md:pb-2 md:text-sm">
+                    <span className="font-bold text-amber-400">
+                      {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
+                    </span>
+                    <span className="font-mono text-gray-100">
+                      &nbsp;sats/{asset?.assets_name}
+                    </span>
+                  </p>
+                  <p className="md:text-sm">
+                    <span className="font-mono text-gray-100">
+                      $
+                      <BtcPrice
+                        btc={asset?.unit_price / asset?.unit_amount / 100000000}
+                      />
+                      &nbsp; /{asset?.assets_name}
+                    </span>
+                  </p>
+                  <p className="font-medium text-2xl md:text-3xl mb-1">
+                    {thousandSeparator(asset?.amount)}
+                  </p>
+                </section>
+              </>
             ) : (
               <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-20">
                 <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
@@ -175,17 +195,17 @@ export const OrdxFtOrderItem = ({
           )}
         </div>
       </CardBody>
-      <CardFooter className="block item-center bg-gray-800 w-[12rem] h-[6rem] md:h-[6.5rem]  md:w-[16rem]">
+      <CardFooter className="block item-center bg-gray-800 w-full h-[6rem] md:h-[6.5rem]">
         <div className="pb-2 flex-1 flex items-center justify-between gap-4 font-bold md:pb-4">
-          <div className="flex pl-2 justify-items-start">
+          <div className="flex ">
             {item.currency === 'BTC' && (
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
             )}
             <span className="text-sm text-gray-400">{item?.price}</span>
           </div>
-          <div className="flex pr-2 justify-items-end">
+          <div className="flex">
             <span className="text-sm text-gray-500">
-              &nbsp;&nbsp;$
+              $
               <BtcPrice btc={item?.price} />
             </span>
           </div>
