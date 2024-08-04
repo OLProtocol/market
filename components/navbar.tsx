@@ -137,11 +137,11 @@ export const Navbar = () => {
         target: '_blank',
         isActive: true,
       },
-      {
-        label: t('pages.tools.title'),
-        href: runtimeEnv === 'test' ? '/tools.html' : '/tools',
-        isActive: false,
-      },
+      // {
+      //   label: t('pages.tools.title'),
+      //   href: runtimeEnv === 'test' ? '/tools.html' : '/tools',
+      //   isActive: false,
+      // },
       {
         label: t('pages.my_assets.title'),
         href: runtimeEnv === 'test' ? '/account.html' : '/account',
