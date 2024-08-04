@@ -213,10 +213,11 @@ export const OrdxOrderList = ({
       });
     }
   };
-  const total = useMemo(
+  const totalPage = useMemo(
     () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
     [data, size],
   );
+  const total = useMemo(() => data?.data?.total || 0, [data]);
   useEffect(() => {
     reset();
   }, []);
@@ -260,10 +261,10 @@ export const OrdxOrderList = ({
           ))}
         </div>
       </Content>
-      {total > 1 && (
+      {totalPage > 1 && (
         <div className="flex justify-center">
           <Pagination
-            total={total}
+            total={totalPage}
             page={page}
             size={size}
             onChange={(offset, size) => {
