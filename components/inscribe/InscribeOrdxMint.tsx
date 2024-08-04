@@ -390,7 +390,7 @@ export const InscribeOrdxMint = ({
     <div>
       <div className="mb-4">
         <div className="flex items-center mb-4">
-          <div className="w-52">{t('common.tick')}</div>
+          <div className="w-20 sm:w-52">{t('common.tick')}</div>
           <Input
             value={data.tick}
             className="flex-1"
@@ -406,7 +406,7 @@ export const InscribeOrdxMint = ({
           />
         </div>
         <div className="flex items-center mb-4">
-          <div className="w-52">{t('common.amount')}</div>
+          <div className="w-20 sm:w-52">{t('common.amount')}</div>
           <Input
             type="number"
             className="flex-1"
