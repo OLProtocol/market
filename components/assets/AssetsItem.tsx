@@ -149,7 +149,7 @@ export const AssetsItem = ({
                 // color="primary"
                 radius="sm"
                 onClick={sellHandler}
-                className="text-tiny h-8 flex-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+                className="text-tiny h-8 flex-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase min-w-unit-2"
               >
                 {t('buttons.list_sale')}
               </Button>
@@ -161,7 +161,7 @@ export const AssetsItem = ({
                 // color="primary"
                 radius="sm"
                 onClick={() => onTransfer?.(item)}
-                className="text-tiny h-8 flex-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
+                className="text-tiny h-8 flex-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase min-w-unit-2"
               >
                 {t('common.transfer')}
               </Button>
