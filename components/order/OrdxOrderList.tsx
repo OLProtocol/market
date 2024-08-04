@@ -1,6 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
+import { Switch } from '@nextui-org/react';
 import { Empty, notification } from 'antd';
 import { getOrders, lockOrder, unlockOrder, cancelOrder } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
@@ -39,6 +40,7 @@ export const OrdxOrderList = ({
     remove: removeBuy,
     reset,
   } = useBuyStore();
+  const [hideStatus, setHideStatus] = useState(false);
   const [canSelect, setCanSelect] = useState(false);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
@@ -78,9 +80,14 @@ export const OrdxOrderList = ({
   );
   useEffect(() => {
     if (data) {
-      set(data.data?.order_list || []);
+      const { order_list = [] } = data?.data || {};
+      if (hideStatus) {
+        set(order_list.filter((i) => i.locked !== 1));
+      } else {
+        set(order_list);
+      }
     }
-  }, [data]);
+  }, [data, hideStatus]);
 
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
@@ -216,9 +223,14 @@ export const OrdxOrderList = ({
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
-        {!list.length && <Empty className="mt-10" />}
-        {!!list.length && (
-          <div className="flex justify-end mb-4">
+        {total > 1 && (
+          <div className="flex justify-end gap-4 mb-4">
+            <Switch
+              isSelected={hideStatus}
+              onValueChange={(e) => setHideStatus(e)}
+            >
+              Hide Locaked
+            </Switch>
             <SortDropdown
               sortList={sortList}
               value={sort}
@@ -227,6 +239,8 @@ export const OrdxOrderList = ({
             ></SortDropdown>
           </div>
         )}
+        {!list.length && <Empty className="mt-10" />}
+
         <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
           {list.map((item: any, i) => (
             <div key={item.order_id}>
