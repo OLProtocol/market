@@ -242,7 +242,7 @@ export const OrdxOrderList = ({
         )}
         {!list.length && <Empty className="mt-10" />}
 
-        <div className="min-h-[30rem] flex flex-wrap justify-center gap-8 mb-4">
+        <div className="min-h-[30rem] flex flex-wrap justify-center md:gap-8 mb-4 gap-2">
           {list.map((item: any, i) => (
             <div key={item.order_id}>
               <OrdxFtOrderItem
