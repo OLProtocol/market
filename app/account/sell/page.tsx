@@ -223,7 +223,7 @@ export default function SellPage() {
                 </div>
               </div>
             )}
-            <div className="w-80 flex items-center gap-1 sm:w-full">
+            <div className="w-full flex items-center gap-1 sm:w-80">
               <Input
                 type="number"
                 placeholder="Custome Global Unit Price"
