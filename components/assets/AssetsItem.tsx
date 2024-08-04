@@ -101,7 +101,10 @@ export const AssetsItem = ({
   return (
     <Card
       radius="lg"
-      className="card-hover forced-colors:hidden w-[10rem] h-[18rem] md:w-[16rem] md:h-[22.6rem] relative border-1 border-solid border-transparent hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
+      classNames={{
+        footer: 'p-1 md:p-3',
+      }}
+      className="card-hover forced-colors:hidden w-[11rem] h-[17rem] md:w-[16rem] md:h-[22.6rem] relative border-1 border-solid border-transparent hover:border hover:border-solid hover:border-indigo-500 bg-repeat hover:bg-[url('/bg.gif')]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -117,7 +120,7 @@ export const AssetsItem = ({
           </div>
         </div>
       )}
-      <CardBody className="radius-lg w-[10rem] h-[10rem] md:w-[16rem] md:h-[16rem] p-0">
+      <CardBody className="radius-lg min-w-[11rem] h-[11rem] md:w-[17rem] md:h-[16rem] p-0 justify-center overflow-hidden">
         {asset?.assets_type === 'ns' && <NameItem asset={asset} />}
         {isSat20Ticker && <Sat20Item asset={asset} />}
         {isSat20Content && <Sat20ContentItem asset={asset} utxo={item?.utxo} />}
@@ -137,7 +140,7 @@ export const AssetsItem = ({
         </Snippet>
         <div className="flex item-center pb-1 gap-2">
           {item.order_id === 0 ? (
-            <div className="flex items-center gap-2 flex-1">
+            <>
               <Button
                 // fullWidth
                 variant="ghost"
@@ -162,7 +165,7 @@ export const AssetsItem = ({
               >
                 {t('common.transfer')}
               </Button>
-            </div>
+            </>
           ) : (
             <Button
               className="text-tiny h-8 w-5/6 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
