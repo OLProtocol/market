@@ -267,7 +267,9 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
   return (
     <div>
       <div className="flex items-center mb-4">
-        <div className="w-52">{t('pages.inscribe.ordx.deploy_mode')}</div>
+        <div className="w-20 sm:w-52">
+          {t('pages.inscribe.ordx.deploy_mode')}
+        </div>
         <RadioGroup
           orientation="horizontal"
           onValueChange={(e) => set('mode', e)}
@@ -283,7 +285,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
       </div>
       <div className="mb-4">
         <div className="flex items-center mb-4">
-          <div className="w-52">{t('common.tick')}</div>
+          <div className="w-20 sm:w-52">{t('common.tick')}</div>
           <Input
             value={data.tick}
             className="flex-1"
@@ -299,7 +301,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
           />
         </div>
         <div className="flex items-center mb-4">
-          <div className="w-52">{t('common.max')}</div>
+          <div className="w-20 sm:w-52">{t('common.max')}</div>
           <Input
             type="number"
             className="flex-1"
@@ -312,7 +314,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
         </div>
         {data.mode === 'project' && (
           <div className="flex items-center mb-4">
-            <div className="w-52">{t('common.selfmint')}</div>
+            <div className="w-20 sm:w-52">{t('common.selfmint')}</div>
             <Input
               type="number"
               className="flex-1"
@@ -334,8 +336,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
           </div>
         )}
         <div className="mb-4">
-          <div className="flex items-center mb-2">
-            <div className="w-52">
+          <div className="flex mb-2 flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="sm:w-52">
               {t('common.block')}{' '}
               <span className="text-xs">
                 （
@@ -391,7 +393,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
             </div>
           </div>
           {time.start && time.end && (
-            <div className="ml-60 mb-2 text-xs text-gray-600">
+            <div className="sm:ml-60 mb-2 text-xs text-gray-600">
               {t('pages.inscribe.ordx.block_helper', {
                 start: time.start,
                 end: time.end,
@@ -399,8 +401,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
             </div>
           )}
         </div>
-        <div className="flex items-center  mb-4">
-          <div className="w-52">
+        <div className="flex mb-2 flex-col gap-2 sm:flex-row sm:items-center">
+          <div className=" sm:w-52">
             {t('common.rarity')}
             <Tooltip
               content={t('pages.inscribe.ordx.rarity_helper')}
@@ -435,8 +437,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
             </div>
           </div>
         </div>
-        <div className="flex items-center  mb-4">
-          <div className="w-52">{t('common.limit_per_mint')}</div>
+        <div className="flex mb-2 flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="sm:w-52">{t('common.limit_per_mint')}</div>
           <div className="flex-1">
             <Input
               type="number"
@@ -452,7 +454,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
           </div>
         </div>
         <div className="flex items-center  mb-4">
-          <div className="w-52">{t('common.description')}</div>
+          <div className="w-20 sm:w-52">{t('common.description')}</div>
           <div className="flex-1">
             <Input
               type="text"
@@ -462,8 +464,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
             />
           </div>
         </div>
-        <div className="flex items-center  mb-4">
-          <div className="w-52">{t('pages.inscribe.ordx.deploy_file')}</div>
+        <div className="flex mb-2 flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="sm:w-52">{t('pages.inscribe.ordx.deploy_file')}</div>
           <div className="flex-1">
             <Dragger
               maxCount={1}
@@ -475,10 +477,10 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />
               </p>
-              <p className="dark:text-white">
+              <p className="dark:text-white break-all">
                 {t('pages.inscribe.files.upload_des_1')}
               </p>
-              <p className="dark:text-white">
+              <p className="dark:text-white break-all">
                 {t('pages.inscribe.files.upload_des_2')}
               </p>
             </Dragger>
