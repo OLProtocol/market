@@ -23,18 +23,18 @@ export const request = async (
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
   } else if (method === 'POST') {
-    if (data) {
-      options.body = JSON.stringify(data);
-      headers['Content-Type'] = 'application/json';
-    } else if (formData) {
-      options.body = formData;
+    // if (data) {
+    //   options.body = JSON.stringify(data);
+    //   headers['Content-Type'] = 'application/json';
+    if (formData) {
+      options.data = formData;
     }
   }
   if (connected && signature) {
     headers['Publickey'] = publicKey;
     headers['Signature'] = signature;
   }
-  delete options.data;
+  // delete options.data;
   options.headers = headers;
   let res = await axios(url, options);
   if ((res as any)?.data.code === -1) {
