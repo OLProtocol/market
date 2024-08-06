@@ -1,15 +1,19 @@
 import { removeObjectEmptyValue } from '@/lib/utils';
 import { useCommonStore } from '@/store';
+import axios from 'axios';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { generateMempoolUrl } from '@/lib/utils';
 
-export const request = async (path: string, options: any = {}) => {
+export const request = async (
+  path: string,
+  options: any = {
+    timeout: 10000,
+  },
+) => {
   const { publicKey, connected, network, disconnect } =
     useReactWalletStore.getState();
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data, formData } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
-  // let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
@@ -32,15 +36,14 @@ export const request = async (path: string, options: any = {}) => {
   }
   delete options.data;
   options.headers = headers;
-  let res = await fetch(url, options);
-  res = await res.json();
-  if ((res as any).code === -1) {
+  let res = await axios(url, options);
+  if ((res as any)?.data.code === -1) {
     // if ((res as any).msg === 'api signature verification failed' || (res as any).msg === 'public and signature parameters are required in the request headers') {
     //   await setSignature('');
     // }
-    throw (res as any).msg;
+    throw (res as any)?.data?.msg;
   }
-  return res as any;
+  return res?.data as any;
 };
 export const getOrdxAssets = async ({
   address,
