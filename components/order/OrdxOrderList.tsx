@@ -233,7 +233,7 @@ export const OrdxOrderList = ({
               isSelected={hideStatus}
               onValueChange={(e) => setHideStatus(e)}
             >
-              Hide Locaked
+              Hide Locked
             </Switch>
             <SortDropdown
               sortList={sortList}
