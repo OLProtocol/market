@@ -115,21 +115,28 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
       });
       return;
     }
-    const res = await cancelOrder({ address, order_id: item.order_id });
-    if (res.code === 200) {
-      notification.success({
-        message: 'Cancel order successfully',
-        description: `The order has been canceled successfully`,
-      });
-      const index = list.findIndex((i) => i.utxo === item.utxo);
-      item.order_id = 0;
-      if (index >= 0) {
-        updateAt(index, item);
+    try {
+      const res = await cancelOrder({ address, order_id: item.order_id });
+      if (res.code === 200) {
+        notification.success({
+          message: 'Cancel order successfully',
+          description: `The order has been canceled successfully`,
+        });
+        const index = list.findIndex((i) => i.utxo === item.utxo);
+        item.order_id = 0;
+        if (index >= 0) {
+          updateAt(index, item);
+        }
+      } else {
+        notification.error({
+          message: 'Cancel order failed',
+          description: res.msg,
+        });
       }
-    } else {
+    } catch (error: any) {
       notification.error({
         message: 'Cancel order failed',
-        description: res.msg,
+        description: error.msg,
       });
     }
   };
