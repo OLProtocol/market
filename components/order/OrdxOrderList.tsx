@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { SortDropdown } from '@/components/SortDropdown';
 import { ScrollContent } from '@/components/ScrollContent';
-import { useList } from 'react-use';
+import { useDebounce, useList } from 'react-use';
 
 interface OrdxOrderListProps {
   assets_name: string;
@@ -74,9 +74,10 @@ export const OrdxOrderList = ({
       address,
       sort,
       assets_type,
+      hide_locked: true,
     }),
   );
-  const [list, { set, push: pushToList, removeAt, filter }] = useList<any>([]);
+  const [list, { set, push: pushToList, removeAt }] = useList<any>([]);
   useEffect(() => {
     if (data) {
       const { order_list = [] } = data?.data || {};
@@ -108,21 +109,28 @@ export const OrdxOrderList = ({
       });
       return;
     }
-    const res = await cancelOrder({
-      address: address || storeAddress,
-      order_id: item.order_id,
-    });
-    if (res.code === 200) {
-      notification.success({
-        message: t('notification.order_cancel_success_title'),
-        description: t('notification.order_cancel_success_description_1'),
+    try {
+      const res = await cancelOrder({
+        address: address || storeAddress,
+        order_id: item.order_id,
       });
-      const index = list.findIndex((i) => i.utxo === item.utxo);
-      removeAt(index);
-    } else {
+      if (res.code === 200) {
+        notification.success({
+          message: t('notification.order_cancel_success_title'),
+          description: t('notification.order_cancel_success_description_1'),
+        });
+        const index = list.findIndex((i) => i.utxo === item.utxo);
+        removeAt(index);
+      } else {
+        notification.error({
+          message: t('notification.order_cancel_failed_title'),
+          description: res.msg,
+        });
+      }
+    } catch (error: any) {
       notification.error({
         message: t('notification.order_cancel_failed_title'),
-        description: res.msg,
+        description: error.msg,
       });
     }
   };
@@ -198,6 +206,13 @@ export const OrdxOrderList = ({
       });
     }
   };
+  const filterList = useMemo(() => {
+    if (hideStatus) {
+      return list.filter((item) => item.locked === 0);
+    } else {
+      return list;
+    }
+  }, [list, hideStatus]);
   const total = useMemo(() => data?.data?.total || 0, [data]);
   const finished = useMemo(() => {
     return list.length >= total;
@@ -236,7 +251,7 @@ export const OrdxOrderList = ({
           empty={!list.length}
         >
           <div className="min-h-[30rem] flex flex-wrap justify-center md:gap-8 mb-4 gap-2">
-            {list.map((item: any, i) => (
+            {filterList.map((item: any, i) => (
               <div key={item.order_id}>
                 <OrdxFtOrderItem
                   assets_name={assets_name}

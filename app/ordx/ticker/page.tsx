@@ -35,7 +35,6 @@ export default function Page() {
   };
 
   const summary = useMemo(() => data?.data?.summary || {}, [data]);
-  console.log(summary);
   const headList = useMemo(() => {
     return [
       {
