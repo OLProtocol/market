@@ -1,15 +1,19 @@
 import { removeObjectEmptyValue } from '@/lib/utils';
 import { useCommonStore } from '@/store';
+import axios from 'axios';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { generateMempoolUrl } from '@/lib/utils';
 
-export const request = async (path: string, options: any = {}) => {
+export const request = async (
+  path: string,
+  options: any = {
+    timeout: 10000,
+  },
+) => {
   const { publicKey, connected, network, disconnect } =
     useReactWalletStore.getState();
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data, formData } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
-  // let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
@@ -19,28 +23,27 @@ export const request = async (path: string, options: any = {}) => {
     const query = new URLSearchParams(removeObjectEmptyValue(data));
     url += `?${query}`;
   } else if (method === 'POST') {
-    if (data) {
-      options.body = JSON.stringify(data);
-      headers['Content-Type'] = 'application/json';
-    } else if (formData) {
-      options.body = formData;
+    // if (data) {
+    //   options.body = JSON.stringify(data);
+    //   headers['Content-Type'] = 'application/json';
+    if (formData) {
+      options.data = formData;
     }
   }
   if (connected && signature) {
     headers['Publickey'] = publicKey;
     headers['Signature'] = signature;
   }
-  delete options.data;
+  // delete options.data;
   options.headers = headers;
-  let res = await fetch(url, options);
-  res = await res.json();
-  if ((res as any).code === -1) {
+  let res = await axios(url, options);
+  if ((res as any)?.data.code === -1) {
     // if ((res as any).msg === 'api signature verification failed' || (res as any).msg === 'public and signature parameters are required in the request headers') {
     //   await setSignature('');
     // }
-    throw (res as any).msg;
+    throw (res as any)?.data?.msg;
   }
-  return res as any;
+  return res?.data as any;
 };
 export const getOrdxAssets = async ({
   address,
@@ -80,6 +83,7 @@ interface GetOrders {
   assets_type?: string;
   address?: string;
   offset: number;
+  hide_locked?: boolean;
   size: number;
   sort?: number; // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
   type?: 1 | 2; // 1: 卖出订单 2: 买入订单， 当前只支持1（默认为1）
@@ -92,9 +96,19 @@ export const getOrders = async ({
   sort = 0,
   type = 1,
   address,
+  hide_locked,
 }: GetOrders) => {
   const res = await request('/ordx/GetOrders', {
-    data: { assets_name, assets_type, offset, size, sort, type, address },
+    data: {
+      assets_name,
+      assets_type,
+      offset,
+      size,
+      sort,
+      type,
+      address,
+      hide_locked,
+    },
   });
   return res;
 };

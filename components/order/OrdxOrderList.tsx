@@ -15,7 +15,8 @@ import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { SortDropdown } from '@/components/SortDropdown';
-import { useList } from 'react-use';
+import { ScrollContent } from '@/components/ScrollContent';
+import { useDebounce, useList } from 'react-use';
 
 interface OrdxOrderListProps {
   assets_name: string;
@@ -46,7 +47,7 @@ export const OrdxOrderList = ({
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(64);
+  const [size, setSize] = useState(32);
   const [sort, setSort] = useState(1);
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
@@ -73,21 +74,20 @@ export const OrdxOrderList = ({
       address,
       sort,
       assets_type,
+      hide_locked: true,
     }),
   );
-  const [list, { set, reset: resetList, updateAt, removeAt }] = useList<any>(
-    [],
-  );
+  const [list, { set, push: pushToList, removeAt }] = useList<any>([]);
   useEffect(() => {
     if (data) {
       const { order_list = [] } = data?.data || {};
-      if (hideStatus) {
-        set(order_list.filter((i) => i.locked !== 1));
-      } else {
+      if (page === 1) {
         set(order_list);
+      } else {
+        pushToList(...order_list);
       }
     }
-  }, [data, hideStatus]);
+  }, [data, hideStatus, page]);
 
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
@@ -109,37 +109,33 @@ export const OrdxOrderList = ({
       });
       return;
     }
-    const res = await cancelOrder({
-      address: address || storeAddress,
-      order_id: item.order_id,
-    });
-    if (res.code === 200) {
-      notification.success({
-        message: t('notification.order_cancel_success_title'),
-        description: t('notification.order_cancel_success_description_1'),
+    try {
+      const res = await cancelOrder({
+        address: address || storeAddress,
+        order_id: item.order_id,
       });
-      const index = list.findIndex((i) => i.utxo === item.utxo);
-      removeAt(index);
-    } else {
+      if (res.code === 200) {
+        notification.success({
+          message: t('notification.order_cancel_success_title'),
+          description: t('notification.order_cancel_success_description_1'),
+        });
+        const index = list.findIndex((i) => i.utxo === item.utxo);
+        removeAt(index);
+      } else {
+        notification.error({
+          message: t('notification.order_cancel_failed_title'),
+          description: res.msg,
+        });
+      }
+    } catch (error: any) {
       notification.error({
         message: t('notification.order_cancel_failed_title'),
-        description: res.msg,
+        description: error.msg,
       });
     }
   };
   const buyHandler = async (item) => {
     try {
-      // const orderDetail = await lockOrder({
-      //   address: storeAddress,
-      //   order_id: item.order_id,
-      // });
-      // if (!orderDetail?.data?.raw) {
-      //   notification.error({
-      //     message: t('notification.lock_order_failed_title'),
-      //     description: orderDetail.msg,
-      //   });
-      //   return;
-      // }
       addBuy({ ...item, status: 'pending' });
     } catch (error: any) {
       console.log(error);
@@ -180,14 +176,11 @@ export const OrdxOrderList = ({
   const onBuy = async (item: any) => {
     await buyHandler(item);
     setCanSelect(true);
-    // await unlockOrder({ address: storeAddress, order_id: item.order_id });
-    // const { raw } = orderDetail.data;
-    // setOrderRaw(raw);
-    // setModalVisiable(true);
   };
   const onBuySuccess = () => {
     mutate(swrKey);
   };
+
   const batchCloseHandler = async () => {
     setCanSelect(false);
     const listPromise = buyList.map((item) =>
@@ -213,11 +206,21 @@ export const OrdxOrderList = ({
       });
     }
   };
-  const totalPage = useMemo(
-    () => (data?.data?.total ? Math.ceil(data?.data?.total / size) : 0),
-    [data, size],
-  );
+  const filterList = useMemo(() => {
+    if (hideStatus) {
+      return list.filter((item) => item.locked === 0);
+    } else {
+      return list;
+    }
+  }, [list, hideStatus]);
   const total = useMemo(() => data?.data?.total || 0, [data]);
+  const finished = useMemo(() => {
+    return list.length >= total;
+  }, [total, list]);
+  const loadMore = () => {
+    setPage(page + 1);
+  };
+
   useEffect(() => {
     reset();
   }, []);
@@ -240,40 +243,34 @@ export const OrdxOrderList = ({
             ></SortDropdown>
           </div>
         )}
-        {!list.length && <Empty className="mt-10" />}
 
-        <div className="min-h-[30rem] flex flex-wrap justify-center md:gap-8 mb-4 gap-2">
-          {list.map((item: any, i) => (
-            <div key={item.order_id}>
-              <OrdxFtOrderItem
-                assets_name={assets_name}
-                assets_type={assets_type}
-                showResale={showResale}
-                canSelect={canSelect}
-                delay={i > 5 ? 2000 : 0}
-                selected={!!buyList.find((i) => i.utxo === item.utxo)}
-                item={item}
-                onCancelOrder={() => onCancelOrder(item)}
-                onSelect={(s) => selectHandler(s, item)}
-                onBuy={() => onBuy(item)}
-              />
-            </div>
-          ))}
-        </div>
+        <ScrollContent
+          loading={isLoading}
+          loadMore={loadMore}
+          finished={finished}
+          empty={!list.length}
+        >
+          <div className="min-h-[30rem] flex flex-wrap justify-center md:gap-8 mb-4 gap-2">
+            {filterList.map((item: any, i) => (
+              <div key={item.order_id}>
+                <OrdxFtOrderItem
+                  assets_name={assets_name}
+                  assets_type={assets_type}
+                  showResale={showResale}
+                  canSelect={canSelect}
+                  delay={i > 5 ? 2000 : 0}
+                  selected={!!buyList.find((i) => i.utxo === item.utxo)}
+                  item={item}
+                  onCancelOrder={() => onCancelOrder(item)}
+                  onSelect={(s) => selectHandler(s, item)}
+                  onBuy={() => onBuy(item)}
+                />
+              </div>
+            ))}
+          </div>
+        </ScrollContent>
       </Content>
-      {totalPage > 1 && (
-        <div className="flex justify-center">
-          <Pagination
-            total={totalPage}
-            page={page}
-            size={size}
-            onChange={(offset, size) => {
-              setPage(offset);
-              // setSize(size);
-            }}
-          />
-        </div>
-      )}
+
       {!!orderRaw && (
         <OrderBuyModal
           item={buyItem}

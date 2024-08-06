@@ -138,7 +138,7 @@ export const AssetsItem = ({
         >
           <span className="font-thin md:pl-8">{hideStr(item?.utxo, 6)}</span>
         </Snippet>
-        <div className="flex item-center pb-1 gap-2">
+        <div className="flex item-center justify-center pb-1 gap-2">
           {item.order_id === 0 ? (
             <>
               <Button
