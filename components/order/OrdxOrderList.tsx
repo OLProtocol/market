@@ -47,7 +47,7 @@ export const OrdxOrderList = ({
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(32);
   const [sort, setSort] = useState(1);
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
