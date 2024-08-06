@@ -83,6 +83,7 @@ interface GetOrders {
   assets_type?: string;
   address?: string;
   offset: number;
+  hide_locked?: boolean;
   size: number;
   sort?: number; // 0: 不排序 1: 价格升序 2: 价格降序 3: 时间升序 4: 时间降序
   type?: 1 | 2; // 1: 卖出订单 2: 买入订单， 当前只支持1（默认为1）
@@ -95,9 +96,19 @@ export const getOrders = async ({
   sort = 0,
   type = 1,
   address,
+  hide_locked,
 }: GetOrders) => {
   const res = await request('/ordx/GetOrders', {
-    data: { assets_name, assets_type, offset, size, sort, type, address },
+    data: {
+      assets_name,
+      assets_type,
+      offset,
+      size,
+      sort,
+      type,
+      address,
+      hide_locked,
+    },
   });
   return res;
 };
