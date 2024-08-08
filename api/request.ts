@@ -212,6 +212,16 @@ export const getBTCPrice = async () => {
   return res;
 };
 
+export const getAssetsAnalytics = async ({ assets_name, assets_type }: any) => {
+  const res = await request('/ordx/GetAssetsAnalytics', {
+    data: {
+      assets_name,
+      assets_type,
+    },
+  });
+  return res;
+};
+
 export const addChargedTask = async ({ address, fee, txid, type }: any) => {
   const res = await request('/ordx/AddChargedTask', {
     method: 'POST',
