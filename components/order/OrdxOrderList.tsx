@@ -47,7 +47,7 @@ export const OrdxOrderList = ({
   const [buyItem, setBuyItem] = useState<any>();
   const [orderRaw, setOrderRaw] = useState<any>();
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(32);
+  const [size, setSize] = useState(10);
   const [sort, setSort] = useState(1);
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
@@ -87,7 +87,7 @@ export const OrdxOrderList = ({
         pushToList(...order_list);
       }
     }
-  }, [data, hideStatus, page]);
+  }, [data, hideStatus]);
 
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
@@ -220,6 +220,7 @@ export const OrdxOrderList = ({
   const loadMore = () => {
     setPage(page + 1);
   };
+  console.log('list', list);
 
   useEffect(() => {
     reset();

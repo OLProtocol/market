@@ -5,6 +5,7 @@ import { Card, CardBody, Button, Avatar, Image } from '@nextui-org/react';
 import { getAssetsSummary } from '@/api';
 import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
+import { OrderAnalyze } from '@/components/order/OrderAnalyze';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useSearchParams } from 'next/navigation';
@@ -172,6 +173,9 @@ export default function Page() {
               assets_type={assets_type}
               showResale
             />
+          </Tab>
+          <Tab key="analyze" title={t('common.analyze')}>
+            <OrderAnalyze assets_name={ticker} assets_type={assets_type} />
           </Tab>
           <Tab key="history" title={t('common.tx_history')}>
             <OrdxOrderHistoryList

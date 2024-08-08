@@ -14,6 +14,8 @@ import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { useList } from 'react-use';
 import { Decimal } from 'decimal.js';
+import { ScrollContent } from '@/components/ScrollContent';
+
 interface Props {
   assets_name: string;
   assets_type: string;
@@ -33,7 +35,6 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
-  const [list, { set, reset: resetList, updateAt }] = useList<any>([]);
   const swrKey = useMemo(() => {
     return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${page}-${size}`;
   }, [address, page, size, assets_name, assets_type]);
@@ -52,18 +53,18 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
     });
   });
 
-  const total = useMemo(() => {
-    // if (data) {
-    //   console.log("OrdxUtxoList: data, total", data, data?.data?.total);
-    // }
-    return data?.data?.total ? Math.ceil(data?.data?.total / size) : 0;
-  }, [data]);
+  const [list, { set, reset: resetList, push: pushToList, updateAt }] =
+    useList<any>([]);
   useEffect(() => {
     if (data) {
-      console.log('OrdxUtxoList: data', data);
-      set(data?.data?.assets || []);
+      const { assets = [] } = data?.data || {};
+      if (page === 1) {
+        set(assets);
+      } else {
+        pushToList(...assets);
+      }
     }
-  }, [data, set]);
+  }, [data]);
 
   const toSell = () => {
     router.push('/account/sell');
@@ -140,6 +141,13 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
       });
     }
   };
+  const total = useMemo(() => data?.data?.total || 0, [data]);
+  const finished = useMemo(() => {
+    return list.length >= total;
+  }, [total, list]);
+  const loadMore = () => {
+    setPage(page + 1);
+  };
 
   useEffect(() => {
     reset();
@@ -147,8 +155,6 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
 
   useEffect(() => {
     if (assets_type || assets_name) {
-      // resetList();
-      // setCanSelect(false);
       trigger();
     }
   }, [page, size]);
@@ -162,11 +168,15 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
   }, [assets_type, assets_name]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
-      <Content loading={isLoading}>
-        {!list.length && <Empty className="mt-10" />}
+      <ScrollContent
+        loading={isLoading}
+        loadMore={loadMore}
+        finished={finished}
+        empty={!list.length}
+      >
         <div className="min-h-[30rem] flex flex-wrap justify-center gap-4 md:gap-6 mb-4">
           {list.map((item: any, i) => (
-            <div key={item.utxo + item.locked}>
+            <div key={item.utxo + i}>
               <AssetsItem
                 assets_name={assets_name}
                 assets_type={assets_type}
@@ -188,8 +198,8 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
             </div>
           ))}
         </div>
-      </Content>
-      {total > 1 && (
+      </ScrollContent>
+      {/* {total > 1 && (
         <div className="flex justify-center">
           <Pagination
             total={total}
@@ -200,7 +210,7 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
             }}
           />
         </div>
-      )}
+      )} */}
       {canSelect && (
         <BatchSellFooter
           actionType={type}
