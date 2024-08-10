@@ -34,9 +34,6 @@ export const ScrollContent = ({
   useDebounce(
     () => {
       const dis = document.documentElement.scrollHeight - y - height;
-      console.log(dis);
-      console.log(loading);
-      console.log(finished);
       if (dis < 100 && !loading && !finished) {
         loadMore?.();
       }

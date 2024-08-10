@@ -271,6 +271,8 @@ export const BatchBuyFooter = ({
   );
   useDebounce(
     () => {
+      console.log(selectSize);
+
       let _list = structuredClone(list);
       const len = _list.length;
       setRemoveOrderIds([]);
@@ -419,6 +421,7 @@ export const BatchBuyFooter = ({
                 size="sm"
                 step={1}
                 minValue={0}
+                maxValue={canSelectLength}
                 value={[selectSize]}
                 className="flex-1"
                 onChange={(e) => {
