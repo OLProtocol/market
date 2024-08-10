@@ -96,7 +96,7 @@ export const BatchBuyFooter = ({
   const canSelectLength = useMemo(() => {
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
-      1000,
+      32,
     );
   }, [assetsList]);
 
