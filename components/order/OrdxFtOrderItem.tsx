@@ -213,7 +213,7 @@ export const OrdxFtOrderItem = ({
               variant="flat"
               radius="sm"
               startContent={
-                item.locker == '1' ? (
+                item.locked == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
                 ) : null
               }
@@ -230,7 +230,7 @@ export const OrdxFtOrderItem = ({
               isLoading={loading}
               radius="sm"
               startContent={
-                item.locker == '1' ? (
+                item.locked == '1' ? (
                   <Icon icon="mdi:lock" className="text-lg" />
                 ) : null
               }
