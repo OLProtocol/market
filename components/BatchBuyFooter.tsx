@@ -84,6 +84,13 @@ export const BatchBuyFooter = ({
   useEffect(() => {
     if (lockData?.code === 200) {
       setRaws(lockData.data?.filter((v) => !!v.raw) || []);
+      const len = lockData.data?.length || 0;
+      for (let i = 0; i < lockData.data?.length; i++) {
+        const { raw, order_id } = lockData.data[i];
+        if (!raw) {
+          removeBuy(order_id);
+        }
+      }
     }
   }, [lockData]);
   const canSelectLength = useMemo(() => {
