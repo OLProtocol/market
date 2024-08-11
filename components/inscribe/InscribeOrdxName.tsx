@@ -168,9 +168,9 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
         <p className="text-gray-500 whitespace-pre-line">
           {t('pages.inscribe.name.description_1')}
         </p>
-        <p className="text-red-500 whitespace-pre-line">
+        {/* <p className="text-red-500 whitespace-pre-line">
           {t('pages.inscribe.name.description_2')}
-        </p>
+        </p> */}
       </div>
       <div className="mb-4">
         <div className="mb-2">
