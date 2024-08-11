@@ -5,10 +5,18 @@ import {
   convertUtxosToBtcUtxos,
   convertBtcUtxosToInputs,
 } from './utxo';
+import { Address, Script } from '@cmdcode/tapscript';
 import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
 
-export const isTaprootAddress = (address, network = 'mainnet') => {
+export function addresToScriptPublicKey(address: string) {
+  const scriptPublicKey = Script.fmt.toAsm(
+    Address.toScriptPubKey(address),
+  )?.[0];
+  return scriptPublicKey;
+}
+
+export function isTaprootAddress(address, network = 'mainnet') {
   try {
     // 通过 bitcoinjs-lib 检查
     const decoded = bitcoin.address.fromBech32(address);
@@ -25,9 +33,9 @@ export const isTaprootAddress = (address, network = 'mainnet') => {
     console.error(e);
     return false;
   }
-};
+}
 
-export const calcNetworkFee = async ({
+export async function calcNetworkFee({
   utxos,
   outputs,
   feeRate,
@@ -43,7 +51,7 @@ export const calcNetworkFee = async ({
   address: string;
   publicKey: string;
   suitable?: boolean;
-}) => {
+}) {
   const btcUtxos = convertUtxosToBtcUtxos({
     utxos,
     address,
@@ -65,9 +73,9 @@ export const calcNetworkFee = async ({
   });
   const fee = await tx.calNetworkFee();
   return fee;
-};
+}
 
-export const buildTransaction = async ({
+export async function buildTransaction({
   utxos,
   outputs,
   feeRate,
@@ -83,7 +91,7 @@ export const buildTransaction = async ({
   address: string;
   publicKey: string;
   suitable?: boolean;
-}) => {
+}) {
   const btcUtxos = convertUtxosToBtcUtxos({
     utxos,
     address,
@@ -107,4 +115,4 @@ export const buildTransaction = async ({
 
   const psbt = tx.toPsbt();
   return psbt;
-};
+}
