@@ -1,16 +1,5 @@
-import {
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  getKeyValue,
-  Snippet,
-  Avatar,
-  Button,
-} from '@nextui-org/react';
+'use client';
+import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import ProgressBar from '@/components/ProgressBar';
 import { useTranslation } from 'react-i18next';

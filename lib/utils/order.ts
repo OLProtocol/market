@@ -1,4 +1,4 @@
-import { Address, Script } from '@cmdcode/tapscript';
+import { addresToScriptPublicKey } from '../wallet/utils';
 import { btcToSats } from '@/lib/utils';
 import { parseUtxo } from './btc';
 import { tryit } from 'radash';
@@ -27,32 +27,25 @@ interface SellOrderProps {
   network: string;
   address: string;
 }
-export const addresToScriptPublicKey = (address: string) => {
-  const scriptPublicKey = Script.fmt.toAsm(
-    Address.toScriptPubKey(address),
-  )?.[0];
-  return scriptPublicKey;
-};
+
 interface BatchSellOrderProps {
   inscriptionUtxos: UtxoAssetItem[];
   network: string;
   address: string;
   unit: string;
 }
-export const buildBatchSellOrder = async ({
+export async function buildBatchSellOrder({
   inscriptionUtxos,
   network,
   address,
   unit,
-}: BatchSellOrderProps) => {
+}: BatchSellOrderProps) {
   console.log(
     'build batch sell order params',
     inscriptionUtxos,
     network,
     address,
   );
-  console.log(inscriptionUtxos);
-  console.log(address);
   const psbtNetwork = toPsbtNetwork(
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
@@ -83,14 +76,14 @@ export const buildBatchSellOrder = async ({
   }
   console.log(batchSell);
   return batchSell.toHex();
-};
+}
 
-export const buildTransferPsbt = async ({
+export async function buildTransferPsbt({
   inscriptionUtxos,
   utxos,
   addresses,
   feeRate,
-}: any) => {
+}: any) {
   const { btcWallet, network, address, publicKey } =
     useReactWalletStore.getState();
 
@@ -130,7 +123,7 @@ export const buildTransferPsbt = async ({
     suitable: true,
   });
   return psbt;
-};
+}
 
 export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
   console.log('split batch signed psbt', signedHex);
