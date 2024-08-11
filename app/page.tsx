@@ -32,7 +32,6 @@ export default function Home() {
   }, []);
   return (
     <div className="py-4">
-      1
       <div className="mb-4 w-full round-lg">
         <MintingTable
           rarepizza={rarePizzaDetail}
