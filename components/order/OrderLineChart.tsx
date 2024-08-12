@@ -21,6 +21,7 @@ export const OrderLineChart = ({ data = [] }: Props) => {
       .theme({
         type: 'classicDark',
       })
+      .data([])
       .encode('x', 'label')
       .encode('y', 'value')
       .scale('y', {
