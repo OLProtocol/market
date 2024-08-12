@@ -54,7 +54,7 @@ export const OrderPieChart = ({ data }: Props) => {
       .theme({
         type: 'classicDark',
       })
-      .data([])
+      .data(optimizeData)
       .interval()
       .transform({ type: 'stackY' })
       .encode('y', 'percentage')
