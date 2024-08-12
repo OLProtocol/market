@@ -84,12 +84,19 @@ export const BatchBuyFooter = ({
   useEffect(() => {
     if (lockData?.code === 200) {
       setRaws(lockData.data?.filter((v) => !!v.raw) || []);
+      const len = lockData.data?.length || 0;
+      for (let i = 0; i < lockData.data?.length; i++) {
+        const { raw, order_id } = lockData.data[i];
+        if (!raw) {
+          removeBuy(order_id);
+        }
+      }
     }
   }, [lockData]);
   const canSelectLength = useMemo(() => {
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
-      1000,
+      32,
     );
   }, [assetsList]);
 
@@ -271,6 +278,8 @@ export const BatchBuyFooter = ({
   );
   useDebounce(
     () => {
+      console.log(selectSize);
+
       let _list = structuredClone(list);
       const len = _list.length;
       setRemoveOrderIds([]);
@@ -405,9 +414,9 @@ export const BatchBuyFooter = ({
           onRemove={onRemoveItem}
         />
       )}
-      <div className="batch-sell-footer fixed bottom-0 w-full h-20 left-0 dark:bg-slate-900 bg-gray-100 z-[99]">
-        <div className="flex justify-between items-center w-full h-full px-4">
-          <div className="flex-1 flex items-center flex-wrap gap-4">
+      <div className="batch-sell-footer fixed bottom-0 w-full h-28 sm:h-20 left-0 dark:bg-slate-900 bg-gray-100 z-[99]">
+        <div className="flex gap-2 justify-center sm:justify-between items-center flex-col sm:flex-row w-full h-full px-4">
+          <div className="sm:flex-1 flex items-center flex-wrap gap-4">
             <div className="flex items-center gap-4 w-60">
               <Input
                 type="number"
@@ -419,6 +428,7 @@ export const BatchBuyFooter = ({
                 size="sm"
                 step={1}
                 minValue={0}
+                maxValue={canSelectLength}
                 value={[selectSize]}
                 className="flex-1"
                 onChange={(e) => {

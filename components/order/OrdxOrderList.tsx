@@ -136,7 +136,11 @@ export const OrdxOrderList = ({
   };
   const buyHandler = async (item) => {
     try {
-      addBuy({ ...item, status: 'pending' });
+      console.log(item);
+
+      if (item.locked === 0) {
+        addBuy({ ...item, status: 'pending' });
+      }
     } catch (error: any) {
       console.log(error);
       notification.error({
@@ -213,6 +217,8 @@ export const OrdxOrderList = ({
       return list;
     }
   }, [list, hideStatus]);
+  console.log('filterList', filterList);
+
   const total = useMemo(() => data?.data?.total || 0, [data]);
   const finished = useMemo(() => {
     return list.length >= total;
@@ -253,7 +259,7 @@ export const OrdxOrderList = ({
         >
           <div className="min-h-[30rem] flex flex-wrap justify-center md:gap-8 mb-4 gap-2">
             {filterList.map((item: any, i) => (
-              <div key={item.order_id}>
+              <div key={item.order_id + '_' + i}>
                 <OrdxFtOrderItem
                   assets_name={assets_name}
                   assets_type={assets_type}
@@ -283,7 +289,7 @@ export const OrdxOrderList = ({
       )}
       {canSelect && (
         <BatchBuyFooter
-          list={list}
+          list={filterList}
           onClose={batchCloseHandler}
           onSuccess={batchSuccessHandler}
         />

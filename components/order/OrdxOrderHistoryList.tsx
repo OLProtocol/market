@@ -182,7 +182,7 @@ export const OrdxOrderHistoryList = ({
         isHeaderSticky
         isStriped
         topContent={
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-4 flex-wrap">
             <div className="flex items-center">
               <span>{t('common.filter')}：</span>
               <SortDropdown
