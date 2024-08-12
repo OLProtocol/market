@@ -1,10 +1,7 @@
 'use client';
-
 import { useMemo, useEffect } from 'react';
-import BannerTop from '@/components/home/BannerTop';
 import { MintingTable } from '@/components/home/MintingTable';
 import { ordxSWR } from '@/api';
-import NamesTop from '@/components/home/NamesTop';
 
 export default function Home() {
   const { data: rarePizzaData, trigger: getRarePizza } = ordxSWR.useOrdxInfo({
@@ -35,12 +32,6 @@ export default function Home() {
   }, []);
   return (
     <div className="py-4">
-      <div>
-        <BannerTop detail={rarePizzaDetail} />
-      </div>
-      {/*       <div>
-        <NamesTop/>
-      </div> */}
       <div className="mb-4 w-full round-lg">
         <MintingTable
           rarepizza={rarePizzaDetail}

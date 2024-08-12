@@ -1,5 +1,5 @@
-export * from './order';
 export * from './btc';
+export * from './order';
 export * from './url';
 import { ordx } from '@/api';
 import { add, format } from 'date-fns';
@@ -58,9 +58,9 @@ export const removeObjectEmptyValue = (obj: any) => {
   return _obj;
 };
 
-export const thousandSeparator = (num: number) => {
+export function thousandSeparator(num: number) {
   return num?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
+}
 
 export const getTimeByHeight = async (height: number, network: string) => {
   const key = `height-time-${height}`;

@@ -1,11 +1,14 @@
 'use client';
 
-import { useMemo, useEffect, useRef, useState } from 'react';
+import { useMemo, useEffect, useRef, useState, use } from 'react';
 import { ButtonGroup, Button, RadioGroup, Radio } from '@nextui-org/react';
 import { getAssetsAnalytics } from '@/api';
 import { Chart } from '@antv/g2';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { OrderPieChart } from './OrderPieChart';
+import { OrderLineChart } from './OrderLineChart';
 import useSWR from 'swr';
+import { ContentLoading } from '@/components/ContentLoading';
 
 interface OrderAnalyzeProps {
   assets_name: string;
@@ -15,10 +18,8 @@ export const OrderAnalyze = ({
   assets_name,
   assets_type,
 }: OrderAnalyzeProps) => {
-  const container = useRef(null);
-  const chart = useRef<any>(null);
   const [type, setType] = useState('24h');
-  const [valueType, setValueType] = useState('volume');
+  const [valueType, setValueType] = useState('avg_price');
   const { network } = useReactWalletStore();
   const swrKey = useMemo(() => {
     return `getAssetsAnalytics-${assets_name}-${assets_type}-${network}`;
@@ -33,113 +34,104 @@ export const OrderAnalyze = ({
   );
   const dataSource = useMemo(() => {
     if (type === '24h') {
-      return (
-        data?.data?.items_24hours
-          ?.filter((i) => !!i)
-          ?.map((item) => ({
-            label: `${item.date?.replace(/^\d{4}-/, '')} ${item.time}`,
-            value: valueType === 'volume' ? item.volume : item.avg_price,
-          })) || []
-      );
-    } else {
-      console.log(data?.data?.items_30days);
-
-      return (
-        data?.data?.items_30days
-          ?.filter((i) => !!i)
-          ?.map((item) => ({
-            label: item.date,
-            value: valueType === 'volume' ? item.volume : item.avg_price,
-          })) || []
-      );
+      return data?.data?.items_24hours?.filter(Boolean) || [];
+    } else if (type === '7d') {
+      return data?.data?.items_30days?.slice(-7)?.filter(Boolean) || [];
+    } else if (type === '30d') {
+      return data?.data?.items_30days?.filter(Boolean) || [];
     }
   }, [data, type, valueType]);
-  const scale = {
-    price: {
-      min: 0,
-      max: 1.5,
-    },
-    year: {
-      range: [0.05, 0.95],
-    },
-  };
-  function renderLineChart(container) {
-    // 如上
-    const chart = new Chart({
-      container: container,
-      autoFit: true,
-    });
+  const lineChartData = useMemo(() => {
+    const lineArr: any[] = [];
+    console.log('dataSource', dataSource);
+    for (let i = 0; i < dataSource.length; i++) {
+      const item = dataSource[i];
+      const label =
+        type === '24h' ? item.time : item.date?.replace(/^\d{4}-/, '');
+      let value = item.avg_price;
+      const volume = item.volume;
+      let realValue = value;
+      if (i > 0 && (value === undefined || value <= 0)) {
+        console.log(value);
 
-    chart
-      .theme({
-        type: 'classicDark',
-      })
-      .data(dataSource)
-      .encode('x', 'label')
-      .encode('y', 'value')
-      .scale('y', {
-        nice: true,
-      })
-      .scale('x', {
-        nice: true,
-      })
-      .axis('x', {
-        labelAutoRotate: false,
-        title: null,
-      })
-      .axis('y', {
-        title: null,
-      });
-    // .axis('y', { labelFormatter: (d) => d + '°C' });
-
-    chart.line().encode('shape', 'smooth').style({
-      stroke: '#F7931A',
-    });
-
-    chart.render();
-
-    return chart;
-  }
-
-  function updateLineChart(chart) {
-    if (!dataSource.length) return;
-
-    chart.data(dataSource);
-
-    // 重新渲染
-    chart.render();
-  }
-  useEffect(() => {
-    console.log(chart.current);
-
-    if (chart.current) {
-      updateLineChart(chart.current);
+        value = lineArr[i - 1].value;
+      }
+      const count = item.order_count;
+      lineArr.push({ label, value, count, realValue, volume });
     }
+    return lineArr;
+  }, [dataSource, valueType, type]);
+
+  const marketData = useMemo(() => {
+    let sat20_count = 0;
+    let me_count = 0;
+    let okx_count = 0;
+    let sat20_volume = 0;
+    let me_volume = 0;
+    let okx_volume = 0;
+    for (const item of dataSource) {
+      if (item.date) {
+        sat20_count += item.sat20.order_count;
+        me_count += item.magic_eden.order_count;
+        okx_count += item.okx.order_count;
+        sat20_volume += item.sat20.volume;
+        me_volume += item.magic_eden.volume;
+        okx_volume += item.okx.volume;
+      }
+    }
+    return [
+      {
+        id: 'sat20',
+        label: 'SAT20Market',
+        count: sat20_count,
+        volume: sat20_volume,
+      },
+      {
+        id: 'me',
+        label: 'Magiceden',
+        count: me_count,
+        volume: me_volume,
+      },
+      {
+        id: 'okx',
+        label: 'OKX',
+        count: okx_count,
+        volume: okx_volume,
+      },
+    ];
   }, [dataSource]);
-  useEffect(() => {
-    if (!chart.current) {
-      chart.current = renderLineChart(container.current);
-    }
-  }, []);
+
+  const types = [
+    {
+      label: '24h',
+      value: '24h',
+    },
+    {
+      label: '7d',
+      value: '7d',
+    },
+    {
+      label: '30d',
+      value: '30d',
+    },
+  ];
   return (
-    <div className="p-2">
-      <div className="flex justify-end items-center mb-4">
-        <ButtonGroup>
-          <Button
-            color={type === '24h' ? 'primary' : 'default'}
-            onClick={() => setType('24h')}
-          >
-            24h
-          </Button>
-          <Button
-            color={type === '30d' ? 'primary' : 'default'}
-            onClick={() => setType('30d')}
-          >
-            30d
-          </Button>
-        </ButtonGroup>
-      </div>
-      <div className="flex justify-end items-center mb-2">
+    <div className="p-2  max-w-[100rem]">
+      <ContentLoading loading={isLoading}>
+        <div className="flex justify-end items-center mb-4">
+          <ButtonGroup>
+            {types.map((item) => (
+              <Button
+                key={item.value}
+                color={type === item.value ? 'primary' : 'default'}
+                onClick={() => setType(item.value)}
+              >
+                {item.label}
+              </Button>
+            ))}
+          </ButtonGroup>
+        </div>
+        {/* <div className="flex justify-end items-center mb-2">
         <RadioGroup
           onValueChange={setValueType}
           orientation="horizontal"
@@ -148,8 +140,12 @@ export const OrderAnalyze = ({
           <Radio value="volume">Volume</Radio>
           <Radio value="aavg_pricevg">Avg Price</Radio>
         </RadioGroup>
-      </div>
-      <div className="w-full max-w-full" ref={container}></div>
+      </div> */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-2">
+          <OrderLineChart data={lineChartData} />
+          <OrderPieChart data={marketData} />
+        </div>
+      </ContentLoading>
     </div>
   );
 };

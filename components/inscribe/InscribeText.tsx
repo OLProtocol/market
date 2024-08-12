@@ -67,8 +67,11 @@ export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
       </div> */}
       <div className="mb-2">
         <Textarea
+          disableAnimation
           disableAutosize
-          rows={5}
+          classNames={{
+            input: 'resize-y min-h-[140px]',
+          }}
           placeholder={t('pages.inscribe.text.textarea_placeholder')}
           value={data.text}
           onChange={(e) => set('text', e.target.value)}

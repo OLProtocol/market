@@ -1,16 +1,5 @@
-import {
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  getKeyValue,
-  Snippet,
-  Avatar,
-  Button,
-} from '@nextui-org/react';
+'use client';
+import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import ProgressBar from '@/components/ProgressBar';
 import { useTranslation } from 'react-i18next';
@@ -76,7 +65,7 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
             </td>
             <td>
               <Button
-                className="flex-1 text-xs h-7 w-16 md:text-2xl font-bold md:h-10 md:w-32  bg-indigo-500/50 md:uppercase"
+                className="flex-1 text-xs h-7 w-16  font-bold md:h-10 md:w-32  bg-indigo-500/50 md:uppercase"
                 variant="flat"
                 radius="sm"
               >
@@ -100,7 +89,7 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
             </td>
             <td>
               <Button
-                className="flex-1 text-xs h-7 w-16 md:text-2xl font-bold md:h-10 md:w-32 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:to-indigo-500 hover:via-purple-500 hover:from-pink-500 md:uppercase"
+                className="flex-1 text-xs h-7 w-16  font-bold md:h-10 md:w-32 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:to-indigo-500 hover:via-purple-500 hover:from-pink-500 md:uppercase"
                 variant="flat"
                 radius="sm"
                 onClick={() => toMint({ type: 'ordx', ticker: 'jades' })}
@@ -125,7 +114,7 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
             </td>
             <td>
               <Button
-                className="flex-1 text-xs h-7 w-16 md:text-2xl font-bold md:h-10 md:w-32 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:to-indigo-500 hover:via-purple-500 hover:from-pink-500 md:uppercase"
+                className="flex-1 text-xs h-7 w-16  font-bold md:h-10 md:w-32 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:to-indigo-500 hover:via-purple-500 hover:from-pink-500 md:uppercase"
                 variant="flat"
                 radius="sm"
                 onClick={() => toMint({ type: 'name', ticker: '' })}
