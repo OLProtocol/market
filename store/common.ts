@@ -6,12 +6,14 @@ interface CommonState {
     value: number;
     type?: string;
   };
+  network: string;
   btcHeight: number;
   btcPrice: number;
   discount: number;
   appVersion: number;
   signature?: string;
   runtimeEnv: string;
+  changeNetwork: (network: string) => void;
   setAppVersion: (version: number) => void;
   setEnv: (env: string) => void;
   setBtcPrice: (b: number) => void;
@@ -30,6 +32,7 @@ export const useCommonStore = create<CommonState>()(
           value: 1,
           type: 'custom',
         },
+        network: 'livenet',
         discount: 0,
         btcHeight: 0,
         runtimeEnv: 'dev',
@@ -39,6 +42,11 @@ export const useCommonStore = create<CommonState>()(
         setEnv: (env) => {
           set({
             runtimeEnv: env,
+          });
+        },
+        changeNetwork: (network) => {
+          set({
+            network,
           });
         },
         setAppVersion: (version) => {

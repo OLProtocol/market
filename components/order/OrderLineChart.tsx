@@ -1,5 +1,6 @@
 'use client';
 
+import { satsToBitcoin } from '@/lib/utils';
 import { useMemo, useEffect, useRef, useState, use } from 'react';
 import { Chart } from '@antv/g2';
 
@@ -21,13 +22,17 @@ export const OrderLineChart = ({ data = [] }: Props) => {
       .theme({
         type: 'classicDark',
       })
-      .data(data)
+      .data(data, {
+        value: {
+          min: 0,
+        },
+      })
       .encode('x', 'label')
       .encode('y', 'value')
-      .scale('y', {
+      .scale('x', {
         nice: true,
       })
-      .scale('x', {
+      .scale('y', {
         nice: true,
       })
       .axis('x', {
@@ -45,14 +50,26 @@ export const OrderLineChart = ({ data = [] }: Props) => {
       .style('size', 30)
       .style('inset', 2)
       .style('maxWidth', 10)
-      .axis('y', { position: 'right', line: false, tick: false, label: false })
+      .scale('y', { independent: true, domainMin: 0 })
+      .axis('y', {
+        position: 'right',
+        line: false,
+        tick: false,
+        label: false,
+        grid: false,
+      })
       .tooltip((d) => {
         return {
           title: d.label,
           name: 'Valume',
-          value: d.volume ? d.volume.toString() : '-',
+          value: d.volume ? `${satsToBitcoin(d.volume)} btc` : '-',
         };
-      });
+      })
+      .tooltip((d) => ({
+        color: false,
+        name: 'Sales',
+        value: d.count ? d.count : '-',
+      }));
 
     chart
       .line()
@@ -60,18 +77,15 @@ export const OrderLineChart = ({ data = [] }: Props) => {
       .style({
         stroke: '#F7931A',
       })
-      .scale('y', { independent: true })
+      .scale('y', { independent: true, domainMin: 0 })
       .axis('y', {
         position: 'left',
+        grid: false,
       })
-      .tooltip((d) => {
-        return {
-          title: d.label,
-          name: 'Avg Price',
-          value: d.realValue ? d.realValue.toString() : '-',
-        };
-      });
-
+      .tooltip((d) => ({
+        name: 'Avg Price',
+        value: d.realValue ? `${d.realValue} sat` : '-',
+      }));
     chart.render();
     return chart;
   }
