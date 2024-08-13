@@ -81,7 +81,7 @@ export const useBuyStore = create<BuyState>()(
     },
     add: (item) => {
       const { list } = get();
-      if (!list.find((i) => i.utxo === item.utxo)) {
+      if (!list.find((i) => i.utxo === item.utxo) && list.length < 32) {
         set((state) => {
           return {
             list: [...state.list, item],
