@@ -1,4 +1,12 @@
-import { Button, Input, Slider } from '@nextui-org/react';
+import {
+  Button,
+  Input,
+  Slider,
+  Popover,
+  PopoverContent,
+  Checkbox,
+  PopoverTrigger,
+} from '@nextui-org/react';
 import { useBuyStore } from '@/store';
 import { Icon } from '@iconify/react';
 import { BatchCart } from './BatchCart';
@@ -47,6 +55,8 @@ export const BatchBuyFooter = ({
   ) {
     minServiceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
+  const [selectMaxPrice, setSelectMaxPrice] = useState(false);
+  const [maxPurchasePrice, setMaxPurchasePrice] = useState<any>();
   const [raws, setRaws] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
@@ -298,7 +308,13 @@ export const BatchBuyFooter = ({
             item.address !== address &&
             _list.findIndex((v) => v.order_id === item.order_id) === -1
           ) {
-            _list.push(item);
+            if (selectMaxPrice) {
+              if (item.price <= Number(maxPurchasePrice)) {
+                _list.push(item);
+              }
+            } else {
+              _list.push(item);
+            }
           }
         }
       }
@@ -405,7 +421,7 @@ export const BatchBuyFooter = ({
 
   return (
     <>
-      {show && list.length && (
+      {show && list.length > 0 && (
         <BatchCart
           splitDummyBol={splitDummyBol}
           networkFee={networkFee}
@@ -435,6 +451,45 @@ export const BatchBuyFooter = ({
                   setSelectSize(isNaN(e[0]) ? 0 : e[0]);
                 }}
               />
+              <Popover placement="top">
+                <PopoverTrigger>
+                  <Button
+                    variant="light"
+                    isIconOnly
+                    color="primary"
+                    aria-label="Like"
+                  >
+                    <Icon icon="solar:settings-bold" className="text-xl" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <div className="flex items-center gap-6 py-2 px-1">
+                    <Checkbox
+                      size="sm"
+                      className="text-xs"
+                      isSelected={selectMaxPrice}
+                      onValueChange={(e) => setSelectMaxPrice(e)}
+                    >
+                      最高扫货价格
+                    </Checkbox>
+                    <Input
+                      classNames={{
+                        input: 'text-right',
+                      }}
+                      size="sm"
+                      isDisabled={!selectMaxPrice}
+                      type="number"
+                      className="w-28"
+                      value={maxPurchasePrice}
+                      onValueChange={(e) => {
+                        console.log(e);
+                        setMaxPurchasePrice(e);
+                      }}
+                      endContent="BTC"
+                    ></Input>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <div className="flex gap-2 items-center">

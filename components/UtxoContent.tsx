@@ -74,7 +74,7 @@ export function UtxoContent({
   const onLoad = () => {
     setTimeout(() => {
       setLoaded(true);
-    }, 1000);
+    }, 1500);
   };
   const onError = () => {
     setLoaded(true);
@@ -108,8 +108,13 @@ export function UtxoContent({
       {showSpinner && (
         <>
           {!!defaultImage ? (
-            <div className="absolute top-0 left-0 w-full h-full z-[1] flex justify-center items-center">
-              <Image src={defaultImage} alt="loading image" radius="none" />
+            <div className="absolute top-0 left-0 w-full h-full z-[1] flex justify-center items-center backdrop-blur-lg bg-black bg-opacity-70">
+              <Image
+                radius="full"
+                src={defaultImage}
+                alt="loading image"
+                classNames={{ wrapper: 'w-1/2' }}
+              />
             </div>
           ) : (
             <div className="absolute top-0 left-0 w-full h-full dark:bg-gray-800 z-[1] bg-gray-100 flex justify-center items-center">
