@@ -21,6 +21,9 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
   const toMint = ({ type, ticker }) => {
     router.push('/inscribe?type=' + type + '&ticker=' + ticker);
   };
+  const toRarePizza = () => {
+    router.push('/ordx/ticker?ticker=RarePizza');
+  };
   const columns = [
     {
       key: 'ticker',
@@ -68,9 +71,10 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
                 className="flex-1 text-xs h-7 w-16  font-bold md:h-10 md:w-32  bg-indigo-500/50 md:uppercase"
                 variant="flat"
                 radius="sm"
+                onClick={() => toRarePizza()}
               >
-                completed
-              </Button>{' '}
+                Trade
+              </Button>
             </td>
           </tr>
           <tr className="h-16 md:h-18 py-4 text-sm md:text-xl border-b-1 border-slate-800">

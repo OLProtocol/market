@@ -10,7 +10,7 @@ const ProgressBar = ({ start, current, target, isdisplay }) => {
   return (
     <div className="w-full max-w-full text-xs bg-gray-600 rounded-full">
       <div
-        className="bg-purple-500 leading-none py-1 text-center text-white rounded-full"
+        className="bg-purple-500 leading-none py-1 text-center text-white rounded-full max-w-full"
         style={{ width: `${percentage}%` }}
       >
         {isdisplay && <div>{percentage}%</div>}
