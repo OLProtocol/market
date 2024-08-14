@@ -38,7 +38,6 @@ export default function Market() {
       { label: t('common.time_1D'), value: 1 },
       { label: t('common.time_7D'), value: 7 },
       { label: t('common.time_30D'), value: 30 },
-      { label: t('common.time_all_time'), value: 0 },
     ],
     [i18n.language],
   );
