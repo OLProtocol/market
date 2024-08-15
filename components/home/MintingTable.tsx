@@ -22,7 +22,7 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
     router.push('/inscribe?type=' + type + '&ticker=' + ticker);
   };
   const toRarePizza = () => {
-    router.push('/ordx/ticker?ticker=RarePizza');
+    router.push('/ordx/ticker?ticker=rarepizza&assets_type=ticker');
   };
   const columns = [
     {
