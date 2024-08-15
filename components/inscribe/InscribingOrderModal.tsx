@@ -58,7 +58,7 @@ export const InscribingOrderModal = ({
   const [sendFee, setSendFee] = useState<number>();
   const [retryCount, setRetryCount] = useState(0);
   const [psbt, setPsbt] = useState<any>();
-  const { feeRate, discount } = useCommonStore();
+  const { feeRate } = useCommonStore();
   const {
     address: currentAccount,
     publicKey,

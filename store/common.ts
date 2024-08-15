@@ -9,7 +9,6 @@ interface CommonState {
   network: string;
   btcHeight: number;
   btcPrice: number;
-  discount: number;
   appVersion: number;
   signature?: string;
   runtimeEnv: string;
@@ -18,7 +17,6 @@ interface CommonState {
   setEnv: (env: string) => void;
   setBtcPrice: (b: number) => void;
   setHeight: (h: number) => void;
-  setDiscount: (d: number) => void;
   setSignature: (signature: string) => void;
   setFeeRate: (feeRate: any) => void;
   reset: () => void;
@@ -33,7 +31,6 @@ export const useCommonStore = create<CommonState>()(
           type: 'custom',
         },
         network: 'livenet',
-        discount: 0,
         btcHeight: 0,
         runtimeEnv: 'dev',
         btcPrice: 0,
@@ -57,11 +54,6 @@ export const useCommonStore = create<CommonState>()(
         setSignature: (signature) => {
           set({
             signature,
-          });
-        },
-        setDiscount: (d) => {
-          set({
-            discount: d,
           });
         },
         setFeeRate: (rate) => {

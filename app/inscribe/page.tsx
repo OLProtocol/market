@@ -31,6 +31,7 @@ export default function Inscribe() {
   const params = useSearchParams();
   const paramsType = (params.get('type') as string) || 'ordx';
   const { t } = useTranslation();
+  const [discount, setDiscount] = useState(0);
   const [metadata, setMetadata] = useState<any>({});
   const [step, setStep] = useState(1);
   const [tab, setTab] = useState<any>(paramsType);
@@ -391,6 +392,7 @@ export default function Inscribe() {
     setMetadata({
       type: list[0].type,
       hasDeployFile,
+      tick: ordxData.tick,
       ordxType: list[0].ordxType,
       isSpecial: list[0].isSpecial,
       specialOffsetAmount,
@@ -542,6 +544,9 @@ export default function Inscribe() {
       label: t('pages.inscribe.files.name'),
     },
   ];
+  const onDiscount = (d) => {
+    setDiscount(d);
+  };
   // useEffect(() => {
   //   if (state?.type) {
   //     setTab(state.type);
@@ -593,13 +598,16 @@ export default function Inscribe() {
                 <InscribeStepTwo
                   list={list}
                   type={tab}
+                  metadata={metadata}
                   onBack={stepTwoBack}
                   onNext={stepTwoNext}
+                  onDiscount={onDiscount}
                 />
               )}
               {step === 3 && (
                 <InscribeStepThree
                   metadata={metadata}
+                  discount={discount}
                   onItemRemove={onItemRemove}
                   onRemoveAll={onRemoveAll}
                   onAddOrder={onAddOrder}

@@ -1,6 +1,5 @@
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import * as blockStream from './blockStream';
 import { ordx } from './ordx';
 const useSatTypes = ({ network }: any) => {
   const { data, error, isLoading } = useSWR(
