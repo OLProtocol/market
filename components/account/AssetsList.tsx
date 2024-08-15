@@ -1,14 +1,11 @@
 'use client';
 
-import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { notification, Empty } from 'antd';
 import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSellStore } from '@/store';
-import { Pagination } from '@/components/Pagination';
-import { Content } from '@/components/Content';
 import { AssetsItem } from '@/components/assets/AssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';

@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 interface Brc20SetpOneProps {
   list: any[];
   type: any;
+  discount: number;
   metadata: any;
   ordxUtxo?: any;
   onItemRemove?: (index: number) => void;
@@ -31,11 +32,12 @@ export const InscribeStepThree = ({
   ordxUtxo,
   onItemRemove,
   metadata,
+  discount,
   onAddOrder,
   onRemoveAll,
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
-  const { feeRate, discount, btcHeight } = useCommonStore((state) => state);
+  const { feeRate, btcHeight } = useCommonStore((state) => state);
   const [errText, setErrText] = useState('');
   const {
     network,
