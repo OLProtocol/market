@@ -1,5 +1,6 @@
 {
   "tick": "Ticker",
+  "notice": "Notice",
   "assets_name": "Assets Name",
   "domain_name": "Domain Name",
   "deploy": "Deploy",

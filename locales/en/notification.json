@@ -23,5 +23,6 @@
   "transaction_title": "Transaction",
   "transaction_spilt_success": "Split & Send success",
   "transaction_spilt_fail": "Split & Send failed",
-  "search_sats_title": "Search sats"
+  "search_sats_title": "Search sats",
+  "website_notice": "市场将于 2022 年 8 月 22 日 14:00 至 20:00 进行系统升级维护。期间，市场交易可能会受到影响，由此带来的不便敬请谅解。恢复时间将通过官方推特第一时间通知，感谢您的理解与支持。"
 }

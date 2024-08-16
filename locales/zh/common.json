@@ -1,5 +1,6 @@
 {
   "tick": "Ticker",
+  "notice": "通知",
   "assets_name": "资产",
   "domain_name": "域名",
   "price": "价格",
