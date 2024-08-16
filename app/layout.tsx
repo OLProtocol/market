@@ -8,6 +8,7 @@ import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
 import '@/locales';
 import { useCommonStore } from '@/store';
+import { useTranslation } from 'react-i18next';
 import { Avatar, Image, Link } from '@nextui-org/react';
 // import ParticleEffect from '@/components/ParticleEffect';
 
@@ -33,6 +34,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   const { appVersion } = useCommonStore();
   const contentList = [
     'https://ord-testnet4.ordx.space/content/68bcab296d2d81537f8e1032cd75043a54c9d14ddb468283fc78b24c7101b105i0?seed=85f086ce2d0de811',
@@ -78,6 +80,10 @@ export default function RootLayout({
           <div className="relative flex flex-col h-screen">
             {/* <ParticleEffect /> Add the ParticleEffect component here */}
             <Navbar />
+            <div className="max-w-[98vw] w-6xl mx-auto p-4 px-8 text-center rounded-xl bg-gray-800 my-2">
+              <span className="text-red-500">{t('common.notice')}：</span>
+              <span className="">{t('notification.website_notice')}</span>
+            </div>
             <main className="mx-auto w-full px-2 md:px-4 flex-grow">
               {children}
             </main>

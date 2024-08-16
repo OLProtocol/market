@@ -23,5 +23,6 @@
   "transaction_title": "交易",
   "transaction_spilt_success": "拆分及转账成功",
   "transaction_spilt_fail": "拆分及转账失败",
-  "search_sats_title": "搜索聪"
+  "search_sats_title": "搜索聪",
+  "website_notice": "The market will undergo system upgrade maintenance from 14:00 to 20:00 on August 22, 2022. During this period, market transactions may be affected. We apologize for the inconvenience. The recovery time will be notified as soon as possible through the official Twitter account. Thank you for your understanding and support."
 }
