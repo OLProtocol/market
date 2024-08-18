@@ -79,7 +79,7 @@ export default function RootLayout({
           <div className="relative flex flex-col h-screen">
             {/* <ParticleEffect /> Add the ParticleEffect component here */}
             <Navbar />
-            <SystemNoticeModal />
+            {/* <SystemNoticeModal /> */}
             <main className="mx-auto w-full px-2 md:px-4 flex-grow">
               {children}
             </main>
