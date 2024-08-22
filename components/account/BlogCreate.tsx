@@ -92,7 +92,9 @@ export function BlogCreate() {
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
-    return !templateInscriptionId || prevInscriptionId == templateInscriptionId;
+    return (
+      !!templateInscriptionId && prevInscriptionId == templateInscriptionId
+    );
   }, [templateInscriptionId]);
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
