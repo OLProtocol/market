@@ -15,7 +15,6 @@ export const InscribeFiles = ({ onChange }: InscribeFilesProps) => {
   const { t } = useTranslation();
   const [originFiles, setOriginFiles] = useState<any[]>([]);
   const filesChange: UploadProps['onChange'] = ({ file, fileList }) => {
-    console.log(file, fileList);
     const originFiles = fileList.map((f) => f.originFileObj);
     onChange?.(originFiles);
     setOriginFiles(originFiles);

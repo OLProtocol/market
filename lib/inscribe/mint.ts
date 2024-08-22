@@ -239,6 +239,22 @@ export const generateSeedByUtxos = (utxos: any[], amount) => {
   amount = Math.max(amount, 546);
   return generateSeed(selectAmountRangesByUtxos(utxos, amount));
 };
+export const generateRuneFiles = async (list: any[]) => {
+  const files: any[] = [];
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    const file = {
+      type: item.type,
+      action: item.action,
+      runeId: item.runeId,
+      runeName: item.runeName,
+      amount: item.amount,
+      show: `${item.runeName} (${item.amount})`,
+    };
+    files.push(file);
+  }
+  return files;
+};
 export const generteFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {

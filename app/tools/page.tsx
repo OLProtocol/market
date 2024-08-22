@@ -24,15 +24,15 @@ export default function ToolsPage() {
   };
 
   const tools = [
-    // {
-    //   name: 'T',
-    //   icon: '/icon/t1.png',
-    //   title: t('pages.tools.transaction.title'),
-    //   desc: t('pages.tools.transaction.description'),
-    //   path: '/tools/transaction',
-    //   type: 'route',
-    //   btnText: t('pages.tools.transaction.btn_split'),
-    // },
+    {
+      name: 'T',
+      icon: '/icon/t1.png',
+      title: t('pages.tools.transaction.title'),
+      desc: t('pages.tools.transaction.description'),
+      path: '/tools/transaction',
+      type: 'route',
+      btnText: t('pages.tools.transaction.btn_split'),
+    },
     {
       name: 'R',
       icon: '/icon/t3.png',

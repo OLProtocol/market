@@ -14,6 +14,7 @@
   "selfmint": "铸造比例",
   "max": "总量",
   "source": "来源",
+  "my_blog": "博客",
   "rarity": "稀有度",
   "deploy_time": "部署时间",
   "deploy_height": "部署高度",
