@@ -12,6 +12,7 @@ import { InscribeFiles } from '@/components/inscribe/InscribeFiles';
 import { InscribeOrdxName } from '@/components/inscribe/InscribeOrdxName';
 import { InscribeStepTwo } from '@/components/inscribe/InscribeStepTwo';
 import { InscribeStepThree } from '@/components/inscribe/InscribeStepThree';
+import { InscribeRune } from '@/components/inscribe/InscribeRune';
 import { useMap, useList } from 'react-use';
 import { InscribingOrderModal } from '@/components/inscribe/InscribingOrderModal';
 import {
@@ -20,7 +21,9 @@ import {
   splitRareUtxosByValue,
   generateSeed,
   splitUtxosByValue,
+  generateRuneFiles,
 } from '@/lib/inscribe';
+import { useInscribeStore } from '@/store';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { OrderList } from '@/components/inscribe/OrderList';
@@ -29,6 +32,7 @@ type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
 export default function Inscribe() {
   const params = useSearchParams();
+  const { inscribeData, reset: resetInscribeData } = useInscribeStore();
   const paramsType = (params.get('type') as string) || 'ordx';
   const { t } = useTranslation();
   const [metadata, setMetadata] = useState<any>({});
@@ -97,6 +101,14 @@ export default function Inscribe() {
     name: '',
     names: [],
     suffix: '.ordx',
+  });
+  const [runeData, { set: setRuneData, reset: resetRune }] = useMap<any>({
+    type: 'rune',
+    action: 'mint',
+    runeId: '1:0',
+    runeName: 'UNCOMMON•GOODS',
+    amount: '1',
+    repeat: 1,
   });
   const brc20Change = (data: any) => {
     setBrc20('type', data.type);
@@ -409,6 +421,8 @@ export default function Inscribe() {
   };
   const textNext = async () => {
     const list: any = [];
+    console.log(textData);
+
     if (textData.type === 'single') {
       list.push({
         type: 'text',
@@ -451,10 +465,34 @@ export default function Inscribe() {
       amount: 330,
       value: file,
     }));
+    console.log(list);
+
     const _files = await generteFiles(list);
     setList(_files);
     setStep(3);
   };
+  useEffect(() => {
+    if (inscribeData.type == 'file') {
+      filesChange([inscribeData.file]);
+    } else if (inscribeData.type == 'text') {
+      console.log('inscribeData', inscribeData);
+      generteFiles([
+        {
+          type: 'text',
+          amount: 330,
+          value: inscribeData.text,
+          offset: 0,
+        },
+      ]).then((files) => {
+        console.log(textData.utxos);
+        setMetadata({
+          type: 'text',
+        });
+        setList(files);
+        setStep(2);
+      });
+    }
+  }, [inscribeData]);
   const filesNext = () => {
     const list: any = [];
     files.forEach((file) => {
@@ -468,20 +506,43 @@ export default function Inscribe() {
     // setList(list);
     // setStep(2);
   };
+  const onRuneChange = (data: any) => {
+    setRuneData('action', data.action);
+    setRuneData('runeId', data.runeId);
+    setRuneData('runeName', data.runeName);
+    setRuneData('amount', data.amount);
+    setRuneData('repeat', data.repeat);
+  };
+  const onRuneNext = async () => {
+    if (runeData.action === 'mint') {
+      const list: any = [];
+      for (let i = 0; i < runeData.repeat; i++) {
+        list.push({
+          type: 'rune',
+          action: runeData.action,
+          runeId: runeData.runeId,
+          runeName: runeData.runeName,
+          amount: runeData.amount,
+        });
+      }
+      const _files = await generateRuneFiles(list);
+      setMetadata({
+        type: 'rune',
+        runeId: runeData.runeId,
+        runeName: runeData.runeName,
+        amount: runeData.amount,
+      });
+      console.log(_files);
+
+      setList(_files);
+      setStep(2);
+    }
+  };
   const stepTwoNext = () => {
     setStep(3);
   };
   const stepTwoBack = () => {
     setStep(1);
-  };
-  const handleTabsChange = (e: any) => {
-    const value = e.target.value;
-    if (tab !== value) {
-      console.log(history);
-      history.replaceState(undefined, '');
-      setTab(value);
-      clearList();
-    }
   };
   const onItemRemove = async (index: number) => {
     await removeAt(index);
@@ -511,6 +572,8 @@ export default function Inscribe() {
     resetText();
     resetName();
     resetOrdx();
+    resetRune();
+    resetInscribeData();
     setMetadata({});
   };
   useEffect(() => {
@@ -519,6 +582,7 @@ export default function Inscribe() {
       resetText();
       resetName();
       resetOrdx();
+      resetInscribeData();
       setMetadata({});
     }
   }, [list]);
@@ -541,6 +605,10 @@ export default function Inscribe() {
       key: 'files',
       label: t('pages.inscribe.files.name'),
     },
+    // {
+    //   key: 'rune',
+    //   label: 'Rune',
+    // },
   ];
   // useEffect(() => {
   //   if (state?.type) {
@@ -586,6 +654,9 @@ export default function Inscribe() {
                       onChange={ordxNameChange}
                       onNext={ordxNameNext}
                     />
+                  )}
+                  {tab === 'rune' && (
+                    <InscribeRune onChange={onRuneChange} onNext={onRuneNext} />
                   )}
                 </>
               )}

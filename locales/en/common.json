@@ -12,6 +12,7 @@
   "content": "Content",
   "selfmint": "Self Mint",
   "max": "Max",
+  "my_blog": "Blog",
   "rarity": "Rarity",
   "deploy_time": "Deploy Time",
   "deploy_height": "Deploy Height",

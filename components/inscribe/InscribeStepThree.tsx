@@ -87,21 +87,6 @@ export const InscribeStepThree = ({
   const submit = async () => {
     if (loading) return;
     setErrText('');
-    const _files: any[] = files.map((f, i) => {
-      let a = f.amount;
-      let o = f.offset;
-      if (tightSelected) {
-        a = 1;
-        o = i;
-      }
-      return {
-        ...f,
-        amount: a,
-        offset: o,
-      };
-    });
-    console.log('_files', _files);
-    const secret = generatePrivateKey();
     const feeObj: any = {
       networkFee: 0,
       serviceFee: 0,
@@ -109,58 +94,77 @@ export const InscribeStepThree = ({
       discountServiceFee: 0,
       totalInscriptionSize: 0,
     };
-    const inscription = generateInscription({
-      metadata,
-      secret,
-      files: _files,
-      network,
-      feeRate: feeRate.value,
-    });
-    const outputLength = oneUtxo || tightSelected ? 1 : files.length;
-
-    const baseSize = 84;
-    const totalSize = baseSize + inscription.txsize;
-    const weight = baseSize * 3 + totalSize;
-    const txHeaderSize = 12; // 版本号 + 输入计数 + 输出计数 + 锁定时间 + 见证标记和标志
-    const inputSize = 41; // 每个输入的大小
-    const outputSize = 52; // 每个输出的大小
-    const witnessSize = inscription.txsize; // 每个输入的见证数据大小
-
-    const numInputs = 1;
-
-    // 计算原始大小
-    const rawSize =
-      txHeaderSize +
-      inputSize * numInputs +
-      outputSize * outputLength +
-      witnessSize;
-
-    // 计算剥离大小
-    const strippedSize =
-      txHeaderSize + inputSize * numInputs + outputSize * outputLength;
-
-    // 计算总权重
-    const totalWeight = strippedSize * 4 + witnessSize * numInputs;
+    const secret = generatePrivateKey();
+    let inscription;
     let _discount = discount;
-    // 计算虚拟大小
-    const vSize = totalWeight / 4;
-    console.log(`witnessSize: ${witnessSize} bytes`);
-    console.log(`Raw size: ${rawSize} bytes`);
-    console.log(`Stripped size: ${strippedSize} bytes`);
-    console.log(`Total weight: ${totalWeight} WU`);
-    console.log(`Virtual size: ${vSize} vBytes`);
+    let _files: any[] = [];
+    if (type === 'rune') {
+    } else {
+      _files = files.map((f, i) => {
+        let a = f.amount;
+        let o = f.offset;
+        if (tightSelected) {
+          a = 1;
+          o = i;
+        }
+        return {
+          ...f,
+          amount: a,
+          offset: o,
+        };
+      });
+      inscription = generateInscription({
+        metadata,
+        secret,
+        files: _files,
+        network,
+        feeRate: feeRate.value,
+      });
+      const outputLength = oneUtxo || tightSelected ? 1 : files.length;
 
-    feeObj.networkFee = Math.ceil(vSize * feeRate.value);
-    let totalFee = feeObj.networkFee + totalInscriptionSize;
-    const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
-    if (metadata.type === 'name' && btcHeight <= 856000) {
-      _discount = 100;
+      const baseSize = 84;
+      const totalSize = baseSize + inscription.txsize;
+      const weight = baseSize * 3 + totalSize;
+      const txHeaderSize = 12; // 版本号 + 输入计数 + 输出计数 + 锁定时间 + 见证标记和标志
+      const inputSize = 41; // 每个输入的大小
+      const outputSize = 52; // 每个输出的大小
+      const witnessSize = inscription.txsize; // 每个输入的见证数据大小
+
+      const numInputs = 1;
+
+      // 计算原始大小
+      const rawSize =
+        txHeaderSize +
+        inputSize * numInputs +
+        outputSize * outputLength +
+        witnessSize;
+
+      // 计算剥离大小
+      const strippedSize =
+        txHeaderSize + inputSize * numInputs + outputSize * outputLength;
+
+      // 计算总权重
+      const totalWeight = strippedSize * 4 + witnessSize * numInputs;
+
+      // 计算虚拟大小
+      const vSize = totalWeight / 4;
+      console.log(`witnessSize: ${witnessSize} bytes`);
+      console.log(`Raw size: ${rawSize} bytes`);
+      console.log(`Stripped size: ${strippedSize} bytes`);
+      console.log(`Total weight: ${totalWeight} WU`);
+      console.log(`Virtual size: ${vSize} vBytes`);
+
+      feeObj.networkFee = Math.ceil(vSize * feeRate.value);
+      let totalFee = feeObj.networkFee + totalInscriptionSize;
+      const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
+      if (metadata.type === 'name' && btcHeight <= 856000) {
+        _discount = 100;
+      }
+      feeObj.serviceFee = Math.ceil(oneFee);
+      feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
+      feeObj.totalInscriptionSize = totalInscriptionSize;
+      feeObj.totalFee = totalFee;
     }
-    feeObj.serviceFee = Math.ceil(oneFee);
-    feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
-    feeObj.totalInscriptionSize = totalInscriptionSize;
-    feeObj.totalFee = totalFee;
-
     const orderId = uuidV4();
     const toAddresses = toAddressList;
     console.log('toAddresses===========' + toAddresses);
@@ -268,7 +272,6 @@ export const InscribeStepThree = ({
   useEffect(() => {
     if (currentAccount) {
       set('toSingleAddress', currentAccount);
-      // set('toMultipleAddresses', data.toMultipleAddresses);
     }
   }, [currentAccount]);
   return (

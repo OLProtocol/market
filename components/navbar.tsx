@@ -114,8 +114,8 @@ export const Navbar = () => {
   const isActive = (href: string) => {
     return pathname === href;
   };
-  const navMenus = useMemo(
-    () => [
+  const navMenus = useMemo(() => {
+    const menus = [
       // {
       //   label: t('pages.home.title'),
       //   href: '/',
@@ -137,19 +137,22 @@ export const Navbar = () => {
         target: '_blank',
         isActive: true,
       },
-      // {
-      //   label: t('pages.tools.title'),
-      //   href: runtimeEnv === 'test' ? '/tools.html' : '/tools',
-      //   isActive: false,
-      // },
+
       {
         label: t('pages.my_assets.title'),
         href: runtimeEnv === 'test' ? '/account.html' : '/account',
         isActive: false,
       },
-    ],
-    [i18n.language, runtimeEnv],
-  );
+    ];
+    if (runtimeEnv !== 'prod') {
+      menus.push({
+        label: t('pages.tools.title'),
+        href: runtimeEnv === 'test' ? '/tools.html' : '/tools',
+        isActive: false,
+      });
+    }
+    return menus;
+  }, [i18n.language, runtimeEnv]);
   useEffect(() => {
     if (location.hostname.startsWith('test')) {
       setEnv('test');

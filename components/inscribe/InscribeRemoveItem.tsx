@@ -24,7 +24,8 @@ export const InscribeRemoveItem = ({
         {value}
       </div>
       <div className="flex items-center pr-2">
-        <span className="mr-2">{clacHexSize(hex)} B</span>
+        {!!hex && <span className="mr-2">{clacHexSize(hex)} B</span>}
+
         <Button onClick={onRemove} isIconOnly>
           <Icon icon="mdi:close-circle" className="text-lg" />
         </Button>

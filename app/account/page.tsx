@@ -9,6 +9,7 @@ import { OrdxOrderList } from '@/components/account/OrdxOrderList';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
+import { BlogCreate } from '@/components/account/BlogCreate';
 import { getAddressAssetsValue } from '@/api';
 
 export default function AccountPage() {
@@ -61,6 +62,9 @@ export default function AccountPage() {
         </Tab>
         <Tab key="bill" title={t('common.my_biils')}>
           <OrdxBillList />
+        </Tab>
+        <Tab key="bill" title={t('common.my_blog')}>
+          <BlogCreate />
         </Tab>
       </Tabs>
     </div>

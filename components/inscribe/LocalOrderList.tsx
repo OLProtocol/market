@@ -78,7 +78,6 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
       const orderStoreState = JSON.parse(orderStoreData);
       const localOrderList = orderStoreState.state?.list;
       if (localOrderList?.length) {
-        console.log('localOrderList', localOrderList);
         historyList = historyList.concat(localOrderList);
       }
     }
@@ -87,7 +86,6 @@ export const LocalOrderList = ({ onOrderClick }: LocalOrderListProps) => {
     for (let i = 0; i < len; i++) {
       const item = historyList[i];
       const dis = Date.now() - item.createAt;
-      console.log('dis', dis);
       if (
         ['pending', 'inscribe_success', 'timeout'].includes(item.status) &&
         dis > 1000 * 60 * 60 * 24 * 7
