@@ -10,11 +10,9 @@ import { thousandSeparator } from '@/lib/utils';
 export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
   const { data: heightData } = ordxSWR.useBtcHeight('livenet');
 
-  const startBlockHeight = 850282;
   const currentBlockHeight = useMemo(() => {
     return heightData?.data.height || 0;
   }, [heightData]);
-  const endBlockHeight = 853358;
 
   const router = useRouter();
   const { t, i18n } = useTranslation();
@@ -22,7 +20,7 @@ export const MintingTable = ({ rarepizza, jades, nsDetail }: any) => {
     router.push('/inscribe?type=' + type + '&ticker=' + ticker);
   };
   const toRarePizza = () => {
-    router.push('/ordx/ticker?ticker=RarePizza');
+    router.push('/ordx/ticker?ticker=rarepizza&assets_type=ticker');
   };
   const columns = [
     {
