@@ -27,9 +27,12 @@ export function BlogCreate() {
   };
   const mintTemplate = async () => {
     console.log('mint template');
+
     setInscribeData({
       type: 'file',
-      file: new File([blogTemplate], 'template.html', { type: 'text/html' }),
+      file: new File([blogTemplate(selectName)], 'template.html', {
+        type: 'text/html',
+      }),
       name: 'template.html',
     });
     nav.push('/inscribe');
