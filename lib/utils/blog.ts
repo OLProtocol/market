@@ -11,7 +11,7 @@ export const blogTemplate = `
     document.title = \`BLob | \${name}\`;
     const getTweets = async () => {
       try {
-        const res = await fetch(\`https://apiprd.ordx.space/mainnet/ns/values/${name}/blog\`)
+        const res = await fetch(\`https://apiprd.ordx.space/mainnet/ns/values/\${name}/blog\`)
         const data = await res.json()
         const a = data?.data?.kvs || [{ key: 'blog_1631455600', value: 'Hello World' }]
         return a.map(kv => ({
