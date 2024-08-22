@@ -8,6 +8,7 @@ import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
 import '@/locales';
 import { useCommonStore } from '@/store';
+import { SystemNoticeModal } from '@/components/SystemNoticeModal';
 import { Avatar, Image, Link } from '@nextui-org/react';
 // import ParticleEffect from '@/components/ParticleEffect';
 
@@ -78,6 +79,7 @@ export default function RootLayout({
           <div className="relative flex flex-col h-screen">
             {/* <ParticleEffect /> Add the ParticleEffect component here */}
             <Navbar />
+            {/* <SystemNoticeModal /> */}
             <main className="mx-auto w-full px-2 md:px-4 flex-grow">
               {children}
             </main>
