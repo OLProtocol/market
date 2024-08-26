@@ -4,7 +4,9 @@ import { devtools, persist } from 'zustand/middleware';
 interface BlogState {
   name: string;
   action: 'update' | 'create';
+  inscriptionId: string;
   content: string;
+  setInscriptionId: (id: string) => void;
   setName: (name: string) => void;
   setAction: (action: 'update' | 'create') => void;
   setContent: (content: string) => void;
@@ -16,6 +18,8 @@ export const useBlogStore = create<BlogState>()(
     name: '',
     action: 'create',
     content: '',
+    inscriptionId: '',
+    setInscriptionId: (id) => set({ inscriptionId: id }),
     setName: (name) => set({ name }),
     setAction: (action) => set({ action }),
     setContent: (content) => set({ content }),

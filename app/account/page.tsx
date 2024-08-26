@@ -28,6 +28,10 @@ export default function AccountPage() {
       revalidateOnReconnect: false,
     },
   );
+  const onTabChange = (k: any) => {
+    history.replaceState(null, '', `?source=${k}`);
+  };
+
   useEffect(() => {
     console.log(data);
     if (data?.data) {
@@ -42,6 +46,7 @@ export default function AccountPage() {
         color="primary"
         size="lg"
         variant="underlined"
+        onSelectionChange={onTabChange}
         classNames={{
           tabList:
             'gap-6 w-full relative rounded-none p-0 border-b border-divider',
@@ -63,7 +68,7 @@ export default function AccountPage() {
         <Tab key="bill" title={t('common.my_biils')}>
           <OrdxBillList />
         </Tab>
-        <Tab key="bill" title={t('common.my_blog')}>
+        <Tab key="blog" title={t('common.my_blog')}>
           <BlogCreate />
         </Tab>
       </Tabs>

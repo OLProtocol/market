@@ -23,8 +23,8 @@ import {
   splitUtxosByValue,
   generateRuneFiles,
 } from '@/lib/inscribe';
-import { useInscribeStore } from '@/store';
-import { useSearchParams } from 'next/navigation';
+import { useInscribeStore, useBlogStore } from '@/store';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { OrderList } from '@/components/inscribe/OrderList';
 // import { useCommonStore } from '@/store';
@@ -32,8 +32,11 @@ type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
 export default function Inscribe() {
   const params = useSearchParams();
+  const nav = useRouter();
   const { inscribeData, reset: resetInscribeData } = useInscribeStore();
+  const { setInscriptionId } = useBlogStore();
   const paramsType = (params.get('type') as string) || 'ordx';
+  const source = params.get('source');
   const { t } = useTranslation();
   const [discount, setDiscount] = useState(0);
   const [metadata, setMetadata] = useState<any>({});
@@ -563,8 +566,13 @@ export default function Inscribe() {
     setOrderId(undefined);
     setModalShow(false);
   };
-  const onFinished = () => {
+  const onFinished = (id) => {
     clear();
+    if (source === 'blog') {
+      setInscriptionId(id);
+      console.log('inscriptionId', id);
+      nav.back();
+    }
   };
   const onRemoveAll = () => {
     clear();
