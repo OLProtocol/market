@@ -12,7 +12,7 @@ const generateUrl = (url: string, network?: string) => {
   console.log('hostname', location.hostname);
 
   if (location.hostname.indexOf('test') > -1) {
-    url = url.replace('apiprd', 'apidev');
+    url = url.replace('apiprd', 'apiprd');
   } else if (location.hostname.indexOf('dev') > -1) {
     url = url.replace('apiprd', 'apidev');
   }

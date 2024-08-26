@@ -36,7 +36,7 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
     nav.push('/ordx/ticker?ticker=btc&assets_type=ns');
   };
   const toMint = () => {
-    nav.push('/inscribe?type=name&ticker=');
+    nav.push('/inscribe?type=name&source=blog');
   };
   const onSelectionChange = (name: any) => {
     setSelected(name);

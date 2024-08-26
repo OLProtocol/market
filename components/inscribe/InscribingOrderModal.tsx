@@ -39,7 +39,7 @@ import { useTranslation } from 'react-i18next';
 interface InscribingOrderMdaolProps {
   show: boolean;
   orderId: string;
-  onFinished?: () => void;
+  onFinished?: (id: string) => void;
   onClose?: () => void;
 }
 export const InscribingOrderModal = ({
@@ -392,7 +392,7 @@ export const InscribingOrderModal = ({
       });
       setLoading(false);
       setActiveStep(2);
-      onFinished?.();
+      onFinished?.(`${txid}i:0`);
     } catch (error: any) {
       console.error(error);
       if (btnStatus) {
@@ -444,6 +444,7 @@ export const InscribingOrderModal = ({
   }, []);
   const closeHandler = () => {
     if (!loading) {
+      onFinished?.(orderId);
       onClose?.();
     }
   };

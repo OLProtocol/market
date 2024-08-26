@@ -35,7 +35,7 @@ export function BlogCreate() {
       }),
       name: 'template.html',
     });
-    nav.push('/inscribe');
+    nav.push('/inscribe?srouce=blog');
   };
   const mintRouting = async () => {
     setInscribeData({
@@ -48,7 +48,7 @@ export function BlogCreate() {
         ord_index: templateInscriptionId,
       }),
     });
-    nav.push('/inscribe');
+    nav.push('/inscribe?srouce=blog');
   };
   const publishHandler = async () => {
     const params = {
@@ -92,9 +92,10 @@ export function BlogCreate() {
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
-    return (
-      !!templateInscriptionId && prevInscriptionId == templateInscriptionId
-    );
+    // return (
+    //   !!templateInscriptionId && prevInscriptionId == templateInscriptionId
+    // );
+    return false;
   }, [templateInscriptionId]);
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
