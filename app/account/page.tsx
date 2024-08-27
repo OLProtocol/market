@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { OrdxAssetsUtxoList } from '@/components/account/OrdxAssetsUtxoList';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
 import { OrdxOrderList } from '@/components/account/OrdxOrderList';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
@@ -14,7 +15,10 @@ import { getAddressAssetsValue } from '@/api';
 
 export default function AccountPage() {
   const { t } = useTranslation();
+  const params = useSearchParams();
+  const paramTab = params.get('source') || 'utxo';
   const { address, balance, network } = useReactWalletStore((state) => state);
+  const [tabKey, setTabKey] = useState(paramTab);
   const [totalSatValue, setTotalSatValue] = useState(0);
   const swrKey = useMemo(() => {
     return `/ordx/getAddressAssetsValue-${address}-${network}`;
@@ -29,6 +33,7 @@ export default function AccountPage() {
     },
   );
   const onTabChange = (k: any) => {
+    setTabKey(k);
     history.replaceState(null, '', `?source=${k}`);
   };
 
@@ -45,6 +50,7 @@ export default function AccountPage() {
         aria-label="Options"
         color="primary"
         size="lg"
+        selectedKey={tabKey}
         variant="underlined"
         onSelectionChange={onTabChange}
         classNames={{

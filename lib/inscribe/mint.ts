@@ -488,6 +488,26 @@ export const generateMultiScript = (
         script.push(...['OP_0', content, 'OP_ENDIF']);
       }
     });
+  } else if (meta.type === 'blog') {
+    const file = files[0];
+    const detaConent = serializeInscriptionId(meta.relateInscriptionId);
+    const offset = file.offset || 0;
+    const edcodeMetaData = cbor.encode(meta.blogMetadata);
+    script.push(...['OP_0', 'OP_IF', ec.encode('ord')]);
+    if (offset > 0) {
+      script.push(...['02', createLittleEndianInteger(offset)]);
+    }
+    script.push(
+      ...[
+        '07',
+        ec.encode('ordx'),
+        '05',
+        edcodeMetaData,
+        '0B',
+        detaConent,
+        'OP_ENDIF',
+      ],
+    );
   } else {
     files.forEach((file) => {
       const content = hexToBytes(file.hex);

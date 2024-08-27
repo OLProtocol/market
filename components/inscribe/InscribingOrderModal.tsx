@@ -444,7 +444,6 @@ export const InscribingOrderModal = ({
   }, []);
   const closeHandler = () => {
     if (!loading) {
-      onFinished?.(orderId);
       onClose?.();
     }
   };
