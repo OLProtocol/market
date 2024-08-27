@@ -47,27 +47,24 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
   }, [selected]);
   return (
     <div>
-      {empty ? (
-        <div className="flex gap-8 justify-center">
-          <Button color="primary" onClick={toBuy}>
-            Buy
-          </Button>
-          <Button color="primary" onClick={toMint}>
-            Inscribe
-          </Button>
-        </div>
-      ) : (
-        <Select
-          isLoading={loading}
-          placeholder="Select an Name"
-          selectedKeys={[selected]}
-          onChange={(e) => onSelectionChange(e.target.value)}
-        >
-          {list.map((item) => (
-            <SelectItem key={item.name}>{item.name}</SelectItem>
-          ))}
-        </Select>
-      )}
+      <Select
+        isLoading={loading}
+        placeholder="Select an Name"
+        selectedKeys={[selected]}
+        onChange={(e) => onSelectionChange(e.target.value)}
+      >
+        {list.map((item) => (
+          <SelectItem key={item.name}>{item.name}</SelectItem>
+        ))}
+      </Select>
+      <div className="flex gap-8 justify-center mt-2">
+        <Button color="primary" onClick={toBuy}>
+          Buy
+        </Button>
+        <Button color="primary" onClick={toMint}>
+          Inscribe
+        </Button>
+      </div>
     </div>
   );
 }
