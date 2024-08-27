@@ -54,6 +54,9 @@ export function BlogCreate() {
     // resetBlogStore()
     nav.push('/inscribe?source=blog');
   };
+  const preview = () => {
+    window.open(`https://${selectName}.mainnet.dev.ordx.space/`, '_blank');
+  };
   const publishHandler = async () => {
     const params = {
       p: 'sns',
@@ -161,6 +164,18 @@ export function BlogCreate() {
                 Mint Routing
               </Button>
             </div>
+          </div>
+          <div className="flex justify-center">
+            <Button
+              color="primary"
+              variant="light"
+              isDisabled={mintRoutingDisabled}
+              onClick={() => {
+                preview();
+              }}
+            >
+              预览: https://{selectName}.mainnet.dev.ordx.space/
+            </Button>
           </div>
           <div className="mb-4">
             <div className="mb-4">
