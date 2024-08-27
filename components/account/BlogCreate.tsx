@@ -79,10 +79,10 @@ export function BlogCreate() {
     setLoading(false);
     if (!err) {
       setCheckStatus(true);
-      const { kvs = [] } = res.data;
+      const { kvs = [] } = res.data || {};
       console.log('_id ', inscriptionId);
       const _id =
-        inscriptionId || kvs.find((kv) => kv.key === 'ord_index')?.value;
+        inscriptionId || kvs?.find((kv) => kv.key === 'ord_index')?.value;
       setTemplateInscriptionId(_id);
       setPrevInscriptionId(_id);
       setNaData(res.data);
