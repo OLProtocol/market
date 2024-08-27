@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { BlogNameSelect } from '@/components/BlogNameSelect';
-import { useInscribeStore } from '@/store';
+import { useInscribeStore, useBlogStore } from '@/store';
 import { ordx } from '@/api';
 import { tryit } from 'radash';
 import { blogTemplate } from '@/lib/utils/blog';
@@ -19,6 +19,7 @@ export function BlogCreate() {
   const [checkStatus, setCheckStatus] = useState(false);
   const [templateInscriptionId, setTemplateInscriptionId] = useState('');
   const [prevInscriptionId, setPrevInscriptionId] = useState('');
+  const { inscriptionId, reset: resetBlogStore } = useBlogStore();
   const { network } = useReactWalletStore();
   const { setData: setInscribeData } = useInscribeStore();
   const checkHandler = async () => {
@@ -26,16 +27,18 @@ export function BlogCreate() {
     await getNsName();
   };
   const mintTemplate = async () => {
-    console.log('mint template');
-
     setInscribeData({
-      type: 'file',
-      file: new File([blogTemplate(selectName)], 'template.html', {
-        type: 'text/html',
-      }),
-      name: 'template.html',
+      type: 'blog',
+      relateInscriptionId:
+        '39df601bd20f73b6731956c90d2b75d2d1efa75b7805f773df3568f8ac8b35a6i0',
+      metadata: {
+        op: 'update',
+        name: selectName,
+        key: 'template_blog',
+      },
+      text: 'template_blog',
     });
-    nav.push('/inscribe?srouce=blog');
+    nav.push('/inscribe?source=blog');
   };
   const mintRouting = async () => {
     setInscribeData({
@@ -48,7 +51,8 @@ export function BlogCreate() {
         ord_index: templateInscriptionId,
       }),
     });
-    nav.push('/inscribe?srouce=blog');
+    // resetBlogStore()
+    nav.push('/inscribe?source=blog');
   };
   const publishHandler = async () => {
     const params = {
@@ -76,11 +80,11 @@ export function BlogCreate() {
     if (!err) {
       setCheckStatus(true);
       const { kvs = [] } = res.data;
-      const inscriptionId = kvs.find((kv) => kv.key === 'ord_index')?.value;
-      if (inscriptionId) {
-        setTemplateInscriptionId(inscriptionId);
-        setPrevInscriptionId(inscriptionId);
-      }
+      console.log('_id ', inscriptionId);
+      const _id =
+        inscriptionId || kvs.find((kv) => kv.key === 'ord_index')?.value;
+      setTemplateInscriptionId(_id);
+      setPrevInscriptionId(_id);
       setNaData(res.data);
     }
   };
@@ -92,9 +96,6 @@ export function BlogCreate() {
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
-    // return (
-    //   !!templateInscriptionId && prevInscriptionId == templateInscriptionId
-    // );
     return false;
   }, [templateInscriptionId]);
   const publishDisabled = useMemo(() => {
@@ -140,6 +141,15 @@ export function BlogCreate() {
                 ></Input>
               </div>
             </div>
+            {/* <div className="mb-2">
+              <h2 className="mb-2">Attr</h2>
+              <div className='flex items-center'>
+                <Input
+                  value={templateInscriptionId}
+                  onChange={(e) => setTemplateInscriptionId(e.target.value)}
+                ></Input>
+              </div>
+            </div> */}
             <div className="flex justify-center">
               <Button
                 color="primary"

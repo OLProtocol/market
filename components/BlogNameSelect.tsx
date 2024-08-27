@@ -27,7 +27,7 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
   });
 
   const list = useMemo(() => {
-    return data?.data?.names?.filter((v) => v.name.indexOf('.btc') > -1) || [];
+    return data?.data?.names || [];
   }, [data]);
 
   const empty = useMemo(() => list.length === 0, [list]);

@@ -477,21 +477,21 @@ export default function Inscribe() {
     setStep(3);
   };
   useEffect(() => {
-    if (inscribeData.type == 'file') {
-      filesChange([inscribeData.file]);
-    } else if (inscribeData.type == 'text') {
-      console.log('inscribeData', inscribeData);
+    const { relateInscriptionId, type, text, metadata } = inscribeData;
+
+    if (type == 'blog' || type == 'text') {
       generteFiles([
         {
           type: 'text',
           amount: 330,
-          value: inscribeData.text,
+          value: text,
           offset: 0,
         },
       ]).then((files) => {
-        console.log(textData.utxos);
         setMetadata({
-          type: 'text',
+          type,
+          relateInscriptionId,
+          blogMetadata: metadata,
         });
         setList(files);
         setStep(2);
@@ -570,7 +570,6 @@ export default function Inscribe() {
     clear();
     if (source === 'blog') {
       setInscriptionId(id);
-      console.log('inscriptionId', id);
       nav.back();
     }
   };
