@@ -392,7 +392,7 @@ export const InscribingOrderModal = ({
       });
       setLoading(false);
       setActiveStep(2);
-      onFinished?.(`${txid}i:0`);
+      onFinished?.(`${txid}i0`);
     } catch (error: any) {
       console.error(error);
       if (btnStatus) {
