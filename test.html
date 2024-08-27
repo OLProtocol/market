@@ -78,25 +78,25 @@
   <script type="module">
     const getName = () => {
       const { hostname } = window.location;
-      if (hostname.indexOf('onl') > -1) {
-        return hostname.replace('.onl', '');
+      if (hostname.indexOf('mainnet.dev.ordx.space') > -1) {
+        return hostname.replace('.mainnet.dev.ordx.space', '');
       } else {
         return undefined;
       }
     }
-    const name = getName() || 'noalone.btc';
+    const name = getName() || '';
     document.title = `BLob | ${name}`;
     const getTweets = async () => {
       try {
-        const res = await fetch(`https://apidev.ordx.space/testnet4/ns/values/${name}/blog`)
+        const res = await fetch(`/ns/values/${name}/blog`)
         const data = await res.json()
-        const a = data?.data?.kvs || [{ key: 'blog_1631455600', value: 'Hello World' }]
+        const a = data?.data?.kvs || []
         return a.map(kv => ({
           t: kv.key.replace('blog_', ''),
           c: kv.value
         }));
       } catch (error) {
-        return [{ t: '1631455600', c: 'Hello World' }];
+        return [];
       }
     }
     const getPersonalInfo = async () => {
@@ -104,7 +104,7 @@
         const res = await fetch(`/ns/values/${name}/personal`)
         const data = await res.json()
         const a = data?.data?.kvs || []
-        const avatar = a.find(kv => kv.key === 'personal_avatar')?.value || 'https://ordx.market/logo.png';
+        const avatar = a.find(kv => kv.key === 'personal_avatar')?.value || '';
         const userName = a.find(kv => kv.key === 'personal_name')?.value || name;
         return {
           avatar,
@@ -112,7 +112,7 @@
         }
       } catch (error) {
         return {
-          avatar: 'https://ordx.market/logo.png',
+          avatar: '',
           name,
         };
       }
