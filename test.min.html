@@ -10,7 +10,7 @@
     document.title = `BLob | ${name}`;
     const getTweets = async () => {
       try {
-        const res = await fetch(`/ns/values/${name}/blog`)
+        const res = await fetch(`https://apidev.ordx.space/testnet4/ns/values/${name}/blog`)
         const data = await res.json()
         const a = data?.data?.kvs || []
         return a.map(kv => ({
@@ -23,10 +23,10 @@
     }
     const getPersonalInfo = async () => {
       try {
-        const res = await fetch(`/ns/values/${name}/personal`)
+        const res = await fetch(`https://apidev.ordx.space/testnet4/ns/values/${name}/personal`)
         const data = await res.json()
         const a = data?.data?.kvs || []
-        const avatar = a.find(kv => kv.key === 'personal_avatar')?.value || '';
+        const avatar = a.find(kv => kv.key === 'personal_avatar')?.value || 'https://ordx.market/logo.png';
         const userName = a.find(kv => kv.key === 'personal_name')?.value || name;
         return {
           avatar,
@@ -34,7 +34,7 @@
         }
       } catch (error) {
         return {
-          avatar: '',
+          avatar: 'https://ordx.market/logo.png',
           name,
         };
       }

@@ -30,7 +30,7 @@ export function BlogCreate() {
     setInscribeData({
       type: 'blog',
       relateInscriptionId:
-        '4c795768641411ecb44f5bcde03b4df874d59d946ec724b9acfe9a5b23d1dc65i0',
+        '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0',
       metadata: {
         op: 'update',
         name: selectName,
