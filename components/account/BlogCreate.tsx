@@ -29,6 +29,7 @@ export function BlogCreate() {
   const mintTemplate = async () => {
     setInscribeData({
       type: 'blog',
+      mode: 'template',
       relateInscriptionId:
         '3e24e4bd35dc2e96382918b945d30b40aceb964bb2922c071127d8b9bcfa98b4i0i0',
       metadata: {
@@ -43,6 +44,7 @@ export function BlogCreate() {
   const mintRouting = async () => {
     setInscribeData({
       type: 'text',
+      mode: 'routing',
       text: JSON.stringify({
         p: 'btcname',
         op: 'routing',

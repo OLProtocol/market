@@ -568,7 +568,7 @@ export default function Inscribe() {
   };
   const onFinished = (id) => {
     clear();
-    if (source === 'blog') {
+    if (source === 'blog' && inscribeData.mode === 'template') {
       setInscriptionId(id);
       nav.back();
     }
