@@ -31,7 +31,7 @@ export function BlogCreate() {
       type: 'blog',
       mode: 'template',
       relateInscriptionId:
-        '3e24e4bd35dc2e96382918b945d30b40aceb964bb2922c071127d8b9bcfa98b4i0i0',
+        '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0',
       metadata: {
         op: 'update',
         name: selectName,
