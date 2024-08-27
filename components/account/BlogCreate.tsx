@@ -26,12 +26,13 @@ export function BlogCreate() {
     setCheckStatus(false);
     await getNsName();
   };
+  const defaultTemplateInscriptionId =
+    '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
   const mintTemplate = async () => {
     setInscribeData({
       type: 'blog',
       mode: 'template',
-      relateInscriptionId:
-        '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0',
+      relateInscriptionId: defaultTemplateInscriptionId,
       metadata: {
         op: 'update',
         name: selectName,
@@ -123,7 +124,9 @@ export function BlogCreate() {
       {checkStatus && (
         <>
           <div className="mb-4">
-            <h2 className="mb-2">2、 Inscribe Template for Routing</h2>
+            <h2 className="mb-2">
+              2、 Inscribe Template for Routing({defaultTemplateInscriptionId})
+            </h2>
             <div className="flex justify-center">
               <Button
                 color="primary"
