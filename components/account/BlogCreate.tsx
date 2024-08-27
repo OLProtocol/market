@@ -107,6 +107,12 @@ export function BlogCreate() {
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
   }, [content, selectName, templateInscriptionId]);
+  const toRoutingInscribe = () => {
+    window.open(
+      `https://ord-testnet4.ordx.space/content/${templateInscriptionId}`,
+      '_blank',
+    );
+  };
   useEffect(() => {
     if (selectName) {
       checkHandler();
@@ -125,7 +131,14 @@ export function BlogCreate() {
         <>
           <div className="mb-4">
             <h2 className="mb-2">
-              2、 Inscribe Template for Routing({defaultTemplateInscriptionId})
+              2、 Inscribe Template for Routing
+              <a
+                target="_blank"
+                className="text-blue-700"
+                href={`https://ord-testnet4.ordx.space/content/${defaultTemplateInscriptionId}`}
+              >
+                ({defaultTemplateInscriptionId})
+              </a>
             </h2>
             <div className="flex justify-center">
               <Button
@@ -158,7 +171,16 @@ export function BlogCreate() {
                 ></Input>
               </div>
             </div> */}
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
+              <Button
+                color="primary"
+                isDisabled={mintRoutingDisabled}
+                onClick={() => {
+                  toRoutingInscribe();
+                }}
+              >
+                查看Routing铭文
+              </Button>
               <Button
                 color="primary"
                 isDisabled={mintRoutingDisabled}
