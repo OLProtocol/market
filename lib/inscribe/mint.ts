@@ -500,7 +500,7 @@ export const generateMultiScript = (
     script.push(
       ...[
         '07',
-        ec.encode('ordx'),
+        ec.encode('sns'),
         '05',
         edcodeMetaData,
         '0B',
