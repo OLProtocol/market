@@ -5,29 +5,42 @@ import { BlogNameSelect } from '@/components/BlogNameSelect';
 import { useInscribeStore, useBlogStore } from '@/store';
 import { ordx } from '@/api';
 import { tryit } from 'radash';
-import { blogTemplate } from '@/lib/utils/blog';
+import { BlogUserInfo } from './BlogUserInfo';
 import { useRouter } from 'next/navigation';
 import { Textarea, Button, Input } from '@nextui-org/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { useMap } from 'react-use';
 
 export function BlogCreate() {
   const nav = useRouter();
   const [selectName, setSelectName] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [naData, setNaData] = useState<any>();
+  const [nsData, setNsData] = useState<any>();
   const [checkStatus, setCheckStatus] = useState(false);
   const [templateInscriptionId, setTemplateInscriptionId] = useState('');
   const [prevInscriptionId, setPrevInscriptionId] = useState('');
   const { inscriptionId, reset: resetBlogStore } = useBlogStore();
   const { network } = useReactWalletStore();
   const { setData: setInscribeData } = useInscribeStore();
+  const [personalInfo, { set: setPersonal, setAll }] = useMap<any>({
+    avatar: '',
+    name: '',
+    desc: '',
+    twitter: '',
+    website: '',
+    email: '',
+    facebook: '',
+  });
+
   const checkHandler = async () => {
     setCheckStatus(false);
     await getNsName();
   };
+  // const defaultTemplateInscriptionId =
+  //   '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
   const defaultTemplateInscriptionId =
-    '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
+    '3ce7ff02ab30fceb8a249824d124cf731c7b10e107b58e106c1ff078358762d3i0';
   const mintTemplate = async () => {
     setInscribeData({
       type: 'blog',
@@ -71,7 +84,26 @@ export function BlogCreate() {
       type: 'text',
       text: JSON.stringify(params),
     });
-    nav.push('/inscribe');
+    nav.push('/inscribe?source=blog');
+  };
+  const mintPersonal = async () => {
+    const params = {
+      p: 'sns',
+      op: 'update',
+      name: selectName,
+      personal_avatar: personalInfo.avatar,
+      personal_name: personalInfo.name,
+      personal_desc: personalInfo.desc,
+      personal_twitter: personalInfo.twitter,
+      personal_website: personalInfo.website,
+      personal_email: personalInfo.email,
+      personal_facebook: personalInfo.facebook,
+    };
+    setInscribeData({
+      type: 'text',
+      text: JSON.stringify(params),
+    });
+    nav.push('/inscribe?source=blog');
   };
   const getNsName = async () => {
     if (!selectName) {
@@ -91,12 +123,12 @@ export function BlogCreate() {
         inscriptionId || kvs?.find((kv) => kv.key === 'ord_index')?.value;
       setTemplateInscriptionId(_id);
       setPrevInscriptionId(_id);
-      setNaData(res.data);
+      setNsData(res.data);
     }
   };
   const hasRoute = useMemo(() => {
-    return !!naData?.kvs?.find((kv) => kv.key === 'ord_handle')?.inscriptionId;
-  }, [naData]);
+    return !!nsData?.kvs?.find((kv) => kv.key === 'ord_handle')?.inscriptionId;
+  }, [nsData]);
 
   const handlerChange = (name: string) => {
     setSelectName(name);
@@ -112,6 +144,18 @@ export function BlogCreate() {
       `https://ord-testnet4.ordx.space/content/${templateInscriptionId}`,
       '_blank',
     );
+  };
+  const personalMintDisabled = useMemo(() => {
+    return !personalInfo.avatar;
+  }, [personalInfo]);
+  const userInfoChange = (d) => {
+    setPersonal('avatar', d.avatar);
+    setPersonal('name', d.name);
+    setPersonal('desc', d.desc);
+    setPersonal('twitter', d.twitter);
+    setPersonal('website', d.website);
+    setPersonal('email', d.email);
+    setPersonal('facebook', d.facebook);
   };
   useEffect(() => {
     if (selectName) {
@@ -131,7 +175,7 @@ export function BlogCreate() {
         <>
           <div className="mb-4">
             <h2 className="mb-2">
-              2、 Inscribe Template for Routing
+              2、 Inscribe a page tempate.
               <a
                 target="_blank"
                 className="text-blue-700"
@@ -203,6 +247,23 @@ export function BlogCreate() {
             >
               预览: https://{selectName}.mainnet.dev.ordx.space/
             </Button>
+          </div>
+          <div className="mb-4">
+            <div className="mb-4">
+              <h2 className="mb-2">4、Publish Content</h2>
+              <BlogUserInfo info={personalInfo} onChange={userInfoChange} />
+            </div>
+            <div className="flex justify-center">
+              <Button
+                color="primary"
+                isDisabled={personalMintDisabled}
+                onClick={() => {
+                  mintPersonal();
+                }}
+              >
+                Mint Personal
+              </Button>
+            </div>
           </div>
           <div className="mb-4">
             <div className="mb-4">

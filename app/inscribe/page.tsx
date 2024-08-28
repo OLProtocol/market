@@ -567,11 +567,11 @@ export default function Inscribe() {
     setModalShow(false);
   };
   const onFinished = (id) => {
-    clear();
     if (source === 'blog' && inscribeData.mode === 'template') {
       setInscriptionId(id);
       nav.back();
     }
+    clear();
   };
   const onRemoveAll = () => {
     clear();
