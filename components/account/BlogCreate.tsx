@@ -43,7 +43,7 @@ export function BlogCreate() {
   // const defaultTemplateInscriptionId =
   //   '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
   const defaultTemplateInscriptionId =
-    '8363072515915869295f7bc11c5c6dfad5be94df3d601f12c5040a37f59a6368i0';
+    '684470e2d8a2bf0f207ca5f432e1ea8172871a9a00b255eff6f1f9275d37b044i0';
   const mintTemplate = async () => {
     setInscribeData({
       type: 'blog',
