@@ -74,7 +74,7 @@ export function BlogCreate() {
     nav.push('/inscribe?source=blog');
   };
   const preview = () => {
-    window.open(`https://${selectName}.mainnet.dev.sat20.org/`, '_blank');
+    window.open(`https://${selectName}.dkvs.xyz/`, '_blank');
   };
   const publishHandler = async () => {
     const params = {
