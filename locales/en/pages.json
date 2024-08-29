@@ -172,5 +172,13 @@
         "genesis_tx": "Genesis Transaction"
       }
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "step_1": "1. Select Blog Name:",
+    "step_2": "2. Inscribe Template: ",
+    "step_3": "3. Inscribe  Routing:",
+    "step_4": "4. Set Personal Information:",
+    "step_5": "5. Publish Blog"
   }
 }
