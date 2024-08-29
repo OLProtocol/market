@@ -78,8 +78,8 @@
   <script type="module">
     const getName = () => {
       const { hostname } = window.location;
-      if (hostname.indexOf('mainnet.dev.ordx.space') > -1) {
-        return hostname.replace('.mainnet.dev.ordx.space', '');
+      if (hostname.indexOf('mainnet.dev.sat20.org') > -1) {
+        return hostname.replace('.mainnet.dev.sat20.org', '');
       } else {
         return undefined;
       }
@@ -88,7 +88,7 @@
     document.title = `BLob | ${name}`;
     const getTweets = async () => {
       try {
-        const res = await fetch(`https://apidev.ordx.space/testnet4/ns/values/${name}/blog`)
+        const res = await fetch(`https://apidev.sat20.org/testnet4/ns/values/${name}/blog`)
         const data = await res.json()
         const a = data?.data?.kvs || []
         return a.map(kv => ({
@@ -101,7 +101,7 @@
     }
     const getPersonalInfo = async () => {
       try {
-        const res = await fetch(`https://apidev.ordx.space/testnet4/ns/values/${name}/personal`)
+        const res = await fetch(`https://apidev.sat20.org/testnet4/ns/values/${name}/personal`)
         const data = await res.json()
         const a = data?.data?.kvs || []
         const avatar = a.find(kv => kv.key === 'personal_avatar')?.value || 'https://ordx.market/logo.png';

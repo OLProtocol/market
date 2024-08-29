@@ -11,7 +11,7 @@ export const blogTemplate = (name: string) => `
     document.title = \`BLob | \${name}\`;
     const getTweets = async () => {
       try {
-        const res = await fetch(\`https://apidev.ordx.space/testnet4/ns/values/\${name}/blog\`)
+        const res = await fetch(\`https://apidev.sat20.org/testnet4/ns/values/\${name}/blog\`)
         const data = await res.json()
         const a = data?.data?.kvs || []
         return a.map(kv => ({
@@ -24,7 +24,7 @@ export const blogTemplate = (name: string) => `
     }
     const getPersonalInfo = async () => {
       try {
-        const res = await fetch(\`https://apidev.ordx.space/testnet4/ns/values/\${name}/personal\`)
+        const res = await fetch(\`https://apidev.sat20.org/testnet4/ns/values/\${name}/personal\`)
         const data = await res.json()
         const a = data?.data?.kvs || []
         const avatar = a.find(kv => kv.key === 'personal_avatar')?.value || 'https://ordx.market/logo.png';
