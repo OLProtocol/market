@@ -147,11 +147,6 @@ export function BlogCreate() {
         description: 'You can only mint your own personal blog.',
       });
       return;
-    } else if (res?.data?.contenttype?.indexOf('image') < 0) {
-      notification.error({
-        message: 'Error',
-        description: 'Avatar must be an image.',
-      });
     }
     setInscribeData({
       type: 'text',
