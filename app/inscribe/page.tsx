@@ -567,6 +567,8 @@ export default function Inscribe() {
     setModalShow(false);
   };
   const onFinished = (id) => {
+    console.log(source, inscribeData);
+
     if (source === 'blog' && inscribeData.mode === 'template') {
       setInscriptionId(id);
       nav.back();
@@ -582,7 +584,7 @@ export default function Inscribe() {
     resetName();
     resetOrdx();
     resetRune();
-    resetInscribeData();
+
     setMetadata({});
   };
   useEffect(() => {
@@ -591,7 +593,6 @@ export default function Inscribe() {
       resetText();
       resetName();
       resetOrdx();
-      resetInscribeData();
       setMetadata({});
     }
   }, [list]);

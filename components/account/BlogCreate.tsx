@@ -25,7 +25,8 @@ export function BlogCreate() {
   const { inscriptionId, reset: resetBlogStore } = useBlogStore();
   const [originPersonalInfo, setOriginPersonalInfo] = useState<any>({});
   const { network, address } = useReactWalletStore();
-  const { setData: setInscribeData } = useInscribeStore();
+  const { setData: setInscribeData, reset: resetInscribeData } =
+    useInscribeStore();
   const [personalInfo, { set: setPersonal, setAll }] = useMap<any>({
     avatar: '',
     name: '',
@@ -43,8 +44,9 @@ export function BlogCreate() {
   // const defaultTemplateInscriptionId =
   //   '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
   const defaultTemplateInscriptionId =
-    '393641b046f2441815620f351ab81430982f9750d00eb9841d2c5fceba41a54ai0';
+    'c49825d8db04ae3ebbadbf4bd9798a6ecdccc642d8bd0079d8cdd2c50a51a51bi0';
   const mintTemplate = async () => {
+    resetInscribeData();
     setInscribeData({
       type: 'blog',
       mode: 'template',
