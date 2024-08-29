@@ -244,16 +244,16 @@ export function BlogCreate() {
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-center mb-4 text-xl">Blog</h1>
+      <h1 className="text-center mb-4 text-xl">{t('pages.blog.title')}</h1>
       <div className="mb-4">
-        <h2 className="mb-2">1. Select Blog Name: </h2>
+        <h2 className="mb-2">{t('pages.blog.step_1')} </h2>
         <BlogNameSelect onChange={handlerChange} loading={loading} />
       </div>
       {checkStatus && (
         <>
           <div className="mb-4">
             <h2 className="mb-2">
-              2. Inscribe Template:
+              {t('pages.blog.step_2')}
               <a
                 target="_blank"
                 className="text-blue-700"
@@ -276,7 +276,7 @@ export function BlogCreate() {
           </div>
           <div className="mb-4">
             <div className="mb-2">
-              <h2 className="mb-2">3. Inscribe Routing: </h2>
+              <h2 className="mb-2">{t('pages.blog.step_3')} </h2>
               <div>
                 <Input
                   value={templateInscriptionId}
@@ -328,7 +328,7 @@ export function BlogCreate() {
           </div>
           <div className="mb-4">
             <div className="mb-4">
-              <h2 className="mb-2">4. Set Personal Information:</h2>
+              <h2 className="mb-2">{t('pages.blog.step_4')} </h2>
               <BlogUserInfo info={personalInfo} onChange={userInfoChange} />
             </div>
             <div className="flex justify-center">
@@ -346,7 +346,7 @@ export function BlogCreate() {
           </div>
           <div className="mb-4">
             <div className="mb-4">
-              <h2 className="mb-2">4、Publish Content</h2>
+              <h2 className="mb-2">{t('pages.blog.step_5')} </h2>
               <Textarea
                 disableAnimation
                 disableAutosize
