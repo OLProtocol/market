@@ -9,10 +9,12 @@ import { BlogUserInfo } from './BlogUserInfo';
 import { useRouter } from 'next/navigation';
 import { Textarea, Button, Input } from '@nextui-org/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { notification } from 'antd';
 import { useMap } from 'react-use';
 
 export function BlogCreate() {
   const nav = useRouter();
+  const [checkAvatarLoading, setCheckAvatarLoading] = useState(false);
   const [selectName, setSelectName] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,8 @@ export function BlogCreate() {
   const [templateInscriptionId, setTemplateInscriptionId] = useState('');
   const [prevInscriptionId, setPrevInscriptionId] = useState('');
   const { inscriptionId, reset: resetBlogStore } = useBlogStore();
-  const { network } = useReactWalletStore();
+  const [originPersonalInfo, setOriginPersonalInfo] = useState<any>({});
+  const { network, address } = useReactWalletStore();
   const { setData: setInscribeData } = useInscribeStore();
   const [personalInfo, { set: setPersonal, setAll }] = useMap<any>({
     avatar: '',
@@ -40,7 +43,7 @@ export function BlogCreate() {
   // const defaultTemplateInscriptionId =
   //   '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
   const defaultTemplateInscriptionId =
-    '3ce7ff02ab30fceb8a249824d124cf731c7b10e107b58e106c1ff078358762d3i0';
+    '8363072515915869295f7bc11c5c6dfad5be94df3d601f12c5040a37f59a6368i0';
   const mintTemplate = async () => {
     setInscribeData({
       type: 'blog',
@@ -87,18 +90,67 @@ export function BlogCreate() {
     nav.push('/inscribe?source=blog');
   };
   const mintPersonal = async () => {
-    const params = {
+    const params: any = {
       p: 'sns',
       op: 'update',
       name: selectName,
-      personal_avatar: personalInfo.avatar,
-      personal_name: personalInfo.name,
-      personal_desc: personalInfo.desc,
-      personal_twitter: personalInfo.twitter,
-      personal_website: personalInfo.website,
-      personal_email: personalInfo.email,
-      personal_facebook: personalInfo.facebook,
     };
+    if (
+      !!personalInfo.avatar &&
+      personalInfo.avatar !== originPersonalInfo.avatar
+    ) {
+      params.avatar = personalInfo.avatar;
+    }
+    if (!!personalInfo.name && personalInfo.name !== originPersonalInfo.name) {
+      params.personal_name = personalInfo.name;
+    }
+    if (!!personalInfo.desc && personalInfo.desc !== originPersonalInfo.desc) {
+      params.personal_desc = personalInfo.desc;
+    }
+    if (
+      !!personalInfo.website &&
+      personalInfo.website !== originPersonalInfo.website
+    ) {
+      params.personal_website = personalInfo.website;
+    }
+    if (
+      !!personalInfo.email &&
+      personalInfo.email !== originPersonalInfo.email
+    ) {
+      params.personal_email = personalInfo.email;
+    }
+    if (
+      !!personalInfo.twitter &&
+      personalInfo.twitter !== originPersonalInfo.twitter
+    ) {
+      params.personal_twitter = personalInfo.twitter;
+    }
+    if (
+      !!personalInfo.facebook &&
+      personalInfo.facebook !== originPersonalInfo.facebook
+    ) {
+      params.personal_facebook = personalInfo.facebook;
+    }
+    setCheckAvatarLoading(true);
+    console.log('params', params);
+
+    const [err, res] = await tryit(ordx.getInscriptiontInfo)({
+      network,
+      inscriptionId: personalInfo.avatar,
+    });
+    setCheckAvatarLoading(false);
+    if (res.code !== 0 || res?.data?.address !== address) {
+      notification.error({
+        message: 'Error',
+        description: 'You can only mint your own personal blog.',
+      });
+      return;
+    } else if (res?.data?.contenttype?.indexOf('image') < 0) {
+      notification.error({
+        message: 'Error',
+        description: 'Avatar must be an image.',
+      });
+    }
     setInscribeData({
       type: 'text',
       text: JSON.stringify(params),
@@ -121,9 +173,37 @@ export function BlogCreate() {
       console.log('_id ', inscriptionId);
       const _id =
         inscriptionId || kvs?.find((kv) => kv.key === 'ord_index')?.value;
+      const avatar = kvs.find((kv) => kv.key === 'avatar')?.value || '';
+      const userName =
+        kvs.find((kv) => kv.key === 'personal_name')?.value || name;
+      const desc = kvs.find((kv) => kv.key === 'personal_desc')?.value || '';
+      const twitter_link =
+        kvs.find((kv) => kv.key === 'personal_twitter')?.value || '';
+      const website_link =
+        kvs.find((kv) => kv.key === 'personal_website')?.value || '';
+      const email_link =
+        kvs.find((kv) => kv.key === 'personal_email')?.value || '';
+      const fb_link =
+        kvs.find((kv) => kv.key === 'personal_facebook')?.value || '';
       setTemplateInscriptionId(_id);
       setPrevInscriptionId(_id);
       setNsData(res.data);
+      setPersonal('avatar', avatar);
+      setPersonal('name', userName);
+      setPersonal('desc', desc);
+      setPersonal('website', website_link);
+      setPersonal('email', email_link);
+      setPersonal('twitter', twitter_link);
+      setPersonal('facebook', fb_link);
+      setOriginPersonalInfo({
+        avatar,
+        name: userName,
+        desc,
+        website: website_link,
+        email: email_link,
+        facebook: fb_link,
+        twitter: twitter_link,
+      });
     }
   };
   const hasRoute = useMemo(() => {
@@ -162,7 +242,6 @@ export function BlogCreate() {
       checkHandler();
     }
   }, [selectName]);
-  console.log(checkStatus);
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -256,6 +335,7 @@ export function BlogCreate() {
             <div className="flex justify-center">
               <Button
                 color="primary"
+                isLoading={checkAvatarLoading}
                 isDisabled={personalMintDisabled}
                 onClick={() => {
                   mintPersonal();

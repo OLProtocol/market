@@ -38,7 +38,7 @@ export const BlogUserInfo = ({ onChange, info = {} }: Props) => {
         ></Input>
       </div>
       <div className="flex justify-center items-center mb-2 ">
-        <span className="w-40">Name</span>
+        <span className="w-40">Nick Name</span>
         <Input value={data.name} onValueChange={(v) => set('name', v)}></Input>
       </div>
       <div className="flex justify-center items-center mb-2 ">
