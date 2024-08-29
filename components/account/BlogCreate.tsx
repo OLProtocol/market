@@ -74,7 +74,7 @@ export function BlogCreate() {
     nav.push('/inscribe?source=blog');
   };
   const preview = () => {
-    window.open(`https://${selectName}.mainnet.dev.ordx.space/`, '_blank');
+    window.open(`https://${selectName}.mainnet.dev.sat20.org/`, '_blank');
   };
   const publishHandler = async () => {
     const params = {
@@ -221,7 +221,7 @@ export function BlogCreate() {
   }, [content, selectName, templateInscriptionId]);
   const toRoutingInscribe = () => {
     window.open(
-      `https://ord-testnet4.ordx.space/content/${templateInscriptionId}`,
+      `https://ord-testnet4.sat20.org/content/${templateInscriptionId}`,
       '_blank',
     );
   };
@@ -258,7 +258,7 @@ export function BlogCreate() {
               <a
                 target="_blank"
                 className="text-blue-700"
-                href={`https://ord-testnet4.ordx.space/content/${defaultTemplateInscriptionId}`}
+                href={`https://ord-testnet4.sat20.org/content/${defaultTemplateInscriptionId}`}
               >
                 ({defaultTemplateInscriptionId})
               </a>
@@ -324,7 +324,7 @@ export function BlogCreate() {
                 preview();
               }}
             >
-              预览: https://{selectName}.mainnet.dev.ordx.space/
+              预览: https://{selectName}.mainnet.dev.sat20.org/
             </Button>
           </div>
           <div className="mb-4">

@@ -9,8 +9,8 @@ export const generateOrdUrl = ({
 }) => {
   const base =
     network === 'testnet'
-      ? 'https://ord-testnet4.ordx.space'
-      : 'https://ord-mainnet.ordx.space';
+      ? 'https://ord-testnet4.sat20.org'
+      : 'https://ord-mainnet.sat20.org';
   let url = base;
   if (locale) {
     url += `/${locale}`;
