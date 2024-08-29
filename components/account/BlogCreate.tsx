@@ -11,8 +11,10 @@ import { Textarea, Button, Input } from '@nextui-org/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { notification } from 'antd';
 import { useMap } from 'react-use';
+import { useTranslation } from 'react-i18next';
 
 export function BlogCreate() {
+  const { t } = useTranslation();
   const nav = useRouter();
   const [checkAvatarLoading, setCheckAvatarLoading] = useState(false);
   const [selectName, setSelectName] = useState('');
@@ -83,7 +85,7 @@ export function BlogCreate() {
       p: 'sns',
       op: 'update',
       name: selectName,
-      [`blog_${+new Date()}`]: content,
+      [`blog_${+new Date()}`]: content.replace('\n', '<br/>'),
     };
     setInscribeData({
       type: 'text',
@@ -211,7 +213,7 @@ export function BlogCreate() {
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
-    return false;
+    return !!templateInscriptionId;
   }, [templateInscriptionId]);
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
@@ -244,14 +246,14 @@ export function BlogCreate() {
     <div className="p-4 max-w-3xl mx-auto">
       <h1 className="text-center mb-4 text-xl">Blog</h1>
       <div className="mb-4">
-        <h2 className="mb-2">1、Select Btc Name</h2>
+        <h2 className="mb-2">1. Select Blog Name: </h2>
         <BlogNameSelect onChange={handlerChange} loading={loading} />
       </div>
       {checkStatus && (
         <>
           <div className="mb-4">
             <h2 className="mb-2">
-              2、 Inscribe a page tempate.
+              2. Inscribe Template:
               <a
                 target="_blank"
                 className="text-blue-700"
@@ -268,13 +270,13 @@ export function BlogCreate() {
                   mintTemplate();
                 }}
               >
-                Mint Template
+                Inscribe Template
               </Button>
             </div>
           </div>
           <div className="mb-4">
             <div className="mb-2">
-              <h2 className="mb-2">3、 Mint Routing</h2>
+              <h2 className="mb-2">3. Inscribe Routing: </h2>
               <div>
                 <Input
                   value={templateInscriptionId}
@@ -294,7 +296,7 @@ export function BlogCreate() {
             <div className="flex justify-center gap-4">
               <Button
                 color="primary"
-                isDisabled={mintRoutingDisabled}
+                // isDisabled={mintRoutingDisabled}
                 onClick={() => {
                   toRoutingInscribe();
                 }}
@@ -303,12 +305,12 @@ export function BlogCreate() {
               </Button>
               <Button
                 color="primary"
-                isDisabled={mintRoutingDisabled}
+                // isDisabled={mintRoutingDisabled}
                 onClick={() => {
                   mintRouting();
                 }}
               >
-                Mint Routing
+                Inscribe Routing
               </Button>
             </div>
           </div>
@@ -326,7 +328,7 @@ export function BlogCreate() {
           </div>
           <div className="mb-4">
             <div className="mb-4">
-              <h2 className="mb-2">4、Publish Content</h2>
+              <h2 className="mb-2">4. Set Personal Information:</h2>
               <BlogUserInfo info={personalInfo} onChange={userInfoChange} />
             </div>
             <div className="flex justify-center">
@@ -338,7 +340,7 @@ export function BlogCreate() {
                   mintPersonal();
                 }}
               >
-                Mint Personal
+                Inscribe Info
               </Button>
             </div>
           </div>
