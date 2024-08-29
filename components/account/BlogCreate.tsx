@@ -324,7 +324,7 @@ export function BlogCreate() {
                 preview();
               }}
             >
-              预览: https://{selectName}.mainnet.dev.sat20.org/
+              预览: https://{selectName}.dkvs.xyz/
             </Button>
           </div>
           <div className="mb-4">
