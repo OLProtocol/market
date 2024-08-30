@@ -116,3 +116,44 @@ export async function buildTransaction({
   const psbt = tx.toPsbt();
   return psbt;
 }
+
+export async function generateTransaction({
+  utxos,
+  outputs,
+  feeRate,
+  network,
+  address,
+  publicKey,
+  suitable = true,
+}: {
+  utxos: Utxo[];
+  outputs: PsbtOutput[];
+  feeRate: number;
+  network: string;
+  address: string;
+  publicKey: string;
+  suitable?: boolean;
+}) {
+  const btcUtxos = convertUtxosToBtcUtxos({
+    utxos,
+    address,
+    publicKey,
+  });
+
+  const tx = new Transaction({
+    address,
+    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    feeRate,
+  });
+  console.log(btcUtxos);
+  tx.setEnableRBF(true);
+
+  outputs.forEach((v) => {
+    tx.addOutput(v.address, v.value);
+  });
+  await tx.addSufficientUtxosForFee(btcUtxos, {
+    suitable,
+  });
+
+  return tx;
+}

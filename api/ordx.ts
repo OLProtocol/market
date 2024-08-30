@@ -178,6 +178,12 @@ const getInscriptiontInfo = async ({ inscriptionId, network }: any) => {
   );
   return data;
 };
+const getAllUtxos = async ({ address, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`allutxos/address/${address}`, network),
+  );
+  return data;
+};
 const getTickerPermission = async ({ address, ticker, network }: any) => {
   const { data } = await axios.get(
     generateUrl(`mint/permission/${ticker}/${address}`, network),
@@ -359,4 +365,5 @@ export const ordx = {
   fetchChainFeeRate,
   getTxHex,
   getNsListStatus,
+  getAllUtxos,
 };

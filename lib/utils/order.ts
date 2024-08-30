@@ -11,7 +11,7 @@ import {
   buildTransaction,
   Transaction,
   convertUtxosToBtcUtxos,
-  converUtxosToInputs,
+  generateTransaction,
   PsbtInput,
 } from '../wallet';
 import { UtxoAssetItem } from '@/store';
@@ -135,7 +135,63 @@ export async function buildTransferPsbt({
   });
   return psbt;
 }
+export async function generateTransferPsbt({
+  inscriptionUtxos,
+  utxos,
+  oneOutput,
+  addresses,
+  feeRate,
+}: any) {
+  const { btcWallet, network, address, publicKey } =
+    useReactWalletStore.getState();
 
+  const len = inscriptionUtxos.length;
+  let toAddress: any[] = [];
+
+  if (addresses.length === 1) {
+    toAddress = Array.from({ length: len }).fill(addresses[0]);
+  } else {
+    toAddress = addresses.slice(0, len);
+  }
+  const inputUtxoss: any[] = [];
+  const outputs: any[] = [];
+  let totalValue = 0;
+  for (let i = 0; i < len; i++) {
+    const item = inscriptionUtxos[i];
+    const [txid, vout] = item.utxo.split(':');
+    inputUtxoss.push({
+      txid,
+      vout: parseInt(vout),
+      value: item.value,
+    });
+    totalValue += item.value;
+    if (!oneOutput) {
+      outputs.push({
+        address: toAddress[i],
+        value: item.value,
+      });
+    }
+  }
+  if (oneOutput) {
+    outputs.push({
+      address: toAddress[0],
+      value: totalValue,
+    });
+  }
+
+  inputUtxoss.push(...utxos);
+
+  const tx = await generateTransaction({
+    utxos: inputUtxoss,
+    outputs,
+    feeRate,
+    network,
+    address,
+    publicKey,
+    suitable: true,
+  });
+  return tx;
+}
 export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
   console.log('split batch signed psbt', signedHex);
   const psbtNetwork = toPsbtNetwork(

@@ -24,6 +24,7 @@
       "network_fee": "Network Fee",
       "btn_send": "Send"
     },
+    "btc_transfer": "Transfer",
     "search_sat": {
       "title": "Sat Hunting",
       "description": "Search Rare Sats",
