@@ -127,7 +127,7 @@ export default function SellPage() {
               <TableColumn className="text-sm md:text-base">
                 {t('common.item')}({list.length})
               </TableColumn>
-              <TableColumn className="text-sm md:text-base"></TableColumn>
+              <TableColumn className="text-sm md:text-base">Action</TableColumn>
             </TableHeader>
             <TableBody>
               {list.map((item, i) => (
