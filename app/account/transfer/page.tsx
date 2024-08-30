@@ -13,6 +13,7 @@ import {
   Tab,
   Textarea,
   Snippet,
+  Checkbox,
 } from '@nextui-org/react';
 import { notification } from 'antd';
 import { useCommonStore, useSellStore } from '@/store';
@@ -26,13 +27,14 @@ import { useUtxoStore } from '@/store';
 export default function SellPage() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const { list } = useSellStore();
+  const { list, remove } = useSellStore();
   const { feeRate } = useCommonStore();
   const { getUnspendUtxos } = useUtxoStore();
   const [selectedTab, setSelectedTab] = useState('single');
   const { network, btcWallet } = useReactWalletStore((state) => state);
   const [singleAddress, setSingleAddress] = useState('');
   const [errText, setErrText] = useState('');
+  const [selected, setSelected] = useState(false);
   const [multipleAddresses, setMultipleAddresses] = useState('');
   console.log('app.account.sell.page: list: ', list);
 
@@ -79,6 +81,7 @@ export default function SellPage() {
         inscriptionUtxos: list,
         addresses: toAddressList,
         network,
+        oneOutput: selected,
         utxos: utxos,
         feeRate: feeRate.value,
       });
@@ -124,6 +127,7 @@ export default function SellPage() {
               <TableColumn className="text-sm md:text-base">
                 {t('common.item')}({list.length})
               </TableColumn>
+              <TableColumn className="text-sm md:text-base"></TableColumn>
             </TableHeader>
             <TableBody>
               {list.map((item, i) => (
@@ -164,6 +168,15 @@ export default function SellPage() {
                       </Snippet>
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() => {
+                        remove(item.utxo);
+                      }}
+                    >
+                      {t('common.delete')}
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -184,6 +197,14 @@ export default function SellPage() {
                     value={singleAddress}
                     onChange={(e) => setSingleAddress(e.target.value)}
                   />
+                </div>
+                <div className="mb-4">
+                  <Checkbox
+                    isSelected={selected}
+                    onValueChange={(value) => setSelected(value)}
+                  >
+                    合并到一个utxo
+                  </Checkbox>
                 </div>
               </div>
             </Tab>

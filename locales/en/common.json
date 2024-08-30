@@ -4,6 +4,7 @@
   "assets_name": "Assets Name",
   "domain_name": "Domain Name",
   "deploy": "Deploy",
+  "delete": "Delete",
   "transfer": "Transfer",
   "mint": "Mint",
   "file": "File",
