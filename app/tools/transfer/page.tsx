@@ -71,7 +71,14 @@ export default function Transfer() {
     setLoading(true);
     setTx(undefined);
     const [err, res] = await tryit(ordx.getAllUtxos)({ address, network });
-
+    if (err) {
+      console.error('Get utxo failed', err);
+      notification.error({
+        message: t('notification.system_error'),
+      });
+      setLoading(false);
+      return;
+    }
     const nftUtxos = res.otherutxos.map((val) => {
       return {
         ...val,
@@ -83,6 +90,7 @@ export default function Transfer() {
     const toAddressList = [singleAddress];
     if (toAddressList.length === 0) {
       setErrText(t('pages.transfer.error_1'));
+      setLoading(false);
       return;
     }
     // if (toAddressList.length !== list.length) {
