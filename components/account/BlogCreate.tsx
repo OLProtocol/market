@@ -45,8 +45,11 @@ export function BlogCreate() {
   };
   // const defaultTemplateInscriptionId =
   //   '83c896e5fb054595a8dc604b29e3262acac7ad1523e30422fd427fa29f994a83i0';
-  const defaultTemplateInscriptionId =
-    'fa8d3086b679985125f000a63a0f533d04b35c3fb97fd70e2f47e708e5ec13d8i0';
+  const defaultTemplateInscriptionId = useMemo(() => {
+    return network === 'testnet'
+      ? 'fa8d3086b679985125f000a63a0f533d04b35c3fb97fd70e2f47e708e5ec13d8i0'
+      : 'c0184cc32562e9b04f829c41ab56e25afbcafdcec54de24be7a6cd0bba2f74dei0';
+  }, [network]);
   const mintTemplate = async () => {
     resetInscribeData();
     setInscribeData({
