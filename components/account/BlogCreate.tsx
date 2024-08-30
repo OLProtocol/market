@@ -81,7 +81,7 @@ export function BlogCreate() {
     nav.push('/inscribe?source=blog');
   };
   const preview = () => {
-    window.open(`https://${selectName}.dkvs.xyz/`, '_blank');
+    window.open(previewUrl, '_blank');
   };
   const publishHandler = async () => {
     const params = {
@@ -159,6 +159,11 @@ export function BlogCreate() {
     });
     nav.push('/inscribe?source=blog');
   };
+  const previewUrl = useMemo(() => {
+    return network === 'testnet'
+      ? `https://${selectName}.deweb.me`
+      : `https://${selectName}.dkvs.xyz`;
+  }, [network, selectName]);
   const getNsName = async () => {
     if (!selectName) {
       return;
@@ -221,6 +226,7 @@ export function BlogCreate() {
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
   }, [content, selectName, templateInscriptionId]);
+
   const toRoutingInscribe = () => {
     window.open(
       `https://ord-testnet4.sat20.org/content/${templateInscriptionId}`,
@@ -326,7 +332,7 @@ export function BlogCreate() {
                 preview();
               }}
             >
-              预览: https://{selectName}.dkvs.xyz/
+              预览: {previewUrl}
             </Button>
           </div>
           <div className="mb-4">
