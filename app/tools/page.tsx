@@ -42,6 +42,15 @@ export default function ToolsPage() {
       type: 'route',
       btnText: t('pages.tools.search_sat.btn_search'),
     },
+    {
+      name: 'S',
+      icon: '/icon/t3.png',
+      title: '一键转移资产',
+      desc: '转移所有铭文资产',
+      path: '/tools/transfer',
+      type: 'route',
+      btnText: t('pages.tools.btc_transfer'),
+    },
   ];
   return (
     <div className="min-h-[10rem] grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-2 sm:gap-4 mt-4 mb-4 pt-2">

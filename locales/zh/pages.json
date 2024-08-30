@@ -24,6 +24,7 @@
       "network_fee": "网络费用",
       "btn_send": "发送"
     },
+    "btc_transfer": "转移",
     "search_sat": {
       "title": "搜索聪",
       "description": "搜索特殊聪",
