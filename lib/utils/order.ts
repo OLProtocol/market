@@ -81,6 +81,7 @@ export async function buildBatchSellOrder({
 export async function buildTransferPsbt({
   inscriptionUtxos,
   utxos,
+  oneOutput,
   addresses,
   feeRate,
 }: any) {
@@ -97,6 +98,7 @@ export async function buildTransferPsbt({
   }
   const inputUtxoss: any[] = [];
   const outputs: any[] = [];
+  let totalValue = 0;
   for (let i = 0; i < len; i++) {
     const item = inscriptionUtxos[i];
     const [txid, vout] = item.utxo.split(':');
@@ -105,13 +107,22 @@ export async function buildTransferPsbt({
       vout: parseInt(vout),
       value: item.value,
     });
+    totalValue += item.value;
+    if (!oneOutput) {
+      outputs.push({
+        address: toAddress[i],
+        value: item.value,
+      });
+    }
+  }
+  if (oneOutput) {
     outputs.push({
-      address: toAddress[i],
-      value: item.value,
+      address: toAddress[0],
+      value: totalValue,
     });
   }
+
   inputUtxoss.push(...utxos);
-  console.log(outputs);
 
   const psbt = await buildTransaction({
     utxos: inputUtxoss,
