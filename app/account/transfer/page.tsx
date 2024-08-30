@@ -61,6 +61,7 @@ export default function SellPage() {
     }
   }, [multipleAddresses, singleAddress, selectedTab, list]);
 
+  const calcGasFee = () => {};
   const transferHandler = async () => {
     if (toAddressList.length === 0) {
       setErrText(t('pages.transfer.error_1'));
