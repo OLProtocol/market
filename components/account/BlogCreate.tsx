@@ -160,7 +160,7 @@ export function BlogCreate() {
     nav.push('/inscribe?source=blog');
   };
   const previewUrl = useMemo(() => {
-    return network === 'testnet'
+    return network !== 'testnet'
       ? `https://${selectName}.deweb.me`
       : `https://${selectName}.dkvs.xyz`;
   }, [network, selectName]);

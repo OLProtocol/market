@@ -23,6 +23,7 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
     return ordx.getNsListByAddress({
       address,
       network,
+      limit: 1000,
     });
   });
 
