@@ -72,9 +72,9 @@ const exoticUtxo = async ({ utxo, network }: any) => {
   );
   return data;
 };
-const getNsListByAddress = async ({ address, network }: any) => {
+const getNsListByAddress = async ({ address, network, limit = 100 }: any) => {
   const { data } = await axios.get(
-    generateUrl(`ns/address/${address}`, network),
+    generateUrl(`ns/address/${address}?start=0&limit=${limit}`, network),
     {
       timeout: 10000,
     },
