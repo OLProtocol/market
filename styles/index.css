@@ -25,3 +25,17 @@
   content: "";
   flex: auto;
 }
+.ant-select-selector, .ant-select-dropdown {
+  background: #27272A !important;
+  border: none!important;
+  color: #fff !important;
+}
+.ant-select-selector input::placeholder {
+  color: #fff !important;
+}
+.ant-select-item-option-content, .ant-select-arrow {
+  color: #fff !important;
+}
+.ant-select-item-option-selected {
+  background: #333 !important;
+}

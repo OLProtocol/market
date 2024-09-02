@@ -74,7 +74,6 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
       const errorText = formatErrArr
         .map((v) => `Name "${v}" is not valid.`)
         .join('\n');
-      console.log(errorText);
       setRemoveArr(formatErrArr);
       setErrorText(errorText);
       return false;
