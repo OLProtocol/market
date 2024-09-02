@@ -36,7 +36,6 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
       })) || []
     );
   }, [data]);
-  console.log(isLoading, loading);
 
   const empty = useMemo(() => list.length === 0, [list]);
 
