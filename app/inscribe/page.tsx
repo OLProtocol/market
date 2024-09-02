@@ -474,7 +474,7 @@ export default function Inscribe() {
 
     const _files = await generteFiles(list);
     setList(_files);
-    setStep(3);
+    setStep(2);
   };
   useEffect(() => {
     const { relateInscriptionId, type, text, metadata } = inscribeData;
