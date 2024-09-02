@@ -48,7 +48,7 @@ export function BlogCreate() {
   const defaultTemplateInscriptionId = useMemo(() => {
     return network === 'testnet'
       ? 'fa8d3086b679985125f000a63a0f533d04b35c3fb97fd70e2f47e708e5ec13d8i0'
-      : 'e529e51f876a7daf92d020edfaa8cd5c5a678a0a031de8a176d7fc5ce9399f12i0';
+      : '85ee4d912f36352f04dcb8a323f4193c9a341f23e5dc1ae1477ecebdc4195672i0';
   }, [network]);
   const mintTemplate = async () => {
     resetInscribeData();
