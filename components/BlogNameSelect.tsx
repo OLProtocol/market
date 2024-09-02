@@ -1,10 +1,11 @@
 'use client';
 
 import useSWR from 'swr';
-import { Select, Button, SelectItem } from '@nextui-org/react';
+import { Button, SelectItem } from '@nextui-org/react';
 import { useEffect, useMemo, useState } from 'react';
 import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { notification, Select } from 'antd';
 import { useRouter } from 'next/navigation';
 
 interface IBlogNameSelectProps {
@@ -19,7 +20,7 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
     return `/ordx/getNsListByAddress-${address}-{network}`;
   }, [address, network]);
 
-  const { data } = useSWR(swrKey, () => {
+  const { data, isLoading } = useSWR(swrKey, () => {
     return ordx.getNsListByAddress({
       address,
       network,
@@ -28,8 +29,14 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
   });
 
   const list = useMemo(() => {
-    return data?.data?.names || [];
+    return (
+      data?.data?.names?.map((item) => ({
+        label: item.name,
+        value: item.name,
+      })) || []
+    );
   }, [data]);
+  console.log(isLoading, loading);
 
   const empty = useMemo(() => list.length === 0, [list]);
 
@@ -49,6 +56,20 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
   return (
     <div>
       <Select
+        value={selected}
+        size="large"
+        onSelect={onSelectionChange}
+        loading={isLoading || loading}
+        showSearch
+        className="w-full rounded-full overflow-hidden bg-[#27272A]"
+        placeholder="Select a person"
+        filterOption={(input, option) =>
+          (option?.label as string).toLowerCase().includes(input.toLowerCase())
+        }
+        options={list}
+      />
+
+      {/* <Select
         isLoading={loading}
         placeholder="Select an Name"
         selectedKeys={[selected]}
@@ -57,7 +78,7 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
         {list.map((item) => (
           <SelectItem key={item.name}>{item.name}</SelectItem>
         ))}
-      </Select>
+      </Select> */}
       <div className="flex gap-8 justify-center mt-2">
         <Button color="primary" onClick={toBuy}>
           Buy

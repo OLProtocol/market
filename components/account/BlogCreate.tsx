@@ -9,7 +9,7 @@ import { BlogUserInfo } from './BlogUserInfo';
 import { useRouter } from 'next/navigation';
 import { Textarea, Button, Input } from '@nextui-org/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { notification } from 'antd';
+import { notification, Select } from 'antd';
 import { useMap } from 'react-use';
 import { useTranslation } from 'react-i18next';
 
@@ -178,8 +178,7 @@ export function BlogCreate() {
       setCheckStatus(true);
       const { kvs = [] } = res.data || {};
       console.log('_id ', inscriptionId);
-      const _id =
-        inscriptionId || kvs?.find((kv) => kv.key === 'ord_index')?.value;
+      const _id = kvs?.find((kv) => kv.key === 'ord_index')?.value;
       const avatar = kvs.find((kv) => kv.key === 'avatar')?.value || '';
       const userName =
         kvs.find((kv) => kv.key === 'personal_name')?.value || name;
@@ -192,6 +191,8 @@ export function BlogCreate() {
         kvs.find((kv) => kv.key === 'personal_email')?.value || '';
       const fb_link =
         kvs.find((kv) => kv.key === 'personal_facebook')?.value || '';
+      const template_blog =
+        kvs.find((kv) => kv.key === 'template_blog')?.value || '';
       setTemplateInscriptionId(_id);
       setPrevInscriptionId(_id);
       setNsData(res.data);
@@ -202,6 +203,7 @@ export function BlogCreate() {
       setPersonal('email', email_link);
       setPersonal('twitter', twitter_link);
       setPersonal('facebook', fb_link);
+      setTemplateInscriptionId(template_blog);
       setOriginPersonalInfo({
         avatar,
         name: userName,
@@ -221,17 +223,19 @@ export function BlogCreate() {
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
-    return !!templateInscriptionId;
+    return templateInscriptionId === prevInscriptionId;
   }, [templateInscriptionId]);
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
   }, [content, selectName, templateInscriptionId]);
 
+  const getInscriptionScr = (id) => {
+    return network === 'testnet'
+      ? `https://ord-testnet4.sat20.org/content/${id}`
+      : `https://ordinals.com/content/${id}`;
+  };
   const toRoutingInscribe = () => {
-    window.open(
-      `https://ord-testnet4.sat20.org/content/${templateInscriptionId}`,
-      '_blank',
-    );
+    window.open(getInscriptionScr(templateInscriptionId), '_blank');
   };
   const personalMintDisabled = useMemo(() => {
     return !personalInfo.avatar;
@@ -266,7 +270,7 @@ export function BlogCreate() {
               <a
                 target="_blank"
                 className="text-blue-700"
-                href={`https://ord-testnet4.sat20.org/content/${defaultTemplateInscriptionId}`}
+                href={getInscriptionScr(defaultTemplateInscriptionId)}
               >
                 ({defaultTemplateInscriptionId})
               </a>
@@ -274,7 +278,7 @@ export function BlogCreate() {
             <div className="flex justify-center">
               <Button
                 color="primary"
-                isDisabled={mintRoutingDisabled}
+                isDisabled={!!templateInscriptionId}
                 onClick={() => {
                   mintTemplate();
                 }}
@@ -305,7 +309,7 @@ export function BlogCreate() {
             <div className="flex justify-center gap-4">
               <Button
                 color="primary"
-                // isDisabled={mintRoutingDisabled}
+                // isDisabled={!!templateInscriptionId}
                 onClick={() => {
                   toRoutingInscribe();
                 }}
@@ -314,7 +318,7 @@ export function BlogCreate() {
               </Button>
               <Button
                 color="primary"
-                // isDisabled={mintRoutingDisabled}
+                isDisabled={mintRoutingDisabled}
                 onClick={() => {
                   mintRouting();
                 }}
