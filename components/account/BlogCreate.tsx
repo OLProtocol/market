@@ -29,7 +29,7 @@ export function BlogCreate() {
   const { network, address } = useReactWalletStore();
   const { setData: setInscribeData, reset: resetInscribeData } =
     useInscribeStore();
-  const [personalInfo, { set: setPersonal, setAll }] = useMap<any>({
+  const [personalInfo, { set: setPersonal, reset }] = useMap<any>({
     avatar: '',
     name: '',
     desc: '',
@@ -193,7 +193,6 @@ export function BlogCreate() {
         kvs.find((kv) => kv.key === 'personal_facebook')?.value || '';
       const template_blog =
         kvs.find((kv) => kv.key === 'template_blog')?.value || '';
-      setTemplateInscriptionId(_id);
       setPrevInscriptionId(_id);
       setNsData(res.data);
       setPersonal('avatar', avatar);
@@ -220,6 +219,13 @@ export function BlogCreate() {
   }, [nsData]);
 
   const handlerChange = (name: string) => {
+    if (name !== selectName) {
+      reset();
+      setNsData({});
+      setOriginPersonalInfo({});
+      setTemplateInscriptionId('');
+      setPrevInscriptionId('');
+    }
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
