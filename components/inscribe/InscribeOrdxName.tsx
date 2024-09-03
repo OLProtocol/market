@@ -162,6 +162,9 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
 
   return (
     <div>
+      <div className="text-center mb-2">
+        {t('pages.inscribe.name.description_3')}
+      </div>
       <div className="flex gap-2 mb-2">
         <a
           href="/files/5d.txt"
