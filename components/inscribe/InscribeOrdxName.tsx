@@ -162,6 +162,29 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
 
   return (
     <div>
+      <div className="flex gap-2 mb-2">
+        <a
+          href="/files/5d.txt"
+          download="5d.txt"
+          className="flex-1 h-20 bg-gray-600 flex justify-center items-center text-white text-lg rounded-md"
+        >
+          5d
+        </a>
+        <a
+          href="/files/4l-btc.txt"
+          download="4l-btc.txt"
+          className="flex-1 h-20 bg-gray-600 flex justify-center items-center text-white text-lg rounded-md"
+        >
+          4l-btc
+        </a>
+        <a
+          href="/files/6d-btc.txt"
+          download="6d-btc.txt"
+          className="flex-1 h-20 bg-gray-600 flex justify-center items-center text-white text-lg rounded-md"
+        >
+          6d-btc
+        </a>
+      </div>
       <div className="mb-4 text-center">
         <p>{t('pages.inscribe.name.description')}</p>
         <p className="text-gray-500 whitespace-pre-line">
