@@ -136,9 +136,16 @@ export default function BtcNameEvent() {
       <div className="mb-6">
         <div className="text-2xl font-bold mb-4 flex justify-between items-center">
           <span>完成 X 社媒任务</span>
-          <Button size="sm" color="default" radius="full" onClick={bindTwitter}>
-            绑定 X
-          </Button>
+          {acountResult && (
+            <Button
+              size="sm"
+              color="default"
+              radius="full"
+              onClick={bindTwitter}
+            >
+              绑定 X
+            </Button>
+          )}
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
           <div className="mb-4">关注 @btcname_DID 的 X 账号</div>
