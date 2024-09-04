@@ -11,6 +11,7 @@ import { tryit } from 'radash';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 export default function BtcNameEvent() {
+  const activity_id = 1;
   const { address } = useReactWalletStore();
   const [loading, setLoading] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
@@ -42,7 +43,10 @@ export default function BtcNameEvent() {
   const getFollowStatus = async () => {
     setLoading(true);
     setActivityResult({});
-    const [err, res] = await tryit(getTwitterActivity)({ address });
+    const [err, res] = await tryit(getTwitterActivity)({
+      address,
+      activity_id,
+    });
     setLoading(false);
     if (err) {
       console.error(err);
@@ -67,6 +71,7 @@ export default function BtcNameEvent() {
       address,
       activity_name: 'following',
       result: 1,
+      activity_id,
     });
     if (err) {
       console.error(err);
@@ -87,6 +92,7 @@ export default function BtcNameEvent() {
     const [err, res] = await tryit(updateTwitterActivity)({
       address,
       activity_name: 'retweets',
+      activity_id,
       result: 1,
     });
     if (err) {
@@ -108,6 +114,7 @@ export default function BtcNameEvent() {
     const [err, res] = await tryit(updateTwitterActivity)({
       address,
       activity_name: 'flowers',
+      activity_id,
       result: 1,
     });
     if (err) {
