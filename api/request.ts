@@ -459,17 +459,18 @@ export const updateTwitterActivity = async ({
   address,
   activity_name,
   result,
+  activity_id,
 }) => {
   const res = await request('/twitter/updateactivity', {
     method: 'POST',
-    data: { address, activity_name, result },
+    data: { address, activity_name, result, activity_id },
   });
   return res;
 };
 
-export const getTwitterActivity = async ({ address }) => {
+export const getTwitterActivity = async ({ address, activity_id }) => {
   const res = await request('/twitter/verifyactivity', {
-    data: { address },
+    data: { address, activity_id },
   });
   return res;
 };
