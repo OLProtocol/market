@@ -17,7 +17,7 @@ export default function BtcNameEvent() {
   const [retweetLoading, setRetweetLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   const [activityResult, setActivityResult] = useState<any>({});
-  const [acountResult, setAccountResult] = useState(false);
+  const [acountResult, setAccountResult] = useState<any>({});
   const bindTwitter = async () => {
     const [_, res] = await tryit(bindTwitterAccount)({ address });
     console.log(res);
@@ -36,7 +36,7 @@ export default function BtcNameEvent() {
       return;
     }
     if (res.code === 200) {
-      setAccountResult(true);
+      setAccountResult(res.data?.twitter || {});
     }
   };
   const getFollowStatus = async () => {
@@ -136,16 +136,17 @@ export default function BtcNameEvent() {
       <div className="mb-6">
         <div className="text-2xl font-bold mb-4 flex justify-between items-center">
           <span>完成 X 社媒任务</span>
-          {!acountResult && (
-            <Button
-              size="sm"
-              color="default"
-              radius="full"
-              onClick={bindTwitter}
-            >
-              绑定 X
-            </Button>
-          )}
+
+          <Button
+            size="sm"
+            color="default"
+            radius="full"
+            isLoading={loading}
+            isDisabled={acountResult?.id}
+            onClick={bindTwitter}
+          >
+            {acountResult?.id ? `已绑定 ${acountResult.name}` : '绑定 X'}
+          </Button>
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
           <div className="mb-4">关注 @btcname_DID 的 X 账号</div>
@@ -154,7 +155,7 @@ export default function BtcNameEvent() {
               onClick={followHandler}
               size="sm"
               isLoading={loading || followLoading}
-              isDisabled={activityResult.following === 1 || !acountResult}
+              isDisabled={activityResult.following === 1 || !acountResult?.id}
               color="default"
               radius="full"
             >
@@ -173,7 +174,7 @@ export default function BtcNameEvent() {
               size="sm"
               color="default"
               isLoading={loading || retweetLoading}
-              isDisabled={activityResult.retweets === 1 || !acountResult}
+              isDisabled={activityResult.retweets === 1 || !acountResult?.id}
               radius="full"
             >
               转发
@@ -191,7 +192,7 @@ export default function BtcNameEvent() {
               size="sm"
               color="default"
               isLoading={loading || likeLoading}
-              isDisabled={activityResult.flowers === 1 || !acountResult}
+              isDisabled={activityResult.flowers === 1 || !acountResult?.id}
               radius="full"
             >
               点赞
