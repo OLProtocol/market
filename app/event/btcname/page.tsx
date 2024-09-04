@@ -23,7 +23,7 @@ export default function BtcNameEvent() {
     console.log(res);
 
     if (res.code === 200) {
-      window.open(res.data.authorization_url, '_blank');
+      location.href = res.data.authorization_url;
     }
   };
   const getTwitter = async () => {
