@@ -20,7 +20,6 @@ export function isTaprootAddress(address, network = 'mainnet') {
   try {
     // 通过 bitcoinjs-lib 检查
     const decoded = bitcoin.address.fromBech32(address);
-    console.log(decoded);
     const isBech32m =
       (decoded.prefix === 'bc' && network !== 'testnet') ||
       (decoded.prefix === 'tb' && network === 'testnet');
