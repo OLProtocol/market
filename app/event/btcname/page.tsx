@@ -136,7 +136,7 @@ export default function BtcNameEvent() {
       <div className="mb-6">
         <div className="text-2xl font-bold mb-4 flex justify-between items-center">
           <span>完成 X 社媒任务</span>
-          {acountResult && (
+          {!acountResult && (
             <Button
               size="sm"
               color="default"
