@@ -637,6 +637,14 @@ interface InscribeParams {
   toAddresses: string[];
   network: 'main' | 'testnet';
 }
+/**
+ * The `inscribe` function in TypeScript handles the creation and signing of a transaction for a
+ * specific network with various parameters and outputs.
+ * @param {InscribeParams}  - The `inscribe` function takes in several parameters to create and
+ * broadcast a transaction on the blockchain. Here is a breakdown of each parameter:
+ * @returns The `inscribe` function is returning the result of pushing the transaction to the network
+ * using `ordx.pushTx({ hex: Tx.encode(txdata).hex, network })`.
+ */
 export const inscribe = async ({
   inscription,
   network,
