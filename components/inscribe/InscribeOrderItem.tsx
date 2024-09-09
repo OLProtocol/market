@@ -16,7 +16,7 @@ export const InscribeOrderItem = ({
   status,
   address,
   txid,
-  offset,
+  offset = 0,
 }: InscribeCheckItemProps) => {
   const { t } = useTranslation();
   const inscriptionId = useMemo(() => `${txid}i${offset}`, [txid, offset]);
