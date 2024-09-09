@@ -229,7 +229,7 @@ export function BlogCreate() {
     setSelectName(name);
   };
   const mintRoutingDisabled = useMemo(() => {
-    return templateInscriptionId === prevInscriptionId;
+    return !templateInscriptionId;
   }, [templateInscriptionId]);
   const publishDisabled = useMemo(() => {
     return !(content && selectName && templateInscriptionId);
@@ -284,7 +284,7 @@ export function BlogCreate() {
             <div className="flex justify-center">
               <Button
                 color="primary"
-                isDisabled={!!templateInscriptionId}
+                // isDisabled={!!templateInscriptionId}
                 onClick={() => {
                   mintTemplate();
                 }}
