@@ -311,6 +311,8 @@ export const InscribingOrderModal = ({
       });
     }
   };
+  console.log(order);
+
   const returnInscirbe = async () => {
     if (!(order && order.commitTx)) {
       return;
@@ -599,8 +601,10 @@ export const InscribingOrderModal = ({
                 <InscribeOrderItem
                   key={index}
                   label={index + 1}
+                  txid={order.txid}
                   status={item?.status}
                   value={item.show}
+                  offset={item.offset}
                   address={
                     order.toAddress?.length > 1
                       ? order.toAddress[index]
