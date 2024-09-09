@@ -92,6 +92,7 @@
   "sort": "Sort",
   "filter": "Filter",
   "filter_all": "All",
+  "inscription_id": "Inscription ID",
   "split_dummy_hint": "If the number of virtual Utxo is not enough, it will be automatically divided.",
   "select_option": "Select Option"
 }
