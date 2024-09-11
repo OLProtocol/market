@@ -12,7 +12,7 @@ interface NameCategoryListProps {
 }
 export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
-  const [selectKey, setSelectKey] = useState('');
+  const [selectKey, setSelectKey] = useState('all');
 
   const swrKey = useMemo(() => {
     return `/ordx/getNameCategoryList-${name}-${network}`;
@@ -33,7 +33,11 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const onSelectionChange = (keys: any) => {
     const _v = Array.from(keys.values())[0] as string;
     setSelectKey(_v);
-    onChange?.(_v);
+    if (_v === 'all') {
+      onChange?.(undefined);
+    } else {
+      onChange?.(_v);
+    }
   };
 
   return (
@@ -46,6 +50,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       selectedKeys={selectKey ? [selectKey] : undefined}
       onSelectionChange={onSelectionChange}
     >
+      <SelectItem key={'all'}>All</SelectItem>
       {list.map((item) => (
         <SelectItem key={item.category} value={item.category}>
           {item.category}
