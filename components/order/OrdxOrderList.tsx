@@ -236,22 +236,24 @@ export const OrdxOrderList = ({
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
-        <div className="flex justify-end gap-4 mb-4">
+        <div className="flex justify-end gap-4 mb-4 flex-wrap">
           {assets_type == 'ns' && (
             <NameCategoryList name={assets_name} onChange={categoryChange} />
           )}
-          <Switch
-            isSelected={hideStatus}
-            onValueChange={(e) => setHideStatus(e)}
-          >
-            Hide Locked
-          </Switch>
-          <SortDropdown
-            sortList={sortList}
-            value={sort}
-            disabled={!list.length || canSelect}
-            onChange={onSortChange}
-          ></SortDropdown>
+          <div className="flex gap-4">
+            <Switch
+              isSelected={hideStatus}
+              onValueChange={(e) => setHideStatus(e)}
+            >
+              Hide Locked
+            </Switch>
+            <SortDropdown
+              sortList={sortList}
+              value={sort}
+              disabled={!list.length || canSelect}
+              onChange={onSortChange}
+            ></SortDropdown>
+          </div>
         </div>
 
         <ScrollContent
