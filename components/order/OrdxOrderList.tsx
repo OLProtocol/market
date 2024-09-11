@@ -15,6 +15,7 @@ import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { SortDropdown } from '@/components/SortDropdown';
+import { NameCategoryList } from '@/components/market/NameCategoryList';
 import { ScrollContent } from '@/components/ScrollContent';
 import { useDebounce, useList } from 'react-use';
 
@@ -49,6 +50,7 @@ export const OrdxOrderList = ({
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState(1);
+  const [category, setCategory] = useState('');
   const sortList = [
     { label: t('common.not_sort'), value: 0 },
     { label: t('common.sort_unit_price_ascending'), value: 1 },
@@ -61,10 +63,10 @@ export const OrdxOrderList = ({
 
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${network}-${page}-${size}-${sort}`;
+      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${network}-${page}-${size}-${sort}-${category}`;
     }
-    return `/ordx/getOrders-${assets_name}-${assets_type}-${network}-${page}-${size}-${sort}`;
-  }, [assets_name, address, page, size, network, sort, assets_type]);
+    return `/ordx/getOrders-${assets_name}-${assets_type}-${network}-${page}-${size}-${sort}-${category}`;
+  }, [assets_name, address, page, size, network, sort, assets_type, category]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({
@@ -73,6 +75,7 @@ export const OrdxOrderList = ({
       assets_name,
       address,
       sort,
+      category,
       assets_type,
       hide_locked: true,
     }),
@@ -136,8 +139,6 @@ export const OrdxOrderList = ({
   };
   const buyHandler = async (item) => {
     try {
-      console.log(item);
-
       if (item.locked === 0) {
         addBuy({ ...item, status: 'pending' });
       }
@@ -184,7 +185,9 @@ export const OrdxOrderList = ({
   const onBuySuccess = () => {
     mutate(swrKey);
   };
-
+  const categoryChange = (c) => {
+    setCategory(c);
+  };
   const batchCloseHandler = async () => {
     setCanSelect(false);
     const listPromise = buyList.map((item) =>
@@ -226,7 +229,6 @@ export const OrdxOrderList = ({
   const loadMore = () => {
     setPage(page + 1);
   };
-  console.log('list', list);
 
   useEffect(() => {
     reset();
@@ -234,22 +236,23 @@ export const OrdxOrderList = ({
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
-        {total > 1 && (
-          <div className="flex justify-end gap-4 mb-4">
-            <Switch
-              isSelected={hideStatus}
-              onValueChange={(e) => setHideStatus(e)}
-            >
-              Hide Locked
-            </Switch>
-            <SortDropdown
-              sortList={sortList}
-              value={sort}
-              disabled={!list.length || canSelect}
-              onChange={onSortChange}
-            ></SortDropdown>
-          </div>
-        )}
+        <div className="flex justify-end gap-4 mb-4">
+          {assets_type == 'ns' && (
+            <NameCategoryList name={assets_name} onChange={categoryChange} />
+          )}
+          <Switch
+            isSelected={hideStatus}
+            onValueChange={(e) => setHideStatus(e)}
+          >
+            Hide Locked
+          </Switch>
+          <SortDropdown
+            sortList={sortList}
+            value={sort}
+            disabled={!list.length || canSelect}
+            onChange={onSortChange}
+          ></SortDropdown>
+        </div>
 
         <ScrollContent
           loading={isLoading}
