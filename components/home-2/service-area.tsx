@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import LinearGradientLine from '@/components/svg/linear-gradient-line';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,7 +17,7 @@ const service_content = {
       We provide the <br /> best service for you
     </div>
   ),
-  des: <div>We've got all your payments covered</div>,
+  des: <div>We&apos;ve got all your payments covered</div>,
 
   users_data: [
     {

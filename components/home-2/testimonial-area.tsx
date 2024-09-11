@@ -17,9 +17,7 @@ const slider_data = [
     name: 'Lana Rey',
     job: 'Founder & Leader',
     info: (
-      <>
-        "Is it possible to Love your credit card processor? with Softec, yes!"
-      </>
+      <>Is it possible to Love your credit card processor? with Softec, yes!</>
     ),
   },
   {
@@ -28,9 +26,7 @@ const slider_data = [
     name: 'J. McGhee',
     job: 'Founder & Leader',
     info: (
-      <>
-        "Is it possible to Love your credit card processor? with Softec, yes!"
-      </>
+      <>Is it possible to Love your credit card processor? with Softec, yes!</>
     ),
   },
   {
@@ -39,9 +35,7 @@ const slider_data = [
     name: 'Michael H.',
     job: 'Founder & Leader',
     info: (
-      <>
-        "Is it possible to Love your credit card processor? with Softec, yes!"
-      </>
+      <>Is it possible to Love your credit card processor? with Softec, yes!</>
     ),
   },
   {
@@ -50,9 +44,7 @@ const slider_data = [
     name: 'Lana Rey',
     job: 'Founder & Leader',
     info: (
-      <>
-        "Is it possible to Love your credit card processor? with Softec, yes!"
-      </>
+      <>Is it possible to Love your credit card processor? with Softec, yes!</>
     ),
   },
 ];

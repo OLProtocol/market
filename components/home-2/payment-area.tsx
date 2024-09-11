@@ -19,10 +19,10 @@ import { column } from 'mathjs';
 const payment_content = {
   title: (
     <span>
-      You'll love our <br /> powerful payments.
+      You&apos;ll love our <br /> powerful payments.
     </span>
   ),
-  sub_title: <span>We've got all your payments covered</span>,
+  sub_title: <span>We&apos;ve got all your payments covered</span>,
   box_1: [
     {
       id: 1,
