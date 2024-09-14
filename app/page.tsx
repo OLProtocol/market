@@ -1,7 +1,6 @@
 'use client';
 import { useMemo, useEffect } from 'react';
 import { MintingTable } from '@/components/home/MintingTable';
-import IndexPage from '@/components/home-2/index';
 import { ordxSWR } from '@/api';
 
 export default function Home() {

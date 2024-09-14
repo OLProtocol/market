@@ -2,7 +2,6 @@
 import '@sat20/btc-connect/dist/style/index.css';
 import '@/styles/globals.css';
 import '@/styles/index.css';
-import '@/styles/index.scss';
 import { fontSans } from '@/config/fonts';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
