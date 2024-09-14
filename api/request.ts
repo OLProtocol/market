@@ -53,9 +53,19 @@ export const getOrdxAssets = async ({
   utxo,
   offset,
   size,
+  category,
 }: any) => {
   const res = await request('/ordx/GetAddressOrdxAssets', {
-    data: { address, offset, size, type, assets_type, assets_name, utxo },
+    data: {
+      address,
+      offset,
+      size,
+      type,
+      assets_type,
+      assets_name,
+      category,
+      utxo,
+    },
   });
   return res;
 };

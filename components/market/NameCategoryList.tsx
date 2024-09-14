@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { CategorySelect } from './CategorySelect';
 interface NameCategoryListProps {
   onChange?: (ticker?: string) => void;
-  name: string;
+  name?: string;
 }
 export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const { t } = useTranslation();

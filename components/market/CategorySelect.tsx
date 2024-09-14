@@ -40,7 +40,6 @@ export const CategorySelect = ({
       selectedKeys={selectKeys}
       onSelectionChange={onSelectionChange}
       renderValue={(items: SelectedItems<any>) => {
-        console.log(items);
         return items.map((item) => (
           <div key={item.key} className="flex items-center gap-2">
             <span>{item.data?.label}</span>
