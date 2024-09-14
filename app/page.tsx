@@ -34,12 +34,12 @@ export default function Home() {
   return (
     <div className="py-4">
       <div className="mb-4 w-full round-lg">
-        <IndexPage />
-        {/* <MintingTable
+        {/* <IndexPage /> */}
+        <MintingTable
           rarepizza={rarePizzaDetail}
           jades={jadesDetail}
           nsDetail={nsDetail}
-        /> */}
+        />
       </div>
     </div>
   );
