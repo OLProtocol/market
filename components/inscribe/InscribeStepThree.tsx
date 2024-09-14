@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useMap, useList } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { Checkbox } from '@nextui-org/checkbox';
+import { Checkbox } from '@nextui-org/react';
 import { isTaprootAddress } from '@/lib/wallet';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
