@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useEffect } from 'react';
 import { MintingTable } from '@/components/home/MintingTable';
+import IndexPage from '@/components/home-2/index';
 import { ordxSWR } from '@/api';
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
   return (
     <div className="py-4">
       <div className="mb-4 w-full round-lg">
+        {/* <IndexPage /> */}
         <MintingTable
           rarepizza={rarePizzaDetail}
           jades={jadesDetail}
