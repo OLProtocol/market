@@ -23,7 +23,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { thousandSeparator, getTickLabel } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
 import { HomeTypeTabs } from '@/components/market/HomeTypeTabs';
-import { BtcPrice } from '@/components/BtcPrice';
+import { NameMarketNav } from '@/components/market/NameMarketNav';
 
 export default function Market() {
   const { t, i18n } = useTranslation();
@@ -138,6 +138,7 @@ export default function Market() {
           onChange={onSortChange}
         ></SortDropdown>
       </div>
+      {type === 'ns' && <NameMarketNav />}
       <Table
         isHeaderSticky
         isStriped
