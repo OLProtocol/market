@@ -6,6 +6,12 @@ const nextConfig = {
     { from: 'public/raresats', to: 'out/raresats' },
     { from: 'public/icon', to: 'out/icon' },
   ],
+  images: {
+    unoptimized: true,
+  },
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 module.exports = nextConfig;

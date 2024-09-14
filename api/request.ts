@@ -53,9 +53,19 @@ export const getOrdxAssets = async ({
   utxo,
   offset,
   size,
+  category,
 }: any) => {
   const res = await request('/ordx/GetAddressOrdxAssets', {
-    data: { address, offset, size, type, assets_type, assets_name, utxo },
+    data: {
+      address,
+      offset,
+      size,
+      type,
+      assets_type,
+      assets_name,
+      category,
+      utxo,
+    },
   });
   return res;
 };
@@ -82,6 +92,7 @@ interface GetOrders {
   assets_name?: string;
   assets_type?: string;
   address?: string;
+  category?: string;
   offset: number;
   hide_locked?: boolean;
   size: number;
@@ -95,6 +106,7 @@ export const getOrders = async ({
   size,
   sort = 0,
   type = 1,
+  category,
   address,
   hide_locked,
 }: GetOrders) => {
@@ -107,6 +119,7 @@ export const getOrders = async ({
       sort,
       type,
       address,
+      category,
       hide_locked,
     },
   });
@@ -372,6 +385,14 @@ export const getFeeDiscount = async ({ address, project_id }: any) => {
     data: {
       address,
       project_id,
+    },
+  });
+  return res;
+};
+export const getNameCategoryList = async ({ name }: any) => {
+  const res = await request(`/ordx/GetNameCategoryList`, {
+    data: {
+      name_set: name,
     },
   });
   return res;

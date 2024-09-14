@@ -16,8 +16,13 @@ import { ScrollContent } from '@/components/ScrollContent';
 interface Props {
   assets_name: string;
   assets_type: string;
+  assets_category?: string;
 }
-export const AssetsList = ({ assets_name, assets_type }: Props) => {
+export const AssetsList = ({
+  assets_name,
+  assets_type,
+  assets_category,
+}: Props) => {
   const router = useRouter();
   const { address, network } = useReactWalletStore((state) => state);
   const {
@@ -32,9 +37,12 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
+  console.log('assets_category', assets_category);
+
   const swrKey = useMemo(() => {
-    return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${page}-${size}`;
-  }, [address, page, size, assets_name, assets_type]);
+    return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${assets_category}-${page}-${size}`;
+  }, [address, page, size, assets_name, assets_type, assets_category]);
+  console.log('swrKey', swrKey);
 
   const {
     data,
@@ -44,6 +52,7 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
     return getOrdxAssets({
       address,
       assets_name,
+      category: assets_category,
       assets_type: assets_type,
       offset: (page - 1) * size,
       size,
@@ -162,7 +171,7 @@ export const AssetsList = ({ assets_name, assets_type }: Props) => {
       setPage(1);
       trigger();
     }
-  }, [assets_type, assets_name]);
+  }, [assets_type, assets_name, assets_category]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <ScrollContent
