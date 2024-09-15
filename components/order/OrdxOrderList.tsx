@@ -80,7 +80,8 @@ export const OrdxOrderList = ({
       hide_locked: true,
     }),
   );
-  const [list, { set, push: pushToList, removeAt }] = useList<any>([]);
+  const [list, { set, push: pushToList, removeAt, reset: resetList }] =
+    useList<any>([]);
   useEffect(() => {
     if (data) {
       const { order_list = [] } = data?.data || {};
@@ -186,6 +187,9 @@ export const OrdxOrderList = ({
     mutate(swrKey);
   };
   const categoryChange = (c) => {
+    reset();
+    setCanSelect(false);
+    resetList();
     setCategory(c);
   };
   const batchCloseHandler = async () => {

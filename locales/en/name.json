@@ -9,7 +9,8 @@
       "6_digit": "6 Digits",
       "7_digit": "7 Digits",
       "8_digit": "8 Digits",
-      "11_digit": "8 Digits"
+      "11_digit": "11 Digits",
+      "12_digit": "12 Digits"
     },
     "letter": {
       "1_letter": "1 Letter",

@@ -68,6 +68,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       label: t('name.category.number.11_digit'),
       value: '11D',
     },
+    {
+      label: t('name.category.number.12_digit'),
+      value: '12D',
+    },
   ];
 
   const letterList = [
@@ -107,12 +111,17 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       value: '',
     },
     {
-      label: t('name.category.other.symmetric_digit'),
-      value: 'SDate',
+      label: t('name.category.other.date'),
+      value: 'sDate',
     },
     {
+      label: t('name.category.other.symmetric_digit'),
+      value: 'symmetric',
+    },
+
+    {
       label: t('name.category.other.consecutive_luck_digit'),
-      value: 'consecutive',
+      value: 'consecutive+luck',
     },
     {
       label: t('name.category.other.full_date'),
