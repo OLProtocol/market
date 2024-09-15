@@ -67,6 +67,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
           label: t('name.category.number.8_digit'),
           value: '8D',
         },
+        {
+          label: t('name.category.number.11_digit'),
+          value: '11D',
+        },
       ].map((item) => ({
         ...item,
         count: list.find((i) => i.category === item.value)?.count,
