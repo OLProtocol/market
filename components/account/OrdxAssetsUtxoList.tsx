@@ -9,15 +9,17 @@ import { NameCategoryList } from './NameCategoryList';
 // import { OrdxUtxoList } from './OrdxUtxoList';
 
 export const OrdxAssetsUtxoList = () => {
-  const router = useRouter();
   const [assertType, setAssertType] = useState<string>('ticker');
   const [assertName, setAssertName] = useState<string>('');
   const [assertCategory, setAssertCategory] = useState<string | undefined>();
   const onAssertChange = (data: string) => {
     setAssertName(data);
+    setAssertCategory('');
   };
   const onCategoryChange = (t: string) => {
     setAssertType(t);
+    setAssertCategory('');
+    setAssertName('');
   };
   const onAssertCategoryChange = (t?: string) => {
     setAssertCategory(t);
