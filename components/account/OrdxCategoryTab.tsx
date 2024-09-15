@@ -45,7 +45,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         value: exoticInfo?.total_value || 0,
       },
       {
-        label: 'Pure Name',
+        label: 'Names[DID])',
         key: 'ns',
         value: nsInfo?.total_value || 0,
       },

@@ -19,10 +19,19 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const [chineseSelected, setChineseSelected] = useState<string | undefined>();
   const [ohterSelected, setOhterSelected] = useState<string | undefined>();
 
-  const swrKey = useMemo(() => {
-    return `/ordx/getNameCategoryList-${name}-${network}`;
-  }, [name, network]);
+  useEffect(() => {
+    if (!name) {
+      setNameSelected('');
+      setLetterSelected('');
+      setChineseSelected('');
+      setOhterSelected('');
+    }
+  }, [name]);
   const numberList = [
+    {
+      label: 'All',
+      value: '',
+    },
     {
       label: t('name.category.number.1_digit'),
       value: '1D',
@@ -59,6 +68,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
 
   const letterList = [
     {
+      label: 'All',
+      value: '',
+    },
+    {
       label: t('name.category.letter.1_letter'),
       value: '1L',
     },
@@ -86,6 +99,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
 
   const otherList = [
     {
+      label: 'All',
+      value: '',
+    },
+    {
       label: t('name.category.other.symmetric_digit'),
       value: 'SDate',
     },
@@ -112,6 +129,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   ];
 
   const chineseList = [
+    {
+      label: 'All',
+      value: '',
+    },
     {
       label: t('name.category.chinese.1_han'),
       value: '1Han',
@@ -146,10 +167,8 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       letterSelected,
       chineseSelected,
       ohterSelected,
-    ].filter((i) => i);
-    if (c.length) {
-      onChange?.(c.join('+'));
-    }
+    ].filter((i) => i || i !== '');
+    onChange?.(c.join('+'));
   }, [nameSelected, letterSelected, chineseSelected, ohterSelected]);
   return (
     <div className="grid grid-cols-2 gap-2 md:grid-cols-4 mb-4">
