@@ -145,7 +145,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
         },
         {
           label: t('name.category.other.luck_digit'),
-          value: 'luck',
+          value: 'lucky',
         },
         {
           label: t('name.category.other.full_date'),
