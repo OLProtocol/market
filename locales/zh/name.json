@@ -29,7 +29,8 @@
     "other": {
       "date": "日期（YYMMDD, YYYYMM）",
       "symmetric_digit": "对称数字（123321）",
-      "consecutive_luck_digit": "含3个连续幸运数（689）",
+      "consecutive_digit": "连续数（689）",
+      "luck_digit": "幸运数（689）",
       "full_date": "完整日期（YYYYMMDD）",
       "did": "10位数字Web3DID",
       "c_mobile_number": "中国11位手机号",

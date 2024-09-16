@@ -140,8 +140,12 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
           value: 'symmetric',
         },
         {
-          label: t('name.category.other.consecutive_luck_digit'),
-          value: 'consecutive+luck',
+          label: t('name.category.other.consecutive_digit'),
+          value: 'consecutive',
+        },
+        {
+          label: t('name.category.other.luck_digit'),
+          value: 'luck',
         },
         {
           label: t('name.category.other.full_date'),

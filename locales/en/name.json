@@ -29,7 +29,8 @@
     "other": {
       "date": "Date (YYMMDD, YYYYMM)",
       "symmetric_digit": "Symmetric Digit",
-      "consecutive_luck_digit": "Consecutive Luck Digit",
+      "consecutive_digit": "Consecutive Digit",
+      "luck_digit": "Luck Digit",
       "full_date": "Full Date (YYYYMMDD)",
       "did": "DID (10-digit Web3DID)",
       "c_mobile_number": "CMobileNumber (11-digit)",
