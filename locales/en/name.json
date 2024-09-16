@@ -33,6 +33,8 @@
       "full_date": "Full Date (YYYYMMDD)",
       "did": "DID (10-digit Web3DID)",
       "c_mobile_number": "CMobileNumber (11-digit)",
+      "dal2": "DaL2",
+      "dal3": "DaL3",
       "unclassified_digit_names": "Other unclassified digit names"
     }
   }

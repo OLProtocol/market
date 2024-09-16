@@ -14,10 +14,12 @@ interface NameCategoryListProps {
 export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
-  const [nameSelected, setNameSelected] = useState<string | undefined>();
-  const [letterSelected, setLetterSelected] = useState<string | undefined>();
-  const [chineseSelected, setChineseSelected] = useState<string | undefined>();
-  const [ohterSelected, setOhterSelected] = useState<string | undefined>();
+  const [nameSelected, setNameSelected] = useState<string | undefined>('');
+  const [letterSelected, setLetterSelected] = useState<string | undefined>('');
+  const [chineseSelected, setChineseSelected] = useState<string | undefined>(
+    '',
+  );
+  const [ohterSelected, setOhterSelected] = useState<string | undefined>('');
 
   const swrKey = useMemo(() => {
     return `/ordx/getNameCategoryList-${name}-${network}`;
@@ -35,6 +37,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const numberList = useMemo(
     () =>
       [
+        {
+          label: 'All',
+          value: '',
+        },
         {
           label: t('name.category.number.1_digit'),
           value: '1D',
@@ -85,6 +91,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     () =>
       [
         {
+          label: 'All',
+          value: '',
+        },
+        {
           label: t('name.category.letter.1_letter'),
           value: '1L',
         },
@@ -118,6 +128,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     () =>
       [
         {
+          label: 'All',
+          value: '',
+        },
+        {
           label: t('name.category.other.date'),
           value: 'sDate',
         },
@@ -142,6 +156,14 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
           value: 'cmn',
         },
         {
+          label: t('name.category.other.dal2'),
+          value: 'DaL2',
+        },
+        {
+          label: t('name.category.other.dal3'),
+          value: 'DaL3',
+        },
+        {
           label: t('name.category.other.unclassified_digit_names'),
           value: 'undefined',
         },
@@ -154,6 +176,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const chineseList = useMemo(
     () =>
       [
+        {
+          label: 'All',
+          value: '',
+        },
         {
           label: t('name.category.chinese.1_han'),
           value: '1Han',
@@ -177,19 +203,26 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     [list],
   );
   const handlerSelected = (type: string, value: string) => {
-    setNameSelected('');
-    setLetterSelected('');
-    setChineseSelected('');
-    setOhterSelected('');
-
     if (type === 'number') {
       setNameSelected(value);
+      setLetterSelected('');
+      setChineseSelected('');
+      setOhterSelected('');
     } else if (type === 'letter') {
       setLetterSelected(value);
+      setNameSelected('');
+      setChineseSelected('');
+      setOhterSelected('');
     } else if (type === 'chinese') {
       setChineseSelected(value);
+      setNameSelected('');
+      setLetterSelected('');
+      setOhterSelected('');
     } else if (type === 'other') {
       setOhterSelected(value);
+      setNameSelected('');
+      setLetterSelected('');
+      setChineseSelected('');
     }
     onChange?.(value);
   };
