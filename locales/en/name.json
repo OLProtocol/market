@@ -28,14 +28,15 @@
     },
     "other": {
       "date": "Date (YYMMDD, YYYYMM)",
-      "symmetric_digit": "Symmetric Digit",
-      "consecutive_digit": "Consecutive Digit",
+      "symmetric_digit": "Symmetric",
+      "consecutive_digit": "Consecutive",
       "luck_digit": "Luck Digit",
       "full_date": "Full Date (YYYYMMDD)",
       "did": "DID (10-digit Web3DID)",
       "c_mobile_number": "CMobileNumber (11-digit)",
-      "dal2": "2N: 2char, digits and letters",
-      "dal3": "3N: 3char, digits and letters",
+      "dal2": "2Mix: 2char, digits and letters",
+      "dal3": "3Mix: 3char, digits and letters",
+      "char2": "2Symbol Name",
       "unclassified_digit_names": "Other unclassified digit names"
     }
   }
