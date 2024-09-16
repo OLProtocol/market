@@ -188,6 +188,7 @@ export const OrdxOrderList = ({
   };
   const categoryChange = (c) => {
     reset();
+    setPage(1);
     setCanSelect(false);
     resetList();
     setCategory(c);

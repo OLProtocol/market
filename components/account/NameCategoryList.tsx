@@ -139,6 +139,14 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       label: t('name.category.other.unclassified_digit_names'),
       value: 'undefined',
     },
+    {
+      label: t('name.category.other.dal2'),
+      value: 'DaL2',
+    },
+    {
+      label: t('name.category.other.dal3'),
+      value: 'DaL3',
+    },
   ];
 
   const chineseList = [

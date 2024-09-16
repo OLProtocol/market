@@ -33,6 +33,8 @@
       "full_date": "完整日期（YYYYMMDD）",
       "did": "10位数字Web3DID",
       "c_mobile_number": "中国11位手机号",
+      "dal2": "2杂（两个字符，必须有数字和字母）",
+      "dal3": "3杂（三个个字符，必须有数字和字母）",
       "unclassified_digit_names": "其他数字组合"
     }
   }
