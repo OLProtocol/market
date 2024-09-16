@@ -112,7 +112,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     },
     {
       label: t('name.category.other.date'),
-      value: 'sDate',
+      value: 'SDate',
     },
     {
       label: t('name.category.other.symmetric_digit'),
