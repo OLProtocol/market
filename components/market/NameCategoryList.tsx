@@ -168,6 +168,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
           value: 'DaL3',
         },
         {
+          label: t('name.category.other.char2'),
+          value: '2char',
+        },
+        {
           label: t('name.category.other.unclassified_digit_names'),
           value: 'undefined',
         },
