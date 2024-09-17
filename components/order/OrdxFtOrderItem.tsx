@@ -109,7 +109,7 @@ export const OrdxFtOrderItem = ({
         </div>
       )}
       <CardBody className="radius-lg w-[10rem] h-[10rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
-        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base">
           <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
             <div className="absolute items-center inset-0 z-10">
               {asset?.assets_type === 'exotic' ? (
