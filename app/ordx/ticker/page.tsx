@@ -112,11 +112,13 @@ export default function Page() {
           )}
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
-              <div className="text-2xl md:text-3xl font-medium text-gary-500">
-                {summary?.nickname
-                  ? summary?.nickname
-                  : getTickLabel(summary?.assets_name)}
-              </div>
+              {ticker !== 'btc' && (
+                <div className="text-2xl md:text-3xl font-medium text-gary-500">
+                  {summary?.nickname
+                    ? summary?.nickname
+                    : getTickLabel(summary?.assets_name)}
+                </div>
+              )}
             </div>
             <WalletConnectBus text={t('buttons.list_sale')}>
               <Button onClick={toAccount} color="primary">
