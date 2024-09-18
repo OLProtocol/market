@@ -31,7 +31,7 @@ export const OrderNameTypeNav: FC<OrderNameTypeNavProps> = ({
               radius="full"
               onClick={() => handlerClick(item)}
             >
-              {item.label} {item.count > 0 ? `(${item.count})` : ''}
+              {item.label}
             </Button>
           </Tooltip>
         ) : (
@@ -42,7 +42,7 @@ export const OrderNameTypeNav: FC<OrderNameTypeNavProps> = ({
             radius="full"
             onClick={() => handlerClick(item)}
           >
-            {item.label} {item.count > 0 ? `(${item.count})` : ''}
+            {item.label}
           </Button>
         ),
       )}
