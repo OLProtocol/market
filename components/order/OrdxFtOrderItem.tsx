@@ -179,7 +179,9 @@ export const OrdxFtOrderItem = ({
         </div>
       </CardBody>
       <CardFooter className="block item-center bg-gray-800 w-full h-[6rem] md:h-[6.5rem]">
-        <div className="flex-1 flex items-center justify-between gap-4 font-bold mb-1 sm:md-2">
+        <div
+          className={`flex-1 flex items-center justify-between gap-4 font-bold mb-1 sm:md-2 ${assets_type === 'ns' ? 'mb-4' : ''}`}
+        >
           <div className="flex ">
             {item.currency === 'BTC' && (
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
@@ -193,20 +195,23 @@ export const OrdxFtOrderItem = ({
             </span>
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-between gap-4  md:mb-2 text-[10px] md:text-xs mb-1">
-          <div className="flex items-center">
-            {item.currency === 'BTC' && (
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
-            )}
-            <span className="font-bold text-amber-400">
-              {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
-            </span>
-            <span className="font-mono text-gray-100">
-              &nbsp;sats/{asset?.assets_name}
-            </span>
+        {assets_type !== 'ns' && (
+          <div className="flex-1 flex items-center justify-between gap-4  md:mb-2 text-[10px] md:text-xs mb-1">
+            <div className="flex items-center">
+              {item.currency === 'BTC' && (
+                <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
+              )}
+              <span className="font-bold text-amber-400">
+                {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
+              </span>
+              <span className="font-mono text-gray-100">
+                &nbsp;sats/{asset?.assets_name}
+              </span>
+            </div>
           </div>
-        </div>
-        <WalletConnectBus className="flex-1 mb-2" text={t('buttons.buy')}>
+        )}
+
+        <WalletConnectBus className={`flex-1`} text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
             <Button
               className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"
