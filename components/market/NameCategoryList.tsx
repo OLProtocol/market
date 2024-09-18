@@ -44,23 +44,25 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
           value: '',
         },
         {
-          label: t('name.category.chinese.2_han'),
+          label: t('name.category.nav.2_han.label'),
           value: '2Han',
         },
         {
-          label: t('name.category.other.dal3'),
+          label: t('name.category.nav.dal3.label'),
+          tooltip: t('name.category.nav.dal3.tooltip'),
           value: 'DaL3',
         },
         {
-          label: t('name.category.letter.cvcv'),
+          label: t('name.category.nav.cvcv.label'),
           value: 'cvcv',
         },
         {
-          label: t('name.category.other.date'),
+          label: t('name.category.nav.date.label'),
+          tooltip: t('name.category.nav.date.tooltip'),
           value: 'SDate',
         },
         {
-          label: t('name.category.other.luck_digit'),
+          label: t('name.category.nav.lucky.label'),
           value: 'lucky',
         },
       ].map((item) => ({
@@ -279,7 +281,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     onChange?.(value);
   };
   return (
-    <div>
+    <div className="flex flex-wrap justify-end items-center gap-2">
       <OrderNameTypeNav
         value={navSelected}
         onChange={handlerNavSelected}
