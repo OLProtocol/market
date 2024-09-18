@@ -7,6 +7,7 @@ import { Tabs, Tab } from '@nextui-org/react';
 import { OrdxOrderList } from '@/components/order/OrdxOrderList';
 import { OrderAnalyze } from '@/components/order/OrderAnalyze';
 import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
+import { OrderNameTypeNav } from '@/components/order/OrderNameTypeNav';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
