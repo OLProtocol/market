@@ -245,7 +245,7 @@ export const OrdxOrderList = ({
           {assets_type == 'ns' && (
             <NameCategoryList name={assets_name} onChange={categoryChange} />
           )}
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-end">
             <Switch
               isSelected={hideStatus}
               onValueChange={(e) => setHideStatus(e)}

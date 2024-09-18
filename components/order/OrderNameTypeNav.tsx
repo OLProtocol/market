@@ -21,7 +21,7 @@ export const OrderNameTypeNav: FC<OrderNameTypeNavProps> = ({
   };
 
   return (
-    <div className="flex gap-2 mb-4">
+    <div className="flex gap-2 mb-4 flex-wrap">
       {list.map((item) => (
         <Button
           key={item.value}
