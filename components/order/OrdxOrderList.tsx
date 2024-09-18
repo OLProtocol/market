@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { Switch } from '@nextui-org/react';
+import { Switch, Tooltip } from '@nextui-org/react';
 import { Empty, notification } from 'antd';
 import { getOrders, lockOrder, unlockOrder, cancelOrder } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
@@ -241,11 +241,11 @@ export const OrdxOrderList = ({
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <Content loading={isLoading}>
-        <div className="flex justify-end gap-4 mb-4 flex-wrap">
+        <div className="flex justify-end items-end gap-4 mb-4 flex-wrap">
           {assets_type == 'ns' && (
             <NameCategoryList name={assets_name} onChange={categoryChange} />
           )}
-          <div className="flex gap-4 items-end">
+          <div className="flex gap-4 items-center">
             <Switch
               isSelected={hideStatus}
               onValueChange={(e) => setHideStatus(e)}

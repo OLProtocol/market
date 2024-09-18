@@ -26,6 +26,25 @@
       "3_han": "3 Han",
       "4_han": "4 Han"
     },
+    "nav": {
+      "2_han": {
+        "label": "2 Han"
+      },
+      "dal3": {
+        "label": "3Mix",
+        "tooltip": "3char, digits and letters"
+      },
+      "cvcv": {
+        "label": "CVCV"
+      },
+      "date": {
+        "label": "Date/Birthday",
+        "tooltip": "YYMMDD, YYYYMM"
+      },
+      "lucky": {
+        "label": " Luck-Digi"
+      }
+    },
     "other": {
       "date": "Date (YYMMDD, YYYYMM)",
       "symmetric_digit": "Symmetric",

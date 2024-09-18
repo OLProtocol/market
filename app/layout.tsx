@@ -47,7 +47,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         /> */}
 
-        <title>Ordx Market</title>
+        <title>Sat20 Market</title>
       </head>
       <body
         className={clsx(
