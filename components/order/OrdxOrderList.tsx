@@ -299,6 +299,8 @@ export const OrdxOrderList = ({
       )}
       {canSelect && (
         <BatchBuyFooter
+          assets_name={assets_name}
+          assets_type={assets_type}
           list={filterList}
           onClose={batchCloseHandler}
           onSuccess={batchSuccessHandler}
