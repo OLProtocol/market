@@ -39,12 +39,16 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface Props {
   list: any[];
+  assets_name?: string;
+  assets_type?: string;
   toBuy?: () => void;
   onSuccess?: () => void;
   onClose?: () => void;
 }
 export const BatchBuyFooter = ({
   list: assetsList,
+  assets_name,
+  assets_type,
   onSuccess,
   onClose,
 }: Props) => {
@@ -68,7 +72,7 @@ export const BatchBuyFooter = ({
     { raw: string; order_id: string }[]
   >([]);
   const [networkFee, setNetworkFee] = useState(0);
-  const { feeRate } = useCommonStore((state) => state);
+  const { feeRate, btcHeight } = useCommonStore((state) => state);
   const { address, network } = useReactWalletStore();
 
   const lockOrderIds = useMemo(() => {
@@ -136,6 +140,13 @@ export const BatchBuyFooter = ({
     [list],
   );
   const serviceFee = useMemo(() => {
+    console.log('btcHeight', btcHeight);
+    console.log('assets_name', assets_name);
+    console.log('assets_type', assets_type);
+
+    if (assets_name === 'btc' && assets_type === 'ns' && btcHeight < 863000) {
+      return 0;
+    }
     const minServiceDecimal = new Decimal(minServiceFee);
     const _s = list.reduce((a, b) => {
       let decimalB = new Decimal(Number(btcToSats(b.price)));
@@ -145,7 +156,7 @@ export const BatchBuyFooter = ({
       return totalSercice;
     }, new Decimal(0));
     return _s.plus(minServiceDecimal).toNumber();
-  }, [list]);
+  }, [list, btcHeight, assets_name, assets_type]);
   const insufficientBalanceStatus = useMemo(
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
