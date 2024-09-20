@@ -45,7 +45,7 @@ export const request = async (
       (res as any)?.data.msg ===
         'public and signature parameters are required in the request headers'
     ) {
-      disconnect();
+      // disconnect();
     }
     throw (res as any)?.data?.msg;
   }
