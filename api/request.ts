@@ -32,15 +32,21 @@ export const request = async (
   }
   if (connected && signature) {
     headers['Publickey'] = publicKey;
-    headers['Signature'] = signature;
+    headers['Signature'] = 'signature';
   }
   // delete options.data;
   options.headers = headers;
   let res = await axios(url, options);
+  console.log(res);
+
   if ((res as any)?.data.code === -1) {
-    // if ((res as any).msg === 'api signature verification failed' || (res as any).msg === 'public and signature parameters are required in the request headers') {
-    //   await setSignature('');
-    // }
+    if (
+      (res as any)?.data.msg === 'api signature verification failed' ||
+      (res as any)?.data.msg ===
+        'public and signature parameters are required in the request headers'
+    ) {
+      disconnect();
+    }
     throw (res as any)?.data?.msg;
   }
   return res?.data as any;
