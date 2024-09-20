@@ -32,7 +32,7 @@ export const request = async (
   }
   if (connected && signature) {
     headers['Publickey'] = publicKey;
-    headers['Signature'] = 'signature';
+    headers['Signature'] = signature;
   }
   // delete options.data;
   options.headers = headers;
@@ -46,6 +46,7 @@ export const request = async (
         'public and signature parameters are required in the request headers'
     ) {
       // disconnect();
+      // setSignature('');
     }
     throw (res as any)?.data?.msg;
   }
