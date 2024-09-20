@@ -1,11 +1,6 @@
 'use client';
 import { Button, ButtonGroup, Card, CardBody } from '@nextui-org/react';
-// import { useLocation } from 'react-router-dom';
-// import { useToast } from '@chakra-ui/react';
-import { random } from 'radash';
 import { useEffect, useMemo, useRef, useState } from 'react';
-// import { BtcHeightAlert } from '@/components/BtcHeightAlert';
-// import { InscribeBrc20 } from './components/InscribeBrc20';
 import { InscribeOrdx } from '@/components/inscribe/InscribeOrdx';
 import { InscribeText } from '@/components/inscribe/InscribeText';
 import { InscribeFiles } from '@/components/inscribe/InscribeFiles';

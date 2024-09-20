@@ -7,7 +7,7 @@ import {
   toPsbtNetwork,
   NetworkType,
 } from '@/lib/wallet';
-import { signAndPushPsbt } from '@/lib';
+import { signAndPushPsbt } from '@/lib/utils/btc';
 import { flat, sum } from 'radash';
 import { keys } from '@cmdcode/crypto-utils';
 import i18n from '@/locales';
