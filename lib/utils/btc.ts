@@ -8,15 +8,15 @@ import { addresToScriptPublicKey } from '../wallet/utils';
 import { bitcoin, toPsbtNetwork, NetworkType } from '../wallet';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
-export const parseUtxo = (utxo: string) => {
+export function parseUtxo(utxo: string) {
   const [txid, vout] = utxo.split(':');
   return {
     txid,
     vout: parseInt(vout),
   };
-};
+}
 
-export const satsToBitcoin = (sats): number => {
+export function satsToBitcoin(sats): number {
   if (typeof sats === 'string') {
     sats = sats.trim();
   }
@@ -41,9 +41,9 @@ export const satsToBitcoin = (sats): number => {
   const btc = satoshis / 1e8;
 
   return btc;
-};
+}
 
-export const btcToSats = (btc: string | number): number => {
+export function btcToSats(btc: string | number): number {
   if (typeof btc === 'string') {
     btc = btc.trim();
   }
@@ -65,12 +65,9 @@ export const btcToSats = (btc: string | number): number => {
   const sats = Math.round(btcAmount * 1e8);
 
   return sats;
-};
+}
 
-export const safeOutputValue = (
-  value: number | Decimal,
-  isMs = false,
-): number => {
+export function safeOutputValue(value: number | Decimal, isMs = false): number {
   const threshold = isMs ? MS_BRC20_UTXO_VALUE : DUST_UTXO_VALUE;
 
   // if value is less than 1k sats, throw an error
@@ -94,13 +91,13 @@ export const safeOutputValue = (
   }
 
   return value.round().toNumber();
-};
+}
 
-// export const filterUtxosByValue = (
+// export function filterUtxosByValue(
 //   utxos: any[],
 //   value,
 //   reverseStatus = true,
-// ) => {
+// ) {
 //   const sortUtxos = sortBy(utxos, 'value');
 //   console.log('sortUtxos', sortUtxos);
 //   const _utxoList = cloneDeep(sortUtxos);
@@ -138,9 +135,9 @@ export const safeOutputValue = (
 //     smallTwoUtxos,
 //     total: avialableValue,
 //   };
-// };
+// }
 
-export const calcPsbtVirtualSize = (psbtHex: string, network: string) => {
+export function calcPsbtVirtualSize(psbtHex: string, network: string) {
   const btccoinNetwork = toPsbtNetwork(
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
@@ -165,9 +162,9 @@ export const calcPsbtVirtualSize = (psbtHex: string, network: string) => {
   const virtualSize = tx.virtualSize();
   console.log('virtualSize', virtualSize);
   return virtualSize;
-};
+}
 
-export const calcPsbtVsizeByUtxos = ({ inputs, outputs, network }) => {
+export function calcPsbtVsizeByUtxos({ inputs, outputs, network }) {
   const btccoinNetwork = toPsbtNetwork(
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
@@ -176,26 +173,26 @@ export const calcPsbtVsizeByUtxos = ({ inputs, outputs, network }) => {
     network: btccoinNetwork,
   });
 
-  inputs.forEach((i) => {
+  inputs.forEach(function (i) {
     virtualPsbt.addInput(i);
   });
-  outputs.forEach((o) => {
+  outputs.forEach(function (o) {
     virtualPsbt.addOutput(o);
   });
   console.log('virtualPsbt', virtualPsbt);
   return calcPsbtVirtualSize(virtualPsbt.toHex(), network);
-};
+}
 
-export const calcUtxosVirtualGas = ({
+export function calcUtxosVirtualGas({
   utxos,
   address,
   network,
   estimateFee,
   feeRate,
   outputLenght,
-}) => {
+}) {
   feeRate = Math.max(1.2, 1);
-  const inputs: any[] = utxos.map((v) => {
+  const inputs: any[] = utxos.map(function (v) {
     return {
       hash: v.txid,
       index: v.vout,
@@ -226,9 +223,9 @@ export const calcUtxosVirtualGas = ({
     network,
   });
   return estimateFee;
-};
+}
 
-export const signAndPushPsbt = async (psbt) => {
+export async function signAndPushPsbt(psbt) {
   const { btcWallet } = useReactWalletStore.getState();
   if (!btcWallet) {
     throw new Error('No wallet connected');
@@ -241,4 +238,4 @@ export const signAndPushPsbt = async (psbt) => {
   } catch (error) {
     return pushedTxId;
   }
-};
+}

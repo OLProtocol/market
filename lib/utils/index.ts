@@ -6,6 +6,13 @@ import { add, format } from 'date-fns';
 import { flat } from 'radash';
 import crypto from 'crypto';
 
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 export const getLabelForAssets = (assets_name: string, assets_type: string) => {
   const assetsMap = {
     ns: {

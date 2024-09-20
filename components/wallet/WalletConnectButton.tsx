@@ -8,7 +8,7 @@ import {
   Snippet,
 } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   WalletConnectReact,
   useReactWalletStore,
@@ -113,6 +113,9 @@ const WalletConnectButton = () => {
       console.log(error);
     }
   };
+  const showAmount = useMemo(() => {
+    return satsToBitcoin(utxoAmount);
+  }, [utxoAmount]);
   const checkSignature = async () => {
     if (signature) {
       try {
@@ -177,7 +180,7 @@ const WalletConnectButton = () => {
               }
             >
               <div className="flex items-center gap-1 pl-2">
-                <span>{satsToBitcoin(utxoAmount)}</span>
+                <span>{showAmount}</span>
                 <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
               </div>
             </Button>
