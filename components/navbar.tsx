@@ -159,7 +159,7 @@ export const Navbar = () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink
             className="flex justify-start items-center gap-1"
-            href="https://default.ordx.market/"
+            href="https://ordx.market/"
           >
             <Image
               radius="none"
