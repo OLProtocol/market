@@ -24,11 +24,14 @@ export interface OrderItemType {
   secret: string;
   txid?: string;
   discount?: number;
+  runeMetadata: any;
+  opReturnScript: string;
   oneUtxo: boolean;
   tight: boolean;
   toAddress: string[];
   network: string;
   files: any[];
+  wifPrivateKey: string;
   metadata: any;
   fee: {
     serviceFee: number;

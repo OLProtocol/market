@@ -28,6 +28,7 @@ import {
   sendBtcPsbt,
   returnInscribe,
 } from '@/lib/inscribe';
+import { mintRune } from '@/lib/inscribe/rune';
 import { deleteMintRecord } from '@/api';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -189,11 +190,19 @@ export const InscribingOrderModal = ({
         value: specialOffsetAmount,
       });
     }
+    console.log('order', order);
 
-    outputs.push({
-      address: order?.inscription.inscriptionAddress,
-      value: totalFee,
-    });
+    if (order.type === 'rune') {
+      outputs.push({
+        address: order?.runeMetadata?.address,
+        value: totalFee,
+      });
+    } else {
+      outputs.push({
+        address: order?.inscription.inscriptionAddress,
+        value: totalFee,
+      });
+    }
 
     if (isSpecial && orderAmount - totalFee > 330) {
       outputs.push({
@@ -216,9 +225,11 @@ export const InscribingOrderModal = ({
     order.fee,
     order.toAddress,
     currentAccount,
+    order.type,
+    order.runeMetadata,
   ]);
   const caclPsbtAndFee = async () => {
-    if (psbtData?.[0]?.length) {
+    if (psbtData?.[0]?.length && psbtData?.[1]?.length) {
       setLoading(true);
       console.log('psbtData', psbtData);
       const params = {
@@ -311,7 +322,7 @@ export const InscribingOrderModal = ({
       });
     }
   };
-  console.log(order);
+  // console.log(order);
 
   const returnInscirbe = async () => {
     if (!(order && order.commitTx)) {
@@ -364,22 +375,37 @@ export const InscribingOrderModal = ({
       console.log('order', order);
       const { commitTx, fee, oneUtxo, tight } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
-      await sleep(10000);
-      // await ordx.pollGetTxStatus(commitTxid, order.network);
-      const txid = await inscribe({
-        secret: order.secret,
-        oneUtxo,
-        tight,
-        network: order.network as any,
-        inscription: order.inscription,
-        files: order.files,
-        metadata: order.metadata,
-        txid: commitTxid,
-        vout: commitTx.vout,
-        amount: commitTx.amount,
-        toAddresses: order.toAddress,
-      });
-
+      await sleep(6000);
+      let txid;
+      if (order.type === 'rune') {
+        txid = await mintRune({
+          secret: order.wifPrivateKey,
+          network: order.network,
+          opReturnScript: order.opReturnScript,
+          files: order.files,
+          toAddress: order.toAddress[0],
+          feeRate: order.feeRate,
+          utxo: {
+            txid: commitTx.txid,
+            vout: commitTx.vout,
+            value: commitTx.amount,
+          },
+        });
+      } else {
+        txid = await inscribe({
+          secret: order.secret,
+          oneUtxo,
+          tight,
+          network: order.network as any,
+          inscription: order.inscription,
+          files: order.files,
+          metadata: order.metadata,
+          txid: commitTxid,
+          vout: commitTx.vout,
+          amount: commitTx.amount,
+          toAddresses: order.toAddress,
+        });
+      }
       order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
       //addSucccessTxid(orderId, txid);
 
