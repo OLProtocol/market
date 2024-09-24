@@ -18,6 +18,7 @@ export interface PsbtInput {
 }
 export interface PsbtOutput {
   address: string;
+  script?: Buffer;
   value: number;
 }
 export enum AddressType {

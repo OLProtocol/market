@@ -9,12 +9,15 @@ import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
 import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { WIFWallet, createWifPrivateKey } from '@/lib/inscribe/WIFWallet';
 import { notification } from 'antd';
 import { inscribeOrderHistory } from '@/lib/storage';
 import { useCalcFee } from '@/lib/hooks';
 import { OrderItemType, useCommonStore, useOrderStore } from '@/store';
 import { tryit } from 'radash';
 import { useTranslation } from 'react-i18next';
+import { Runestone, none, some, RuneId } from 'runelib';
+// import { Runestone, RuneId } from '@ordjs/runestone';
 
 interface Brc20SetpOneProps {
   list: any[];
@@ -37,7 +40,7 @@ export const InscribeStepThree = ({
   onRemoveAll,
 }: Brc20SetpOneProps) => {
   const { t } = useTranslation();
-  const { feeRate, btcHeight } = useCommonStore((state) => state);
+  const { feeRate, btcHeight, runtimeEnv } = useCommonStore((state) => state);
   const [errText, setErrText] = useState('');
   const {
     network,
@@ -82,6 +85,9 @@ export const InscribeStepThree = ({
     }
   }, [data.toMultipleAddresses, data.toSingleAddress, selectedTab]);
   const totalInscriptionSize = useMemo(() => {
+    if (type === 'rune') {
+      return files.length * 546;
+    }
     return tightSelected
       ? Math.max(330, files.length)
       : files.reduce((acc, cur) => acc + cur.amount, 0);
@@ -100,7 +106,41 @@ export const InscribeStepThree = ({
     let inscription;
     let _discount = discount;
     let _files: any[] = [];
+    let _opReturnScript;
+    const runeMetadata: any = {};
+    const wifPrivateKey = createWifPrivateKey(network);
     if (type === 'rune') {
+      _files = files;
+      const oneNetwork = Math.ceil(130 * feeRate.value);
+      const twoNetwork = Math.ceil(180 * feeRate.value);
+      feeObj.networkFee = (files.length - 1) * twoNetwork + oneNetwork;
+      console.log('feeObj.network', feeObj.network);
+      let totalFee = feeObj.networkFee + totalInscriptionSize;
+      const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
+      if (metadata.type === 'name' && btcHeight <= 856000) {
+        _discount = 100;
+      }
+      if (runtimeEnv === 'dev') {
+        _discount = 100;
+      }
+      feeObj.serviceFee = Math.ceil(oneFee);
+      feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
+      feeObj.totalInscriptionSize = totalInscriptionSize;
+      feeObj.totalFee = totalFee;
+      const runestone = new Runestone(
+        [],
+        none(),
+        some(new RuneId(1, 0)),
+        some(1),
+      );
+      _opReturnScript = runestone.encipher().toString('hex');
+      console.log('wifPrivateKey', wifPrivateKey);
+      const runeWallet = new WIFWallet({
+        network: network,
+        privateKey: wifPrivateKey,
+      });
+
+      runeMetadata.address = runeWallet.address;
     } else {
       _files = files.map((f, i) => {
         let a = f.amount;
@@ -191,7 +231,10 @@ export const InscribeStepThree = ({
       type,
       inscription,
       secret,
+      wifPrivateKey,
       oneUtxo,
+      runeMetadata,
+      opReturnScript: _opReturnScript,
       tight: tightSelected,
       discount: _discount,
       fee: feeObj,

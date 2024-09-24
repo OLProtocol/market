@@ -11,7 +11,7 @@ import { signAndPushPsbt } from '@/lib/utils/btc';
 import { flat, sum } from 'radash';
 import { keys } from '@cmdcode/crypto-utils';
 import i18n from '@/locales';
-import { Decimal } from 'decimal.js';
+import { WIFWallet } from '@/lib/inscribe/WIFWallet';
 const crypto = require('crypto');
 import {
   textToHex,
@@ -637,6 +637,7 @@ interface InscribeParams {
   toAddresses: string[];
   network: 'main' | 'testnet';
 }
+
 /**
  * The `inscribe` function in TypeScript handles the creation and signing of a transaction for a
  * specific network with various parameters and outputs.
@@ -804,6 +805,8 @@ export const generateSendBtcPsbt = async ({
   network,
   publicKey,
 }) => {
+  console.log('outputs', outputs);
+
   const psbt = await buildTransaction({
     utxos: utxos,
     outputs,

@@ -11,7 +11,7 @@ import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { useList } from 'react-use';
 import { Decimal } from 'decimal.js';
-import { ScrollContent } from '@/components/ScrollContent';
+import { InfiniteScroll } from '@/components/InfiniteScroll';
 
 interface Props {
   assets_name: string;
@@ -151,7 +151,7 @@ export const AssetsList = ({
   const finished = useMemo(() => {
     return list.length >= total;
   }, [total, list]);
-  const loadMore = () => {
+  const loadMore = async () => {
     setPage(page + 1);
   };
 
@@ -174,13 +174,13 @@ export const AssetsList = ({
   }, [assets_type, assets_name, assets_category]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
-      <ScrollContent
+      <InfiniteScroll
         loading={isLoading}
         loadMore={loadMore}
-        finished={finished}
+        hasMore={!finished}
         empty={!list.length}
       >
-        <div className="min-h-[30rem] flex flex-wrap justify-center gap-4 md:gap-6 mb-4">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-4">
           {list.map((item: any, i) => (
             <div key={item.utxo + i}>
               <AssetsItem
@@ -204,7 +204,7 @@ export const AssetsList = ({
             </div>
           ))}
         </div>
-      </ScrollContent>
+      </InfiniteScroll>
       {/* {total > 1 && (
         <div className="flex justify-center">
           <Pagination

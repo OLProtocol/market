@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { SortDropdown } from '@/components/SortDropdown';
 import { NameCategoryList } from '@/components/market/NameCategoryList';
-import { ScrollContent } from '@/components/ScrollContent';
+import { InfiniteScroll } from '@/components/InfiniteScroll';
 import { useDebounce, useList } from 'react-use';
 
 interface OrdxOrderListProps {
@@ -231,7 +231,7 @@ export const OrdxOrderList = ({
   const finished = useMemo(() => {
     return list.length >= total;
   }, [total, list]);
-  const loadMore = () => {
+  const loadMore = async () => {
     setPage(page + 1);
   };
 
@@ -261,10 +261,10 @@ export const OrdxOrderList = ({
           </div>
         </div>
 
-        <ScrollContent
+        <InfiniteScroll
           loading={isLoading}
           loadMore={loadMore}
-          finished={finished}
+          hasMore={!finished}
           empty={!list.length}
         >
           <div className="min-h-[30rem] flex flex-wrap justify-center md:gap-8 mb-4 gap-2">
@@ -285,7 +285,7 @@ export const OrdxOrderList = ({
               </div>
             ))}
           </div>
-        </ScrollContent>
+        </InfiniteScroll>
       </Content>
 
       {!!orderRaw && (

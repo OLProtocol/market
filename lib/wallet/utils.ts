@@ -106,7 +106,7 @@ export async function buildTransaction({
   tx.setEnableRBF(true);
 
   outputs.forEach((v) => {
-    tx.addOutput(v.address, v.value);
+    tx.addOutput(v.address, v.value, v.script);
   });
   await tx.addSufficientUtxosForFee(btcUtxos, {
     suitable,

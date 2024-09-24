@@ -615,10 +615,10 @@ export default function Inscribe() {
       key: 'files',
       label: t('pages.inscribe.files.name'),
     },
-    // {
-    //   key: 'rune',
-    //   label: 'Rune',
-    // },
+    {
+      key: 'rune',
+      label: 'Rune',
+    },
   ];
   const onDiscount = (d) => {
     setDiscount(d);
