@@ -112,7 +112,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     },
     {
       label: t('name.category.other.date'),
-      value: 'sDate',
+      value: 'SDate',
     },
     {
       label: t('name.category.other.symmetric_digit'),
@@ -120,8 +120,12 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     },
 
     {
-      label: t('name.category.other.consecutive_luck_digit'),
-      value: 'consecutive+luck',
+      label: t('name.category.other.consecutive_digit'),
+      value: 'consecutive',
+    },
+    {
+      label: t('name.category.other.luck_digit'),
+      value: 'lucky',
     },
     {
       label: t('name.category.other.full_date'),
@@ -136,16 +140,20 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       value: 'cmn',
     },
     {
-      label: t('name.category.other.unclassified_digit_names'),
-      value: 'undefined',
-    },
-    {
       label: t('name.category.other.dal2'),
       value: 'DaL2',
     },
     {
       label: t('name.category.other.dal3'),
       value: 'DaL3',
+    },
+    {
+      label: t('name.category.other.char2'),
+      value: '2char',
+    },
+    {
+      label: t('name.category.other.unclassified_digit_names'),
+      value: 'undefined',
     },
   ];
 

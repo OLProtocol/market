@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { Select, SelectItem, Tabs, Tab } from '@nextui-org/react';
 import { getNameCategoryList } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { OrderNameTypeNav } from '@/components/order/OrderNameTypeNav';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CategorySelect } from './CategorySelect';
@@ -15,6 +16,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
   const [nameSelected, setNameSelected] = useState<string | undefined>('');
+  const [navSelected, setNavSelected] = useState<string | undefined>('');
   const [letterSelected, setLetterSelected] = useState<string | undefined>('');
   const [chineseSelected, setChineseSelected] = useState<string | undefined>(
     '',
@@ -34,6 +36,41 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
     },
   );
   const list = useMemo(() => data?.data || [], [data]);
+  const navList = useMemo(
+    () =>
+      [
+        {
+          label: 'All',
+          value: '',
+        },
+        {
+          label: t('name.category.nav.2_han.label'),
+          value: '2Han',
+        },
+        {
+          label: t('name.category.nav.dal3.label'),
+          tooltip: t('name.category.nav.dal3.tooltip'),
+          value: 'DaL3',
+        },
+        {
+          label: t('name.category.nav.cvcv.label'),
+          value: 'cvcv',
+        },
+        {
+          label: t('name.category.nav.date.label'),
+          tooltip: t('name.category.nav.date.tooltip'),
+          value: 'SDate',
+        },
+        {
+          label: t('name.category.nav.lucky.label'),
+          value: 'lucky',
+        },
+      ].map((item) => ({
+        ...item,
+        count: list.find((i) => i.category === item.value)?.count,
+      })),
+    [list],
+  );
   const numberList = useMemo(
     () =>
       [
@@ -133,15 +170,19 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
         },
         {
           label: t('name.category.other.date'),
-          value: 'sDate',
+          value: 'SDate',
         },
         {
           label: t('name.category.other.symmetric_digit'),
           value: 'symmetric',
         },
         {
-          label: t('name.category.other.consecutive_luck_digit'),
-          value: 'consecutive+luck',
+          label: t('name.category.other.consecutive_digit'),
+          value: 'consecutive',
+        },
+        {
+          label: t('name.category.other.luck_digit'),
+          value: 'lucky',
         },
         {
           label: t('name.category.other.full_date'),
@@ -162,6 +203,10 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
         {
           label: t('name.category.other.dal3'),
           value: 'DaL3',
+        },
+        {
+          label: t('name.category.other.char2'),
+          value: '2char',
         },
         {
           label: t('name.category.other.unclassified_digit_names'),
@@ -224,39 +269,54 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
       setLetterSelected('');
       setChineseSelected('');
     }
+    setNavSelected(value);
     onChange?.(value);
   };
-
+  const handlerNavSelected = (value: string) => {
+    setNavSelected(value);
+    setNameSelected('');
+    setLetterSelected('');
+    setChineseSelected('');
+    setOhterSelected('');
+    onChange?.(value);
+  };
   return (
-    <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-      <CategorySelect
-        key="number"
-        placeholder="Number Category"
-        list={numberList}
-        selected={nameSelected}
-        onChange={(v) => handlerSelected('number', v)}
+    <div className="flex flex-wrap justify-end items-center gap-2">
+      <OrderNameTypeNav
+        value={navSelected}
+        onChange={handlerNavSelected}
+        list={navList}
       />
-      <CategorySelect
-        key="letter"
-        placeholder="Letter Category"
-        list={letterList}
-        selected={letterSelected}
-        onChange={(v) => handlerSelected('letter', v)}
-      />
-      <CategorySelect
-        key="chinese"
-        placeholder="Chinese Category"
-        list={chineseList}
-        selected={chineseSelected}
-        onChange={(v) => handlerSelected('chinese', v)}
-      />
-      <CategorySelect
-        key="other"
-        placeholder="Other Category"
-        list={otherList}
-        selected={ohterSelected}
-        onChange={(v) => handlerSelected('other', v)}
-      />
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+        <CategorySelect
+          key="number"
+          placeholder="Number Category"
+          list={numberList}
+          selected={nameSelected}
+          onChange={(v) => handlerSelected('number', v)}
+        />
+        <CategorySelect
+          key="letter"
+          placeholder="Letter Category"
+          list={letterList}
+          selected={letterSelected}
+          onChange={(v) => handlerSelected('letter', v)}
+        />
+        <CategorySelect
+          key="chinese"
+          placeholder="Chinese Category"
+          list={chineseList}
+          selected={chineseSelected}
+          onChange={(v) => handlerSelected('chinese', v)}
+        />
+        <CategorySelect
+          key="other"
+          placeholder="Other Category"
+          list={otherList}
+          selected={ohterSelected}
+          onChange={(v) => handlerSelected('other', v)}
+        />
+      </div>
     </div>
   );
 };
