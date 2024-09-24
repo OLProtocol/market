@@ -17,7 +17,7 @@ import {
 } from '@nextui-org/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { thousandSeparator, getTickLabel } from '@/lib/utils';
@@ -28,7 +28,9 @@ import { NameMarketNav } from '@/components/market/NameMarketNav';
 export default function Market() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const [type, setType] = useState<string>('ticker');
+  const params = useSearchParams();
+  const paramType = params.get('type') || 'ticker';
+  const [type, setType] = useState<string>(paramType);
   const [interval, setInterval] = useState<any>(1);
   const [sortField, setSortField] = useState<any>('');
   const [sortOrder, setSortOrder] = useState<any>(0);
@@ -74,6 +76,11 @@ export default function Market() {
     setSortOrder(0);
     setSortField('');
     setSortDescriptor({ column: '', direction: 'ascending' });
+
+    // Update the URL without refreshing the page
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('type', e);
+    window.history.replaceState({}, '', newUrl.toString());
   };
   const onTableSortChange = (e: SortDescriptor) => {
     setSortDescriptor(e);

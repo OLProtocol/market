@@ -109,7 +109,7 @@ export const OrdxFtOrderItem = ({
         </div>
       )}
       <CardBody className="radius-lg w-[10rem] h-[10rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
-        <div className="flex-1 text-xs tracking-widest antialiased md:text-base uppercase">
+        <div className="flex-1 text-xs tracking-widest antialiased md:text-base">
           <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
             <div className="absolute items-center inset-0 z-10">
               {asset?.assets_type === 'exotic' ? (
@@ -179,7 +179,9 @@ export const OrdxFtOrderItem = ({
         </div>
       </CardBody>
       <CardFooter className="block item-center bg-gray-800 w-full h-[6rem] md:h-[6.5rem]">
-        <div className="flex-1 flex items-center justify-between gap-4 font-bold mb-1 sm:md-2">
+        <div
+          className={`flex-1 flex items-center justify-between gap-4 font-bold mb-1 sm:md-2 ${assets_type === 'ns' ? 'mb-4' : ''}`}
+        >
           <div className="flex ">
             {item.currency === 'BTC' && (
               <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
@@ -193,20 +195,23 @@ export const OrdxFtOrderItem = ({
             </span>
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-between gap-4  md:mb-2 text-[10px] md:text-xs mb-1">
-          <div className="flex items-center">
-            {item.currency === 'BTC' && (
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
-            )}
-            <span className="font-bold text-amber-400">
-              {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
-            </span>
-            <span className="font-mono text-gray-100">
-              &nbsp;sats/{asset?.assets_name}
-            </span>
+        {assets_type !== 'ns' && (
+          <div className="flex-1 flex items-center justify-between gap-4  md:mb-2 text-[10px] md:text-xs mb-1">
+            <div className="flex items-center">
+              {item.currency === 'BTC' && (
+                <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-0.5" />
+              )}
+              <span className="font-bold text-amber-400">
+                {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
+              </span>
+              <span className="font-mono text-gray-100">
+                &nbsp;sats/{asset?.assets_name}
+              </span>
+            </div>
           </div>
-        </div>
-        <WalletConnectBus className="flex-1 mb-2" text={t('buttons.buy')}>
+        )}
+
+        <WalletConnectBus className={`flex-1`} text={t('buttons.buy')}>
           {item?.address === currentAddress && showResale ? (
             <Button
               className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase"

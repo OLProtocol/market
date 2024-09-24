@@ -157,7 +157,10 @@ export const Navbar = () => {
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href="https://ordx.market/"
+          >
             <Image
               radius="none"
               src="/logo.png"
@@ -203,12 +206,10 @@ export const Navbar = () => {
       </NavbarContent>
       {isMenuOpen && (
         <NavbarMenu>
-          {/* {searchInput} */}
           <div className="flex flex-col gap-2">
             <NavbarMenuItem>
               <div className="flex items-center gap-4">
                 <FeerateSelectButton />
-                {/* <ThemeSwitch /> */}
                 <LanguageSelect />
               </div>
             </NavbarMenuItem>

@@ -26,15 +26,36 @@
       "3_han": "3 Han",
       "4_han": "4 Han"
     },
+    "nav": {
+      "2_han": {
+        "label": "2 Han"
+      },
+      "dal3": {
+        "label": "3Mix",
+        "tooltip": "3char, digits and letters"
+      },
+      "cvcv": {
+        "label": "CVCV"
+      },
+      "date": {
+        "label": "Date/Birthday",
+        "tooltip": "YYMMDD, YYYYMM"
+      },
+      "lucky": {
+        "label": " Luck-Digi"
+      }
+    },
     "other": {
       "date": "Date (YYMMDD, YYYYMM)",
-      "symmetric_digit": "Symmetric Digit",
-      "consecutive_luck_digit": "Consecutive Luck Digit",
+      "symmetric_digit": "Symmetric",
+      "consecutive_digit": "Consecutive",
+      "luck_digit": "Luck Digit",
       "full_date": "Full Date (YYYYMMDD)",
       "did": "DID (10-digit Web3DID)",
       "c_mobile_number": "CMobileNumber (11-digit)",
-      "dal2": "DaL2",
-      "dal3": "DaL3",
+      "dal2": "2Mix: 2char, digits and letters",
+      "dal3": "3Mix: 3char, digits and letters",
+      "char2": "2Symbol Name",
       "unclassified_digit_names": "Other unclassified digit names"
     }
   }
