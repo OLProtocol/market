@@ -161,8 +161,7 @@ const WalletConnectButton = () => {
   return (
     <WalletConnectReact
       config={{
-        network: 'livenet',
-        defaultConnectorId: 'okx',
+        network: 'livenet' as any,
       }}
       theme={theme === 'dark' ? 'dark' : 'light'}
       onConnectSuccess={onConnectSuccess}

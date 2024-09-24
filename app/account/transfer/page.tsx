@@ -90,7 +90,9 @@ export default function SellPage() {
         throw new Error('No wallet connected');
       }
       const signedPsbts = await btcWallet.signPsbt(batchOrderPsbt.toHex());
-      await btcWallet.pushPsbt(signedPsbts);
+      if (signedPsbts) {
+        await btcWallet.pushPsbt(signedPsbts);
+      }
       notification.success({
         message: t('notification.transfer_success_title'),
       });

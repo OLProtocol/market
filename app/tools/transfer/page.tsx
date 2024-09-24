@@ -139,7 +139,9 @@ export default function Transfer() {
         throw new Error('No wallet connected');
       }
       const signedPsbts = await btcWallet.signPsbt(tx.toPsbt().toHex());
-      await btcWallet.pushPsbt(signedPsbts);
+      if (signedPsbts) {
+        await btcWallet.pushPsbt(signedPsbts);
+      }
       notification.success({
         message: t('notification.transfer_success_title'),
       });
