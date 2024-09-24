@@ -314,6 +314,7 @@ export const InscribeStepThree = ({
       setLoading(false);
     }
   };
+  const disabledKeys = type === 'rune' ? ['multiple'] : [];
   useEffect(() => {
     if (currentAccount) {
       set('toSingleAddress', currentAccount);
@@ -345,6 +346,7 @@ export const InscribeStepThree = ({
 
       <Tabs
         aria-label="address tabs"
+        disabledKeys={disabledKeys}
         selectedKey={selectedTab}
         onSelectionChange={(key) => setSelectedTab(key as string)}
       >
