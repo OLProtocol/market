@@ -387,7 +387,7 @@ export const buildBuyOrder = async ({
   console.log('signed', signed);
   // const txid = await btcWallet.pushPsbt(signed);
   // console.log('buy order txid', txid);
-  const psbt = bitcoin.Psbt.fromHex(signed, {
+  const psbt = bitcoin.Psbt.fromHex(signed!, {
     network: psbtNetwork,
   });
 

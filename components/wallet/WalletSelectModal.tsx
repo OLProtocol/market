@@ -44,7 +44,7 @@ export const WalletSelectModal = ({
     }
   };
   useEffect(() => {
-    init({ defaultConnectorId: 'okx', network: 'livenet' });
+    // init({ defaultConnectorId: 'okx', network: 'livenet' });
   }, []);
   useEffect(() => {
     if (visiable) {

@@ -21,7 +21,7 @@ export async function mintRune({
   toAddress,
   feeRate,
   utxo,
-}: MintRuneParams): Promise<string> {
+}: MintRuneParams): Promise<string | undefined> {
   console.log(
     'mintRune',
     secret,
@@ -51,7 +51,7 @@ export async function mintRune({
       index: inputUtxo.vout,
       witnessUtxo: { value: inputUtxo.value, script: wallet.output! },
       tapInternalKey: toXOnly(wallet.ecPair.publicKey),
-    });
+    } as any);
     psbt.addOutput({ script: Buffer.from(opReturnScript, 'hex'), value: 0 });
     psbt.addOutput({ address: outputAddress, value: outputValue });
     return psbt;

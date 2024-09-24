@@ -231,10 +231,10 @@ export async function signAndPushPsbt(psbt) {
     throw new Error('No wallet connected');
   }
   const signed = await btcWallet.signPsbt(psbt.toHex());
-  const pushedTxId = await btcWallet.pushPsbt(signed);
+  const pushedTxId = await btcWallet.pushPsbt(signed!);
   console.log('pushedTxId', pushedTxId);
   try {
-    return JSON.parse(pushedTxId);
+    return JSON.parse(pushedTxId!);
   } catch (error) {
     return pushedTxId;
   }
