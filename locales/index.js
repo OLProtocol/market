@@ -34,7 +34,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
-    debug: true,
+    debug: false,
     detection: {
       order: [
         'localStorage',
