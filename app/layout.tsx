@@ -34,7 +34,7 @@ export default function RootLayout({
   ];
   // const lang = i18nConfig.defaultLocale;
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       <head>
         {contentList.map((content, index) => (
           <link key={index} rel="preload" href={content} as="script" />
