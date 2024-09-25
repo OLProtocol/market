@@ -34,7 +34,7 @@ export function tweakSigner(
     signer.publicKey[0] === 3 ? ecc.privateNegate(privateKey) : privateKey;
   const tweakedPrivateKey = ecc.privateAdd(
     adjustedPrivateKey,
-    tapTweakHash(toXOnly(signer.publicKey), opts.tweakHash),
+    tapTweakHash(toXOnly(signer.publicKey as Buffer), opts.tweakHash),
   );
 
   if (!tweakedPrivateKey) {
@@ -43,7 +43,7 @@ export function tweakSigner(
 
   return ECPair.fromPrivateKey(Buffer.from(tweakedPrivateKey), {
     network: opts.network,
-  });
+  }) as any;
 }
 
 export const createWifPrivateKey = (network: string): string => {

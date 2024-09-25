@@ -50,7 +50,7 @@ export async function mintRune({
       hash: inputUtxo.txid,
       index: inputUtxo.vout,
       witnessUtxo: { value: inputUtxo.value, script: wallet.output! },
-      tapInternalKey: toXOnly(wallet.ecPair.publicKey),
+      tapInternalKey: toXOnly(wallet.ecPair.publicKey as Buffer),
     } as any);
     psbt.addOutput({ script: Buffer.from(opReturnScript, 'hex'), value: 0 });
     psbt.addOutput({ address: outputAddress, value: outputValue });
