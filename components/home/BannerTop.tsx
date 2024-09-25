@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import { ordxSWR } from '@/api';
 import { useRouter } from 'next/navigation';
 import { thousandSeparator } from '@/lib/utils';
-import CountdownTimer from '@/components/CountdownTimer';
+// import CountdownTimer from '@/components/CountdownTimer';
 import ProgressBar from '@/components/ProgressBar';
 
 const BannerTop = ({ detail }: any) => {
@@ -39,13 +39,12 @@ const BannerTop = ({ detail }: any) => {
                 {formatDate(today)}
               </div>
               <div>
-              <Image
-                radius="full"
-                src="./names-free.png"
-                alt="logo"
-                className="w-1/2 h-1/2 p-1 rounded-full"
-              />
-
+                <Image
+                  radius="full"
+                  src="./names-free.png"
+                  alt="logo"
+                  className="w-1/2 h-1/2 p-1 rounded-full"
+                />
               </div>
               {/* <h2 className="text-3xl md:text-7xl font-bold mb-4 mt-14">
                 🔥 Names is now <br />
@@ -72,7 +71,7 @@ const BannerTop = ({ detail }: any) => {
                 <h3 className="text-2xl md:text-4xl font-bold text-primary mb-4 uppercase">
                   Names Free Mint End In
                 </h3>
-                <CountdownTimer date={targetDate} />
+                {/* <CountdownTimer date={targetDate} /> */}
                 <div className="mt-8">
                   <div className="flex justify-between mb-2">
                     <h6>
