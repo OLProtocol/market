@@ -29,7 +29,7 @@
     "@sat20/btc-connect": "^1.4.12",
     "@tanstack/react-table": "^8.17.0",
     "@types/node": "20.5.7",
-    "@types/react": "18.2. 21",
+    "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "@unisat/wallet-sdk": "^1.6.2",
     "antd": "^5.15.3",
