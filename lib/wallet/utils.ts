@@ -6,7 +6,6 @@ import {
   convertBtcUtxosToInputs,
 } from './utxo';
 import { Address, Script } from '@cmdcode/tapscript';
-import { bech32 } from 'bech32';
 import * as bitcoin from 'bitcoinjs-lib';
 
 export function addresToScriptPublicKey(address: string) {

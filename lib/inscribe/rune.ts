@@ -1,4 +1,5 @@
 import { WIFWallet, toXOnly } from '@/lib/inscribe/WIFWallet';
+import { sleep } from 'radash';
 import { bitcoin } from '@/lib/wallet/bitcoin';
 import { toPsbtNetwork, NetworkType } from '@/lib/wallet/network';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
@@ -84,13 +85,17 @@ export async function mintRune({
       });
     }
   }
-  console.log('txHexs', txHexs);
 
   const { btcWallet } = useReactWalletStore.getState();
   if (!btcWallet) throw new Error('No wallet connected');
-
-  const txids = await Promise.all(
-    txHexs.map(({ psbtHex }) => btcWallet.pushPsbt(psbtHex)),
-  );
+  const txids: any = [];
+  for (let i = 0; i < txHexs.length; i++) {
+    const { psbtHex } = txHexs[i];
+    const txid = await btcWallet.pushPsbt(psbtHex);
+    if (txid) {
+      txids.push(JSON.parse(txid));
+    }
+    await sleep(3000);
+  }
   return txids[txids.length - 1];
 }
