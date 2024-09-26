@@ -32,7 +32,6 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
     const exoticInfo = data?.data?.find((v) => v.assets_type === 'exotic');
     const nftInfo = data?.data?.find((v) => v.assets_type === 'nft');
     const nsInfo = data?.data?.find((v) => v.assets_type === 'ns');
-    console.log(data);
     return [
       {
         label: 'SAT20 Token',
