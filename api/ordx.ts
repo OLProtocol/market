@@ -272,6 +272,19 @@ const getUtxo = async ({ utxo, network }: any) => {
   return data;
 };
 
+const getOrdinalsAssets = async ({ address, network }: any) => {
+  const { data } = await axios.get(
+    `https://${network === 'testnet' ? 'testnet4' : 'mainnet'}-ordinals.sat20.org/address/${address}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    },
+  );
+  return data;
+};
+
 const pushTx = async ({ hex, network }: any) => {
   const { data } = await axios.post(generateUrl(`btc/tx`, network), {
     SignedTxHex: hex,
@@ -287,6 +300,7 @@ export const getNsName = async ({ name, network }: any) => {
   const { data } = await axios.get(generateUrl(`ns/name/${name}`, network));
   return data;
 };
+
 export const checkNsNames = async ({ names, network }: any) => {
   const { data } = await axios.post(generateUrl(`ns/check`, network), {
     Names: names,
@@ -369,4 +383,5 @@ export const ordx = {
   getTxHex,
   getNsListStatus,
   getAllUtxos,
+  getOrdinalsAssets,
 };

@@ -54,6 +54,11 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         key: 'nft',
         value: nftInfo?.total_value || 0,
       },
+      {
+        label: 'Runes',
+        key: 'rune',
+        value: nftInfo?.total_value || 0,
+      },
     ];
   }, [data]);
   const [selected, setSelected] = useState(list[0].key);
