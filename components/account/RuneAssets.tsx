@@ -94,9 +94,9 @@ export const RuneAssets = () => {
                       return (
                         <TableCell>
                           <div className="flex items-center space-x-4">
-                            <div className="bg-orange-500 text-white w-10 h-10 rounded flex items-center justify-center font-bold">
+                            {/* <div className="bg-orange-500 text-white w-10 h-10 rounded flex items-center justify-center font-bold">
                               UN
-                            </div>
+                            </div> */}
                             <span className="text-lg">UNCOMMON•GOODS</span>
                           </div>
                         </TableCell>
