@@ -105,7 +105,7 @@ export const InscribingOrderModal = ({
     if (!currentAccount || unspendUtxos?.length === 0) {
       return 0;
     }
-    return sum(unspendUtxos, (utxo) => utxo.value);
+    return sum(unspendUtxos, (utxo: any) => utxo.value);
   }, [utxoList, currentAccount]);
   const canCalcPsbt = useMemo(() => {
     const unspendUtxos = getUnspendUtxos();
@@ -122,7 +122,7 @@ export const InscribingOrderModal = ({
         ) == undefined
       );
     });
-    const unspendAmount = sum(filterUnspendUtxos, (utxo) => utxo.value);
+    const unspendAmount = sum(filterUnspendUtxos, (utxo: any) => utxo.value);
     const serviceFee = order?.fee?.discountServiceFee || 0;
     const totalFee = order?.fee?.totalFee || 0;
     const totalInscriptionSize = order?.fee?.totalInscriptionSize || 0;

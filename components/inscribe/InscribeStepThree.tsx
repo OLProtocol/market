@@ -360,7 +360,7 @@ export const InscribeStepThree = ({
               />
             </div>
           </div>
-          {files.length > 1 && showTight && (
+          {files.length > 1 && showTight && type !== 'rune' && (
             <>
               <div className="mb-4">
                 <Checkbox
