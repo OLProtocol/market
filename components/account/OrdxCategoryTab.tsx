@@ -57,7 +57,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
       {
         label: 'Runes',
         key: 'rune',
-        value: nftInfo?.total_value || 0,
+        value: 0,
       },
     ];
   }, [data]);
@@ -92,18 +92,33 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
             </span>
           </CardHeader>
           <Divider className="divide-inherit divide-dashed" />
-          <CardBody className="text-left text-md leading-8">
-            <div className="flex">
-              <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-              {item.value}
-            </div>
-            <div className="flex text-sm md:font-bold">
-              <span className="text-yellow-400 w-5"> &nbsp;$</span>
-              <span className="text-gray-400 h-5">
-                <BtcPrice btc={item.value} />
-              </span>
-            </div>
-          </CardBody>
+          {item.key === 'rune' ? (
+            <CardBody className="text-left text-md leading-8">
+              <div className="flex">
+                <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
+                {item.value}
+              </div>
+              <div className="flex text-sm md:font-bold">
+                <span className="text-yellow-400 w-5"> &nbsp;$</span>
+                <span className="text-gray-400 h-5">
+                  <BtcPrice btc={item.value} />
+                </span>
+              </div>
+            </CardBody>
+          ) : (
+            <CardBody className="text-left text-md leading-8">
+              <div className="flex">
+                <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
+                {item.value}
+              </div>
+              <div className="flex text-sm md:font-bold">
+                <span className="text-yellow-400 w-5"> &nbsp;$</span>
+                <span className="text-gray-400 h-5">
+                  <BtcPrice btc={item.value} />
+                </span>
+              </div>
+            </CardBody>
+          )}
         </Card>
       ))}
     </div>
