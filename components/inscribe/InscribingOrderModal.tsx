@@ -198,7 +198,7 @@ export const InscribingOrderModal = ({
         value: 0,
       });
       outputs.push({
-        address: currentAccount,
+        address: order.toAddress[0],
         value: 330,
       });
       if (order.files.length > 1) {
@@ -550,6 +550,9 @@ export const InscribingOrderModal = ({
                   </div>
                   <div className="text-sm text-gray-400">
                     {t('pages.inscribe.pay.step_three.des')}
+                  </div>
+                  <div className="text-sm text-red-400">
+                    {t('pages.inscribe.pay.step_three.hint')}
                   </div>
                 </div>
                 <div className="flex justify-center mt-4 gap-4">

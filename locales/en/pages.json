@@ -166,6 +166,7 @@
       },
       "step_three": {
         "name": "Start Inscribing",
+        "hint": "Minting in progress, please do not close!",
         "des": "Please wait for the inscription to be confirmed."
       },
       "step_four": {
