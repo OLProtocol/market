@@ -123,7 +123,7 @@ export const InscribeStepThree = ({
       _files = files;
       const oneNetwork = Math.ceil(130 * feeRate.value);
       const twoNetwork = Math.ceil(180 * feeRate.value);
-      feeObj.networkFee = (files.length - 1) * oneNetwork + twoNetwork;
+      feeObj.networkFee = (files.length - 1) * oneNetwork;
       if (files.length === 1) {
         feeObj.networkFee = 0;
       }
