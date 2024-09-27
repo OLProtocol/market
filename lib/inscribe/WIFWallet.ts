@@ -48,7 +48,9 @@ export function tweakSigner(
 
 export const createWifPrivateKey = (network: string): string => {
   const bitcoinNetwork =
-    network === 'mainnet' ? networks.bitcoin : networks.testnet;
+    network === 'mainnet' || network === 'livenet'
+      ? networks.bitcoin
+      : networks.testnet;
   const keyPair = ECPair.makeRandom({ network: bitcoinNetwork });
   return keyPair.toWIF();
 };
@@ -61,8 +63,14 @@ export class WIFWallet {
   public output: Buffer;
 
   constructor(walletParam: IWIFWallet) {
+    console.log('walletParam', walletParam);
+
     this.network =
-      walletParam.network === 'mainnet' ? networks.bitcoin : networks.testnet;
+      walletParam.network === 'livenet' || walletParam.network === 'mainnet'
+        ? networks.bitcoin
+        : networks.testnet;
+    console.log('this.network', this.network);
+
     this.ecPair = ECPair.fromWIF(walletParam.privateKey, this.network);
     this.signer = tweakSigner(this.ecPair, { network: this.network });
 
