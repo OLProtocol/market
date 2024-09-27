@@ -194,9 +194,19 @@ export const InscribingOrderModal = ({
 
     if (order.type === 'rune') {
       outputs.push({
-        address: order?.runeMetadata?.address,
-        value: totalFee,
+        script: Buffer.from(order.opReturnScript, 'hex'),
+        value: 0,
       });
+      outputs.push({
+        address: currentAccount,
+        value: 330,
+      });
+      if (order.files.length > 1) {
+        outputs.push({
+          address: order?.runeMetadata?.address,
+          value: totalFee - 330,
+        });
+      }
     } else {
       outputs.push({
         address: order?.inscription.inscriptionAddress,
@@ -226,7 +236,9 @@ export const InscribingOrderModal = ({
     order.toAddress,
     currentAccount,
     order.type,
+    order.files,
     order.runeMetadata,
+    order.opReturnScript,
   ]);
   const caclPsbtAndFee = async () => {
     if (psbtData?.[0]?.length && psbtData?.[1]?.length) {
@@ -289,6 +301,8 @@ export const InscribingOrderModal = ({
       let vout = 0;
       if (metadata?.specialOffsetAmount > 0) {
         vout = 1;
+      } else if (order.type === 'rune') {
+        vout = 2;
       }
       const commitTx = {
         txid,
@@ -298,6 +312,18 @@ export const InscribingOrderModal = ({
       if (spendUtxos?.length) {
         removeUtxos(spendUtxos);
         console.log(utxoList);
+      }
+      if (order.type === 'rune' && order.files.length === 1) {
+        notification.success({
+          message: 'Success',
+          description: 'Inscribe Success',
+        });
+        order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
+        await changeStatus(orderId, 'inscribe_success');
+        setLoading(false);
+        setActiveStep(2);
+        onFinished?.(`${txid}i0`);
+        return;
       }
       setCommitTx(orderId, commitTx);
       await changeStatus(orderId, 'paid');
@@ -387,8 +413,8 @@ export const InscribingOrderModal = ({
           feeRate: order.feeRate,
           utxo: {
             txid: commitTx.txid,
-            vout: commitTx.vout,
-            value: commitTx.amount,
+            vout: 2,
+            value: commitTx.amount - 330,
           },
         });
       } else {

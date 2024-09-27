@@ -54,13 +54,17 @@ export async function mintRune({
       tapInternalKey: toXOnly(wallet.ecPair.publicKey as Buffer),
     } as any);
     psbt.addOutput({ script: Buffer.from(opReturnScript, 'hex'), value: 0 });
-    psbt.addOutput({ address: outputAddress, value: outputValue });
+    if (outputValue > 0) {
+      psbt.addOutput({ address: outputAddress, value: outputValue });
+    }
     return psbt;
   };
 
-  if (files.length === 1) {
-    const psbt = createPsbt(utxo, toAddress, 546);
+  if (files.length < 3) {
+    const psbt = createPsbt(utxo, toAddress, 330);
     const signedPsbt = wallet.signPsbt(psbt);
+    console.log('signedPsbt', signedPsbt);
+
     const tx = signedPsbt.extractTransaction();
     txHexs.push({
       psbtHex: signedPsbt.toHex(),
@@ -69,15 +73,21 @@ export async function mintRune({
     });
   } else {
     let parentUtxo = utxo;
-    for (let i = 0; i < files.length; i++) {
-      const psbt = createPsbt(parentUtxo, toAddress, 546);
-      const balance = parentUtxo.value - fee - 546;
-      if (i !== files.length - 1) {
+    console.log('parentUtxo', parentUtxo);
+
+    for (let i = 0; i < files.length - 1; i++) {
+      const psbt = createPsbt(parentUtxo, toAddress, 0);
+      const balance = parentUtxo.value - fee;
+      if (i < files.length - 2) {
         psbt.addOutput({ address: wallet.address, value: balance });
+      } else {
+        psbt.addOutput({ address: toAddress, value: 330 });
       }
       const signedPsbt = wallet.signPsbt(psbt);
+      console.log('signedPsbt', signedPsbt);
+
       const tx = signedPsbt.extractTransaction();
-      parentUtxo = { txid: tx.getId(), vout: 2, value: balance };
+      parentUtxo = { txid: tx.getId(), vout: 1, value: balance };
       txHexs.push({
         psbtHex: signedPsbt.toHex(),
         hex: tx.toHex(),
