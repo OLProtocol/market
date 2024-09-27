@@ -254,11 +254,15 @@ export const InscribingOrderModal = ({
         suitable: true,
       };
       const [psbtError, psbt] = await tryit(generateSendBtcPsbt)(params);
-      setPsbt(psbt);
+      console.log('psbt', psbt);
+
       const [feeError, fee] = await tryit(calcNetworkFee)(params);
+      console.error(feeError);
+
+      console.log('fee', fee);
+
       setSendFee(fee);
       setLoading(false);
-      console.error(psbtError);
     }
   };
   useEffect(() => {
