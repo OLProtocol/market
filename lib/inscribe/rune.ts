@@ -35,7 +35,7 @@ export async function mintRune({
   );
 
   const wallet = new WIFWallet({ network, privateKey: secret });
-  const fee = Math.ceil(180 * feeRate);
+  const fee = Math.ceil(130 * feeRate);
   const btcNetwork = toPsbtNetwork(
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );

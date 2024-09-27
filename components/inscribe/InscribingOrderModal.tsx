@@ -293,8 +293,6 @@ export const InscribingOrderModal = ({
       if (!psbt) {
         return;
       }
-      console.log('psbt', psbt);
-      console.log(psbtData?.[0]);
       const spendUtxos = psbtData?.[0]?.slice(0, psbt.txInputs.length);
       console.log('spendUtxos', spendUtxos);
       txid = await sendBtcPsbt(psbt, currentAccount);
