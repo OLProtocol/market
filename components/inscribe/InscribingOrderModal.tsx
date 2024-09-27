@@ -413,7 +413,7 @@ export const InscribingOrderModal = ({
           feeRate: order.feeRate,
           utxo: {
             txid: commitTx.txid,
-            vout: 2,
+            vout: commitTx.vout,
             value: commitTx.amount - 330,
           },
         });
