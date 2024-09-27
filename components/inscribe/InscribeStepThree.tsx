@@ -1,9 +1,15 @@
-import { Tabs, Tab, Button, Input, Textarea } from '@nextui-org/react';
-import { useMemo, useState, useEffect } from 'react';
-import { useMap, useList } from 'react-use';
+import {
+  Tabs,
+  Tab,
+  Button,
+  Input,
+  Textarea,
+  Checkbox,
+} from '@nextui-org/react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMap } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
-import { Checkbox } from '@nextui-org/react';
 import { isTaprootAddress } from '@/lib/wallet';
 import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
@@ -12,12 +18,18 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { WIFWallet, createWifPrivateKey } from '@/lib/inscribe/WIFWallet';
 import { notification } from 'antd';
 import { inscribeOrderHistory } from '@/lib/storage';
-import { useCalcFee } from '@/lib/hooks';
-import { OrderItemType, useCommonStore, useOrderStore } from '@/store';
 import { tryit } from 'radash';
 import { useTranslation } from 'react-i18next';
 import { Runestone, none, some, RuneId } from 'runelib';
-// import { Runestone, RuneId } from '@ordjs/runestone';
+import { useCommonStore, useOrderStore, OrderItemType } from '@/store';
+
+const DEFAULT_FEE_OBJ = {
+  networkFee: 0,
+  serviceFee: 0,
+  totalFee: 0,
+  discountServiceFee: 0,
+  totalInscriptionSize: 0,
+};
 
 interface Brc20SetpOneProps {
   list: any[];
@@ -29,6 +41,7 @@ interface Brc20SetpOneProps {
   onRemoveAll?: () => void;
   onAddOrder?: (order: OrderItemType) => void;
 }
+
 export const InscribeStepThree = ({
   list,
   type,
@@ -53,27 +66,27 @@ export const InscribeStepThree = ({
     toMultipleAddresses: '',
   });
   const [loading, setLoading] = useState(false);
-  const { add: addOrder, changeStatus } = useOrderStore((state) => state);
-  // const { serviceStatus } = useCommonStore((state) => state);
+  const { add: addOrder } = useOrderStore((state) => state);
   const [selected, setSelected] = useState(false);
   const [tightSelected, setTightSelected] = useState(false);
   const [selectedTab, setSelectedTab] = useState<string>('single');
 
-  const files = useMemo(() => {
-    return list;
-  }, [list]);
-
+  const files = useMemo(() => list, [list]);
   const oneUtxo = useMemo(() => selected, [selected]);
 
-  const checkToAddressIsTaproot = (address: string[]) => {
-    for (const addr of address) {
-      if (!isTaprootAddress(addr, network)) {
-        setErrText(t('pages.inscribe.step_three.error_3'));
-        return false;
+  const checkToAddressIsTaproot = useCallback(
+    (address: string[]) => {
+      for (const addr of address) {
+        if (!isTaprootAddress(addr, network)) {
+          setErrText(t('pages.inscribe.step_three.error_3'));
+          return false;
+        }
       }
-    }
-    return true;
-  };
+      return true;
+    },
+    [network, t],
+  );
+
   const toAddressList = useMemo(() => {
     if (selectedTab === 'single') {
       return [data.toSingleAddress];
@@ -84,24 +97,20 @@ export const InscribeStepThree = ({
         .filter((address) => address !== '');
     }
   }, [data.toMultipleAddresses, data.toSingleAddress, selectedTab]);
+
   const totalInscriptionSize = useMemo(() => {
     if (type === 'rune') {
-      return files.length * 546;
+      return (files.length > 1 ? 2 : 1) * 330;
     }
     return tightSelected
       ? Math.max(330, files.length)
       : files.reduce((acc, cur) => acc + cur.amount, 0);
-  }, [files, tightSelected]);
+  }, [files, tightSelected, type]);
+
   const submit = async () => {
     if (loading) return;
     setErrText('');
-    const feeObj: any = {
-      networkFee: 0,
-      serviceFee: 0,
-      totalFee: 0,
-      discountServiceFee: 0,
-      totalInscriptionSize: 0,
-    };
+    const feeObj = { ...DEFAULT_FEE_OBJ };
     const secret = generatePrivateKey();
     let inscription;
     let _discount = discount;
@@ -109,12 +118,15 @@ export const InscribeStepThree = ({
     let _opReturnScript;
     const runeMetadata: any = {};
     const wifPrivateKey = createWifPrivateKey(network);
+
     if (type === 'rune') {
       _files = files;
       const oneNetwork = Math.ceil(130 * feeRate.value);
       const twoNetwork = Math.ceil(180 * feeRate.value);
-      feeObj.networkFee = (files.length - 1) * twoNetwork + oneNetwork;
-      console.log('feeObj.network', feeObj.network);
+      feeObj.networkFee = (files.length - 1) * oneNetwork + twoNetwork;
+      if (files.length === 1) {
+        feeObj.networkFee = 0;
+      }
       let totalFee = feeObj.networkFee + totalInscriptionSize;
       const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
       if (metadata.type === 'name' && btcHeight <= 856000) {
@@ -134,27 +146,14 @@ export const InscribeStepThree = ({
         some(1),
       );
       _opReturnScript = runestone.encipher().toString('hex');
-      console.log('wifPrivateKey', wifPrivateKey);
-      const runeWallet = new WIFWallet({
-        network: network,
-        privateKey: wifPrivateKey,
-      });
-
+      const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });
       runeMetadata.address = runeWallet.address;
     } else {
-      _files = files.map((f, i) => {
-        let a = f.amount;
-        let o = f.offset;
-        if (tightSelected) {
-          a = 1;
-          o = i;
-        }
-        return {
-          ...f,
-          amount: a,
-          offset: o,
-        };
-      });
+      _files = files.map((f, i) => ({
+        ...f,
+        amount: tightSelected ? 1 : f.amount,
+        offset: tightSelected ? i : f.offset,
+      }));
       inscription = generateInscription({
         metadata,
         secret,
@@ -163,39 +162,23 @@ export const InscribeStepThree = ({
         feeRate: feeRate.value,
       });
       const outputLength = oneUtxo || tightSelected ? 1 : files.length;
-
       const baseSize = 84;
       const totalSize = baseSize + inscription.txsize;
       const weight = baseSize * 3 + totalSize;
-      const txHeaderSize = 12; // 版本号 + 输入计数 + 输出计数 + 锁定时间 + 见证标记和标志
-      const inputSize = 41; // 每个输入的大小
-      const outputSize = 52; // 每个输出的大小
-      const witnessSize = inscription.txsize; // 每个输入的见证数据大小
-
+      const txHeaderSize = 12;
+      const inputSize = 41;
+      const outputSize = 52;
+      const witnessSize = inscription.txsize;
       const numInputs = 1;
-
-      // 计算原始大小
       const rawSize =
         txHeaderSize +
         inputSize * numInputs +
         outputSize * outputLength +
         witnessSize;
-
-      // 计算剥离大小
       const strippedSize =
         txHeaderSize + inputSize * numInputs + outputSize * outputLength;
-
-      // 计算总权重
       const totalWeight = strippedSize * 4 + witnessSize * numInputs;
-
-      // 计算虚拟大小
       const vSize = totalWeight / 4;
-      console.log(`witnessSize: ${witnessSize} bytes`);
-      console.log(`Raw size: ${rawSize} bytes`);
-      console.log(`Stripped size: ${strippedSize} bytes`);
-      console.log(`Total weight: ${totalWeight} WU`);
-      console.log(`Virtual size: ${vSize} vBytes`);
-
       feeObj.networkFee = Math.ceil(vSize * feeRate.value);
       let totalFee = feeObj.networkFee + totalInscriptionSize;
       const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
@@ -207,9 +190,9 @@ export const InscribeStepThree = ({
       feeObj.totalInscriptionSize = totalInscriptionSize;
       feeObj.totalFee = totalFee;
     }
+
     const orderId = uuidV4();
     const toAddresses = toAddressList;
-    console.log('toAddresses===========' + toAddresses);
     if (toAddresses.length === 0) {
       setErrText(t('pages.inscribe.step_three.error_1'));
       return;
@@ -222,10 +205,10 @@ export const InscribeStepThree = ({
       setErrText(t('pages.inscribe.step_three.error_2'));
       return;
     }
-    const checkStatus = checkToAddressIsTaproot(toAddresses);
-    if (!checkStatus) {
+    if (!checkToAddressIsTaproot(toAddresses)) {
       return;
     }
+
     const order: OrderItemType = {
       orderId,
       type,
@@ -249,7 +232,6 @@ export const InscribeStepThree = ({
 
     const [err] = await tryit(inscribeOrderHistory.addItem)(order);
     if (err) {
-      console.log(err);
       notification.error({
         message: t('pages.inscribe.step_three.error_5'),
         description: err.message,
@@ -259,19 +241,21 @@ export const InscribeStepThree = ({
     addOrder(order);
     onAddOrder?.(order);
   };
-  const showTight = ['localhost', 'test'].some(
-    (n) => location.hostname.indexOf(n) > -1,
+
+  const showTight = useMemo(
+    () => ['localhost', 'test'].some((n) => location.hostname.indexOf(n) > -1),
+    [],
   );
-  const calcHex = (file: any) => {
-    if (file.fileHex) {
-      return file.hex + file.fileHex;
-    } else if (file.parent) {
-      return file.hex + file.parent;
-    } else {
-      return file.hex;
-    }
-  };
-  const cycleFill = () => {
+  const calcHex = useCallback(
+    (file: any) =>
+      file.fileHex
+        ? file.hex + file.fileHex
+        : file.parent
+          ? file.hex + file.parent
+          : file.hex,
+    [],
+  );
+  const cycleFill = useCallback(() => {
     const addresses = data.toMultipleAddresses;
     const addressList = addresses
       .split('\n')
@@ -285,41 +269,14 @@ export const InscribeStepThree = ({
       }
       set('toMultipleAddresses', newAddressList.join('\n'));
     }
-  };
-  const getWalletAddresses = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      let addresses: string[] = [];
-      console.log(btcWallet);
+  }, [data.toMultipleAddresses, list.length, set]);
 
-      if (btcWallet?.connector) {
-        if (btcWallet.connector.id === 'unisat') {
-          console.log(connector as any);
-          addresses = await (
-            btcWallet.connector as any
-          ).unisat.requestAccounts();
-        } else if (btcWallet.connector.id === 'okx') {
-          addresses = await (
-            btcWallet.connector as any
-          ).okxwallet.requestAccounts();
-        }
-      }
-      console.log('addresses=' + addresses);
-      // set('toMultipleAddresses', addresses.join('\n'));
-    } catch (error) {
-      console.error(error);
-      // setErrText(t('pages.inscribe.step_three.error_4'));
-    } finally {
-      setLoading(false);
-    }
-  };
-  const disabledKeys = type === 'rune' ? ['multiple'] : [];
   useEffect(() => {
     if (currentAccount) {
       set('toSingleAddress', currentAccount);
     }
-  }, [currentAccount]);
+  }, [currentAccount, set]);
+
   return (
     <div>
       <div className="text-lg font-bold flex justify-between mb-2">
@@ -346,19 +303,17 @@ export const InscribeStepThree = ({
 
       <Tabs
         aria-label="address tabs"
-        disabledKeys={disabledKeys}
+        disabledKeys={type === 'rune' ? ['multiple'] : []}
         selectedKey={selectedTab}
         onSelectionChange={(key) => setSelectedTab(key as string)}
       >
         <Tab key="single" title={t('pages.inscribe.step_three.to_single')}>
           <div className="mb-4">
-            <div>
-              <Input
-                placeholder="Basic usage"
-                value={data.toSingleAddress}
-                onChange={(e) => set('toSingleAddress', e.target.value)}
-              />
-            </div>
+            <Input
+              placeholder="Basic usage"
+              value={data.toSingleAddress}
+              onChange={(e) => set('toSingleAddress', e.target.value)}
+            />
           </div>
           {files.length > 1 && showTight && type !== 'rune' && (
             <>
@@ -384,7 +339,7 @@ export const InscribeStepThree = ({
         <Tab key="multiple" title={t('pages.inscribe.step_three.to_multiple')}>
           <div className="mb-4">
             <div className="mb-2">
-              Multiple Adddress ({toAddressList.length}):
+              Multiple Address ({toAddressList.length}):
             </div>
             <Textarea
               placeholder="Enter multiple addresses, one per line"
@@ -392,12 +347,6 @@ export const InscribeStepThree = ({
               onChange={(e) => set('toMultipleAddresses', e.target.value)}
               className="mb-2"
             />
-            {/* <Button
-                size="sm"
-                onClick={() => {
-                  getWalletAddresses();
-                }}
-              ></Button> */}
             <div className="flex">
               <Button color={'primary'} onClick={cycleFill}>
                 {t('pages.inscribe.step_three.cycle_fill', {
