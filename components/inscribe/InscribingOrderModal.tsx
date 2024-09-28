@@ -260,7 +260,7 @@ export const InscribingOrderModal = ({
       console.error(feeError);
 
       console.log('fee', fee);
-
+      setPsbt(psbt);
       setSendFee(fee);
       setLoading(false);
     }
@@ -298,6 +298,8 @@ export const InscribingOrderModal = ({
         return;
       }
       const spendUtxos = psbtData?.[0]?.slice(0, psbt.txInputs.length);
+      console.log('psbt', psbt);
+
       console.log('spendUtxos', spendUtxos);
       txid = await sendBtcPsbt(psbt, currentAccount);
       let vout = 0;
