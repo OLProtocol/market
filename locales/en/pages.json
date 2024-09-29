@@ -183,5 +183,11 @@
     "step_3": "3. Inscribe  Routing:",
     "step_4": "4. Set Personal Information:",
     "step_5": "5. Publish Content"
+  },
+  "event": {
+    "totast": {
+      "success": "Congratulations, you are eligible for the lottery! The list of winners will be announced on Twitter after the event, please stay tuned!",
+      "error": "Sorry, you need to continue to complete the task!"
+    }
   }
 }
