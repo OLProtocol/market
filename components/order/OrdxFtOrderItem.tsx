@@ -117,7 +117,7 @@ export const OrdxFtOrderItem = ({
                   radius="full"
                   src={`/raresats/${asset?.assets_name}.svg`}
                   alt="logo"
-                  className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
+                  className="w-20 h-20 md:w-28 md:h-28 top-8 left-8 md:top-14 md:left-14 rounded-full"
                 />
               ) : (
                 showContent(asset?.content_type, asset?.delegate) && (

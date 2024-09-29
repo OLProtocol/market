@@ -31,22 +31,22 @@ export default function BtcNameEvent() {
       return [
         {
           activity_id: 1,
-          title: '🔥 .btc (BtcName) Blind Box Airdrop',
-          time: '2024/10/1 ~ 2024/10/7',
-          desc: 'Complete the Web3 task during the event period',
-          twitter_id: 'SAT20Market',
-          tweet_id: '1234567890123456789',
+          title: '🔥 Earn $RarePizza airdrop at zero cost!',
+          time: '2024/9/30 ~ 2024/10/6',
+          desc: 'Complete the task to earn a 100 $RarePizza airdrop!',
+          twitter_id: 'SimBtc123',
+          tweet_id: '1838568142236455423',
         },
       ];
     } else {
       return [
         {
           activity_id: 1,
-          title: '🔥 .btc (BtcName) 盲盒空投',
+          title: '🔥 零成本赢取$RarePizza空投！',
           time: '2024/10/1 ~ 2024/10/7',
-          desc: '活动期间持有 ≥ 0.0002 BTC',
-          twitter_id: 'SAT20Market',
-          tweet_id: '1234567890123456789',
+          desc: '完成任务赢取100 $RarePizza空投',
+          twitter_id: 'SimBtc123',
+          tweet_id: '1838568142236455423',
         },
       ];
     }
