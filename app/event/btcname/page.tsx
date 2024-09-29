@@ -142,7 +142,7 @@ export default function BtcNameEvent() {
   };
   const likeHandler = async () => {
     window.open(
-      'https://twitter.com/intent/like?tweet_id=${currentData?.tweet_id}',
+      `https://twitter.com/intent/like?tweet_id=${currentData?.tweet_id}`,
       '_blank',
     );
     const [err, res] = await tryit(updateTwitterActivity)({
