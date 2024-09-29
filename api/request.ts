@@ -469,7 +469,7 @@ export const getSatsByAddress = async ({ address, sats, network }: any) => {
 };
 
 export const bindTwitterAccount = async ({ address }) => {
-  const res = await request('/twitter/bindaccount', {
+  const res = await request('/sat20twitter/bindaccount', {
     method: 'POST',
     data: { address },
   });
@@ -477,7 +477,7 @@ export const bindTwitterAccount = async ({ address }) => {
 };
 
 export const getTwitterAccount = async ({ address }) => {
-  const res = await request('/twitter/getaccountinfo', {
+  const res = await request('/sat20twitter/getaccountinfo', {
     data: { address },
   });
   return res;
@@ -489,7 +489,7 @@ export const updateTwitterActivity = async ({
   result,
   activity_id,
 }) => {
-  const res = await request('/twitter/updateactivity', {
+  const res = await request('/sat20twitter/updateactivity', {
     method: 'POST',
     data: { address, activity_name, result, activity_id },
   });
@@ -497,7 +497,7 @@ export const updateTwitterActivity = async ({
 };
 
 export const getTwitterActivity = async ({ address, activity_id }) => {
-  const res = await request('/twitter/verifyactivity', {
+  const res = await request('/sat20twitter/verifyactivity', {
     data: { address, activity_id },
   });
   return res;
