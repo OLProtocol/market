@@ -619,7 +619,18 @@ export default function Inscribe() {
       key: 'rune',
       label: 'Rune',
     },
+    {
+      key: 'blog',
+      label: t('common.my_blog'),
+    },
   ];
+  const handleTabChange = (key: any) => {
+    if (key === 'blog') {
+      nav.push('/account?source=blog');
+    } else {
+      setTab(key);
+    }
+  };
   const onDiscount = (d) => {
     setDiscount(d);
   };
@@ -641,7 +652,7 @@ export default function Inscribe() {
                 <Button
                   key={item.key}
                   color={tab === item.key ? 'primary' : 'default'}
-                  onClick={() => setTab(item.key)}
+                  onClick={() => handleTabChange(item.key)}
                 >
                   {item.label}
                 </Button>
