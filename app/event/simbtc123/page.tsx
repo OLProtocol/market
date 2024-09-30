@@ -42,7 +42,7 @@ export default function BtcNameEvent() {
       return [
         {
           activity_id: 1,
-          title: '🔥 随机抽取 1000 名幸运用户，赢 $RarePizza 空投！',
+          title: '🔥 随机抽 1000 名幸运者，赢 $RarePizza 空投！',
           time: '2024/10/1 ~ 2024/10/7',
           desc: '完成任务即有机会参与抽奖，1000 名幸运儿将随机抽出！活动结束后，我们将在推特公布中奖名单。中奖用户将在 SAT20 协议 L2（Lighting Channel + SatoshiNet）正式上线后，获得 100 个 $RarePizza 空投！机会有限，快来拼手速赢取空投吧！',
           twitter_id: 'SimBtc123',
@@ -183,18 +183,18 @@ export default function BtcNameEvent() {
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-4">{currentData?.title}</h1>
-        <p className="text-sm">{currentData?.time}</p>
+        <h1 className="md:text-3xl font-bold mb-4">{currentData?.title}</h1>
+        <p className="text-sm">Time:{currentData?.time}</p>
       </div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4">完成Web3 任务</h2>
+        <h2 className="md:text-2xl font-bold mb-4">Step-by-step Task Completion</h2>
         <div className="border border-gray-700 rounded-lg p-4">
           {currentData?.desc}
         </div>
       </div>
       <div className="mb-6">
-        <div className="text-2xl font-bold mb-4 flex justify-between items-center">
-          <span>完成 X 社媒任务</span>
+        <div className="md:text-2xl font-bold mb-4 flex justify-between items-center">
+          <span>Complete Follow, Like, and Retweet</span>
 
           <Button
             size="sm"
@@ -204,11 +204,11 @@ export default function BtcNameEvent() {
             isDisabled={acountResult?.id}
             onClick={bindTwitter}
           >
-            {acountResult?.id ? `已绑定 ${acountResult.name}` : '绑定 X'}
+            {acountResult?.id ? `Bound successfully ${acountResult.name}` : 'Bind X'}
           </Button>
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
-          <div className="mb-4">关注 @{currentData?.twitter_id} 的 X 账号</div>
+          <div className="mb-4">Follow @{currentData?.twitter_id} on X (formerly Twitter)</div>
           <div className="flex items-center gap-4">
             <Button
               onClick={followHandler}
@@ -218,7 +218,7 @@ export default function BtcNameEvent() {
               color="default"
               radius="full"
             >
-              关注
+              Follow
             </Button>
             {/* <Button size="sm" color="default" radius="full">
               验证
@@ -226,7 +226,7 @@ export default function BtcNameEvent() {
           </div>
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
-          <div className="mb-4">转发 @{currentData?.twitter_id} 的推文</div>
+          <div className="mb-4">Retweet @{currentData?.twitter_id} 's post</div>
           <div className="flex items-center gap-4">
             <Button
               onClick={shareHandler}
@@ -236,7 +236,7 @@ export default function BtcNameEvent() {
               isDisabled={activityResult.retweets === 1 || !acountResult?.id}
               radius="full"
             >
-              转发
+              Retweet
             </Button>
             {/* <Button size="sm" color="default" radius="full">
               验证
@@ -244,7 +244,7 @@ export default function BtcNameEvent() {
           </div>
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
-          <div className="mb-4">点赞 @{currentData?.twitter_id} 的推文</div>
+          <div className="mb-4">Like @{currentData?.twitter_id} 's post</div>
           <div className="flex items-center gap-4">
             <Button
               onClick={likeHandler}
@@ -254,7 +254,7 @@ export default function BtcNameEvent() {
               isDisabled={activityResult.flowers === 1 || !acountResult?.id}
               radius="full"
             >
-              点赞
+              Like
             </Button>
             {/* <Button size="sm" color="default" radius="full">
               验证
@@ -268,7 +268,7 @@ export default function BtcNameEvent() {
             radius="full"
             onClick={verifyActivity}
           >
-            验证抽奖资格
+            Verify Eligibility
           </Button>
         </div>
       </div>
