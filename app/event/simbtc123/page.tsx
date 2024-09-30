@@ -31,9 +31,9 @@ export default function BtcNameEvent() {
       return [
         {
           activity_id: 1,
-          title: '🔥 Earn $RarePizza airdrop at zero cost!',
+          title: '🔥 Randomly Select 1,000 Winners for $RarePizza Airdrop!',
           time: '2024/10/1 ~ 2024/10/7',
-          desc: 'After completing the task, you will qualify for a lottery draw, with a total of 100 winners. The winning list will be announced on Twitter after the event ends. Winning users will receive 100 $RarePizza airdrops once the SAT20 protocol L2 (Lighting Channel + SatoshiNet) officially launches!',
+          desc: 'Complete the task to qualify for a lucky draw, where 1,000 winners will be randomly selected! The list of winners will be announced on Twitter after the event ends. Each winning participant will receive 100 $RarePizza airdropped once the SAT20 protocol L2 (Lighting Channel + SatoshiNet) officially launches. Don’t miss out—act fast for a chance to win!',
           twitter_id: 'SimBtc123',
           tweet_id: '1838568142236455423',
         },
@@ -42,9 +42,9 @@ export default function BtcNameEvent() {
       return [
         {
           activity_id: 1,
-          title: '🔥 零成本赢取$RarePizza空投！',
+          title: '🔥 随机抽取 1000 名幸运用户，赢 $RarePizza 空投！',
           time: '2024/10/1 ~ 2024/10/7',
-          desc: ' 完成任务后，可获得抽取空投资格，共计抽出100名中奖者，活动结束后会在推特公布中奖名单，中奖用户会在SAT20协议 L2(Lighting Channel +SatoshiNet)正式上线后获得100个$RarePizza空投！',
+          desc: '完成任务即有机会参与抽奖，1000 名幸运儿将随机抽出！活动结束后，我们将在推特公布中奖名单。中奖用户将在 SAT20 协议 L2（Lighting Channel + SatoshiNet）正式上线后，获得 100 个 $RarePizza 空投！机会有限，快来拼手速赢取空投吧！',
           twitter_id: 'SimBtc123',
           tweet_id: '1838568142236455423',
         },
