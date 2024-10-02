@@ -12,6 +12,7 @@ import {
   Checkbox,
   Radio,
 } from '@nextui-org/react';
+import { Icon } from '@iconify/react';
 import { hideStr } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
@@ -83,18 +84,21 @@ export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
               <TableColumn key={column.key}>{column.label}</TableColumn>
             )}
           </TableHeader>
-          <TableBody items={utxos}>
-            {(item) => (
+          <TableBody>
+            {utxos.map((item) => (
               <TableRow key={item.utxo}>
                 {(columnKey) => {
                   const value = getKeyValue(item, columnKey);
                   if (columnKey === 'radio') {
                     return (
                       <TableCell>
-                        <Checkbox
-                          isReadOnly
-                          value={item.utxo}
-                          checked={selectedKeys.has(item.utxo)}
+                        <Icon
+                          icon={
+                            selectedKeys.has(item.utxo)
+                              ? 'solar:check-circle-bold-duotone'
+                              : 'solar:record-line-duotone'
+                          }
+                          className="text-xl"
                         />
                       </TableCell>
                     );
@@ -131,7 +135,7 @@ export const UtxoSelectTable = ({ utxos, onChange }: Props) => {
                   }
                 }}
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </CardBody>
