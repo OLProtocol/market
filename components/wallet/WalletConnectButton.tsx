@@ -198,11 +198,6 @@ const WalletConnectButton = () => {
                   </span>
                 </Snippet>
               </div>
-              {/* <div className="flex items-center justify-end gap-2 px-4 text-abse">
-                <span>Balance：</span>
-                <span>{satsToBitcoin(utxoAmount)} BTC</span>
-                <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
-              </div> */}
               <Button className="w-full" onClick={toHistory}>
                 {t('buttons.to_history')}
               </Button>
