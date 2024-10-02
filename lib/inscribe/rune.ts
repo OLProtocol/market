@@ -101,9 +101,20 @@ export async function mintRune({
   const txids: any = [];
   for (let i = 0; i < txHexs.length; i++) {
     const { psbtHex } = txHexs[i];
-    const txid = await btcWallet.pushPsbt(psbtHex);
+    let txid;
+    try {
+      txid = await btcWallet.pushPsbt(psbtHex);
+    } catch (error: any) {
+      if (error.code !== -32603) {
+        throw error;
+      }
+    }
     if (txid) {
-      txids.push(JSON.parse(txid));
+      try {
+        txids.push(JSON.parse(txid));
+      } catch (error) {
+        txids.push(txid);
+      }
     }
     await sleep(3000);
   }
