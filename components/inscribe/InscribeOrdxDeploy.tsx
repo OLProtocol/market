@@ -190,13 +190,13 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
           setErrorText(t('pages.inscribe.ordx.error_14'));
           return false;
         }
-        if (
-          data.selfmint !== '100' &&
-          !(data.block_start && data.block_end && data.blockChecked)
-        ) {
-          setErrorText(t('pages.inscribe.ordx.error_15'));
-          return false;
-        }
+        // if (
+        //   data.selfmint !== '100' &&
+        //   !(data.block_start && data.block_end && data.blockChecked)
+        // ) {
+        //   setErrorText(t('pages.inscribe.ordx.error_15'));
+        //   return false;
+        // }
       }
       return true;
     } catch (error) {
