@@ -11,7 +11,6 @@ import { tryit } from 'radash';
 import { notification } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useTranslation } from 'react-i18next';
 
 export default function BtcNameEvent() {
@@ -32,22 +31,22 @@ export default function BtcNameEvent() {
       return [
         {
           activity_id: 1,
-          title: '🔥 .btc (BtcName) Blind Box Airdrop',
-          time: '2024/10/1 ~ 2024/10/7',
-          desc: 'Complete the Web3 task during the event period',
-          twitter_id: 'SAT20Market',
-          tweet_id: '1234567890123456789',
+          title: '🔥 Earn $RarePizza airdrop at zero cost!',
+          time: '2024/9/30 ~ 2024/10/6',
+          desc: 'Complete the task to earn a 100 $RarePizza airdrop!',
+          twitter_id: 'sat20market',
+          tweet_id: '1838568142236455423',
         },
       ];
     } else {
       return [
         {
           activity_id: 1,
-          title: '🔥 .btc (BtcName) 盲盒空投',
+          title: '🔥 零成本赢取$RarePizza空投！',
           time: '2024/10/1 ~ 2024/10/7',
-          desc: '活动期间持有 ≥ 0.0002 BTC',
-          twitter_id: 'SAT20Market',
-          tweet_id: '1234567890123456789',
+          desc: '完成任务赢取100 $RarePizza空投',
+          twitter_id: 'sat20market',
+          tweet_id: '1838568142236455423',
         },
       ];
     }
@@ -142,7 +141,7 @@ export default function BtcNameEvent() {
   };
   const likeHandler = async () => {
     window.open(
-      `https://twitter.com/intent/like?tweet_id=${currentData?.tweet_id}`,
+      'https://twitter.com/intent/like?tweet_id=${currentData?.tweet_id}',
       '_blank',
     );
     const [err, res] = await tryit(updateTwitterActivity)({
@@ -196,18 +195,17 @@ export default function BtcNameEvent() {
       <div className="mb-6">
         <div className="text-2xl font-bold mb-4 flex justify-between items-center">
           <span>完成 X 社媒任务</span>
-          <WalletConnectBus>
-            <Button
-              size="sm"
-              color="default"
-              radius="full"
-              isLoading={loading}
-              isDisabled={acountResult?.id}
-              onClick={bindTwitter}
-            >
-              {acountResult?.id ? `已绑定 ${acountResult.name}` : '绑定 X'}
-            </Button>
-          </WalletConnectBus>
+
+          <Button
+            size="sm"
+            color="default"
+            radius="full"
+            isLoading={loading}
+            isDisabled={acountResult?.id}
+            onClick={bindTwitter}
+          >
+            {acountResult?.id ? `已绑定 ${acountResult.name}` : '绑定 X'}
+          </Button>
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
           <div className="mb-4">关注 @{currentData?.twitter_id} 的 X 账号</div>
