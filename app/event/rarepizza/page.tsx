@@ -11,7 +11,6 @@ import { tryit } from 'radash';
 import { notification } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useTranslation } from 'react-i18next';
 
 export default function BtcNameEvent() {
@@ -142,7 +141,7 @@ export default function BtcNameEvent() {
   };
   const likeHandler = async () => {
     window.open(
-      `https://twitter.com/intent/like?tweet_id=${currentData?.tweet_id}`,
+      'https://twitter.com/intent/like?tweet_id=${currentData?.tweet_id}',
       '_blank',
     );
     const [err, res] = await tryit(updateTwitterActivity)({
@@ -196,18 +195,17 @@ export default function BtcNameEvent() {
       <div className="mb-6">
         <div className="text-2xl font-bold mb-4 flex justify-between items-center">
           <span>完成 X 社媒任务</span>
-          <WalletConnectBus>
-            <Button
-              size="sm"
-              color="default"
-              radius="full"
-              isLoading={loading}
-              isDisabled={acountResult?.id}
-              onClick={bindTwitter}
-            >
-              {acountResult?.id ? `已绑定 ${acountResult.name}` : '绑定 X'}
-            </Button>
-          </WalletConnectBus>
+
+          <Button
+            size="sm"
+            color="default"
+            radius="full"
+            isLoading={loading}
+            isDisabled={acountResult?.id}
+            onClick={bindTwitter}
+          >
+            {acountResult?.id ? `已绑定 ${acountResult.name}` : '绑定 X'}
+          </Button>
         </div>
         <div className="mb-4 border border-gray-700 rounded-lg p-4">
           <div className="mb-4">关注 @{currentData?.twitter_id} 的 X 账号</div>
