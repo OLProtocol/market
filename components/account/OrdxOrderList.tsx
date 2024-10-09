@@ -7,7 +7,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { use, useEffect, useMemo, useState } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Content } from '@/components/Content';
-import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
+import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItemBack';
 import { useTranslation } from 'react-i18next';
 import { useList } from 'react-use';
 

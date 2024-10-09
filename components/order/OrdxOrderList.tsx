@@ -10,7 +10,7 @@ import { Pagination } from '@/components/Pagination';
 import { BatchBuyFooter } from '@/components/BatchBuyFooter';
 import { Content } from '@/components/Content';
 import { useBuyStore } from '@/store';
-import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
+import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItemBack';
 import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
