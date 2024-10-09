@@ -26,7 +26,7 @@ export const OrderAssetContent = ({
             <Image
               src={`/raresats/${asset?.assets_name}.svg`}
               alt="logo"
-              className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14"
+              className="w-16 h-16 md:w-28 md:h-28 top-9 left-[44px] md:top-14 md:left-[72px]"
             />
           ) : (
             showContent(asset?.content_type, asset?.delegate) && (
@@ -53,7 +53,7 @@ export const OrderAssetContent = ({
               key={i}
               src={`/raresats/${item?.assets_name}.svg`}
               alt="icon"
-              className="w-5 h-5"
+              className="w-4 h-4 md:w-5 md:h-5"
             />
           ))}
         </div>
@@ -71,18 +71,26 @@ const AssetContentOverlay = ({ asset, assets_type, showContent }) => (
   <>
     {showContent(asset?.content_type, asset?.delegate) ? (
       <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
-        <p className="font-medium text-2xl md:text-3xl mb-1">
-          {thousandSeparator(asset?.amount)}
+        <p className="font-medium text-2xl md:text-3xl mb-1">       
+         { thousandSeparator(asset?.amount)}
         </p>
       </section>
     ) : (
       <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-20">
-        <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
-          {assets_type === 'ns'
-            ? asset?.assets_name
-            : thousandSeparator(asset?.amount)}
-        </p>
-        {assets_type !== 'ns' && <AssetPriceInfo asset={asset} />}
+       
+          {assets_type === 'ns' 
+            ? ( <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">asset?.assets_name</p>)
+            : ( assets_type === 'exotic' ? (
+              <div className="flex flex-col justify-end font-medium pb-6 text-2xl md:text-4xl md:pb-9 h-full">                    
+                      <span>{thousandSeparator(asset?.amount)}</span>
+              </div>
+            ): (
+            <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">{thousandSeparator(asset?.amount)}</p>
+            )
+            )
+            }
+      
+        {assets_type !== 'ns'  && assets_type !== 'exotic' && <AssetPriceInfo asset={asset} />}
       </section>
     )}
   </>
@@ -90,19 +98,30 @@ const AssetContentOverlay = ({ asset, assets_type, showContent }) => (
 
 const AssetPriceInfo = ({ asset }) => (
   <>
-    <p className="pt-12 md:pb-2 md:text-sm">
-      <span className="font-bold text-amber-400">
-        {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
-      </span>
-      <span className="font-mono text-gray-100">
-        &nbsp;sats/{asset?.assets_name}
-      </span>
-    </p>
-    <p className="md:text-sm">
-      <span className="font-mono text-gray-100">
-        $<BtcPrice btc={asset?.unit_price / asset?.unit_amount / 100000000} />
-        &nbsp; /{asset?.assets_name}
-      </span>
-    </p>
+  {asset?.assets_type === 'exotic' ? (
+      <p className="md:text-sm">
+        <span className="font-mono text-gray-100">
+          $<BtcPrice btc={asset?.unit_price / asset?.unit_amount / 100000000} />
+          &nbsp; /{asset?.assets_name}
+        </span>
+      </p>
+    ):(
+      <>
+      <p className="pt-12 md:pb-2 md:text-sm">
+          <span className="font-bold text-amber-400">
+            {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
+          </span>
+          <span className="font-mono text-gray-100">
+            &nbsp;sats/{asset?.assets_name}
+          </span>
+        </p>
+        <p className="md:text-sm">
+            <span className="font-mono text-gray-100">
+              $<BtcPrice btc={asset?.unit_price / asset?.unit_amount / 100000000} />
+              &nbsp; /{asset?.assets_name}
+            </span>
+          </p>
+        </>
+    )}
   </>
 );
