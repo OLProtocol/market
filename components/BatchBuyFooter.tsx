@@ -41,6 +41,7 @@ interface Props {
   list: any[];
   assets_name?: string;
   assets_type?: string;
+  selectedSource?: string;
   toBuy?: () => void;
   onSuccess?: () => void;
   onClose?: () => void;
@@ -49,6 +50,7 @@ export const BatchBuyFooter = ({
   list: assetsList,
   assets_name,
   assets_type,
+  selectedSource,
   onSuccess,
   onClose,
 }: Props) => {
@@ -101,7 +103,7 @@ export const BatchBuyFooter = ({
       const len = lockData.data?.length || 0;
       for (let i = 0; i < lockData.data?.length; i++) {
         const { raw, order_id } = lockData.data[i];
-        if (!raw) {
+        if (!raw && selectedSource !== 'Magisat') {
           removeBuy(order_id);
         }
       }
@@ -161,7 +163,6 @@ export const BatchBuyFooter = ({
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
   );
-  // useEffect(() => {
   //   if (utxos.length) {
   //     const outputs = [
   //       {
@@ -299,8 +300,6 @@ export const BatchBuyFooter = ({
   );
   useDebounce(
     () => {
-      console.log(selectSize);
-
       let _list = structuredClone(list);
       const len = _list.length;
       setRemoveOrderIds([]);
@@ -316,6 +315,7 @@ export const BatchBuyFooter = ({
           }
           if (
             item.locked === 0 &&
+            item.order_source === selectedSource &&
             item.address !== address &&
             _list.findIndex((v) => v.order_id === item.order_id) === -1
           ) {

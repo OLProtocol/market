@@ -3,7 +3,13 @@ import { UtxoContent } from '@/components/UtxoContent';
 import { thousandSeparator } from '@/lib/utils';
 import { BtcPrice } from '../BtcPrice';
 
-export const OrderAssetContent = ({ asset, assets_type, delay, utxo }) => {
+export const OrderAssetContent = ({
+  asset,
+  assets_type,
+  order_source,
+  othersAssets,
+  utxo,
+}) => {
   const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type) return false;
     return (
@@ -18,10 +24,9 @@ export const OrderAssetContent = ({ asset, assets_type, delay, utxo }) => {
         <div className="absolute items-center inset-0 z-10">
           {asset?.assets_type === 'exotic' ? (
             <Image
-              radius="full"
               src={`/raresats/${asset?.assets_name}.svg`}
               alt="logo"
-              className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14 rounded-full"
+              className="w-32 h-32 md:w-36 md:h-36 top-8 left-8 md:top-14 md:left-14"
             />
           ) : (
             showContent(asset?.content_type, asset?.delegate) && (
@@ -29,7 +34,6 @@ export const OrderAssetContent = ({ asset, assets_type, delay, utxo }) => {
                 <UtxoContent
                   defaultImage="/ordx-utxo-content-default.jpg"
                   inscriptionId={asset?.inscription_id}
-                  delay={delay}
                   utxo={utxo}
                 />
               </div>
@@ -42,6 +46,18 @@ export const OrderAssetContent = ({ asset, assets_type, delay, utxo }) => {
           showContent={showContent}
         />
       </div>
+      {assets_type === 'exotic' && (
+        <div className="flex gap-1 absolute bottom-2 px-1 overflow-x-auto w-full left-0 justify-center">
+          {othersAssets?.map((item, i) => (
+            <Image
+              key={i}
+              src={`/raresats/${item?.assets_name}.svg`}
+              alt="icon"
+              className="w-5 h-5"
+            />
+          ))}
+        </div>
+      )}
       {assets_type !== 'ns' && (
         <div className="left-0 top-0 flex absolute p-2 rounded-br-[1rem] text-center text-gray-200 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 backdrop-saturate-50 hover:text-gray-100 z-10">
           {asset?.assets_name}

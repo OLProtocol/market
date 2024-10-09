@@ -6,11 +6,10 @@ import { Empty, notification } from 'antd';
 import { getOrders, lockOrder, unlockOrder, cancelOrder } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
-import { Pagination } from '@/components/Pagination';
 import { BatchBuyFooter } from '@/components/BatchBuyFooter';
 import { Content } from '@/components/Content';
 import { useBuyStore } from '@/store';
-import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItemBack';
+import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItem';
 import { OrderBuyModal } from '@/components/order/OrderBuyModal';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -93,6 +92,10 @@ export const OrdxOrderList = ({
     }
   }, [data, hideStatus]);
 
+  const selectedSource = useMemo(() => {
+    return buyList?.[0]?.order_source || '';
+  }, [buyList]);
+
   const onSortChange = (sort?: number) => {
     if (sort !== undefined) {
       setSort(sort);
@@ -144,7 +147,6 @@ export const OrdxOrderList = ({
         addBuy({ ...item, status: 'pending' });
       }
     } catch (error: any) {
-      console.log(error);
       notification.error({
         message: t('notification.lock_order_failed_title'),
         description: error,
@@ -271,6 +273,7 @@ export const OrdxOrderList = ({
             {filterList.map((item: any, i) => (
               <div key={item.order_id + '_' + i}>
                 <OrdxFtOrderItem
+                  selectedSource={selectedSource}
                   assets_name={assets_name}
                   assets_type={assets_type}
                   showResale={showResale}

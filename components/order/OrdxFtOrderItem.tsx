@@ -13,6 +13,7 @@ interface Props {
   delay?: number;
   assets_type?: string;
   assets_name?: string;
+  selectedSource?: string;
   showResale?: boolean;
   onCancelOrder?: () => void;
   canSelect?: boolean;
@@ -25,6 +26,7 @@ export const OrdxFtOrderItem = ({
   onBuy,
   canSelect,
   selected,
+  selectedSource,
   onSelect,
   assets_name,
   assets_type,
@@ -41,9 +43,17 @@ export const OrdxFtOrderItem = ({
       item?.assets?.[0],
     [item?.assets, assets_name],
   );
-
+  const othersAssets = useMemo(() => {
+    if (item?.assets.length > 1) {
+      return item?.assets.filter((v) => v.assets_name !== assets_name);
+    }
+    return [];
+  }, [item?.assets, assets_name]);
   const canBuy = useMemo(
-    () => currentAddress && item.address !== currentAddress,
+    () =>
+      currentAddress &&
+      item.address !== currentAddress &&
+      (!selectedSource || selectedSource === item.order_source),
     [currentAddress, item.address],
   );
 
@@ -63,8 +73,9 @@ export const OrdxFtOrderItem = ({
       <CardBody className="radius-lg w-[10rem] h-[10rem] md:w-[16em] md:h-[16rem] top-0 bottom-0 left-0">
         <OrderAssetContent
           asset={asset}
+          othersAssets={othersAssets}
+          order_source={item?.order_source}
           assets_type={assets_type}
-          delay={delay}
           utxo={item?.utxo}
         />
       </CardBody>
