@@ -14,7 +14,7 @@ export const RareSatsItem = ({ asset }: Props) => {
         classNames={{
           wrapper: 'w-32 h-32 md:w-36 md:h-36',
         }}
-        src={`/raresats/${asset?.assets_name}.png`}
+        src={`/raresats/${asset?.assets_name}.svg`}
         alt="logo"
       />
       <div className="font-medium  font-mono text-2xl md:text-3xl mb-1 absolute bottom-0 left-0 z-10 w-full text-center">
