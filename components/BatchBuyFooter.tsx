@@ -27,9 +27,11 @@ import {
   calcBuyOrderFee,
   satsToBitcoin,
   getSuitableUtxos,
+  buildBuyThirdOrder,
 } from '@/lib';
 import {
   getUtxoByValue,
+  bulkBuyingThirdOrder,
   bulkBuyOrder,
   lockBulkOrder,
   unlockBulkOrder,
@@ -75,7 +77,7 @@ export const BatchBuyFooter = ({
   >([]);
   const [networkFee, setNetworkFee] = useState(0);
   const { feeRate, btcHeight } = useCommonStore((state) => state);
-  const { address, network } = useReactWalletStore();
+  const { address, network, publicKey } = useReactWalletStore();
 
   const lockOrderIds = useMemo(() => {
     return list.map((v) => v.order_id);
@@ -279,12 +281,14 @@ export const BatchBuyFooter = ({
   ]);
   useDebounce(
     () => {
-      if (list.length) {
+      console.log('lockTrigger');
+      console.log(lockOrderIds);
+      if (lockOrderIds.length) {
         lockTrigger();
       }
     },
-    1000,
-    [list],
+    10000,
+    [lockOrderIds],
   );
   useEffect(() => {
     setSelectSize(list.length);
@@ -390,14 +394,31 @@ export const BatchBuyFooter = ({
           serviceFee +
           DUMMY_UTXO_VALUE * dummyLength,
       );
-      const buyRaw = await buildBuyOrder({
-        raws,
-        utxos: filterConsumUtxos,
-        dummyUtxos: newDummyUtxos,
-        serviceFee: serviceFee,
-        feeRate: feeRate.value,
-      });
+      let buyRaw = '';
+      console.log('selectedSource', selectedSource);
 
+      if (selectedSource === 'Magisat') {
+        const buyRaw = await buildBuyThirdOrder({
+          order_ids: list.map((v) => v.order_id),
+          fee_rate_tier: 'halfHourFee',
+        });
+      } else {
+        buyRaw = await buildBuyOrder({
+          raws,
+          utxos: filterConsumUtxos,
+          dummyUtxos: newDummyUtxos,
+          serviceFee: serviceFee,
+          feeRate: feeRate.value,
+        });
+      }
+      if (!buyRaw) {
+        notification.error({
+          message: t('notification.order_buy_failed_title'),
+          description: t('notification.order_buy_failed_description_1'),
+        });
+        setLoading(false);
+        return;
+      }
       const order_ids = list.map((v) => v.order_id);
       const res = await bulkBuyOrder({
         address,
@@ -422,7 +443,7 @@ export const BatchBuyFooter = ({
       console.log('buy order error', error);
       notification.error({
         message: t('notification.order_buy_failed_title'),
-        description: error.message,
+        description: error,
       });
       console.error(error);
     } finally {

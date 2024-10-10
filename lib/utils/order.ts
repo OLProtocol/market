@@ -15,7 +15,7 @@ import {
   PsbtInput,
 } from '../wallet';
 import { UtxoAssetItem } from '@/store';
-import { ordx } from '@/api';
+import { ordx, bulkBuyingThirdOrder } from '@/api';
 interface SellOrderProps {
   inscriptionUtxo: {
     txid: string;
@@ -280,6 +280,36 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
     balanceUtxo,
     dummyUtxos,
   };
+};
+export const buildBuyThirdOrder = async ({ order_ids, fee_rate_tier }: any) => {
+  const { btcWallet, network, address, publicKey } =
+    useReactWalletStore.getState();
+  const thirdRes = await bulkBuyingThirdOrder({
+    address,
+    publickey: publicKey,
+    order_ids,
+    fee_rate_tier,
+    receiver_address: address,
+  });
+  const psbtNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
+  if (thirdRes?.code === 200 && btcWallet && thirdRes.data) {
+    const buyRaw = thirdRes.data;
+    const signed = await btcWallet.signPsbt(buyRaw);
+    console.log('signed', signed);
+    // const txid = await btcWallet.pushPsbt(signed);
+    // console.log('buy order txid', txid);
+    const psbt = bitcoin.Psbt.fromHex(signed!, {
+      network: psbtNetwork,
+    });
+
+    const tx = psbt.extractTransaction();
+    const rawTxHex = tx.toHex();
+    return rawTxHex;
+  } else {
+    throw new Error(thirdRes?.msg || 'Failed to build third order');
+  }
 };
 export const buildBuyOrder = async ({
   raws,

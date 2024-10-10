@@ -142,6 +142,8 @@ export const OrdxOrderList = ({
     }
   };
   const buyHandler = async (item) => {
+    console.log(item);
+
     try {
       if (item.locked === 0) {
         addBuy({ ...item, status: 'pending' });
@@ -302,6 +304,7 @@ export const OrdxOrderList = ({
       )}
       {canSelect && (
         <BatchBuyFooter
+          selectedSource={selectedSource}
           assets_name={assets_name}
           assets_type={assets_type}
           list={filterList}

@@ -331,6 +331,25 @@ export const unlockBulkOrder = async ({ address, orderIds }: any) => {
   });
   return res;
 };
+export const bulkBuyingThirdOrder = async ({
+  address,
+  publickey,
+  order_ids,
+  fee_rate_tier,
+  receiver_address,
+}: any) => {
+  const res = await request('/ordx/BulkBuyingThirdOrder', {
+    method: 'POST',
+    data: {
+      address,
+      publickey,
+      order_ids,
+      fee_rate_tier,
+      receiver_address,
+    },
+  });
+  return res;
+};
 
 export const getOrderTask = async (tx_id: string) => {
   const res = await request('/ordx/GetOrderTask', {
