@@ -143,7 +143,12 @@ export const OrdxOrderList = ({
   };
   const buyHandler = async (item) => {
     console.log(item);
-
+    if (buyList.length >= 1 && selectedSource === 'Magisat') {
+      notification.success({
+        message: 'Magisat can only place one order for now',
+      });
+      return;
+    }
     try {
       if (item.locked === 0) {
         addBuy({ ...item, status: 'pending' });
