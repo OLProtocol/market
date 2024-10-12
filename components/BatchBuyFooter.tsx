@@ -112,11 +112,14 @@ export const BatchBuyFooter = ({
     }
   }, [lockData]);
   const canSelectLength = useMemo(() => {
+    if (selectedSource === 'Magisat') {
+      return 1;
+    }
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
       32,
     );
-  }, [assetsList]);
+  }, [assetsList, selectedSource]);
 
   const utxos = useMemo(() => data?.data || [], [data]);
   const dummyUtxos = useMemo(
@@ -144,10 +147,9 @@ export const BatchBuyFooter = ({
     [list],
   );
   const serviceFee = useMemo(() => {
-    console.log('btcHeight', btcHeight);
-    console.log('assets_name', assets_name);
-    console.log('assets_type', assets_type);
-
+    if (selectedSource === 'Magisat') {
+      return 0;
+    }
     if (assets_name === 'btc' && assets_type === 'ns' && btcHeight < 863000) {
       return 0;
     }
@@ -160,7 +162,7 @@ export const BatchBuyFooter = ({
       return totalSercice;
     }, new Decimal(0));
     return _s.plus(minServiceDecimal).toNumber();
-  }, [list, btcHeight, assets_name, assets_type]);
+  }, [list, btcHeight, assets_name, assets_type, selectedSource]);
   const insufficientBalanceStatus = useMemo(
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
