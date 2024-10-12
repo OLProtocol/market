@@ -71,26 +71,29 @@ const AssetContentOverlay = ({ asset, assets_type, showContent }) => (
   <>
     {showContent(asset?.content_type, asset?.delegate) ? (
       <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
-        <p className="font-medium text-2xl md:text-3xl mb-1">       
-         { thousandSeparator(asset?.amount)}
+        <p className="font-medium text-2xl md:text-3xl mb-1">
+          {thousandSeparator(asset?.amount)}
         </p>
       </section>
     ) : (
       <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-20">
-       
-          {assets_type === 'ns' 
-            ? ( <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">asset?.assets_name</p>)
-            : ( assets_type === 'exotic' ? (
-              <div className="flex flex-col justify-end font-medium pb-6 text-2xl md:text-4xl md:pb-9 h-full">                    
-                      <span>{thousandSeparator(asset?.amount)}</span>
-              </div>
-            ): (
-            <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">{thousandSeparator(asset?.amount)}</p>
-            )
-            )
-            }
-      
-        {assets_type !== 'ns'  && assets_type !== 'exotic' && <AssetPriceInfo asset={asset} />}
+        {assets_type === 'ns' ? (
+          <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
+            {asset?.assets_name}
+          </p>
+        ) : assets_type === 'exotic' ? (
+          <div className="flex flex-col justify-end font-medium pb-6 text-2xl md:text-4xl md:pb-9 h-full">
+            <span>{thousandSeparator(asset?.amount)}</span>
+          </div>
+        ) : (
+          <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
+            {thousandSeparator(asset?.amount)}
+          </p>
+        )}
+
+        {assets_type !== 'ns' && assets_type !== 'exotic' && (
+          <AssetPriceInfo asset={asset} />
+        )}
       </section>
     )}
   </>
@@ -98,16 +101,16 @@ const AssetContentOverlay = ({ asset, assets_type, showContent }) => (
 
 const AssetPriceInfo = ({ asset }) => (
   <>
-  {asset?.assets_type === 'exotic' ? (
+    {asset?.assets_type === 'exotic' ? (
       <p className="md:text-sm">
         <span className="font-mono text-gray-100">
           $<BtcPrice btc={asset?.unit_price / asset?.unit_amount / 100000000} />
           &nbsp; /{asset?.assets_name}
         </span>
       </p>
-    ):(
+    ) : (
       <>
-      <p className="pt-12 md:pb-2 md:text-sm">
+        <p className="pt-12 md:pb-2 md:text-sm">
           <span className="font-bold text-amber-400">
             {(asset?.unit_price / asset?.unit_amount).toFixed(2)}
           </span>
@@ -116,12 +119,15 @@ const AssetPriceInfo = ({ asset }) => (
           </span>
         </p>
         <p className="md:text-sm">
-            <span className="font-mono text-gray-100">
-              $<BtcPrice btc={asset?.unit_price / asset?.unit_amount / 100000000} />
-              &nbsp; /{asset?.assets_name}
-            </span>
-          </p>
-        </>
+          <span className="font-mono text-gray-100">
+            $
+            <BtcPrice
+              btc={asset?.unit_price / asset?.unit_amount / 100000000}
+            />
+            &nbsp; /{asset?.assets_name}
+          </span>
+        </p>
+      </>
     )}
   </>
 );
