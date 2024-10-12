@@ -59,6 +59,21 @@ export const AssetsItem = ({
       item?.assets_list[0],
     [item?.assets_list, assets_name],
   );
+  // const otherAssets = [
+  //   {
+  //     assets_name: 'pizza',
+  //     amount: 0,
+  //     content_type: '',
+  //     delegate: '',
+  //     assets_type: 'exotic',
+  //   },
+  // ];
+  const otherAssets = useMemo(() => {
+    if (item?.assets_list?.length > 1) {
+      return item.assets_list.filter((v) => v.assets_name !== assets_name);
+    }
+    return [];
+  }, [item?.assets, assets_name]);
   const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type || assets_type !== 'ticker') return false;
     return (
@@ -124,7 +139,9 @@ export const AssetsItem = ({
         {asset?.assets_type === 'ns' && <NameItem asset={asset} />}
         {isSat20Ticker && <Sat20Item asset={asset} />}
         {isSat20Content && <Sat20ContentItem asset={asset} utxo={item?.utxo} />}
-        {asset?.assets_type === 'exotic' && <RareSatsItem asset={asset} />}
+        {asset?.assets_type === 'exotic' && (
+          <RareSatsItem asset={asset} otherAssets={otherAssets} />
+        )}
         {asset?.assets_type === 'nft' && <OrdinalsNftItem asset={asset} />}
       </CardBody>
 
