@@ -78,11 +78,11 @@ const AssetContentOverlay = ({ asset, assets_type, showContent }) => (
     ) : (
       <section className="text-center pt-10 font-mono md:pt-12 absolute top-0 left-0 w-full h-full z-20">
         {assets_type === 'ns' ? (
-          <p className="font-medium pt-5 text-2xl md:text-3xl md:pt-6">
+          <p className="font-medium pt-5 text-lg md:text-xl md:pt-6">
             {asset?.assets_name}
           </p>
         ) : assets_type === 'exotic' ? (
-          <div className="flex flex-col justify-end font-medium pb-6 text-2xl md:text-4xl md:pb-9 h-full">
+          <div className="flex flex-col justify-end font-medium pb-6 text-xl md:text-4xl md:pb-9 h-full">
             <span>{thousandSeparator(asset?.amount)}</span>
           </div>
         ) : (
