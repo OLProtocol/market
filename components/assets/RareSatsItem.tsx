@@ -11,7 +11,6 @@ export const RareSatsItem = ({ asset, otherAssets }: Props) => {
         {asset?.assets_name}
       </div>
       <Image
-        radius="full"
         classNames={{
           wrapper: 'w-32 h-32 md:w-36 md:h-36',
           img: 'w-full h-full',
