@@ -192,7 +192,7 @@ export default function Market() {
                           <Image
                             src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}
                             alt="logo"
-                            className="w-14 h-14 min-w-[3.5rem] p-2 rounded-full"
+                            className="w-14 h-14 min-w-[3.5rem] p-2"
                           />
                         ) : tick_type === 'exotic' ? (
                           <Image
