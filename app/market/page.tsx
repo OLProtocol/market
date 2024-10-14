@@ -190,24 +190,21 @@ export default function Market() {
                       <div className="flex text-sm md:text-base items-left">
                         {logo ? (
                           <Image
-                            radius="full"
-                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}                           
+                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}
                             alt="logo"
-                            className="w-14 h-14 min-w-[3.5rem] p-2 rounded-full bg-gray-950"
+                            className="w-14 h-14 min-w-[3.5rem] p-2 rounded-full"
                           />
-                        ) : (
-                          tick_type === 'exotic' ? (
-                            <Image                       
+                        ) : tick_type === 'exotic' ? (
+                          <Image
                             src={`/raresats/${nickname ? nickname : getTickLabel(tick)}.svg`}
                             alt="logo"
                             className="w-14 h-14 min-w-[3.5rem] p-2  bg-gray-650"
                           />
-                          ):(
-                            <Avatar
-                                name={tick.slice(0, 1).toUpperCase()}
-                                className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
-                              />
-                          )
+                        ) : (
+                          <Avatar
+                            name={tick.slice(0, 1).toUpperCase()}
+                            className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
+                          />
                         )}
                         <span className="pt-4 ml-2 break-keep whitespace-nowrap">
                           {nickname ? nickname : getTickLabel(tick)}

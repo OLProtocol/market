@@ -99,24 +99,21 @@ export default function Page() {
         <div className="flex-1 flex items-center mb-4 gap-4">
           {summary?.logo ? (
             <Image
-              radius="full"
               src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${summary.logo}`}
               alt="logo"
-              className="w-20 h-20 p-2 rounded-full bg-gray-900"
+              className="w-20 h-20 p-2 rounded-full"
             />
-          ) : (
-            summary?.assets_type  === 'exotic' ?(
-              <Image        
+          ) : summary?.assets_type === 'exotic' ? (
+            <Image
               src={`/raresats/${summary?.assets_name}.svg`}
               alt="logo"
               className="w-20 h-20 p-2"
             />
-            ):(
+          ) : (
             <Avatar
               name={ticker.slice(0, 1).toUpperCase()}
               className="text-3xl text-gray-200 font-black w-20 h-20 bg-gray-900"
             />
-           )
           )}
           <div className="flex-1 flex items-center flex-wrap justify-center h-20">
             <div className="flex-1">
