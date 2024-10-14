@@ -76,7 +76,7 @@ export const OrdxOrderList = ({
       sort,
       category,
       assets_type,
-      hide_locked: true,
+      hide_locked: false,
     }),
   );
   const [list, { set, push: pushToList, removeAt, reset: resetList }] =
@@ -234,12 +234,13 @@ export const OrdxOrderList = ({
       return list;
     }
   }, [list, hideStatus]);
-  console.log('filterList', filterList);
 
   const total = useMemo(() => data?.data?.total || 0, [data]);
   const finished = useMemo(() => {
     return list.length >= total;
   }, [total, list]);
+  console.log('finished', finished);
+
   const loadMore = async () => {
     setPage(page + 1);
   };

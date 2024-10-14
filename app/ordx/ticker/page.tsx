@@ -177,6 +177,7 @@ export default function Page() {
         >
           <Tab key="market" title={t('pages.market.title')}>
             <OrdxOrderList
+              key={`${ticker}_${assets_type}`}
               assets_name={ticker}
               assets_type={assets_type}
               showResale
