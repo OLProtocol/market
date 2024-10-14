@@ -101,7 +101,7 @@ export default function Page() {
             <Image
               src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${summary.logo}`}
               alt="logo"
-              className="w-20 h-20 p-2 rounded-full"
+              className="w-20 h-20 p-2"
             />
           ) : summary?.assets_type === 'exotic' ? (
             <Image
