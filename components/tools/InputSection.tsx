@@ -417,7 +417,7 @@ export function InputSection({
                   <Select
                     aria-label="Select unit"
                     size="sm"
-                    className="w-16 sm:w-20 min-w-max"
+                    className="w-24 sm:w-32 min-w-max"
                     selectedKeys={[item.value.unit]}
                     onChange={(e) => handleInputUnitSelectChange(item.id, e)}
                   >
