@@ -8,6 +8,7 @@ export function OutputSection({ outputList, setOutputList, address }) {
     const newId = outputList.items.length + 1;
     const newItem = {
       id: newId,
+      num: 1,
       value: {
         sats: 0,
         unit: 'sats',
@@ -34,6 +35,8 @@ export function OutputSection({ outputList, setOutputList, address }) {
   };
 
   const setOutputSats = (itemId: number, sats: string) => {
+    console.log(sats);
+
     const unit = outputList.items[itemId - 1].value.unit;
     if (unit === 'sats') {
       outputList.items[itemId - 1].value.sats = Number(sats);
@@ -43,7 +46,12 @@ export function OutputSection({ outputList, setOutputList, address }) {
 
     setOutputList('items', outputList.items);
   };
+  const setOutputNum = (itemId: number, num: string) => {
+    console.log(Number(num));
 
+    outputList.items[itemId - 1].num = Number(num);
+    setOutputList('items', outputList.items);
+  };
   const handleOutputUnitSelectChange = (itemId: number, e: any) => {
     const unit = e.target.value;
     outputList.items[itemId - 1].value.unit = unit;
@@ -66,6 +74,15 @@ export function OutputSection({ outputList, setOutputList, address }) {
                 Output {i + 1}
               </span>
               <div className="flex space-x-1 sm:space-x-2">
+                <Input
+                  type="number"
+                  placeholder="0"
+                  size="sm"
+                  className="w-20"
+                  value={item.num?.toString()}
+                  onChange={(e) => setOutputNum(item.id, e.target.value)}
+                  endContent={<span>个</span>}
+                />
                 <Button
                   size="sm"
                   color="primary"
