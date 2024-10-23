@@ -110,12 +110,12 @@ export const Navbar = () => {
       // },
       {
         label: t('pages.market.title'),
-        href: '/market/',
+        href: '/market.html',
         isActive: true,
       },
       {
         label: t('pages.inscribe.title'),
-        href: '/inscribe/',
+        href: '/inscribe.html',
         isActive: true,
       },
       {
@@ -127,14 +127,14 @@ export const Navbar = () => {
 
       {
         label: t('pages.my_assets.title'),
-        href: '/account/',
+        href: '/account.html',
         isActive: false,
       },
     ];
     if (runtimeEnv !== 'prod') {
       menus.push({
         label: t('pages.tools.title'),
-        href: '/tools/',
+        href: '/tools.html',
         isActive: false,
       });
     }
