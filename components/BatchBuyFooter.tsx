@@ -112,9 +112,9 @@ export const BatchBuyFooter = ({
     }
   }, [lockData]);
   const canSelectLength = useMemo(() => {
-    if (selectedSource === 'Magisat') {
-      return 1;
-    }
+    // if (selectedSource === 'Magisat') {
+    //   return 1;
+    // }
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
       32,
