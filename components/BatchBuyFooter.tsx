@@ -205,7 +205,6 @@ export const BatchBuyFooter = ({
   // }, [utxos]);
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
-    // const spendableDummyUtxos = dummyUtxos?.slice(0, 1) || [];
     const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
     const dis = dummyLength - spendableDummyUtxos.length;
     let balanceUtxo: any;
