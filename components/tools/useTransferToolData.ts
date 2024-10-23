@@ -53,6 +53,7 @@ export function useTransferToolData() {
     items: [
       {
         id: 1,
+        num: 1,
         value: {
           sats: 0,
           unit: 'sats',
@@ -136,13 +137,21 @@ export function useTransferToolData() {
       return;
     }
 
+    const outputs: any[] = [];
     outputList.items.forEach((v) => {
-      outTotal += v.value.sats;
+      for (let i = 0; i < v.num; i++) {
+        outputs.push({
+          address: v.value.address,
+          value: v.value.sats,
+        });
+      }
+    });
+    outputs.forEach((v) => {
+      outTotal += v.value;
     });
     if (outTotal === 0) {
       return;
     }
-
     const utxos = inputList.items.map((v) => ({
       txid: v.value.utxo.split(':')[0],
       vout: Number(v.value.utxo.split(':')[1]),
@@ -151,10 +160,7 @@ export function useTransferToolData() {
 
     const fee = await calcNetworkFee({
       utxos,
-      outputs: outputList.items.map((v) => ({
-        address: v.value.address,
-        value: v.value.sats,
-      })),
+      outputs,
       feeRate: feeRate.value,
       network,
       address: address,
@@ -359,23 +365,29 @@ export function useTransferToolData() {
         (acc, cur) => acc + cur.value.sats,
         0,
       );
-      const outTotal = outputList.items.reduce(
-        (acc, cur) => acc + cur.value.sats,
-        0,
-      );
+      // const outTotal = outputList.items.reduce(
+      //   (acc, cur) => acc + cur.value.sats,
+      //   0,
+      // );
 
       const utxos = inputList.items.map((v) => ({
         txid: v.value.utxo.split(':')[0],
         vout: Number(v.value.utxo.split(':')[1]),
         value: v.value.sats,
       }));
-
+      const outputs: any[] = [];
+      outputList.items.forEach((v) => {
+        for (let i = 0; i < v.num; i++) {
+          outputs.push({
+            address: v.value.address,
+            value: v.value.sats,
+          });
+        }
+      });
+      const outTotal = outputs.reduce((acc, cur) => acc + cur.value, 0);
       const fee = await calcNetworkFee({
         utxos,
-        outputs: outputList.items.map((v) => ({
-          address: v.value.address,
-          value: v.value.sats,
-        })),
+        outputs: outputs,
         feeRate: feeRate.value,
         network,
         address: address,
@@ -392,10 +404,7 @@ export function useTransferToolData() {
 
       const psbt = await buildTransaction({
         utxos,
-        outputs: outputList.items.map((v) => ({
-          address: v.value.address,
-          value: v.value.sats,
-        })),
+        outputs,
         feeRate: feeRate.value,
         network,
         address: address,
