@@ -81,7 +81,7 @@ export function OutputSection({ outputList, setOutputList, address }) {
                   className="w-20"
                   value={item.num?.toString()}
                   onChange={(e) => setOutputNum(item.id, e.target.value)}
-                  endContent={<span>个</span>}
+                  // endContent={<span>个</span>}
                 />
                 <Button
                   size="sm"
