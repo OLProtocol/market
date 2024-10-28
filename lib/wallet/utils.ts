@@ -101,7 +101,7 @@ export async function buildTransaction({
     network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
     feeRate,
   });
-  console.log(btcUtxos);
+  console.log(outputs);
   tx.setEnableRBF(true);
 
   outputs.forEach((v) => {

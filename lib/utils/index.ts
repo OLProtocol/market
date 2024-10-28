@@ -21,7 +21,7 @@ export const getLabelForAssets = (assets_name: string, assets_type: string) => {
   };
   return assetsMap[assets_type]?.[assets_name] || assets_name;
 };
-export const getTickLabel = (tick?: string) => {
+export const getTickLabel = (tick?: string, type?: string) => {
   if (tick === undefined) return undefined;
   const tickMap = {
     // n: 'Name',
@@ -29,6 +29,9 @@ export const getTickLabel = (tick?: string) => {
     // e: 'Rare',
     btc: 'PN-btc',
   };
+  if (type === 'n' && tick === '') {
+    return 'Pure Name';
+  }
   return tickMap[tick] || tick;
 };
 

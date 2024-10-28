@@ -365,16 +365,13 @@ export function useTransferToolData() {
         (acc, cur) => acc + cur.value.sats,
         0,
       );
-      // const outTotal = outputList.items.reduce(
-      //   (acc, cur) => acc + cur.value.sats,
-      //   0,
-      // );
 
       const utxos = inputList.items.map((v) => ({
         txid: v.value.utxo.split(':')[0],
         vout: Number(v.value.utxo.split(':')[1]),
         value: v.value.sats,
       }));
+
       const outputs: any[] = [];
       outputList.items.forEach((v) => {
         for (let i = 0; i < v.num; i++) {
@@ -408,6 +405,7 @@ export function useTransferToolData() {
         feeRate: feeRate.value,
         network,
         address: address,
+        suitable: false,
         publicKey,
       });
 
@@ -465,6 +463,7 @@ export function useTransferToolData() {
     setOutputList('items', [
       {
         id: 1,
+        num: 1,
         value: {
           sats: 0,
           unit: 'sats',
