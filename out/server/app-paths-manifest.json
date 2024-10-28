@@ -1,0 +1,4 @@
+{
+  "/inscribe/page": "app/inscribe/page.js",
+  "/tools/transaction/page": "app/tools/transaction/page.js"
+}
