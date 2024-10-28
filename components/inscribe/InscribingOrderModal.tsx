@@ -405,7 +405,7 @@ export const InscribingOrderModal = ({
       console.log('order', order);
       const { commitTx, fee, oneUtxo, tight } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
-      await sleep(6000);
+      await sleep(10000);
       let txid;
       if (order.type === 'rune') {
         txid = await mintRune({
