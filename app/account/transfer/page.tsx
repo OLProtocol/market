@@ -36,7 +36,6 @@ export default function SellPage() {
   const [errText, setErrText] = useState('');
   const [selected, setSelected] = useState(false);
   const [multipleAddresses, setMultipleAddresses] = useState('');
-  console.log('app.account.sell.page: list: ', list);
 
   const checkToAddressIsTaproot = (address: string[]) => {
     for (const addr of address) {

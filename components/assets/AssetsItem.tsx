@@ -123,7 +123,8 @@ export const AssetsItem = ({
     await onCancelOrder?.();
     setLoading(false);
   };
-
+  const showSplit = assets_type === 'ticker' && ['图币测试5', 'pearl', 'rarepizza'].includes(assets_name);
+  
   return (
     <Card
       radius="lg"
@@ -193,8 +194,7 @@ export const AssetsItem = ({
               >
                 {t('common.transfer')}
               </Button>
-              {assets_type === 'ticker' &&
-                (assets_name === 'pearl' || assets_name === 'rarepizza') && (
+              {showSplit && (
                   <Button
                     // fullWidth
                     variant="ghost"
