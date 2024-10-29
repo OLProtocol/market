@@ -102,6 +102,7 @@ export const Navbar = () => {
     return pathname === href;
   };
   const navMenus = useMemo(() => {
+    
     const menus = [
       // {
       //   label: t('pages.home.title'),

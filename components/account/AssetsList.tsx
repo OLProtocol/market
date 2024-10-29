@@ -5,11 +5,13 @@ import { notification, Empty } from 'antd';
 import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSellStore } from '@/store';
+import { useSellStore, useUtxoStore, useCommonStore } from '@/store';
+import { splitAsset } from '@/lib/utils/asset';
 import { AssetsItem } from '@/components/assets/AssetsItem';
 import { BatchSellFooter } from '@/components/BatchSellFooter';
 import { useRouter } from 'next/navigation';
 import { useList } from 'react-use';
+import { useTranslation } from 'react-i18next';
 import { Decimal } from 'decimal.js';
 import { InfiniteScroll } from '@/components/InfiniteScroll';
 
@@ -23,8 +25,9 @@ export const AssetsList = ({
   assets_type,
   assets_category,
 }: Props) => {
+  const { t } = useTranslation();
   const router = useRouter();
-  const { address, network } = useReactWalletStore((state) => state);
+  const { address, network, btcWallet } = useReactWalletStore((state) => state);
   const {
     add: addSell,
     changeAssetsName,
@@ -33,16 +36,16 @@ export const AssetsList = ({
     list: sellList,
     remove: removeSell,
   } = useSellStore((state) => state);
+  const { feeRate } = useCommonStore();
+  const { getUnspendUtxos } = useUtxoStore();
   const [type, setType] = useState('sell');
   const [canSelect, setCanSelect] = useState(false);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
-  console.log('assets_category', assets_category);
 
   const swrKey = useMemo(() => {
     return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${assets_category}-${page}-${size}`;
   }, [address, page, size, assets_name, assets_type, assets_category]);
-  console.log('swrKey', swrKey);
 
   const {
     data,
@@ -77,6 +80,42 @@ export const AssetsList = ({
   };
   const toTransfer = () => {
     router.push('/account/transfer');
+  };
+  const onSplit = async (item: any) => {
+    const utxos = getUnspendUtxos();
+    if (item.value % 1000 !== 0 || item.value <= 1000) {
+      notification.error({
+        message: t('notification.split_error_title'),
+        description: t('notification.split_error_description'),
+      });
+      return;
+    }
+    try {
+      const splitPsbt = await splitAsset({
+        asset: item,
+        utxos: utxos,
+        amount: 1000,
+        feeRate: feeRate.value,
+      });
+      if (!btcWallet) {
+        throw new Error('No wallet connected');
+      }
+      const signedPsbts = await btcWallet.signPsbt(splitPsbt.toHex());
+      if (signedPsbts) {
+        await btcWallet.pushPsbt(signedPsbts);
+      }
+      notification.success({
+        message: t('notification.split_success_title'),
+      });
+    } catch (error: any) {
+      console.error('List failed', error);
+    
+      notification.error({
+        message: t('notification.split_error_title'),
+        description: error.message,
+      });
+      throw error;
+    }
   };
   const sellHandler = async (item: any) => {
     addHandler(item);
@@ -149,6 +188,9 @@ export const AssetsList = ({
   };
   const total = useMemo(() => data?.data?.total || 0, [data]);
   const finished = useMemo(() => {
+    console.log('list.length', list.length);
+    console.log('total', total);
+
     return list.length >= total;
   }, [total, list]);
   const loadMore = async () => {
@@ -195,6 +237,7 @@ export const AssetsList = ({
                   setType('transfer');
                   sellHandler(item);
                 }}
+                onSplit={() => onSplit(item)}
                 onSell={() => {
                   setType('sell');
                   sellHandler(item);

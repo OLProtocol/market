@@ -25,6 +25,7 @@ interface Props {
   assets_name: string;
   onSell?: (item: any) => void;
   onTransfer?: (item: any) => void;
+  onSplit?: (item: any) => void;
   onCancelOrder?: () => void;
   selected?: boolean;
   canSelect?: boolean;
@@ -35,6 +36,7 @@ export const AssetsItem = ({
   item,
   onSell,
   onTransfer,
+  onSplit,
   onCancelOrder,
   selected,
   assets_name,
@@ -106,7 +108,16 @@ export const AssetsItem = ({
     tickContent = '';
     isText = false;
   }
-
+  const splitHandler = async (item: any) => {
+    setLoading(true);
+    try {
+      await onSplit?.(item);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const cancelHandler = async () => {
     setLoading(true);
     await onCancelOrder?.();
@@ -182,6 +193,23 @@ export const AssetsItem = ({
               >
                 {t('common.transfer')}
               </Button>
+              {assets_type === 'ticker' &&
+                (assets_name === 'pearl' || assets_name === 'rarepizza') && (
+                  <Button
+                    // fullWidth
+                    variant="ghost"
+                    size="md"
+                    isLoading={loading}
+                    // color="primary"
+                    radius="sm"
+                    onClick={() => {
+                      splitHandler?.(item);
+                    }}
+                    className="text-tiny h-8 flex-1 bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` uppercase min-w-unit-2"
+                  >
+                    {t('common.split')}
+                  </Button>
+                )}
             </>
           ) : (
             <Button
