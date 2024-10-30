@@ -31,8 +31,8 @@ export default function SellPage() {
   const { feeRate } = useCommonStore();
   const { getUnspendUtxos } = useUtxoStore();
   const [selectedTab, setSelectedTab] = useState('single');
-  const { network, btcWallet } = useReactWalletStore((state) => state);
-  const [singleAddress, setSingleAddress] = useState('');
+  const { network, btcWallet, address } = useReactWalletStore((state) => state);
+  const [singleAddress, setSingleAddress] = useState(address);
   const [errText, setErrText] = useState('');
   const [selected, setSelected] = useState(false);
   const [multipleAddresses, setMultipleAddresses] = useState('');
