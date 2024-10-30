@@ -371,7 +371,6 @@ export function useTransferToolData() {
         vout: Number(v.value.utxo.split(':')[1]),
         value: v.value.sats,
       }));
-
       const outputs: any[] = [];
       outputList.items.forEach((v) => {
         for (let i = 0; i < v.num; i++) {

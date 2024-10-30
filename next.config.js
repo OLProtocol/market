@@ -2,7 +2,7 @@
 // const nextTranslate = require('next-translate-plugin');
 const nextConfig = {
   output: 'export',
-  // distDir: 'out',
+  distDir: 'out',
   webpack: (config, { isServer }) => {
     // 启用 WebAssembly 实验特性
     config.experiments = {
