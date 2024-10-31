@@ -399,11 +399,19 @@ export const BatchBuyFooter = ({
       console.log('selectedSource', selectedSource);
 
       if (selectedSource === 'Magisat') {
-        const buyRaw = await buildBuyThirdOrder({
+        buyRaw = await buildBuyThirdOrder({
           order_ids: list.map((v) => v.order_id),
           fee_rate_tier: 'halfHourFee',
         });
       } else {
+        if (raws.length === 0) {
+          notification.error({
+            message: t('notification.order_buy_failed_title'),
+            description: t('notification.order_buy_failed_description_2'),
+          });
+          setLoading(false);
+          return;
+        }
         buyRaw = await buildBuyOrder({
           raws,
           utxos: filterConsumUtxos,
