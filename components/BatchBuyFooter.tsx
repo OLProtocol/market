@@ -10,7 +10,7 @@ import {
 import { useBuyStore } from '@/store';
 import { Icon } from '@iconify/react';
 import { BatchCart } from './BatchCart';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -280,17 +280,22 @@ export const BatchBuyFooter = ({
     totalPrice,
     feeRate.value,
   ]);
-  useDebounce(
-    () => {
-      console.log('lockTrigger');
-      console.log(lockOrderIds);
-      if (lockOrderIds.length) {
-        lockTrigger();
-      }
-    },
-    10000,
-    [lockOrderIds],
-  );
+  const previousLockOrderIdsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    if (
+      lockOrderIds.length > 0 &&
+      !arraysEqual(lockOrderIds, previousLockOrderIdsRef.current)
+    ) {
+      previousLockOrderIdsRef.current = lockOrderIds;
+      lockTrigger();
+    }
+  }, [lockOrderIds, lockTrigger]);
+
+  function arraysEqual(a: string[], b: string[]) {
+    if (a.length !== b.length) return false;
+    return a.every((val, index) => val === b[index]);
+  }
   useEffect(() => {
     setSelectSize(list.length);
   }, [list]);
