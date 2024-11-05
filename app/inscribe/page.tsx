@@ -129,6 +129,8 @@ export default function Inscribe() {
     setNameData('suffix', data.suffix);
   };
   const ordxChange = (data: any) => {
+    console.log(data);
+    
     setOrd2Data('type', data.type);
     setOrd2Data('tick', data.tick);
     setOrd2Data('utxos', data.utxos);
@@ -629,6 +631,7 @@ export default function Inscribe() {
       nav.push('/account?source=blog');
     } else {
       setTab(key);
+      setStep(1);
     }
   };
   const onDiscount = (d) => {
@@ -668,15 +671,20 @@ export default function Inscribe() {
                     <InscribeFiles onNext={filesNext} onChange={filesChange} />
                   )}
                   {tab === 'text' && (
-                    <InscribeText onNext={textNext} onChange={textChange} />
+                    <InscribeText
+                      onNext={textNext}
+                      onChange={textChange}
+                      value={{ text: textData.text, type: textData.type }} // Pass value prop
+                    />
                   )}
                   {tab === 'ordx' && (
-                    <InscribeOrdx onChange={ordxChange} onNext={ordxNext} />
+                    <InscribeOrdx onChange={ordxChange} onNext={ordxNext} value={ordxData} />
                   )}
                   {tab === 'name' && (
                     <InscribeOrdxName
                       onChange={ordxNameChange}
                       onNext={ordxNameNext}
+                      value={{ name: nameData.name, type: nameData.type }} // Pass value prop
                     />
                   )}
                   {tab === 'rune' && (

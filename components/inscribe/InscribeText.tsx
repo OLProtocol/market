@@ -6,19 +6,27 @@ import { useTranslation } from 'react-i18next';
 interface InscribeTextProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
+  value?: { text: string; type: string }; // New prop
 }
-export const InscribeText = ({ onNext, onChange }: InscribeTextProps) => {
+export const InscribeText = ({ onNext, onChange, value: defaultValue }: InscribeTextProps) => {
   const { t } = useTranslation();
   const [utxo, setUtxo] = useState('');
   const [value, setValue] = useState('');
   const [data, { set }] = useMap<any>({
-    type: 'single',
-    text: '',
+    type: defaultValue?.type || 'single',
+    text: defaultValue?.text || '',
     utxos: [],
   });
   useEffect(() => {
     onChange?.(data);
   }, [data]);
+
+  // useEffect(() => {
+  //   if (value) {
+  //     set('type', value.type);
+  //     set('text', value.text);
+  //   }
+  // }, [value]);
 
   useEffect(() => {
     if (utxo && value) {

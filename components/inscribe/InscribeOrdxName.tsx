@@ -1,5 +1,5 @@
 import { Textarea, Button } from '@nextui-org/react';
-import { useEffect, useState, useMemo, use } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useMap } from 'react-use';
 import { notification } from 'antd';
 import { ordx } from '@/api';
@@ -12,8 +12,9 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 interface InscribeTextProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
+  value?: { name: string; type: string }; // New prop
 }
-export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
+export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps) => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore();
   const [errorText, setErrorText] = useState('');
@@ -21,8 +22,8 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
   const [loading, setLoading] = useState(false);
   const [removeArr, setRemoveArr] = useState<string[]>([]);
   const [data, { set }] = useMap<any>({
-    type: 'mint',
-    name: '',
+    type: value?.type || 'mint',
+    name: value?.name || '',
     names: [],
     suffix: '',
   });
@@ -156,6 +157,12 @@ export const InscribeOrdxName = ({ onNext, onChange }: InscribeTextProps) => {
     // setErrorText('');
     setChecked(false);
   };
+  // useEffect(() => {
+  //   if (value) {
+  //     set('type', value.type);
+  //     set('name', value.name);
+  //   }
+  // }, [value]);
   useEffect(() => {
     onChange?.(data);
   }, [data]);

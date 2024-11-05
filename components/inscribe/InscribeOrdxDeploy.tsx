@@ -38,16 +38,18 @@ const { Dragger } = Upload;
 interface InscribeOrdxProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
-  onUtxoChange?: (data: any) => void;
+  value?: any; // Add 'value' prop
 }
 
-export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
+export const InscribeOrdxDeploy = ({ onNext, onChange, value }: InscribeOrdxProps) => {
   const { address: currentAccount, network, connected } = useReactWalletStore();
   const { btcHeight } = useCommonStore((state) => state);
   const { t } = useTranslation();
   // const { state } = useLocation();
   const [time, setTime] = useState({ start: undefined, end: undefined } as any);
-  const [data, { set }] = useMap<any>({
+  console.log(value);
+  
+  const [data, { set,  }] = useMap<any>({
     type: 'deploy',
     mode: 'fair',
     tick: '',
@@ -69,11 +71,12 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
     trzChecked: false,
     isSpecial: false,
     des: '',
+    ...(value || {}), // Initialize with 'value' prop
   });
 
   const [errorText, setErrorText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [tickBlurChecked, setTickBlurChecked] = useState(false);
+  const [tickBlurChecked, setTickBlurChecked] = useState(true);
   const [tickChecked, setTickChecked] = useState(false);
   const [files, setFiles] = useState<any[]>([]);
   const [originFiles, setOriginFiles] = useState<any[]>([]);
@@ -181,10 +184,10 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
         return false;
       }
       if (data.mode === 'fair') {
-        if (!(data.blockChecked || data.rarityChecked)) {
-          setErrorText(t('pages.inscribe.ordx.error_13'));
-          return false;
-        }
+        // if (!(data.blockChecked || data.rarityChecked)) {
+        //   setErrorText(t('pages.inscribe.ordx.error_13'));
+        //   return false;
+        // }
       } else if (data.mode === 'project') {
         if (!data.max) {
           setErrorText(t('pages.inscribe.ordx.error_14'));
@@ -262,6 +265,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange }: InscribeOrdxProps) => {
   }, [btcHeight]);
   useEffect(() => {
     setTickChecked(false);
+    console.log(data);
+    
     onChange?.(data);
   }, [data]);
   return (

@@ -19,12 +19,14 @@ import { useSearchParams } from 'next/navigation';
 interface InscribeOrdxMintProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
+  value?: any; // Add 'value' prop
 }
 
 const MAX_REPEAT = 1000;
 export const InscribeOrdxMint = ({
   onNext,
   onChange,
+  value,
 }: InscribeOrdxMintProps) => {
   const params = useSearchParams();
   const paramsTicker = (params.get('ticker') as string) || '';
@@ -42,6 +44,7 @@ export const InscribeOrdxMint = ({
     repeatMint: 1,
     relateInscriptionId: '',
     utxos: [],
+    ...(value || {}), // Initialize with 'value' prop
   });
 
   const [showRepeat, setShowRepeat] = useState(false);
