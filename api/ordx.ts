@@ -131,6 +131,15 @@ const getOrdxAddressHistory = async ({
   return data;
 };
 
+const getOrdxNsUxtos = async ({ address, sub, network, start, limit }) => {
+  const { data } = await axios.get(
+    generateUrl(
+      `ns/address/${address}/${sub}?start=${start}&limit=${limit}`,
+      network,
+    ),
+  );
+  return data;
+};
 const getOrdxAddressHolders = async ({
   address,
   ticker,
@@ -146,6 +155,7 @@ const getOrdxAddressHolders = async ({
   );
   return data;
 };
+
 const getOrdxTickHistory = async ({ start, limit, ticker, network }: any) => {
   const { data } = await axios.get(
     generateUrl(
@@ -384,4 +394,5 @@ export const ordx = {
   getNsListStatus,
   getAllUtxos,
   getOrdinalsAssets,
+  getOrdxNsUxtos,
 };

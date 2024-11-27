@@ -9,6 +9,7 @@ import {
   getOrdxSummary,
   getSats,
   getUtxoByValue,
+  ordx,
 } from '@/api';
 import {
   calcNetworkFee,
@@ -204,31 +205,52 @@ export function useTransferToolData() {
         if (item.type === 'f') {
           tickerOrAssetsType = item.ticker;
         }
-        res = await getOrdxAddressHolders({
-          start: 0,
-          limit: ordxUtxoLimit,
-          address: address,
-          tickerOrAssetsType: tickerOrAssetsType,
-          network: network,
-        });
+        let ticker = item.ticker;
+        if (item.type === 'n' && !item.ticker) {
+          ticker = 'PureName';
+        }
+        if (item.type === 'n') {
+          res = await ordx.getOrdxNsUxtos({
+            start: 0,
+            limit: ordxUtxoLimit,
+            address: address,
+            sub: ticker,
+            network: network,
+          });
+        } else {
+          res = await getOrdxAddressHolders({
+            start: 0,
+            limit: ordxUtxoLimit,
+            address: address,
+            tickerOrAssetsType: tickerOrAssetsType,
+            network: network,
+          });
+        }
+
+        console.log(res);
+
         const utxosOfTicker: any[] = [];
         let total = 0;
         if (res.code === 0) {
-          const details = res.data.detail;
+          const details = (item.type === 'n' ? res.data.names : res.data.detail) || [];
           total = res.data.total;
+          console.log('details = ', details);
+          
           details.forEach((detail) => {
             const utxo = {
               txid: detail.utxo.split(':')[0],
               vout: Number(detail.utxo.split(':')[1]),
-              value: detail.amount,
-              assetamount: detail.assetamount,
+              value: detail.amount || detail.value,
+              assetamount: detail.assetamount || detail.value,
             };
             utxosOfTicker.push(utxo);
           });
         }
-
+        console.log('utxosOfTicker = ', utxosOfTicker);
+        
         tickers.push({
-          ticker: item.ticker,
+          ticker: ticker,
+          type: item.type,
           total: total,
           utxos: utxosOfTicker,
         });

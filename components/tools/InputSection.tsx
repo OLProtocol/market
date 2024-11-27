@@ -387,7 +387,7 @@ export function InputSection({
                 }
                 isLoading={loadingStates[item.id] || loading}
               >
-                {item.options?.utxos.map((utxo) => (
+                {item.options?.utxos?.map((utxo) => (
                   <SelectItem
                     key={utxo.txid + ':' + utxo.vout}
                     textValue={utxo.txid + ':' + utxo.vout}
