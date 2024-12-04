@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 // import { BtcHeightAlert } from '@/components/BtcHeightAlert';
 // import { InscribeBrc20 } from './components/InscribeBrc20';
 import { InscribeOrdx } from '@/components/inscribe/InscribeOrdx';
+import { InscribeBrc20 } from '@/components/inscribe/InscribeBrc20';
 import { InscribeText } from '@/components/inscribe/InscribeText';
 import { InscribeFiles } from '@/components/inscribe/InscribeFiles';
 import { InscribeOrdxName } from '@/components/inscribe/InscribeOrdxName';
@@ -93,7 +94,7 @@ export default function Inscribe() {
     amount: 1,
     repeatMint: 1,
     limitPerMint: 1,
-    totalSupply: 21000000,
+    max: 21000000,
   });
   const [textData, { set: setTextData, reset: resetText }] = useMap({
     type: 'single',
@@ -120,7 +121,7 @@ export default function Inscribe() {
     setBrc20('amount', data.amount);
     setBrc20('repeatMint', data.repeatMint);
     setBrc20('limitPerMint', data.limitPerMint);
-    setBrc20('totalSupply', data.totalSupply);
+    setBrc20('max', data.max);
   };
   const ordxNameChange = (data: any) => {
     setNameData('type', data.type);
@@ -178,7 +179,7 @@ export default function Inscribe() {
           p: 'brc-20',
           op: 'deploy',
           tick: brc20Data.tick.toString(),
-          max: brc20Data.totalSupply.toString(),
+          max: brc20Data.max.toString(),
           lim: brc20Data.limitPerMint.toString(),
         }),
       });
@@ -197,33 +198,6 @@ export default function Inscribe() {
     const _files = await generteFiles(list);
     setList(_files);
     setStep(2);
-  };
-  const findSepiceAmt = () => {
-    const { utxos, amount } = ordxData;
-    const userAmt = amount || 0;
-    const realAmt = Math.max(userAmt, 330);
-    const findBetweenByValue = (userAmt: number, realAmt, ranges: any[]) => {
-      let outAmt = 0;
-      let outValue = 0;
-      let preTotalSize = 0;
-      for (let i = 0; i < ranges.length; i++) {
-        const range = ranges[i];
-        outValue += range.size;
-        if (userAmt > outValue) {
-          preTotalSize += range.size;
-        }
-        if (userAmt <= outValue) {
-          const dis = userAmt - preTotalSize;
-          outAmt = range.offset + dis;
-          break;
-        }
-      }
-      if (outAmt < realAmt) {
-        outAmt += realAmt - outAmt;
-      }
-      return outAmt;
-    };
-    return findBetweenByValue(userAmt, realAmt, ordxData.utxos[0].sats);
   };
   const ordxNameNext = async () => {
     const list: any = [];
@@ -601,6 +575,10 @@ export default function Inscribe() {
 
   const tabList = [
     {
+      key: 'brc20',
+      label: 'Brc20',
+    },
+    {
       key: 'ordx',
       label: 'Ticker',
     },
@@ -669,6 +647,9 @@ export default function Inscribe() {
                 <>
                   {tab === 'files' && (
                     <InscribeFiles onNext={filesNext} onChange={filesChange} />
+                  )}
+                  {tab === 'brc20' && (
+                    <InscribeBrc20 onNext={brc20Next} onChange={brc20Change} value={brc20Data} />
                   )}
                   {tab === 'text' && (
                     <InscribeText
