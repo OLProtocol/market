@@ -22,6 +22,7 @@ import { Icon } from '@iconify/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { thousandSeparator, getTickLabel } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
+import { BtcPrice } from '@/components/BtcPrice';
 import { HomeTypeTabs } from '@/components/market/HomeTypeTabs';
 import { NameMarketNav } from '@/components/market/NameMarketNav';
 
@@ -242,29 +243,44 @@ export default function Market() {
                     </TableCell>
                   );
                 } else if (columnKey === 'market_cap') {
+                  const value = getKeyValue(item, columnKey);
+                  const btc = (value / 100000000).toFixed(4);
                   return (
                     <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        <Icon
-                          icon="cryptocurrency-color:btc"
-                          className="mr-1 mt-0.5"
-                        />
-                        {(getKeyValue(item, 'market_cap') / 100000000).toFixed(
-                          4,
+                      <div className="flex flex-col">
+                        <div className="flex text-sm md:text-base">
+                          <Icon
+                            icon="cryptocurrency-color:btc"
+                            className="mr-1 mt-0.5"
+                          />
+                          {btc}
+                        </div>
+                        {value > 0 && (
+                          <div className="flex">
+                            $<BtcPrice btc={btc} />
+                          </div>
                         )}
                       </div>
                     </TableCell>
                   );
                 } else if (columnKey === 'tx_total_volume') {
+                  const value = getKeyValue(item, columnKey);
+                  const btc = (value / 100000000).toFixed(4);
                   return (
                     <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        <Icon
-                          icon="cryptocurrency-color:btc"
-                          className="mr-1 mt-0.5"
-                        />
-                        {getKeyValue(item, columnKey)}
-                        {/* <BtcPrice btc={getKeyValue(item, columnKey)} /> */}
+                      <div className="flex flex-col">
+                        <div className="flex text-sm md:text-base">
+                          <Icon
+                            icon="cryptocurrency-color:btc"
+                            className="mr-1 mt-0.5"
+                          />
+                          {btc}
+                        </div>
+                        {value > 0 && (
+                          <div className="flex">
+                            $<BtcPrice btc={btc} />
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                   );
