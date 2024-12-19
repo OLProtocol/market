@@ -131,7 +131,7 @@ export default function Inscribe() {
   };
   const ordxChange = (data: any) => {
     console.log(data);
-    
+
     setOrd2Data('type', data.type);
     setOrd2Data('tick', data.tick);
     setOrd2Data('utxos', data.utxos);
@@ -163,6 +163,8 @@ export default function Inscribe() {
         list.push({
           type: 'brc20',
           name: `mint_${i}`,
+          amount: 330,
+          offset: 0,
           value: JSON.stringify({
             p: 'brc-20',
             op: 'mint',
@@ -175,6 +177,8 @@ export default function Inscribe() {
       list.push({
         type: 'brc20',
         name: 'deploy_0',
+        amount: 330,
+        offset: 0,
         value: JSON.stringify({
           p: 'brc-20',
           op: 'deploy',
@@ -187,6 +191,8 @@ export default function Inscribe() {
       list.push({
         type: 'brc20',
         name: 'transfer_0',
+        amount: 330,
+        offset: 0,
         value: JSON.stringify({
           p: 'brc-20',
           op: 'transfer',
@@ -196,6 +202,9 @@ export default function Inscribe() {
       });
     }
     const _files = await generteFiles(list);
+    setMetadata({
+      type: 'brc20',
+    });
     setList(_files);
     setStep(2);
   };
@@ -402,7 +411,6 @@ export default function Inscribe() {
   };
   const textNext = async () => {
     const list: any = [];
-    console.log(textData);
 
     if (textData.type === 'single') {
       list.push({
@@ -483,9 +491,6 @@ export default function Inscribe() {
         value: file,
       });
     });
-    console.log(list);
-    // setList(list);
-    // setStep(2);
   };
   const onRuneChange = (data: any) => {
     setRuneData('action', data.action);
@@ -575,12 +580,12 @@ export default function Inscribe() {
 
   const tabList = [
     {
-      key: 'brc20',
-      label: 'Brc20',
-    },
-    {
       key: 'ordx',
       label: 'Ticker',
+    },
+    {
+      key: 'brc20',
+      label: 'Brc20',
     },
     {
       key: 'name',
@@ -649,7 +654,11 @@ export default function Inscribe() {
                     <InscribeFiles onNext={filesNext} onChange={filesChange} />
                   )}
                   {tab === 'brc20' && (
-                    <InscribeBrc20 onNext={brc20Next} onChange={brc20Change} value={brc20Data} />
+                    <InscribeBrc20
+                      onNext={brc20Next}
+                      onChange={brc20Change}
+                      value={brc20Data}
+                    />
                   )}
                   {tab === 'text' && (
                     <InscribeText
@@ -659,7 +668,11 @@ export default function Inscribe() {
                     />
                   )}
                   {tab === 'ordx' && (
-                    <InscribeOrdx onChange={ordxChange} onNext={ordxNext} value={ordxData} />
+                    <InscribeOrdx
+                      onChange={ordxChange}
+                      onNext={ordxNext}
+                      value={ordxData}
+                    />
                   )}
                   {tab === 'name' && (
                     <InscribeOrdxName

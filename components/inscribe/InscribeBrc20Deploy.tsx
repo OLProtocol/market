@@ -121,15 +121,17 @@ export const InscribeBrc20Deploy = ({
         </div>
       </div>
       <div className="w-60 mx-auto flex justify-center">
-        <Button
-          isLoading={loading}
-          isDisabled={buttonDisabled}
-          color="primary"
-          className="w-60"
-          onClick={nextHandler}
-        >
-          {tickChecked ? t('buttons.next') : 'Check'}
-        </Button>
+        <WalletConnectBus>
+          <Button
+            isLoading={loading}
+            isDisabled={buttonDisabled}
+            color="primary"
+            className="w-60"
+            onClick={nextHandler}
+          >
+            {tickChecked ? t('buttons.next') : 'Check'}
+          </Button>
+        </WalletConnectBus>
       </div>
       {errorText && (
         <div className="mt-2 text-xl text-center text-red-500">{errorText}</div>
