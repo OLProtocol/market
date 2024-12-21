@@ -425,6 +425,8 @@ export const BatchBuyFooter = ({
           feeRate: feeRate.value,
         });
       }
+      console.log('buyRaw', buyRaw);
+      
       if (!buyRaw) {
         notification.error({
           message: t('notification.order_buy_failed_title'),

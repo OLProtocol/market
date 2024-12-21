@@ -221,7 +221,7 @@ export const buyOrder = async ({ address, order_id, raw }: any) => {
 };
 export const bulkBuyOrder = async ({ address, order_ids, raw }: any) => {
   const res = await request('/ordx/BulkBuyOrder', {
-    method: 'P                   OST',
+    method: 'POST',
     data: { address, order_ids, raw },
   });
   return res; 
