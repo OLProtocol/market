@@ -224,7 +224,7 @@ export const bulkBuyOrder = async ({ address, order_ids, raw }: any) => {
     method: 'POST',
     data: { address, order_ids, raw },
   });
-  return res;
+  return res; 
 };
 
 export const getBTCPrice = async () => {
