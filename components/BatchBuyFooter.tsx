@@ -56,7 +56,7 @@ export const BatchBuyFooter = ({
   onSuccess,
   onClose,
 }: Props) => {
-  let minServiceFee = 0;
+  let minServiceFee = 1000;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
     process.env.NEXT_PUBLIC_IS_FREE == '0'
@@ -249,7 +249,7 @@ export const BatchBuyFooter = ({
     setCalcLoading(true);
     const newDummyUtxos = dummyUtxos?.slice(0, dummyLength);
 
-    const virtualFee = (170 * 10 + 34 * (3 + dummyLength) + 10) * feeRate.value;
+    const virtualFee = (172 * 10 + 34 * (3 + dummyLength) + 10) * feeRate.value;
     const { utxos: filterConsumUtxos } = filterUtxosByValue(
       canSpendableUtxos,
       virtualFee +
@@ -417,6 +417,8 @@ export const BatchBuyFooter = ({
           setLoading(false);
           return;
         }
+        console.log('serviceFee', serviceFee);
+        
         buyRaw = await buildBuyOrder({
           raws,
           utxos: filterConsumUtxos,
@@ -435,25 +437,25 @@ export const BatchBuyFooter = ({
         setLoading(false);
         return;
       }
-      // const order_ids = list.map((v) => v.order_id);
-      // const res = await bulkBuyOrder({
-      //   address,
-      //   order_ids,
-      //   raw: buyRaw,
-      // });
-      // setLoading(false);
-      // if (res.code === 200) {
-      //   notification.success({
-      //     message: t('notification.order_buy_success_title'),
-      //     description: t('notification.order_buy_success_description'),
-      //   });
-      //   onSuccess?.();
-      // } else {
-      //   notification.error({
-      //     message: t('notification.order_buy_failed_title'),
-      //     description: res.msg,
-      //   });
-      // }
+      const order_ids = list.map((v) => v.order_id);
+      const res = await bulkBuyOrder({
+        address,
+        order_ids,
+        raw: buyRaw,
+      });
+      setLoading(false);
+      if (res.code === 200) {
+        notification.success({
+          message: t('notification.order_buy_success_title'),
+          description: t('notification.order_buy_success_description'),
+        });
+        onSuccess?.();
+      } else {
+        notification.error({
+          message: t('notification.order_buy_failed_title'),
+          description: res.msg,
+        });
+      }
     } catch (error: any) {
       setLoading(false);
       console.log('buy order error', error);

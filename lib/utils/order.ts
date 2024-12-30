@@ -413,6 +413,9 @@ export const buildBuyOrder = async ({
   if (!btcWallet) {
     throw new Error('Wallet not initialized');
   }
+  console.log('buy psbt hex', buyPsbt.toHex());
+  console.log('buy psbt base64', buyPsbt.toBase64());
+  
   const signed = await btcWallet.signPsbt(buyPsbt.toHex());
   console.log('signed', signed);
   // const txid = await btcWallet.pushPsbt(signed);

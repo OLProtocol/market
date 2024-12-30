@@ -91,7 +91,7 @@ export function UtxoContent({
     if (inscriptionId && seed) {
       return generateOrdUrl({
         network,
-        path: `content/${inscriptionId}?seed=${seed}`,
+        path: `preview/${inscriptionId}?seed=${seed}`,
       });
     } else {
       return undefined;
