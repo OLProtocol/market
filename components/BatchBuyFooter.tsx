@@ -56,7 +56,7 @@ export const BatchBuyFooter = ({
   onSuccess,
   onClose,
 }: Props) => {
-  let minServiceFee = 0;
+  let minServiceFee = 1000;
   if (
     process.env.NEXT_PUBLIC_SERVICE_FEE &&
     process.env.NEXT_PUBLIC_IS_FREE == '0'
@@ -147,7 +147,7 @@ export const BatchBuyFooter = ({
     [list],
   );
   const serviceFee = useMemo(() => {
-    if (selectedSource === 'Magisat' || true) {
+    if (selectedSource === 'Magisat') {
       return 0;
     }
     if (assets_name === 'btc' && assets_type === 'ns' && btcHeight < 863000) {
