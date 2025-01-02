@@ -66,6 +66,7 @@ export default function Market() {
   const onSortChange = (i?: number) => {
     setInterval(i);
   };
+  console.log('data', data);
   const list = useMemo(() => {
     return data?.data || [];
   }, [data]);
@@ -265,7 +266,7 @@ export default function Market() {
                   );
                 } else if (columnKey === 'tx_total_volume') {
                   const value = getKeyValue(item, columnKey);
-                  const btc = (value / 100000000).toFixed(4);
+                  const btc = value.toFixed(4);
                   return (
                     <TableCell>
                       <div className="flex flex-col">
