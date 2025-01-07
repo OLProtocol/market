@@ -435,25 +435,25 @@ export const BatchBuyFooter = ({
         setLoading(false);
         return;
       }
-      // const order_ids = list.map((v) => v.order_id);
-      // const res = await bulkBuyOrder({
-      //   address,
-      //   order_ids,
-      //   raw: buyRaw,
-      // });
-      // setLoading(false);
-      // if (res.code === 200) {
-      //   notification.success({
-      //     message: t('notification.order_buy_success_title'),
-      //     description: t('notification.order_buy_success_description'),
-      //   });
-      //   onSuccess?.();
-      // } else {
-      //   notification.error({
-      //     message: t('notification.order_buy_failed_title'),
-      //     description: res.msg,
-      //   });
-      // }
+      const order_ids = list.map((v) => v.order_id);
+      const res = await bulkBuyOrder({
+        address,
+        order_ids,
+        raw: buyRaw,
+      });
+      setLoading(false);
+      if (res.code === 200) {
+        notification.success({
+          message: t('notification.order_buy_success_title'),
+          description: t('notification.order_buy_success_description'),
+        });
+        onSuccess?.();
+      } else {
+        notification.error({
+          message: t('notification.order_buy_failed_title'),
+          description: res.msg,
+        });
+      }
     } catch (error: any) {
       setLoading(false);
       console.log('buy order error', error);
