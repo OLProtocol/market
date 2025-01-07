@@ -28,7 +28,7 @@ import {
   sendBtcPsbt,
   returnInscribe,
 } from '@/lib/inscribe';
-import { mintRune } from '@/lib/inscribe/rune';
+import { mintRune, etchRune } from '@/lib/inscribe/rune';
 import { deleteMintRecord } from '@/api';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -192,7 +192,7 @@ export const InscribingOrderModal = ({
     }
     console.log('order', order);
 
-    if (order.type === 'rune') {
+    if (order.type === 'rune' && order.metadata.action === 'mint') {
       outputs.push({
         script: Buffer.from(order.opReturnScript, 'hex'),
         value: 0,
@@ -207,6 +207,12 @@ export const InscribingOrderModal = ({
           value: totalFee - 330,
         });
       }
+    }  if (order.type === 'rune' && order.metadata.action === 'etch') {
+      outputs.push({
+        address: order?.inscription.address,
+        value: totalFee,
+      });
+      
     } else {
       outputs.push({
         address: order?.inscription.inscriptionAddress,
@@ -253,6 +259,8 @@ export const InscribingOrderModal = ({
         feeRate: feeRate.value,
         suitable: true,
       };
+      console.log('params', params);
+      
       const [psbtError, psbt] = await tryit(generateSendBtcPsbt)(params);
       console.log('psbt', psbt);
 
@@ -305,7 +313,7 @@ export const InscribingOrderModal = ({
       let vout = 0;
       if (metadata?.specialOffsetAmount > 0) {
         vout = 1;
-      } else if (order.type === 'rune') {
+      } else if (order.type === 'rune' && order.metadata.action === 'mint') {
         vout = 2;
       }
       const commitTx = {
@@ -317,10 +325,10 @@ export const InscribingOrderModal = ({
         removeUtxos(spendUtxos);
         console.log(utxoList);
       }
-      if (order.type === 'rune' && order.files.length === 1) {
+      if (order.type === 'rune' && order.metadata.action === 'mint' && order.files.length === 1) {
         notification.success({
           message: 'Success',
-          description: 'Inscribe Success',
+          description: 'Iweinscribe Success',
         });
         order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
         await changeStatus(orderId, 'inscribe_success');
@@ -407,7 +415,7 @@ export const InscribingOrderModal = ({
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
       await sleep(10000);
       let txid;
-      if (order.type === 'rune') {
+      if (order.type === 'rune' && order.metadata.action === 'mint') {
         txid = await mintRune({
           secret: order.wifPrivateKey,
           network: order.network,
@@ -419,6 +427,21 @@ export const InscribingOrderModal = ({
             txid: commitTx.txid,
             vout: commitTx.vout,
             value: commitTx.amount - 330,
+          },
+        });
+      } else if (order.type === 'rune' && order.metadata.action === 'etch') {
+        txid = await etchRune({
+          secret: order.wifPrivateKey,
+          network: order.network,
+          opReturnScript: order.opReturnScript,
+          files: order.files,
+          inscription: order.inscription,
+          toAddress: order.toAddress[0],
+          feeRate: order.feeRate,
+          utxo: {
+            txid: commitTx.txid,
+            vout: commitTx.vout,
+            value: commitTx.amount,
           },
         });
       } else {

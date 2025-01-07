@@ -243,15 +243,31 @@ export const generateRuneFiles = async (list: any[]) => {
   const files: any[] = [];
   for (let i = 0; i < list.length; i++) {
     const item = list[i];
-    const file = {
-      type: item.type,
-      action: item.action,
-      runeId: item.runeId,
-      runeName: item.runeName,
-      amount: item.amount,
-      show: `${item.runeName} (${item.amount})`,
-    };
-    files.push(file);
+    if (item.action === 'etch') {
+      const file = {
+        type: item.type,
+        action: item.action,
+        runeName: item.runeName,
+        amount: item.amount,
+        show: `Etching ${item.runeName}`,
+        cap: item.cap,
+        symbol: item.symbol,
+        divisibility: item.divisibility,
+        premine: item.premine,
+      };
+      files.push(file);
+    } else {
+      const file = {
+        type: item.type,
+        action: item.action,
+        runeId: item.runeId,
+        runeName: item.runeName,
+        amount: item.amount,
+        show: `${item.runeName} (${item.amount})`,
+      };
+      files.push(file);
+    }
+    
   }
   return files;
 };

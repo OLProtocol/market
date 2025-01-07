@@ -13,7 +13,7 @@ import { InscribeFiles } from '@/components/inscribe/InscribeFiles';
 import { InscribeOrdxName } from '@/components/inscribe/InscribeOrdxName';
 import { InscribeStepTwo } from '@/components/inscribe/InscribeStepTwo';
 import { InscribeStepThree } from '@/components/inscribe/InscribeStepThree';
-import { InscribeRune } from '@/components/inscribe/InscribeRune';
+import { InscribeRunes } from '@/components/inscribe/InscribeRunes';
 import { useMap, useList } from 'react-use';
 import { InscribingOrderModal } from '@/components/inscribe/InscribingOrderModal';
 import {
@@ -114,6 +114,10 @@ export default function Inscribe() {
     runeName: 'UNCOMMON•GOODS',
     amount: '1',
     repeat: 1,
+    cap: 0,
+    symbol: '$',
+    divisibility: 0,
+    premine: 0,
   });
   const brc20Change = (data: any) => {
     setBrc20('type', data.type);
@@ -498,6 +502,10 @@ export default function Inscribe() {
     setRuneData('runeName', data.runeName);
     setRuneData('amount', data.amount);
     setRuneData('repeat', data.repeat);
+    setRuneData('cap', data.cap);
+    setRuneData('symbol', data.symbol);
+    setRuneData('divisibility', data.divisibility);
+    setRuneData('premine', data.premine);
   };
   const onRuneNext = async () => {
     if (runeData.action === 'mint') {
@@ -514,9 +522,38 @@ export default function Inscribe() {
       const _files = await generateRuneFiles(list);
       setMetadata({
         type: 'rune',
+        action: runeData.action,
         runeId: runeData.runeId,
         runeName: runeData.runeName,
         amount: runeData.amount,
+      });
+      console.log(_files);
+
+      setList(_files);
+      setStep(2);
+    } else if (runeData.action === 'etch') {
+      const list: any = [];
+      list.push({
+        type: 'rune',
+        action: runeData.action,
+        runeName: runeData.runeName,
+        amount: runeData.amount,
+        cap: runeData.cap,
+        symbol: runeData.symbol,
+        divisibility: runeData.divisibility,
+        premine: runeData.premine,
+      });
+      const _files = await generateRuneFiles(list);
+      setMetadata({
+        type: 'rune',
+        action: runeData.action,
+        runeId: runeData.runeId,
+        runeName: runeData.runeName,
+        amount: runeData.amount,
+        cap: runeData.cap,
+        symbol: runeData.symbol,
+        divisibility: runeData.divisibility,
+        premine: runeData.premine,
       });
       console.log(_files);
 
@@ -602,7 +639,7 @@ export default function Inscribe() {
     },
     {
       key: 'rune',
-      label: 'Rune',
+      label: 'Runes',
     },
     {
       key: 'blog',
@@ -682,7 +719,7 @@ export default function Inscribe() {
                     />
                   )}
                   {tab === 'rune' && (
-                    <InscribeRune onChange={onRuneChange} onNext={onRuneNext} />
+                    <InscribeRunes onChange={onRuneChange} onNext={onRuneNext} value={runeData}/>
                   )}
                 </>
               )}

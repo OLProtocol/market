@@ -6,6 +6,8 @@ import {
   Textarea,
   Checkbox,
 } from '@nextui-org/react';
+import { networks, Signer as BTCSigner } from 'bitcoinjs-lib';
+import { Address, Signer, Tap, Tx, Script } from '@cmdcode/tapscript';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useMap } from 'react-use';
 import { InscribeRemoveItem } from './InscribeRemoveItem';
@@ -15,12 +17,13 @@ import { v4 as uuidV4 } from 'uuid';
 import { FeeShow } from './FeeShow';
 import { generatePrivateKey, generateInscription } from '@/lib/inscribe';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { WIFWallet, createWifPrivateKey } from '@/lib/inscribe/WIFWallet';
+import { WIFWallet, createWifPrivateKey, toXOnly } from '@/lib/inscribe/WIFWallet';
+import { bitcoin } from '@/lib/wallet';
 import { notification } from 'antd';
 import { inscribeOrderHistory } from '@/lib/storage';
 import { tryit } from 'radash';
 import { useTranslation } from 'react-i18next';
-import { Runestone, none, some, RuneId } from 'runelib';
+import { Runestone, Rune, Terms, none, Etching, some, RuneId, EtchInscription, Range } from 'runelib';
 import { useCommonStore, useOrderStore, OrderItemType } from '@/store';
 
 const DEFAULT_FEE_OBJ = {
@@ -119,7 +122,7 @@ export const InscribeStepThree = ({
     const runeMetadata: any = {};
     const wifPrivateKey = createWifPrivateKey(network);
 
-    if (type === 'rune') {
+    if (type === 'rune' && metadata.action === 'mint') {
       _files = files;
       const oneNetwork = Math.ceil(130 * feeRate.value);
       const twoNetwork = Math.ceil(180 * feeRate.value);
@@ -148,6 +151,98 @@ export const InscribeStepThree = ({
       _opReturnScript = runestone.encipher().toString('hex');
       const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });
       runeMetadata.address = runeWallet.address;
+      runeMetadata.publicKey = runeWallet.ecPair.publicKey.toString('hex');
+    } else if (type === 'rune' && metadata.action === 'etch') {
+      const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });
+      runeMetadata.address = runeWallet.address;
+      runeMetadata.publicKey = runeWallet.ecPair.publicKey;
+      _files = files;
+      const etchRunes = _files[0];
+      const ins = new EtchInscription();
+      const bitcoinNetwork = network === 'mainnet'
+              ? networks.bitcoin
+              : networks.testnet;
+      ins.setContent('text/plain', Buffer.from('test runes', 'utf-8'));
+      ins.setRune(etchRunes.runeName);
+
+      const etching_script_asm = `${toXOnly(runeMetadata.publicKey).toString('hex')} OP_CHECKSIG`;
+      bitcoin.script.fromASM(etching_script_asm);
+      const etching_script = Buffer.concat([
+        bitcoin.script.fromASM(etching_script_asm) as any,
+        ins.encipher(),
+      ]);
+
+      const scriptTree: any = {
+        output: etching_script,
+      };
+
+      
+
+      const etching_redeem = {
+        output: etching_script,
+        redeemVersion: 192,
+      };
+      const script_p2tr = bitcoin.payments.p2tr({
+        internalPubkey: toXOnly(runeMetadata.publicKey),
+        scriptTree,
+        network: bitcoinNetwork,
+      });
+      const etching_p2tr = bitcoin.payments.p2tr({
+        internalPubkey: toXOnly(runeMetadata.publicKey),
+        scriptTree,
+        redeem: etching_redeem,
+        network: bitcoinNetwork,
+      });
+      console.log('etching_script', etching_script);
+      console.log('etching_p2tr', etching_p2tr);
+      console.log('etching_redeem', etching_redeem);
+      const address = script_p2tr.address ?? "";
+      inscription = {
+        address,
+        redeemVersion: etching_redeem.redeemVersion,
+        p2tr_script: script_p2tr.output!.toString('hex'),
+        script: etching_redeem.output.toString('hex'),
+        cb: etching_p2tr.witness![etching_p2tr.witness!.length - 1].toString('hex'),
+        amount: 0,
+        network: network,
+      }
+      const rune = Rune.fromName(etchRunes.runeName);
+      const terms = new Terms(1000, 10000, new Range(none(), none()), new Range(none(), none()))
+
+      const etching = new Etching(some(1), some(100000000), some(rune), none(), some("$"), some(terms), true);
+  
+      const stone = new Runestone([], some(etching), none(), none());
+      _opReturnScript = stone.encipher().toString('hex');
+      console.log('opReturnScript', _opReturnScript);
+      
+      const txsize = 64 + 33 + etching_script.length;
+      const txHeaderSize = 12;
+      const inputSize = 41;
+      const outputSize = 52;
+      const witnessSize = txsize;
+      const numInputs = 1;
+
+      const strippedSize =
+        txHeaderSize + inputSize * numInputs + outputSize * 2;
+      const totalWeight = strippedSize * 4 + witnessSize * numInputs;
+      const vSize = totalWeight / 4;
+      console.log('vSize', vSize);
+      
+      feeObj.networkFee = Math.ceil((vSize + 30) * feeRate.value);
+      let totalFee = feeObj.networkFee + totalInscriptionSize;
+      console.log('totalFee', totalFee);
+      
+      const oneFee = 1000 + Math.ceil(totalInscriptionSize * 0.01);
+      if (metadata.type === 'name' && btcHeight <= 856000) {
+        _discount = 100;
+      }
+      if (runtimeEnv === 'dev') {
+        _discount = 100;
+      }
+      feeObj.serviceFee = Math.ceil(oneFee);
+      feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
+      feeObj.totalInscriptionSize = totalInscriptionSize;
+      feeObj.totalFee = totalFee;
     } else {
       _files = files.map((f, i) => ({
         ...f,
@@ -162,19 +257,12 @@ export const InscribeStepThree = ({
         feeRate: feeRate.value,
       });
       const outputLength = oneUtxo || tightSelected ? 1 : files.length;
-      const baseSize = 84;
-      const totalSize = baseSize + inscription.txsize;
-      const weight = baseSize * 3 + totalSize;
       const txHeaderSize = 12;
       const inputSize = 41;
       const outputSize = 52;
       const witnessSize = inscription.txsize;
       const numInputs = 1;
-      const rawSize =
-        txHeaderSize +
-        inputSize * numInputs +
-        outputSize * outputLength +
-        witnessSize;
+
       const strippedSize =
         txHeaderSize + inputSize * numInputs + outputSize * outputLength;
       const totalWeight = strippedSize * 4 + witnessSize * numInputs;

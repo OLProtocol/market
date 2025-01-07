@@ -120,3 +120,59 @@ export async function mintRune({
   }
   return txids[txids.length - 1];
 }
+
+export async function etchRune({
+  secret,
+  network,
+  opReturnScript,
+  files,
+  inscription,
+  toAddress,
+  feeRate,
+  utxo,
+}: any): Promise<string | undefined> {
+  console.log(
+    'etchRune',
+    secret,
+    network,
+    opReturnScript,
+    files,
+    toAddress,
+    feeRate,
+    utxo,
+    inscription,
+  );
+
+  const wallet = new WIFWallet({ network, privateKey: secret });
+  const btcNetwork = toPsbtNetwork(
+    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+  );
+  
+  const psbt = new bitcoin.Psbt({ network: btcNetwork });
+  psbt.addInput({
+    hash: utxo.txid,
+    index: 0,
+    witnessUtxo: { value: utxo.value, script: Buffer.from(inscription.p2tr_script, 'hex') },
+    tapLeafScript: [
+      {
+        leafVersion: inscription.redeemVersion,
+        script: Buffer.from(inscription.script, 'hex'),
+        controlBlock: Buffer.from(inscription.cb, 'hex'),
+      },
+    ],
+  } as any);
+  
+  psbt.addOutput({ script: Buffer.from(opReturnScript, 'hex'), value: 0 });
+  psbt.addOutput({ address: toAddress, value: 330 });
+  console.log('psbt', psbt);
+  psbt.signInput(0, wallet.ecPair);
+  psbt.finalizeAllInputs();
+  console.log('psbt hex', psbt.toHex());
+  const tx = psbt.extractTransaction();
+  console.log('tx', tx);
+  
+  const { btcWallet } = useReactWalletStore.getState();
+  if (!btcWallet) throw new Error('No wallet connected');
+  const txid = await btcWallet.pushPsbt(psbt.toHex());
+  return txid;
+}
