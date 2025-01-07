@@ -13,7 +13,7 @@ const ECPair = ECPairFactory(ecc);
 function tapTweakHash(pubKey: Buffer, h?: Buffer): Buffer {
   return bitcoin.crypto.taggedHash(
     'TapTweak',
-    h ? Buffer.concat([pubKey, h]) : pubKey,
+    h ? Buffer.concat([pubKey as any, h]) : pubKey,
   );
 }
 

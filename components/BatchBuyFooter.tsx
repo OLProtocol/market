@@ -386,7 +386,6 @@ export const BatchBuyFooter = ({
         );
         return !l;
       });
-      console.log('spendableUtxos', spendableUtxos);
       if (balanceUtxo) {
         spendableUtxos.push(balanceUtxo);
       }
