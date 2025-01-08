@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, use } from 'react';
 import { useMap } from 'react-use';
 import { notification } from 'antd';
 import { ordx } from '@/api';
+import { tryit } from 'radash';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
@@ -12,27 +13,82 @@ interface InscribeTextProps {
   onChange?: (data: any) => void;
   value?: any; // Add 'value' prop
 }
-export const InscribeRunesMint = ({ onNext, onChange, value = {} }: InscribeTextProps) => {
+export const InscribeRunesMint = ({
+  onNext,
+  onChange,
+  value = {},
+}: InscribeTextProps) => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore();
   const [errorText, setErrorText] = useState('');
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [removeArr, setRemoveArr] = useState<string[]>([]);
+  const [tickBlurChecked, setTickBlurChecked] = useState(true);
+  const [tickChecked, setTickChecked] = useState(false);
   const [data, { set }] = useMap<any>({
     type: 'rune',
     action: 'mint',
-    runeId: '1:0',
-    runeName: 'UNCOMMON•GOODS',
+    runeId: '',
+    runeName: '',
     amount: '1',
     repeat: 1,
     ...(value || {}), // Initialize with 'value' prop
   });
   const maxRepeat = 24;
+
+  const checkTick = async () => {
+    const { runeName } = data;
+    const [err, res] = await tryit(ordx.getTickInfo)({
+      asset: `runes:f:${runeName.replace(':', '_')}`,
+      network,
+    });
+    console.log('checkTick', err, res);
+    if (err || res.code !== 0) {
+      setErrorText('rune is not exisited');
+      return false;
+    }
+    const { displayname, name, limit, maxSupply, totalMinted } = res.data ?? {};
+    const currentMint = Number(data.repeat) * Number(limit);
+    if (Number(totalMinted) + currentMint > Number(maxSupply)) {
+      setErrorText('Mint amount exceeds the maximum supply');
+      return false;
+    }
+    set('runeId', name?.Ticker?.replace('_', ':'));
+    set('runeName', displayname);
+    set('amount', limit);
+    return true;
+  };
   const nextHandler = async () => {
-    onNext?.();
+    setErrorText('');
+    if (!tickChecked) {
+      const checkStatus = await checkTick();
+
+      if (!checkStatus) {
+        return;
+      }
+      setTimeout(() => {
+        setTickChecked(true);
+      }, 100);
+    } else {
+      setLoading(true);
+
+      setLoading(false);
+      onNext?.();
+    }
+  };
+
+  console.log('checkStatus', tickChecked);
+
+  const ontickBlur = async () => {
+    setTickBlurChecked(false);
+    if (data.runeName) {
+      await checkTick();
+    }
+    setTickBlurChecked(true);
   };
   useEffect(() => {
+    setTickChecked(false);
     onChange?.(data);
   }, [data]);
 
@@ -43,11 +99,14 @@ export const InscribeRunesMint = ({ onNext, onChange, value = {} }: InscribeText
           <div className="w-20 sm:w-52">{t('common.tick')}</div>
           <Input
             value={data.runeName}
-            isReadOnly
             className="flex-1"
             maxLength={32}
             type="text"
             placeholder={t('pages.inscribe.ordx.tick_placeholder')}
+            onBlur={ontickBlur}
+            onChange={(e) => {
+              set('runeName', e.target.value);
+            }}
           />
         </div>
         <div className="flex items-center mb-4">
@@ -55,9 +114,15 @@ export const InscribeRunesMint = ({ onNext, onChange, value = {} }: InscribeText
           <Input
             type="number"
             className="flex-1"
+            readOnly
             value={data.amount}
-            isReadOnly
             min={1}
+            onChange={(e) => {
+              set(
+                'amount',
+                isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
+              );
+            }}
           ></Input>
         </div>
         <div>
@@ -99,8 +164,14 @@ export const InscribeRunesMint = ({ onNext, onChange, value = {} }: InscribeText
       </div>
       <div className="w-60 mx-auto flex justify-center">
         <WalletConnectBus>
-          <Button color="primary" className="w-60" onClick={nextHandler}>
-            {t('buttons.next')}
+          <Button
+            isLoading={loading}
+            color="primary"
+            isDisabled={!data.runeName}
+            className="w-60"
+            onClick={nextHandler}
+          >
+            {tickChecked ? t('buttons.next') : 'Check'}
           </Button>
         </WalletConnectBus>
       </div>

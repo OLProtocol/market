@@ -207,7 +207,7 @@ export const InscribingOrderModal = ({
           value: totalFee - 330,
         });
       }
-    }  if (order.type === 'rune' && order.metadata.action === 'etch') {
+    } else  if (order.type === 'rune' && order.metadata.action === 'etch') {
       outputs.push({
         address: order?.inscription.address,
         value: totalFee,
@@ -458,6 +458,10 @@ export const InscribingOrderModal = ({
           amount: commitTx.amount,
           toAddresses: order.toAddress,
         });
+      }
+      try {
+        txid = JSON.parse(txid);
+      } catch (error) {
       }
       order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
       //addSucccessTxid(orderId, txid);

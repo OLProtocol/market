@@ -4,6 +4,9 @@ import { Input, Button } from '@nextui-org/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-use';
+import { ordx } from '@/api'
+import { tryit } from 'radash';
+import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 // import { CopyButton } from '@/components/CopyButton';
 
@@ -19,15 +22,15 @@ export const InscribeRunesEtch = ({
   value,
 }: InscribeRunesEtchProps) => {
   const { t } = useTranslation();
-
+  const { address: currentAccount, network, connected } = useReactWalletStore();
   const [data, { set }] = useMap<any>({
     type: 'rune',
     action: 'etch',
-    runeName: 'UNCOMMON•GOODS',
+    runeName: 'STESTETSETSETSETSET',
     amount: '1',
     cap: 0,
     symbol: '$',
-    divisibility: 0,
+    divisibility: 1,
     premine: 0,
     ...(value || {}), // Initialize with 'value' prop
   });
@@ -56,6 +59,14 @@ export const InscribeRunesEtch = ({
     }
   };
   const checkTick = async () => {
+    const { runeName } = data;
+    const [err, res] = await tryit(ordx.getDeployInfo)({ asset: `runes:f:${runeName}`, network});
+    console.log('checkTick', err, res);
+    if (err || res.code !== 0) {
+      setErrorText('rune is exisited');
+      return false;
+    }
+
     return true;
   };
   const tickChange = async (value: string) => {
@@ -92,7 +103,7 @@ export const InscribeRunesEtch = ({
           />
         </div>
         <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-20 sm:w-52">{t('common.deploy_max')}</div>
+          <div className="w-20 sm:w-52">Amount</div>
           <div className="flex-1">
             <Input
               type="number"
@@ -108,7 +119,7 @@ export const InscribeRunesEtch = ({
           </div>
         </div>
         <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-20 sm:w-52">{t('common.deploy_max')}</div>
+          <div className="w-20 sm:w-52">Cap</div>
           <div className="flex-1">
             <Input
               type="number"
@@ -124,7 +135,7 @@ export const InscribeRunesEtch = ({
           </div>
         </div>
         <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-20 sm:w-52">{t('common.deploy_max')}</div>
+          <div className="w-20 sm:w-52">Symbol</div>
           <div className="flex-1">
             <Input
               value={data.symbol}
@@ -138,30 +149,31 @@ export const InscribeRunesEtch = ({
             ></Input>
           </div>
         </div>
-        {/* <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-20 sm:w-52">{t('common.deploy_max')}</div>
+        <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="w-20 sm:w-52">Premine</div>
           <div className="flex-1">
             <Input
-              value={data.symbol}
+              type="number"
+              value={data.premine.toString()}
               onChange={(e) =>
                 set(
-                  'symbol',
+                  'premine',
                   isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
                 )
               }
               min={1}
             ></Input>
           </div>
-        </div> */}
+        </div>
         <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-20 sm:w-52">{t('common.limit_per_mint')}</div>
+          <div className="w-20 sm:w-52">Divisibility</div>
           <div className="flex-1">
             <Input
               type="number"
-              value={data.amount.toString()}
+              value={data.divisibility.toString()}
               onChange={(e) =>
                 set(
-                  'amount',
+                  'divisibility',
                   isNaN(Number(e.target.value)) ? 0 : Number(e.target.value),
                 )
               }

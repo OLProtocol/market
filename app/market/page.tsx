@@ -66,6 +66,7 @@ export default function Market() {
   const onSortChange = (i?: number) => {
     setInterval(i);
   };
+  console.log('data', data);
   const list = useMemo(() => {
     return data?.data || [];
   }, [data]);

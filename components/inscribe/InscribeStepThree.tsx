@@ -124,6 +124,7 @@ export const InscribeStepThree = ({
 
     if (type === 'rune' && metadata.action === 'mint') {
       _files = files;
+      const runeId = metadata.runeId;
       const oneNetwork = Math.ceil(130 * feeRate.value);
       const twoNetwork = Math.ceil(180 * feeRate.value);
       feeObj.networkFee = (files.length - 1) * oneNetwork;
@@ -142,11 +143,14 @@ export const InscribeStepThree = ({
       feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
       feeObj.totalInscriptionSize = totalInscriptionSize;
       feeObj.totalFee = totalFee;
+      const runeIdArr = runeId.split(':');
+      console.log('runeIdArr', runeIdArr);
+      
       const runestone = new Runestone(
         [],
         none(),
-        some(new RuneId(1, 0)),
-        some(1),
+        some(new RuneId(Number(runeIdArr[0]), Number(runeIdArr[1]))),
+        some(Number(metadata.amount)),
       );
       _opReturnScript = runestone.encipher().toString('hex');
       const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });
@@ -207,9 +211,10 @@ export const InscribeStepThree = ({
         network: network,
       }
       const rune = Rune.fromName(etchRunes.runeName);
-      const terms = new Terms(1000, 10000, new Range(none(), none()), new Range(none(), none()))
-
-      const etching = new Etching(some(1), some(100000000), some(rune), none(), some("$"), some(terms), true);
+      const terms = new Terms(Number(etchRunes.amount), Number(etchRunes.cap), new Range(none(), none()), new Range(none(), none()))
+      console.log('etchRunes', etchRunes);
+      
+      const etching = new Etching(some(Number(etchRunes.divisibility)), some(Number(etchRunes.premine)), some(rune), none(), some(etchRunes.symbol), some(terms), true);
   
       const stone = new Runestone([], some(etching), none(), none());
       _opReturnScript = stone.encipher().toString('hex');

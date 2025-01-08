@@ -110,8 +110,8 @@ export default function Inscribe() {
   const [runeData, { set: setRuneData, reset: resetRune }] = useMap<any>({
     type: 'rune',
     action: 'mint',
-    runeId: '1:0',
-    runeName: 'UNCOMMON•GOODS',
+    runeId: '',
+    runeName: '',
     amount: '1',
     repeat: 1,
     cap: 0,

@@ -282,6 +282,14 @@ const getUtxo = async ({ utxo, network }: any) => {
   return data;
 };
 
+const getDeployInfo = async ({ asset, network }: any) => {
+  const { data } = await axios.get(`http://192.168.10.104:8009/testnet/deploy/${asset}`);
+  return data;
+}
+const getTickInfo = async ({ asset, network }: any) => {
+  const { data } = await axios.get(`http://192.168.10.104:8009/testnet/v3/tick/info/${asset}`);
+  return data;
+}
 const getOrdinalsAssets = async ({ address, network }: any) => {
   const { data } = await axios.get(
     `https://${network === 'testnet' ? 'testnet4' : 'mainnet'}-ordinals.sat20.org/address/${address}`,
@@ -395,4 +403,6 @@ export const ordx = {
   getAllUtxos,
   getOrdinalsAssets,
   getOrdxNsUxtos,
+  getDeployInfo,
+  getTickInfo,
 };
