@@ -5,6 +5,8 @@ import { Radio, RadioGroup } from '@nextui-org/react';
 import { InscribeRunesMint } from './InscribeRunesMint';
 import { InscribeRunesEtch } from './InscribeRunesEtch';
 import { useTranslation } from 'react-i18next';
+import { RunesPhaseDisplay } from '@/components/RunesPhaseDisplay';
+
 interface InscribeRunesProps {
   onNext?: () => void;
   onChange?: (data: any) => void;
@@ -22,6 +24,7 @@ export const InscribeRunes = ({
   const { t } = useTranslation();
   return (
     <div className="p-4">
+      {/* <RunesPhaseDisplay /> */}
       <div className="mb-4 flex justify-center">
         <RadioGroup
           orientation="horizontal"
