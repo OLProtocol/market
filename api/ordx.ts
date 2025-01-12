@@ -29,6 +29,8 @@ const generateV3Url = (url: string, network?: string) => {
     url = url.replace('apiprd', 'apidev');
   } else if (location.hostname.indexOf('dev') > -1) {
     url = url.replace('apiprd', 'apidev');
+  } else {
+    url = url.replace('apiprd', 'apidev');
   }
   return url;
 };
