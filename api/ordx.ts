@@ -21,6 +21,17 @@ const generateUrl = (url: string, network?: string) => {
   }
   return url;
 };
+const generateV3Url = (url: string, network?: string) => {
+  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
+  console.log('hostname', location.hostname);
+
+  if (location.hostname.indexOf('test') > -1) {
+    url = url.replace('apiprd', 'apidev');
+  } else if (location.hostname.indexOf('dev') > -1) {
+    url = url.replace('apiprd', 'apidev');
+  }
+  return url;
+};
 const responseParse = async (response) => {
   const { code, msg, data } = response?.data || {};
   if (code === 0) {
@@ -283,11 +294,11 @@ const getUtxo = async ({ utxo, network }: any) => {
 };
 
 const getDeployInfo = async ({ asset, network }: any) => {
-  const { data } = await axios.get(`http://192.168.10.104:8009/testnet/deploy/${asset}`);
+  const { data } = await axios.get(generateV3Url(`deploy/${asset}`, network));
   return data;
 }
 const getTickInfo = async ({ asset, network }: any) => {
-  const { data } = await axios.get(`http://192.168.10.104:8009/testnet/v3/tick/info/${asset}`);
+  const { data } = await axios.get(generateV3Url(`v3/tick/info/${asset}`, network));
   return data;
 }
 const getOrdinalsAssets = async ({ address, network }: any) => {
