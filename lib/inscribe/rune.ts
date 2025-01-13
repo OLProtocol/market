@@ -35,7 +35,7 @@ export async function mintRune({
   );
 
   const wallet = new WIFWallet({ network, privateKey: secret });
-  const fee = Math.ceil(130 * feeRate);
+  const fee = Math.ceil(132 * feeRate);
   const btcNetwork = toPsbtNetwork(
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
@@ -105,9 +105,8 @@ export async function mintRune({
     try {
       txid = await btcWallet.pushPsbt(psbtHex);
     } catch (error: any) {
-      if (error.code !== -32603) {
-        throw error;
-      }
+      console.log(error);
+      throw error;
     }
     if (txid) {
       try {

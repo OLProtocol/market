@@ -400,7 +400,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   version: () => (/* binding */ version)\n/* harmony export */ });\nconst version = 246;\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9hc3NldHMvdmVyc2lvbi5qcyIsIm1hcHBpbmdzIjoiOzs7O0FBQU8sTUFBTUEsVUFBVSxJQUFJIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vbmV4dC1hcHAtdGVtcGxhdGUvLi9hc3NldHMvdmVyc2lvbi5qcz84MjQyIl0sInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBjb25zdCB2ZXJzaW9uID0gMjQ2O1xuICAgICJdLCJuYW1lcyI6WyJ2ZXJzaW9uIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(ssr)/./assets/version.js\n");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   version: () => (/* binding */ version)\n/* harmony export */ });\nconst version = 247;\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9hc3NldHMvdmVyc2lvbi5qcyIsIm1hcHBpbmdzIjoiOzs7O0FBQU8sTUFBTUEsVUFBVSxJQUFJIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vbmV4dC1hcHAtdGVtcGxhdGUvLi9hc3NldHMvdmVyc2lvbi5qcz84MjQyIl0sInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBjb25zdCB2ZXJzaW9uID0gMjQ3O1xuICAgICJdLCJuYW1lcyI6WyJ2ZXJzaW9uIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(ssr)/./assets/version.js\n");
 
 /***/ }),
 

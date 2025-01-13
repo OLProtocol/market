@@ -125,8 +125,8 @@ export const InscribeStepThree = ({
     if (type === 'rune' && metadata.action === 'mint') {
       _files = files;
       const runeId = metadata.runeId;
-      const oneNetwork = Math.ceil(130 * feeRate.value);
-      const twoNetwork = Math.ceil(180 * feeRate.value);
+      const oneNetwork = Math.ceil(132 * feeRate.value);
+      const twoNetwork = Math.ceil(182 * feeRate.value);
       feeObj.networkFee = (files.length - 1) * oneNetwork;
       if (files.length === 1) {
         feeObj.networkFee = 0;
