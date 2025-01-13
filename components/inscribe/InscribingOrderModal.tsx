@@ -420,6 +420,7 @@ export const InscribingOrderModal = ({
           secret: order.wifPrivateKey,
           network: order.network,
           opReturnScript: order.opReturnScript,
+          runeMetadata: order.runeMetadata,
           files: order.files,
           toAddress: order.toAddress[0],
           feeRate: order.feeRate,

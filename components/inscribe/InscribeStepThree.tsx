@@ -153,7 +153,6 @@ export const InscribeStepThree = ({
       console.log('vSize', vSize);
       
       const oneNetwork = Math.ceil(vSize * feeRate.value);
-      const twoNetwork = Math.ceil(182 * feeRate.value);
       feeObj.networkFee = (files.length - 1) * oneNetwork;
       if (files.length === 1) {
         feeObj.networkFee = 0;
@@ -174,6 +173,7 @@ export const InscribeStepThree = ({
       
       const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });
       runeMetadata.address = runeWallet.address;
+      runeMetadata.oneNetworkFee = oneNetwork;
       runeMetadata.publicKey = runeWallet.ecPair.publicKey.toString('hex');
     } else if (type === 'rune' && metadata.action === 'etch') {
       const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });

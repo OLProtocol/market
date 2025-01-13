@@ -11,6 +11,7 @@ interface MintRuneParams {
   files: any[];
   toAddress: string;
   feeRate: number;
+  runeMetadata: any;
   utxo: { txid: string; vout: number; value: number };
 }
 
@@ -20,6 +21,7 @@ export async function mintRune({
   opReturnScript,
   files,
   toAddress,
+  runeMetadata,
   feeRate,
   utxo,
 }: MintRuneParams): Promise<string | undefined> {
@@ -35,7 +37,7 @@ export async function mintRune({
   );
 
   const wallet = new WIFWallet({ network, privateKey: secret });
-  const fee = Math.ceil(132 * feeRate);
+  const fee = Math.ceil(runeMetadata.oneNetworkFee);
   const btcNetwork = toPsbtNetwork(
     network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
