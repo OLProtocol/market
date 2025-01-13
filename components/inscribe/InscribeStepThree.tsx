@@ -125,7 +125,34 @@ export const InscribeStepThree = ({
     if (type === 'rune' && metadata.action === 'mint') {
       _files = files;
       const runeId = metadata.runeId;
-      const oneNetwork = Math.ceil(132 * feeRate.value);
+      const runeIdArr = runeId.split(':');
+      console.log('runeIdArr', runeIdArr);
+      console.log(Number(runeIdArr[0]), Number(runeIdArr[1]));
+      console.log(Number(metadata.amount));
+      
+      const runestone = new Runestone(
+        [],
+        none(),
+        some(new RuneId(Number(runeIdArr[0]), Number(runeIdArr[1]))),
+        some(Number(metadata.amount)),
+      );
+      _opReturnScript = runestone.encipher().toString('hex');
+      const opSize = Math.ceil(_opReturnScript.length / 2);
+
+      const txsize = 64 + 33 + opSize;
+      const txHeaderSize = 12;
+      const inputSize = 41;
+      const outputSize = 52;
+      const witnessSize = txsize;
+      const numInputs = 1;
+
+      const strippedSize =
+        txHeaderSize + inputSize * numInputs + outputSize * 2;
+      const totalWeight = strippedSize * 4 + witnessSize * numInputs;
+      const vSize = totalWeight / 4;
+      console.log('vSize', vSize);
+      
+      const oneNetwork = Math.ceil(vSize * feeRate.value);
       const twoNetwork = Math.ceil(182 * feeRate.value);
       feeObj.networkFee = (files.length - 1) * oneNetwork;
       if (files.length === 1) {
@@ -143,18 +170,8 @@ export const InscribeStepThree = ({
       feeObj.discountServiceFee = Math.ceil((oneFee * (100 - _discount)) / 100);
       feeObj.totalInscriptionSize = totalInscriptionSize;
       feeObj.totalFee = totalFee;
-      const runeIdArr = runeId.split(':');
-      console.log('runeIdArr', runeIdArr);
-      console.log(Number(runeIdArr[0]), Number(runeIdArr[1]));
-      console.log(Number(metadata.amount));
+     
       
-      const runestone = new Runestone(
-        [],
-        none(),
-        some(new RuneId(Number(runeIdArr[0]), Number(runeIdArr[1]))),
-        some(Number(metadata.amount)),
-      );
-      _opReturnScript = runestone.encipher().toString('hex');
       const runeWallet = new WIFWallet({ network, privateKey: wifPrivateKey });
       runeMetadata.address = runeWallet.address;
       runeMetadata.publicKey = runeWallet.ecPair.publicKey.toString('hex');
