@@ -145,6 +145,8 @@ export const InscribeStepThree = ({
       feeObj.totalFee = totalFee;
       const runeIdArr = runeId.split(':');
       console.log('runeIdArr', runeIdArr);
+      console.log(Number(runeIdArr[0]), Number(runeIdArr[1]));
+      console.log(Number(metadata.amount));
       
       const runestone = new Runestone(
         [],
