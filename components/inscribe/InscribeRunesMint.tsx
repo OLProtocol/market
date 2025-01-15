@@ -59,6 +59,11 @@ export const InscribeRunesMint = ({
     set('amount', limit);
     return true;
   };
+  const onTickChange = (value) => {
+    value = value.replace(/[^a-zA-Z •]/g, '').toUpperCase();
+    value = value.replace(' ', '•');
+    set('runeName', value);
+  };
   const nextHandler = async () => {
     setErrorText('');
     if (!tickChecked) {
@@ -87,6 +92,10 @@ export const InscribeRunesMint = ({
     }
     setTickBlurChecked(true);
   };
+  const addDot = () => {
+    const { runeName } = data;
+    set('runeName', `${runeName}•`);
+  };
   useEffect(() => {
     setTickChecked(false);
     onChange?.(data);
@@ -102,10 +111,15 @@ export const InscribeRunesMint = ({
             className="flex-1"
             maxLength={32}
             type="text"
-            placeholder={t('pages.inscribe.ordx.tick_placeholder')}
+            placeholder={`Enter 'AAAAA•AAAAA•AAAAA' or 'BBBBB BBBBB BBBBB' here`}
             onBlur={ontickBlur}
+            endContent={
+              <Button size="sm" onClick={addDot}>
+                •
+              </Button>
+            }
             onChange={(e) => {
-              set('runeName', e.target.value);
+              onTickChange(e.target.value);
             }}
           />
         </div>

@@ -69,8 +69,14 @@ export const InscribeRunesEtch = ({
 
     return true;
   };
-  const tickChange = async (value: string) => {
-    set('runeName', value.trim());
+  const tickChange = (value) => {
+    value = value.replace(/[^a-zA-Z •]/g, '').toUpperCase();
+    value = value.replace(' ', '•');
+    set('runeName', value);
+  };
+  const addDot = () => {
+    const { runeName } = data;
+    set('runeName', `${runeName}•`);
   };
   const ontickBlur = async () => {
     setTickBlurChecked(false);
@@ -91,6 +97,11 @@ export const InscribeRunesEtch = ({
           <Input
             value={data.runeName}
             className="flex-1"
+            endContent={
+              <Button size="sm" onClick={addDot}>
+                •
+              </Button>
+            }
             onChange={(e) => {
               tickChange(e.target.value);
             }}
@@ -99,7 +110,7 @@ export const InscribeRunesEtch = ({
             }}
             maxLength={32}
             type="text"
-            placeholder={t('pages.inscribe.ordx.tick_placeholder')}
+            placeholder={`Enter 'AAAAA•AAAAA•AAAAA' or 'BBBBB BBBBB BBBBB' here`}
           />
         </div>
         <div className="flex mb-4 flex-col gap-2 sm:flex-row sm:items-center">
