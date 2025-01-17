@@ -618,7 +618,11 @@ export default function Inscribe() {
   const tabList = [
     {
       key: 'ordx',
-      label: 'Ticker',
+      label: 'ORDX',
+    },
+    {
+      key: 'rune',
+      label: 'Runes',
     },
     {
       key: 'brc20',
@@ -632,14 +636,9 @@ export default function Inscribe() {
       key: 'text',
       label: t('pages.inscribe.text.name'),
     },
-
     {
       key: 'files',
       label: t('pages.inscribe.files.name'),
-    },
-    {
-      key: 'rune',
-      label: 'Runes',
     },
     {
       key: 'blog',

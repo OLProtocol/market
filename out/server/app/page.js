@@ -400,7 +400,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   version: () => (/* binding */ version)\n/* harmony export */ });\nconst version = 250;\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9hc3NldHMvdmVyc2lvbi5qcyIsIm1hcHBpbmdzIjoiOzs7O0FBQU8sTUFBTUEsVUFBVSxJQUFJIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vbmV4dC1hcHAtdGVtcGxhdGUvLi9hc3NldHMvdmVyc2lvbi5qcz84MjQyIl0sInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBjb25zdCB2ZXJzaW9uID0gMjUwO1xuICAgICJdLCJuYW1lcyI6WyJ2ZXJzaW9uIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(ssr)/./assets/version.js\n");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   version: () => (/* binding */ version)\n/* harmony export */ });\nconst version = 251;\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9hc3NldHMvdmVyc2lvbi5qcyIsIm1hcHBpbmdzIjoiOzs7O0FBQU8sTUFBTUEsVUFBVSxJQUFJIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vbmV4dC1hcHAtdGVtcGxhdGUvLi9hc3NldHMvdmVyc2lvbi5qcz84MjQyIl0sInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBjb25zdCB2ZXJzaW9uID0gMjUxO1xuICAgICJdLCJuYW1lcyI6WyJ2ZXJzaW9uIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(ssr)/./assets/version.js\n");
 
 /***/ }),
 
@@ -1323,7 +1323,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"app":{"title":"SAT20 Market","versio
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"connect":"连接","my_assets":"我的资产","disconnect":"断开连接","cancel":"取消","confirm":"确认","inscribe":"铭文","start_inscribe":"开始铭文","buy":"购买","close":"关闭","talk_later":"稍后再谈","update_now":"现在更新","list_sale":"上架","remove_sale":"下架","next":"下一步","back":"返回","pay_wallet":"使用钱包支付","submit_payment":"提交并支付发票","remove_all":"移除所有","to_history":"交易历史"}');
+module.exports = /*#__PURE__*/JSON.parse('{"connect":"连接","my_assets":"我的资产","disconnect":"断开连接","cancel":"取消","confirm":"确认","inscribe":"铸造","start_inscribe":"开始铸造","buy":"购买","close":"关闭","talk_later":"稍后再谈","update_now":"现在更新","list_sale":"上架","remove_sale":"下架","next":"下一步","back":"返回","pay_wallet":"使用钱包支付","submit_payment":"提交并支付发票","remove_all":"移除所有","to_history":"交易历史"}');
 
 /***/ }),
 

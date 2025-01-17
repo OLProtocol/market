@@ -497,7 +497,7 @@ export const InscribingOrderModal = ({
       setActiveStep(1);
     }
     if (order.status === 'inscribe_success') {
-      setActiveStep(1);
+      setActiveStep(2);
     }
   };
 
