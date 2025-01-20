@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/inscribe/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/inscribe/page.js"
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -16,15 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/error.js"
     ],
-    "/page": [
+    "/inscribe/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
-    "/market/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/market/page.js"
+      "static/chunks/app/inscribe/page.js"
     ]
   }
 }

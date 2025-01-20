@@ -126,9 +126,6 @@ export const InscribeStepThree = ({
       _files = files;
       const runeId = metadata.runeId;
       const runeIdArr = runeId.split(':');
-      console.log('runeIdArr', runeIdArr);
-      console.log(Number(runeIdArr[0]), Number(runeIdArr[1]));
-      console.log(Number(metadata.amount));
       
       const runestone = new Runestone(
         [],
@@ -185,7 +182,7 @@ export const InscribeStepThree = ({
       const bitcoinNetwork = network === 'mainnet'
               ? networks.bitcoin
               : networks.testnet;
-      ins.setContent('text/plain', Buffer.from('test runes', 'utf-8'));
+      // ins.setContent('text/plain', Buffer.from('test runes', 'utf-8'));
       ins.setRune(etchRunes.runeName);
 
       const etching_script_asm = `${toXOnly(runeMetadata.publicKey).toString('hex')} OP_CHECKSIG`;
