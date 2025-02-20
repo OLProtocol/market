@@ -15,7 +15,7 @@ export const request = async (
   const { headers = {}, method = 'GET', data, formData } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
-    url = url.replace('apiprd', 'apitest');
+    url = url.replace('apiprd', 'apiprd');
   } else if (location.hostname.indexOf('dev') > -1) {
     url = url.replace('apiprd', 'apidev');
   }
