@@ -207,12 +207,11 @@ export const InscribingOrderModal = ({
           value: totalFee - 330,
         });
       }
-    } else  if (order.type === 'rune' && order.metadata.action === 'etch') {
+    } else if (order.type === 'rune' && order.metadata.action === 'etch') {
       outputs.push({
         address: order?.inscription.address,
         value: totalFee,
       });
-      
     } else {
       outputs.push({
         address: order?.inscription.inscriptionAddress,
@@ -260,7 +259,7 @@ export const InscribingOrderModal = ({
         suitable: true,
       };
       console.log('params', params);
-      
+
       const [psbtError, psbt] = await tryit(generateSendBtcPsbt)(params);
       console.log('psbt', psbt);
 
@@ -325,7 +324,11 @@ export const InscribingOrderModal = ({
         removeUtxos(spendUtxos);
         console.log(utxoList);
       }
-      if (order.type === 'rune' && order.metadata.action === 'mint' && order.files.length === 1) {
+      if (
+        order.type === 'rune' &&
+        order.metadata.action === 'mint' &&
+        order.files.length === 1
+      ) {
         notification.success({
           message: 'Success',
           description: 'Iweinscribe Success',
@@ -349,9 +352,11 @@ export const InscribingOrderModal = ({
         }),
       });
       setLoading(false);
-      setTimeout(() => {
-        inscribeHandler();
-      }, 0);
+      if (order.type !== 'rune' && order.metadata.action !== 'etch') {
+        setTimeout(() => {
+          inscribeHandler();
+        }, 0);
+      }
     } catch (error: any) {
       setLoading(false);
       console.error(error);
@@ -462,8 +467,7 @@ export const InscribingOrderModal = ({
       }
       try {
         txid = JSON.parse(txid);
-      } catch (error) {
-      }
+      } catch (error) {}
       order.toAddress.forEach((address) => addSucccessTxid(orderId, txid));
       //addSucccessTxid(orderId, txid);
 
