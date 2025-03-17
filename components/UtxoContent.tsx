@@ -1,12 +1,13 @@
 import useSWRMutation from 'swr/mutation';
 import { ordx } from '@/api';
 import { Spinner, Image } from '@nextui-org/react';
-import { tryit } from 'radash';
+import { chain, tryit } from 'radash';
 import { use, useRef, useState } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { generateOrdUrl } from '@/lib/utils';
 import { generateSeed } from '@/lib/utils';
+import { useCommonStore } from '@/store';
 
 interface UtxoContentProps {
   inscriptionId: string;
@@ -27,11 +28,11 @@ export function UtxoContent({
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   // const [delayLoading, setDelayLoading] = useState(true);
-
+  const { chain } = useCommonStore();
   const getSeedByUtxo = async () => {
     setLoading(true);
     // 检查 sessionStorage 中是否已经存在 seed
-    const key = `utxo-content-seed-${network}-${utxo}`;
+    const key = `utxo-content-seed-${chain}-${network}-${utxo}`;
     const cachedSeed = sessionStorage.getItem(key);
     if (cachedSeed) {
       setSeed(cachedSeed);

@@ -62,12 +62,12 @@ export const OrderBuyModal = ({
   ) {
     serviceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
-  const { feeRate } = useCommonStore((state) => state);
+  const { feeRate, chain } = useCommonStore((state) => state);
   const { address, network } = useReactWalletStore((state) => state);
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data, isLoading } = useSWR(
-    `getUtxoByValue-${address}-${network}`,
+    `getUtxoByValue-${address}-${chain}-${network}`,
     () => getUtxoByValue({ address, network, value: 500 }),
   );
   const utxos = useMemo(() => data?.data || [], [data]);

@@ -8,6 +8,7 @@ import { use, useEffect, useMemo, useState } from 'react';
 import { Pagination } from '@/components/Pagination';
 import { Content } from '@/components/Content';
 import { OrdxFtOrderItem } from '@/components/order/OrdxFtOrderItemBack';
+import { useCommonStore } from '@/store';
 import { useTranslation } from 'react-i18next';
 import { useList } from 'react-use';
 
@@ -19,13 +20,14 @@ export const OrdxOrderList = ({ address }: OrdxOrderListProps) => {
   const { address: storeAddress, network } = useReactWalletStore(
     (state) => state,
   );
+  const { chain } = useCommonStore();
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${address}-${network}-${page}-${size}`;
+      return `/ordx/getOrders-${address}-${chain}-${network}-${page}-${size}`;
     }
-    return `/ordx/getOrders-${network}-${page}-${size}`;
+    return `/ordx/getOrders-${chain}-${network}-${page}-${size}`;
   }, [address, page, size, network]);
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({ offset: (page - 1) * size, size, address }),

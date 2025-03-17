@@ -7,7 +7,9 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { OrderNameTypeNav } from '@/components/order/OrderNameTypeNav';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCommonStore } from '@/store';
 import { CategorySelect } from './CategorySelect';
+
 interface NameCategoryListProps {
   onChange?: (ticker?: string) => void;
   name?: string;
@@ -15,6 +17,7 @@ interface NameCategoryListProps {
 export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const [nameSelected, setNameSelected] = useState<string | undefined>('');
   const [navSelected, setNavSelected] = useState<string | undefined>('');
   const [letterSelected, setLetterSelected] = useState<string | undefined>('');
@@ -24,7 +27,7 @@ export const NameCategoryList = ({ onChange, name }: NameCategoryListProps) => {
   const [ohterSelected, setOhterSelected] = useState<string | undefined>('');
 
   const swrKey = useMemo(() => {
-    return `/ordx/getNameCategoryList-${name}-${network}`;
+    return `/ordx/getNameCategoryList-${name}-${chain}-${network}`;
   }, [name, network]);
 
   const { data, isLoading, mutate } = useSWR(

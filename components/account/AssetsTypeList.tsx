@@ -6,6 +6,7 @@ import { getLabelForAssets } from '@/lib/utils';
 import { getAddressAssetsList } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
+import { useCommonStore } from '@/store';
 
 import { useRouter } from 'next/navigation';
 
@@ -18,10 +19,11 @@ export const AssetsTypeList = ({
   assets_type,
 }: AssetsTypeListProps) => {
   const { address, network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const [selectKey, setSelectKey] = useState('');
 
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressAssetsList-${address}-${network}-${assets_type}`;
+    return `/ordx/getAddressAssetsList-${address}-${chain}-${network}-${assets_type}`;
   }, [address, network, assets_type]);
 
   const { data, isLoading, mutate } = useSWR(

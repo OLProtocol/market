@@ -2,8 +2,10 @@
 import { useMemo, useEffect } from 'react';
 import { MintingTable } from '@/components/home/MintingTable';
 import { ordxSWR } from '@/api';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
   const { data: rarePizzaData, trigger: getRarePizza } = ordxSWR.useOrdxInfo({
     tick: 'rarepizza',
     network: 'livenet',
@@ -29,6 +31,7 @@ export default function Home() {
   useEffect(() => {
     getRarePizza();
     getJades();
+    router.push('/market');
   }, []);
   return (
     <div className="py-4">

@@ -13,7 +13,9 @@ export const request = async (
     useReactWalletStore.getState();
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data, formData } = options;
-  let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
+  const { chain } = useCommonStore.getState();
+  const baseUrl = chain === 'btc' ? process.env.NEXT_PUBLIC_HOST : process.env.NEXT_PUBLIC_SATESTNET_HOST;
+  let url = `${baseUrl}${network === 'testnet' ? '/testnet' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apiprd');
   } else if (location.hostname.indexOf('dev') > -1) {

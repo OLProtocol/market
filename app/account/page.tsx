@@ -12,16 +12,17 @@ import { useTranslation } from 'react-i18next';
 import { OrdxBillList } from '@/components/account/OrdxBillList';
 import { BlogCreate } from '@/components/account/BlogCreate';
 import { getAddressAssetsValue } from '@/api';
-
+import { useCommonStore } from '@/store';
 export default function AccountPage() {
   const { t } = useTranslation();
   const params = useSearchParams();
   const paramTab = params.get('source') || 'utxo';
   const { address, balance, network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const [tabKey, setTabKey] = useState(paramTab);
   const [totalSatValue, setTotalSatValue] = useState(0);
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressAssetsValue-${address}-${network}`;
+    return `/ordx/getAddressAssetsValue-${address}-${chain}-${network}`;
   }, [address, network]);
 
   const { data, isLoading, mutate } = useSWR(

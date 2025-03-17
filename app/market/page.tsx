@@ -23,6 +23,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { thousandSeparator, getTickLabel } from '@/lib/utils';
 import { SortDropdown } from '@/components/SortDropdown';
 import { BtcPrice } from '@/components/BtcPrice';
+import { useCommonStore } from '@/store';
 import { HomeTypeTabs } from '@/components/market/HomeTypeTabs';
 import { NameMarketNav } from '@/components/market/NameMarketNav';
 
@@ -30,6 +31,7 @@ export default function Market() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
+  const { chain } = useCommonStore();
   const paramType = params.get('type') || 'ticker';
   const [type, setType] = useState<string>(paramType);
   const [interval, setInterval] = useState<any>(1);
@@ -50,7 +52,7 @@ export default function Market() {
   });
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}-${type}-${interval}-${sortField}-${sortOrder}`,
+    `/ordx/getTopTickers-¥{chain}-${network}-${type}-${interval}-${sortField}-${sortOrder}`,
     () => {
       let res = getTopAssets({
         assets_type: type,

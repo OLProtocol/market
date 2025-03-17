@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { getAddressAssetsSummary } from '@/api';
-import { satsToBitcoin } from '@/lib/utils';
+import { useCommonStore } from '@/store';
 import { BtcPrice } from '@/components/BtcPrice';
 
 interface IOrdxCategoryTabProps {
@@ -14,9 +14,9 @@ interface IOrdxCategoryTabProps {
 export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
   const { t } = useTranslation();
   const { address, balance, network } = useReactWalletStore((state) => state);
-
+  const { chain } = useCommonStore();
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressAssetsSummary-${address}-${network}`;
+    return `/ordx/getAddressAssetsSummary-${address}-${chain}-${network}`;
   }, [address, network]);
 
   const { data, isLoading, mutate } = useSWR(

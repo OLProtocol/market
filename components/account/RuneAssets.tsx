@@ -17,11 +17,13 @@ import {
   TableCell,
   getKeyValue,
 } from '@nextui-org/react';
+import { useCommonStore } from '@/store';
 
 export const RuneAssets = () => {
   const { address, network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const swrKey = useMemo(() => {
-    return `/ordx/getAddressAssetsList-${address}-${network}`;
+    return `/ordx/getAddressAssetsList-${address}-${chain}-${network}`;
   }, [address, network]);
 
   const { data, isLoading, mutate } = useSWR(

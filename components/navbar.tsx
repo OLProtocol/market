@@ -28,6 +28,8 @@ import useSWRMutation from 'swr/mutation';
 import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { ChainSelect } from '@/components/ChainSelect';
+
 
 const WalletButton = dynamic(
   () => import('../components/wallet/WalletConnectButton') as any,
@@ -36,15 +38,14 @@ const WalletButton = dynamic(
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
-  const { setHeight, setBtcPrice, runtimeEnv, setEnv } = useCommonStore();
+  const { setHeight, setBtcPrice, runtimeEnv, setEnv, chain } = useCommonStore();
   const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
-
   const { data: heightData } = ordxSWR.useBtcHeight(network as any);
   const { data, trigger: getUtxos } = useSWRMutation(
-    `getUtxoByValue-${address}-${network}`,
+    `getUtxoByValue-${address}-${chain}-${network}`,
     () => getUtxoByValue({ address, network, value: 500 }),
   );
   const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
@@ -198,6 +199,9 @@ export const Navbar = () => {
         <NavbarItem className="hidden sm:flex gap-2">
           <LanguageSelect />
         </NavbarItem>
+        <NavbarItem className="hidden sm:flex gap-2">
+          <ChainSelect />
+        </NavbarItem>
         <NavbarItem className="">
           <WalletButton />
         </NavbarItem>
@@ -212,6 +216,7 @@ export const Navbar = () => {
               <div className="flex items-center gap-4">
                 <FeerateSelectButton />
                 <LanguageSelect />
+                <ChainSelect />
               </div>
             </NavbarMenuItem>
             <Divider />

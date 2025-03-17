@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
+type Chain = 'btc' | 'sat20';
 interface CommonState {
   feeRate: {
     value: number;
     type?: string;
   };
+  chain: Chain;
   network: string;
   btcHeight: number;
   btcPrice: number;
@@ -13,6 +15,7 @@ interface CommonState {
   signature?: string;
   runtimeEnv: string;
   changeNetwork: (network: string) => void;
+  setChain: (chain: Chain) => void;
   setAppVersion: (version: number) => void;
   setEnv: (env: string) => void;
   setBtcPrice: (b: number) => void;
@@ -30,6 +33,7 @@ export const useCommonStore = create<CommonState>()(
           value: 1,
           type: 'custom',
         },
+        chain: 'btc',
         network: 'livenet',
         btcHeight: 0,
         runtimeEnv: 'dev',
@@ -39,6 +43,11 @@ export const useCommonStore = create<CommonState>()(
         setEnv: (env) => {
           set({
             runtimeEnv: env,
+          });
+        },
+        setChain: (chain) => {
+          set({
+            chain,
           });
         },
         changeNetwork: (network) => {

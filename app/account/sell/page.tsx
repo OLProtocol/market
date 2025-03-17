@@ -34,7 +34,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { useDebounce } from 'react-use';
-
+import { useCommonStore } from '@/store';
 export default function SellPage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -54,8 +54,9 @@ export default function SellPage() {
   const [globalProice, setGlobalPrice] = useState<any>();
   console.log('app.account.sell.page: list: ', list);
   const { network, address, btcWallet } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const { data, isLoading: isSummaryLoading } = useSWR(
-    `getAssetsSummary-${assets_name}-${assets_type}-${network}`,
+    `getAssetsSummary-${assets_name}-${assets_type}-${chain}-${network}`,
     () => {
       console.log('app.account.sell.page: ticker: ', assets_name);
       let ret: Promise<any>;

@@ -17,6 +17,7 @@ import { SortDropdown } from '@/components/SortDropdown';
 import { NameCategoryList } from '@/components/market/NameCategoryList';
 import { InfiniteScroll } from '@/components/InfiniteScroll';
 import { useDebounce, useList } from 'react-use';
+import { useCommonStore } from '@/store';
 
 interface OrdxOrderListProps {
   assets_name: string;
@@ -41,6 +42,7 @@ export const OrdxOrderList = ({
     remove: removeBuy,
     reset,
   } = useBuyStore();
+  const { chain } = useCommonStore();
   const [hideStatus, setHideStatus] = useState(false);
   const [canSelect, setCanSelect] = useState(false);
   const [modalVisiable, setModalVisiable] = useState(false);
@@ -62,9 +64,9 @@ export const OrdxOrderList = ({
 
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${network}-${page}-${size}-${sort}-${category}`;
+      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${chain}-${network}-${page}-${size}-${sort}-${category}`;
     }
-    return `/ordx/getOrders-${assets_name}-${assets_type}-${network}-${page}-${size}-${sort}-${category}`;
+    return `/ordx/getOrders-${assets_name}-${assets_type}-${chain}-${network}-${page}-${size}-${sort}-${category}`;
   }, [assets_name, address, page, size, network, sort, assets_type, category]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>

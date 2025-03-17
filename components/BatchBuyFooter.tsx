@@ -16,7 +16,6 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { notification } from 'antd';
 import { Decimal } from 'decimal.js';
-import { useCommonStore } from '@/store';
 import { useDebounce } from 'react-use';
 import {
   buildDummyUtxos,
@@ -37,6 +36,7 @@ import {
   unlockBulkOrder,
   unlockOrder,
 } from '@/api';
+import { useCommonStore } from '@/store';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 interface Props {
@@ -63,6 +63,7 @@ export const BatchBuyFooter = ({
   ) {
     minServiceFee = Number(process.env.NEXT_PUBLIC_SERVICE_FEE);
   }
+  const { chain } = useCommonStore();
   const [selectMaxPrice, setSelectMaxPrice] = useState(false);
   const [maxPurchasePrice, setMaxPurchasePrice] = useState<any>();
   const [raws, setRaws] = useState<string[]>([]);
@@ -84,7 +85,7 @@ export const BatchBuyFooter = ({
   }, [list]);
 
   const { data, isLoading } = useSWR(
-    `getUtxoByValue-${address}-${network}`,
+    `getUtxoByValue-${address}-${chain}-${network}`,
     () => getUtxoByValue({ address, network, value: 0 }),
   );
 
@@ -93,7 +94,7 @@ export const BatchBuyFooter = ({
     isMutating: lockLoading,
     trigger: lockTrigger,
   } = useSWRMutation(
-    `getUtxoByValue-${address}-${network}-${JSON.stringify(lockOrderIds)}`,
+    `getUtxoByValue-${address}-${chain}-${network}-${JSON.stringify(lockOrderIds)}`,
     () => lockBulkOrder({ address, orderIds: lockOrderIds }),
   );
   const orderLength = useMemo(() => list.length || 0, [list]);

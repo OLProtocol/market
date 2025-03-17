@@ -36,15 +36,18 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
+  console.log('network', network);
+
   const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const [utxoAmount, setUtxoAmount] = useState(0);
-  const toMyAssets = () => {
-    router.push('/account');
+
+  const initCheck = async () => {
+    await check();
+    await checkSignature();
   };
   useEffect(() => {
-    console.log('check', connected);
-    check();
+    initCheck();
   }, []);
   useEffect(() => {
     const unspendUtxos = getUnspendUtxos();
@@ -52,6 +55,8 @@ const WalletConnectButton = () => {
     setUtxoAmount(amount);
   }, [UtxoList]);
   const onConnectSuccess = async (wallet: any) => {
+    console.log('onConnectSuccess');
+    
     if (!signature) {
       console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
       try {
@@ -118,6 +123,8 @@ const WalletConnectButton = () => {
   }, [utxoAmount]);
   const checkSignature = async () => {
     if (signature) {
+      console.log('checkSignature', signature);
+
       try {
         const bol = message.verifyMessageOfECDSA(
           publicKey,

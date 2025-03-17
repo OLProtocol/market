@@ -8,6 +8,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { OrderPieChart } from './OrderPieChart';
 import { OrderLineChart } from './OrderLineChart';
 import useSWR from 'swr';
+import { useCommonStore } from '@/store';
 import { ContentLoading } from '@/components/ContentLoading';
 
 interface OrderAnalyzeProps {
@@ -21,8 +22,9 @@ export const OrderAnalyze = ({
   const [type, setType] = useState('24h');
   const [valueType, setValueType] = useState('avg_price');
   const { network } = useReactWalletStore();
+  const { chain } = useCommonStore();
   const swrKey = useMemo(() => {
-    return `getAssetsAnalytics-${assets_name}-${assets_type}-${network}`;
+    return `getAssetsAnalytics-${assets_name}-${assets_type}-${chain}-${network}`;
   }, [assets_name, network, assets_type]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>

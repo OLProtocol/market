@@ -21,11 +21,12 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 export const FeerateSelectButton = () => {
   const { t } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const { isOpen, onClose, onOpenChange, onOpen } = useDisclosure();
   const [fee, setFee] = useState({ value: 1, type: 'Normal' });
 
   const { data, isLoading } = useSWR(
-    `getRecommendedFees-${network}`,
+    `getRecommendedFees-${chain}-${network}`,
     () => getRecommendedFees(),
     {
       refreshInterval: 1000 * 60 * 10, // 10 minutes
