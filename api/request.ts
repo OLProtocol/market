@@ -14,8 +14,15 @@ export const request = async (
   const { signature, reset, setSignature } = useCommonStore.getState();
   const { headers = {}, method = 'GET', data, formData } = options;
   const { chain } = useCommonStore.getState();
-  const baseUrl = chain === 'btc' ? process.env.NEXT_PUBLIC_HOST : process.env.NEXT_PUBLIC_SATESTNET_HOST;
-  let url = `${baseUrl}${network === 'testnet' ? '/testnet' : ''}${path}`;
+  let baseUrl = ''; 
+  if (chain === 'btc') {
+    baseUrl = process.env.NEXT_PUBLIC_HOST as string;
+    baseUrl += network === 'testnet' ? '/testnet' : '/mainnet';
+  } else if (chain === 'sat20') {
+    baseUrl = process.env.NEXT_PUBLIC_SATESTNET_HOST as string;
+    baseUrl += network === 'testnet' ? '/satstestnet' : '/satsnet';
+  }
+  let url = `${baseUrl}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apiprd');
   } else if (location.hostname.indexOf('dev') > -1) {
@@ -431,7 +438,7 @@ export const getUtxoByValue = async ({
   value = 600,
   network,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/utxo/address/${address}/${value}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}/btc${network === 'testnet' ? '/testnet' : '/mainnet'}/utxo/address/${address}/${value}`;
   const res = await fetch(url);
   return res.json();
 };
@@ -461,14 +468,8 @@ export const getOrdxAddressHolders = async ({
   start,
   limit,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${tickerOrAssetsType}?start=${start}&limit=${limit}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/address/utxolist/${address}/${tickerOrAssetsType}?start=${start}&limit=${limit}`;
   // const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
-  const res = await fetch(url);
-  return res.json();
-};
-
-export const getOrdxSummary = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/summary/${address}`;
   const res = await fetch(url);
   return res.json();
 };

@@ -28,7 +28,7 @@ export default function SellPage() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { list, remove } = useSellStore();
-  const { feeRate } = useCommonStore();
+  const { feeRate, chain } = useCommonStore();
   const { getUnspendUtxos } = useUtxoStore();
   const [selectedTab, setSelectedTab] = useState('single');
   const { network, btcWallet, address } = useReactWalletStore((state) => state);
@@ -87,7 +87,7 @@ export default function SellPage() {
       if (!btcWallet) {
         throw new Error('No wallet connected');
       }
-      const signedPsbts = await btcWallet.signPsbt(batchOrderPsbt.toHex());
+      const signedPsbts = await btcWallet.signPsbt(batchOrderPsbt.toHex(), { chain });
       if (signedPsbts) {
         await btcWallet.pushPsbt(signedPsbts);
       }

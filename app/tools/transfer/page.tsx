@@ -30,7 +30,7 @@ export default function Transfer() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { list, remove } = useSellStore();
-  const { feeRate } = useCommonStore();
+  const { feeRate, chain } = useCommonStore();
   const { getUnspendUtxos } = useUtxoStore();
   const [selectedTab, setSelectedTab] = useState('single');
   const { network, btcWallet, address } = useReactWalletStore((state) => state);
@@ -114,11 +114,6 @@ export default function Transfer() {
       const _fee = await tx.calNetworkFee();
       setGasFee(_fee);
       setTx(tx);
-      // const signedPsbts = await btcWallet.signPsbt(batchOrderPsbt.toHex());
-      // await btcWallet.pushPsbt(signedPsbts);
-      // notification.success({
-      //   message: t('notification.transfer_success_title'),
-      // });
     } catch (error: any) {
       console.error('List failed', error);
       notification.error({
@@ -138,7 +133,7 @@ export default function Transfer() {
       if (!btcWallet) {
         throw new Error('No wallet connected');
       }
-      const signedPsbts = await btcWallet.signPsbt(tx.toPsbt().toHex());
+      const signedPsbts = await btcWallet.signPsbt(tx.toPsbt().toHex(), { chain });
       if (signedPsbts) {
         await btcWallet.pushPsbt(signedPsbts);
       }

@@ -14,7 +14,7 @@ import {
   useReactWalletStore,
 } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
-
+import { useAssets } from '@/lib/hooks';
 import { useTheme } from 'next-themes';
 import { hideStr, satsToBitcoin } from '@/lib/utils';
 import { message } from '@/lib/wallet-sdk';
@@ -24,6 +24,7 @@ import { useCommonStore } from '@/store';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useUtxoStore } from '@/store';
 const WalletConnectButton = () => {
+  // const { loading } = useAssets();
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
@@ -56,7 +57,7 @@ const WalletConnectButton = () => {
   }, [UtxoList]);
   const onConnectSuccess = async (wallet: any) => {
     console.log('onConnectSuccess');
-    
+
     if (!signature) {
       console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
       try {

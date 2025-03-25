@@ -15,7 +15,7 @@ import {
   PsbtInput,
 } from '../wallet';
 import { UtxoAssetItem } from '@/store';
-import { ordx, bulkBuyingThirdOrder } from '@/api';
+import { clientApi, bulkBuyingThirdOrder } from '@/api';
 interface SellOrderProps {
   inscriptionUtxo: {
     txid: string;
@@ -33,12 +33,41 @@ interface BatchSellOrderProps {
   network: string;
   address: string;
   unit: string;
+  chain: string;
 }
+
+interface DisplayAsset {
+  // Assuming DisplayAsset has properties that are not specified in the given context
+  // Placeholder properties for demonstration
+  id: string;
+  name: string;
+}
+
+interface AssetsInUtxo {
+  UtxoId: number;
+  OutPoint: string; // tx:vout
+  Value: number;
+  PkScript: Uint8Array;
+  Assets: DisplayAsset[];
+}
+
+interface SellUtxoInfo {
+  AssetsInUtxo: AssetsInUtxo;
+  Price: number; // 价格
+  AssetInfo?: {
+    // Assuming AssetInfo has properties that are not specified in the given context
+    // Placeholder properties for demonstration
+    id: string;
+    name: string;
+  }; // 不指定时，直接使用输入的Asset的资产信息
+}
+
 export async function buildBatchSellOrder({
   inscriptionUtxos,
   network,
   address,
   unit,
+  chain,
 }: BatchSellOrderProps) {
   console.log(
     'build batch sell order params',
@@ -52,30 +81,61 @@ export async function buildBatchSellOrder({
   const batchSell = new bitcoin.Psbt({
     network: psbtNetwork,
   });
-  for (let i = 0; i < inscriptionUtxos.length; i++) {
-    const { utxo, price } = inscriptionUtxos[i];
-    console.log(utxo, price);
-    const { txid, vout } = parseUtxo(utxo);
-    const [error, rawTx] = await tryit(ordx.getTxHex)({ txid: txid, network });
-    if (error) {
-      throw error;
+  if (chain === 'btc') {
+    for (let i = 0; i < inscriptionUtxos.length; i++) {
+      const { utxo, price } = inscriptionUtxos[i];
+      console.log(utxo, price);
+      const { txid, vout } = parseUtxo(utxo);
+      const [error, rawTx] = await tryit(clientApi.getTxRaw)(txid);
+      if (error) {
+        throw error;
+      }
+      const [error2, utxoInfo] = await tryit(clientApi.getUtxoInfo)(utxo);
+      if (error2) {
+        throw error2;
+      }
+      console.log('utxoInfo', utxoInfo);
+
+      const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx.data);
+      console.log(ordinalPreTx);
+      const utxoInput = {
+        hash: txid,
+        index: vout,
+        witnessUtxo: ordinalPreTx.outs[vout],
+        sighashType: SIGHASH_SINGLE_ANYONECANPAY,
+      };
+      batchSell.addInput(utxoInput);
+      batchSell.addOutput({
+        address,
+        value: unit === 'btc' ? btcToSats(price) : Number(price),
+      });
     }
-    const ordinalPreTx = bitcoin.Transaction.fromHex(rawTx.data);
-    console.log(ordinalPreTx);
-    const utxoInput = {
-      hash: txid,
-      index: vout,
-      witnessUtxo: ordinalPreTx.outs[vout],
-      sighashType: SIGHASH_SINGLE_ANYONECANPAY,
-    };
-    batchSell.addInput(utxoInput);
-    batchSell.addOutput({
+    console.log(batchSell);
+    return batchSell.toHex();
+  } else {
+    const sellUtxoInfos: SellUtxoInfo[] = [];
+    for (let i = 0; i < inscriptionUtxos.length; i++) {
+      const { utxo, price } = inscriptionUtxos[i];
+      const [error2, utxoInfo] = await tryit(clientApi.getUtxoInfo)(utxo);
+      if (error2) {
+        throw error2;
+      }
+      sellUtxoInfos.push({
+        ...utxoInfo.data,
+        Price: unit === 'btc' ? btcToSats(price) : Number(price),
+      });
+    }
+    const sat20SellOrder = await window.sat20.buildBatchSellOrder(
+      sellUtxoInfos.map((v) => JSON.stringify(v)),
       address,
-      value: unit === 'btc' ? btcToSats(price) : Number(price),
-    });
+      network,
+    );
+    const psbt = sat20SellOrder?.data?.psbt;
+    if (!psbt) {
+      throw new Error('Failed to build sat20 sell order');
+    }
+    return psbt;
   }
-  console.log(batchSell);
-  return batchSell.toHex();
 }
 
 export async function buildTransferPsbt({
@@ -192,32 +252,45 @@ export async function generateTransferPsbt({
   });
   return tx;
 }
-export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
+export const splitBatchSignedPsbt = async (
+  signedHex: string,
+  network: string,
+  chain: string,
+) => {
   console.log('split batch signed psbt', signedHex);
-  const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
-  );
-  const psbt = bitcoin.Psbt.fromHex(signedHex, {
-    network: psbtNetwork,
-  });
-  const { inputCount } = psbt;
-  const newPsbts: string[] = [];
-  for (let i = 0; i < inputCount; i++) {
-    const newPsbt = new bitcoin.Psbt({
+  if (chain === 'btc') {
+    const psbtNetwork = toPsbtNetwork(
+      network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    );
+    const psbt = bitcoin.Psbt.fromHex(signedHex, {
       network: psbtNetwork,
     });
-    const batchInput = {
-      hash: psbt.txInputs[i].hash as any,
-      index: psbt.txInputs[i].index,
-      witnessUtxo: psbt.data.inputs[i].witnessUtxo as any,
-      finalScriptWitness: psbt.data.inputs[i].finalScriptWitness,
-    };
-    const batchOutput = psbt.txOutputs[i];
-    newPsbt.addInput(batchInput);
-    newPsbt.addOutput(batchOutput);
-    newPsbts.push(newPsbt.toHex());
+    const { inputCount } = psbt;
+    const newPsbts: string[] = [];
+    for (let i = 0; i < inputCount; i++) {
+      const newPsbt = new bitcoin.Psbt({
+        network: psbtNetwork,
+      });
+      const batchInput = {
+        hash: psbt.txInputs[i].hash as any,
+        index: psbt.txInputs[i].index,
+        witnessUtxo: psbt.data.inputs[i].witnessUtxo as any,
+        finalScriptWitness: psbt.data.inputs[i].finalScriptWitness,
+      };
+      const batchOutput = psbt.txOutputs[i];
+      newPsbt.addInput(batchInput);
+      newPsbt.addOutput(batchOutput);
+      newPsbts.push(newPsbt.toHex());
+    }
+    return newPsbts;
+  } else {
+    const res = await window.sat20.splitBatchSignedPsbt(signedHex, network);
+    const psbts = res?.data?.psbts;
+    if (!psbts || psbts.length === 0) {
+      throw new Error('Failed to split sat20 sell order');
+    }
+    return psbts;
   }
-  return newPsbts;
 };
 
 interface BuyOrderProps {
@@ -415,7 +488,7 @@ export const buildBuyOrder = async ({
   }
   console.log('buy psbt hex', buyPsbt.toHex());
   console.log('buy psbt base64', buyPsbt.toBase64());
-  
+
   const signed = await btcWallet.signPsbt(buyPsbt.toHex());
   console.log('signed', signed);
   // const txid = await btcWallet.pushPsbt(signed);

@@ -36,7 +36,7 @@ export const AssetsList = ({
     list: sellList,
     remove: removeSell,
   } = useSellStore((state) => state);
-  const { feeRate } = useCommonStore();
+  const { feeRate, chain } = useCommonStore();
   const { getUnspendUtxos } = useUtxoStore();
   const [type, setType] = useState('sell');
   const [canSelect, setCanSelect] = useState(false);
@@ -44,8 +44,8 @@ export const AssetsList = ({
   const [size, setSize] = useState(12);
 
   const swrKey = useMemo(() => {
-    return `/ordx/getOrdxAssets-${address}-${assets_type}-${assets_name}-${assets_category}-${page}-${size}`;
-  }, [address, page, size, assets_name, assets_type, assets_category]);
+    return `/ordx/getOrdxAssets-${address}-${chain}-${assets_type}-${assets_name}-${assets_category}-${page}-${size}`;
+  }, [address, page, size, assets_name, assets_type, assets_category, chain]);
 
   const {
     data,
@@ -100,7 +100,9 @@ export const AssetsList = ({
       if (!btcWallet) {
         throw new Error('No wallet connected');
       }
-      const signedPsbts = await btcWallet.signPsbt(splitPsbt.toHex());
+      const signedPsbts = await btcWallet.signPsbt(splitPsbt.toHex(), {
+        chain,
+      });
       if (signedPsbts) {
         await btcWallet.pushPsbt(signedPsbts);
       }
@@ -109,7 +111,7 @@ export const AssetsList = ({
       });
     } catch (error: any) {
       console.error('List failed', error);
-    
+
       notification.error({
         message: t('notification.split_error_title'),
         description: error.message,

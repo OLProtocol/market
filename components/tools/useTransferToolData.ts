@@ -6,7 +6,6 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useCommonStore } from '@/store';
 import {
   getOrdxAddressHolders,
-  getOrdxSummary,
   getSats,
   getUtxoByValue,
   ordx,
@@ -20,16 +19,82 @@ import {
 } from '@/lib';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { debounce } from 'lodash';
+
+// Constants
+const LIMITS = {
+  ORDX_UTXO: 100,
+  PLAIN_UTXO: 100,
+} as const;
+
+// Types
+interface InputItem {
+  id: number;
+  value: {
+    ticker: string;
+    utxo: string;
+    sats: number;
+    unit: string;
+    description?: string;
+  };
+  options: {
+    tickers: Array<any>;
+    utxos: Array<any>;
+  };
+}
+
+interface OutputItem {
+  id: number;
+  num: number;
+  value: {
+    sats: number;
+    unit: string;
+    address: string;
+  };
+}
+
+interface Balance {
+  sats: number;
+  unit: string;
+}
+
+interface TickerItem {
+  ticker: string;
+  type?: string;
+  total?: number;
+  utxos: Array<{
+    txid: string;
+    vout: number;
+    value: number;
+    assetamount?: number;
+  }>;
+}
+
+// Error handling utility
+const createErrorHandler = (t: any) => (error: Error, customMessage?: string) => {
+  console.error('Transfer tool error:', error);
+
+  notification.error({
+    message: t('notification.transaction_title'),
+    description: customMessage || error.message || t('notification.transaction_spilt_fail'),
+  });
+};
 
 export function useTransferToolData() {
   const { t } = useTranslation();
-  const [fee, setFee] = useState(0);
+  const handleError = useMemo(() => createErrorHandler(t), [t]);
+  
+  // 合并基础状态
+  const [transferState, setTransferState] = useState({
+    fee: 0,
+    loading: false,
+    ordxUtxoLimit: LIMITS.ORDX_UTXO,
+    plainUtxoLimit: LIMITS.PLAIN_UTXO,
+    refresh: 0
+  });
+
   const { feeRate } = useCommonStore((state) => state);
-  const [loading, setLoading] = useState(false);
   const { address, network, publicKey } = useReactWalletStore((state) => state);
-  const [refresh, setRefresh] = useState(0);
-  const [ordxUtxoLimit, setOrdxUtxoLimit] = useState(100);
-  const [plainUtxoLimit, setPlainUtxoLimit] = useState(100);
 
   const [inputList, { set: setInputList }] = useMap<any>({
     items: [
@@ -70,6 +135,59 @@ export function useTransferToolData() {
   });
 
   const [tickerList, { set: setTickerList }] = useList<any>([]);
+
+  // 使用 useMemo 优化计算密集型函数
+  const calculateBalance = useMemo(() => {
+    return debounce(async () => {
+      try {
+        let inTotal = 0;
+        let outTotal = 0;
+        
+        // 计算输入总额
+        inputList.items.forEach((v) => {
+          inTotal += v.value.sats;
+        });
+        if (inTotal === 0) return;
+
+        // 计算输出总额
+        const outputs: any[] = [];
+        outputList.items.forEach((v) => {
+          for (let i = 0; i < v.num; i++) {
+            outputs.push({
+              address: v.value.address,
+              value: v.value.sats,
+            });
+          }
+        });
+        outputs.forEach((v) => {
+          outTotal += v.value;
+        });
+        if (outTotal === 0) return;
+
+        // 准备 UTXO 数据
+        const utxos = inputList.items.map((v) => ({
+          txid: v.value.utxo.split(':')[0],
+          vout: Number(v.value.utxo.split(':')[1]),
+          value: v.value.sats,
+        }));
+
+        // 计算网络费用
+        const fee = await calcNetworkFee({
+          utxos,
+          outputs,
+          feeRate: feeRate.value,
+          network,
+          address: address,
+          publicKey,
+        });
+
+        setTransferState(prev => ({ ...prev, fee }));
+        setBalance('sats', inTotal - outTotal - fee);
+      } catch (error) {
+        handleError(error as Error);
+      }
+    }, 300);
+  }, [inputList.items, outputList.items, feeRate.value, network, address, publicKey, handleError]);
 
   const handleTickerSelectChange = useCallback(
     (itemId, ticker) => {
@@ -128,177 +246,123 @@ export function useTransferToolData() {
     [inputList.items],
   );
 
-  const calculateBalance = useCallback(async () => {
-    let inTotal = 0;
-    let outTotal = 0;
-    inputList.items.forEach((v) => {
-      inTotal += v.value.sats;
-    });
-    if (inTotal === 0) {
-      return;
-    }
-
-    const outputs: any[] = [];
-    outputList.items.forEach((v) => {
-      for (let i = 0; i < v.num; i++) {
-        outputs.push({
-          address: v.value.address,
-          value: v.value.sats,
-        });
-      }
-    });
-    outputs.forEach((v) => {
-      outTotal += v.value;
-    });
-    if (outTotal === 0) {
-      return;
-    }
-    const utxos = inputList.items.map((v) => ({
-      txid: v.value.utxo.split(':')[0],
-      vout: Number(v.value.utxo.split(':')[1]),
-      value: v.value.sats,
-    }));
-
-    const fee = await calcNetworkFee({
-      utxos,
-      outputs,
-      feeRate: feeRate.value,
-      network,
-      address: address,
-      publicKey,
-    });
-    setFee(fee);
-    setBalance('sats', inTotal - outTotal - fee);
-  }, [
-    inputList.items,
-    outputList.items,
-    feeRate.value,
-    network,
-    address,
-    publicKey,
-  ]);
-
   const getTickers = useCallback(async () => {
-    const tickers: any[] = [];
-
-    let res = await getOrdxSummary({
-      address: address,
-      network,
-    });
-
-    if (res.code !== 0) {
-      notification.error({
-        message: t('notification.transaction_title'),
-        description: res.msg,
+    try {
+      const tickers: any[] = [];
+      const res = await ordx.getOrdxSummary({
+        address: address,
+        network,
       });
-      return;
-    }
-    const detail = res.data.detail;
 
-    await Promise.all(
-      detail.map(async (item) => {
-        if (item.type === 'e' || item.type === 'o') {
-          return;
-        }
+      if (res.code !== 0) {
+        handleError(new Error(res.msg));
+        return [];
+      }
 
-        let tickerOrAssetsType = item.type;
-        if (item.type === 'f') {
-          tickerOrAssetsType = item.ticker;
-        }
-        let ticker = item.ticker;
-        if (item.type === 'n' && !item.ticker) {
-          ticker = 'PureName';
-        }
-        if (item.type === 'n') {
-          res = await ordx.getOrdxNsUxtos({
-            start: 0,
-            limit: ordxUtxoLimit,
-            address: address,
-            sub: ticker,
-            network: network,
-          });
-        } else {
-          res = await getOrdxAddressHolders({
-            start: 0,
-            limit: ordxUtxoLimit,
-            address: address,
-            tickerOrAssetsType: tickerOrAssetsType,
-            network: network,
-          });
-        }
+      const detail = res.data.detail;
+      await Promise.all(
+        detail.map(async (item) => {
+          if (item.type === 'e' || item.type === 'o') {
+            return;
+          }
 
-        console.log(res);
+          let tickerOrAssetsType = item.type;
+          if (item.type === 'f') {
+            tickerOrAssetsType = item.ticker;
+          }
+          let ticker = item.ticker;
+          if (item.type === 'n' && !item.ticker) {
+            ticker = 'PureName';
+          }
+          let res;
+          if (item.type === 'n') {
+            res = await ordx.getOrdxNsUxtos({
+              start: 0,
+              limit: transferState.ordxUtxoLimit,
+              address: address,
+              sub: ticker,
+              network: network,
+            })
+            console.log('res = ', res);
+            
+            return;
+          } else if (!!item.type) {
+            res = await getOrdxAddressHolders({
+              start: 0,
+              limit: transferState.ordxUtxoLimit,
+              address: address,
+              tickerOrAssetsType: tickerOrAssetsType,
+              network: network,
+            })
+          }
 
-        const utxosOfTicker: any[] = [];
-        let total = 0;
-        if (res.code === 0) {
-          const details = (item.type === 'n' ? res.data.names : res.data.detail) || [];
-          total = res.data.total;
-          console.log('details = ', details);
-          
-          details.forEach((detail) => {
-            const utxo = {
+          if (res && res.code === 0) {
+            const details = (item.type === 'n' ? res.data.names : res.data.detail) || [];
+            const total = res.data.total;
+            
+            const utxosOfTicker = details.map((detail) => ({
               txid: detail.utxo.split(':')[0],
               vout: Number(detail.utxo.split(':')[1]),
               value: detail.amount || detail.value,
               assetamount: detail.assetamount || detail.value,
-            };
-            utxosOfTicker.push(utxo);
-          });
-        }
-        console.log('utxosOfTicker = ', utxosOfTicker);
-        
-        tickers.push({
-          ticker: ticker,
-          type: item.type,
-          total: total,
-          utxos: utxosOfTicker,
-        });
-      }),
-    );
+            }));
 
-    return tickers;
-  }, [address, network, ordxUtxoLimit, t]);
+            tickers.push({
+              ticker: ticker,
+              type: item.type,
+              total: total,
+              utxos: utxosOfTicker,
+            });
+          }
+        }),
+      );
+      console.log('123tickers = ', tickers);
+      
+      return tickers;
+    } catch (error) {
+
+      handleError(error as Error);
+      return [];
+    }
+  }, [address, network, transferState.ordxUtxoLimit, handleError]);
 
   const getAvialableTicker = useCallback(async () => {
-    let res = await getUtxoByValue({
-      address: address,
-      value: 0,
-      network,
-    });
-    if (res.code !== 0) {
-      notification.error({
-        message: t('notification.transaction_title'),
-        description: res.msg,
+    try {
+      const res = await getUtxoByValue({
+        address: address,
+        value: 0,
+        network,
       });
-      return;
+
+      if (res.code !== 0) {
+        handleError(new Error(res.msg));
+        return null;
+      }
+
+      return {
+        ticker: t('pages.tools.transaction.available_utxo'),
+        utxos: res.data,
+      };
+    } catch (error) {
+      handleError(error as Error);
+      return null;
     }
-    return {
-      ticker: t('pages.tools.transaction.available_utxo'),
-      utxos: res.data,
-    };
-  }, [address, network, t]);
+  }, [address, network, t, handleError]);
 
   const getRareSatTicker = useCallback(async () => {
-    const data = await getSats({
-      address: address,
-      network,
-    });
+    try {
+      const data = await getSats({
+        address: address,
+        network,
+      });
 
-    let tickers: any[] = [];
+      if (data.code !== 0) {
+        return [];
+      }
 
-    if (data.code === 0) {
-      data.data.forEach((item) => {
-        let hasRareStats = false;
-        if (item.sats && item.sats.length > 0) {
-          item.sats.forEach((sat) => {
-            if (sat.satributes && sat.satributes.length > 0) {
-              hasRareStats = true;
-              return;
-            }
-          });
-        }
-
+      return data.data.reduce((tickers: any[], item) => {
+        const hasRareStats = item.sats?.some(sat => sat.satributes?.length > 0);
+        
         if (hasRareStats) {
           const utxo = {
             txid: item.utxo.split(':')[0],
@@ -306,81 +370,56 @@ export function useTransferToolData() {
             value: item.value,
           };
 
-          if (tickers.length === 0) {
+          const tickerName = t('pages.tools.transaction.rare_sats') + '-' + item.sats[0].satributes[0];
+          const existingTicker = tickers.find(t => t.ticker === tickerName);
+
+          if (existingTicker) {
+            existingTicker.utxos.push(utxo);
+          } else {
             tickers.push({
-              ticker:
-                t('pages.tools.transaction.rare_sats') +
-                '-' +
-                item.sats[0].satributes[0],
+              ticker: tickerName,
               utxos: [utxo],
             });
-          } else {
-            let utxoExist = false;
-            tickers.forEach((obj) => {
-              obj.utxos.forEach((tmp) => {
-                if (tmp === utxo.txid + ':' + utxo.vout) {
-                  utxoExist = true;
-                  return;
-                }
-              });
-            });
-            if (!utxoExist) {
-              if (
-                tickers.some(
-                  (obj) =>
-                    obj['ticker'] ===
-                    t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0],
-                )
-              ) {
-                tickers = tickers.map((obj) => {
-                  if (
-                    obj['ticker'] ===
-                    t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0]
-                  ) {
-                    return {
-                      ticker: obj['ticker'],
-                      utxos: [...obj.utxos, utxo],
-                    };
-                  } else {
-                    return obj;
-                  }
-                });
-              } else {
-                tickers.push({
-                  ticker:
-                    t('pages.tools.transaction.rare_sats') +
-                    '-' +
-                    item.sats[0].satributes[0],
-                  utxos: [utxo],
-                });
-              }
-            }
           }
         }
-      });
-    }
 
-    return tickers;
-  }, [address, network, t]);
+        return tickers;
+      }, []);
+    } catch (error) {
+      handleError(error as Error);
+      return [];
+    }
+  }, [address, network, t, handleError]);
 
   const getAllTickers = useCallback(async () => {
-    const tickers = await getTickers();
-    const avialableTicker = await getAvialableTicker();
-    tickers?.push(avialableTicker);
-    const rareSatTickers = await getRareSatTicker();
-    const combinedArray = tickers?.concat(rareSatTickers);
-    setTickerList(combinedArray || []);
-  }, [getTickers, getAvialableTicker, getRareSatTicker]);
+    try {
+      const [tickers, availableTicker, rareSatTickers] = await Promise.all([
+        getTickers(),
+        getAvialableTicker(),
+        getRareSatTicker(),
+      ]);
+      console.log('tickers = ', tickers);
+      console.log('availableTicker = ', availableTicker);
+      console.log('rareSatTickers = ', rareSatTickers);
+
+      const combinedTickers = [
+        ...(tickers || []),
+        ...(availableTicker ? [availableTicker] : []),
+        ...(rareSatTickers || []),
+      ];
+
+      setTickerList(combinedTickers);
+    } catch (error) {
+      handleError(error as Error);
+      setTickerList([]);
+    }
+  }, [getTickers, getAvialableTicker, getRareSatTicker, handleError]);
 
   const splitHandler = useCallback(async () => {
     if (!address) {
       return;
     }
-    setLoading(true);
+    setTransferState(prev => ({ ...prev, loading: true }));
 
     try {
       const inTotal = inputList.items.reduce(
@@ -412,7 +451,7 @@ export function useTransferToolData() {
         publicKey,
       });
       if (inTotal - outTotal - fee < 0) {
-        setLoading(false);
+        setTransferState(prev => ({ ...prev, loading: false }));
         notification.error({
           message: t('notification.transaction_title'),
           description: 'Not enough sats',
@@ -431,16 +470,16 @@ export function useTransferToolData() {
       });
 
       const txid = await signAndPushPsbt(psbt);
-      setLoading(false);
+      setTransferState(prev => ({ ...prev, loading: false }));
       notification.success({
         message: t('notification.transaction_title'),
         description: t('notification.transaction_spilt_success'),
       });
 
-      setRefresh((prev) => prev + 1);
+      setTransferState(prev => ({ ...prev, refresh: prev.refresh + 1 }));
     } catch (error: any) {
       console.log('error(transfer sats) = ', error);
-      setLoading(false);
+      setTransferState(prev => ({ ...prev, loading: false }));
       notification.error({
         message: t('notification.transaction_title'),
         description: error.message || t('notification.transaction_spilt_fail'),
@@ -480,7 +519,7 @@ export function useTransferToolData() {
     setBalance('sats', 0);
     setBalance('unit', 'sats');
 
-    setFee(0);
+    setTransferState(prev => ({ ...prev, fee: 0 }));
     setOutputList('items', [
       {
         id: 1,
@@ -495,12 +534,13 @@ export function useTransferToolData() {
     if (address) {
       getAllTickers();
     }
-  }, [address, refresh, getAllTickers]);
+  }, [address, transferState.refresh, getAllTickers]);
 
   return useMemo(
     () => ({
-      fee,
-      loading,
+      fee: transferState.fee,
+      loading: transferState.loading,
+      refresh: transferState.refresh,
       address,
       inputList,
       outputList,
@@ -512,12 +552,10 @@ export function useTransferToolData() {
       setOutputList,
       setBalance,
       splitHandler,
-      refresh,
       feeRate,
     }),
     [
-      fee,
-      loading,
+      transferState,
       address,
       inputList,
       outputList,
@@ -526,7 +564,6 @@ export function useTransferToolData() {
       handleTickerSelectChange,
       handleUtxoSelectChange,
       splitHandler,
-      refresh,
       feeRate,
     ],
   );

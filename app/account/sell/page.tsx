@@ -119,12 +119,13 @@ export default function SellPage() {
         address,
         network,
         unit: amountUnit,
+        chain,
       });
       console.log('Batch Order PSBT', batchOrderPsbt);
-      const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt);
+      const signedPsbts = await btcWallet?.signPsbt(batchOrderPsbt, { chain });
       console.log('Batch Order raw', signedPsbts);
       if (signedPsbts) {
-        const psbts = splitBatchSignedPsbt(signedPsbts, network);
+        const psbts = await splitBatchSignedPsbt(signedPsbts, network, chain);
         const orders = list.map((v, j) => {
           const { assets_list } = v;
           let asset;
