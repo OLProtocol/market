@@ -24,7 +24,7 @@ export const request = async (
   }
   let url = `${baseUrl}${path}`;
   if (location.hostname.indexOf('test') > -1) {
-    url = url.replace('apiprd', 'apiprd');
+    url = url.replace('appdev', 'appdev');
   } else if (location.hostname.indexOf('dev') > -1) {
     url = url.replace('apiprd', 'apidev');
   }

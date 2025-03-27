@@ -32,6 +32,7 @@ import {
   getUtxoByValue,
   bulkBuyingThirdOrder,
   bulkBuyOrder,
+  clientApi,
   lockBulkOrder,
   unlockBulkOrder,
   unlockOrder,
@@ -86,7 +87,7 @@ export const BatchBuyFooter = ({
 
   const { data, isLoading } = useSWR(
     `getUtxoByValue-${address}-${chain}-${network}`,
-    () => getUtxoByValue({ address, network, value: 0 }),
+    () => clientApi.getOrdxAddressHolders(address, '::', 0, 100),
   );
 
   const {
@@ -113,16 +114,24 @@ export const BatchBuyFooter = ({
     }
   }, [lockData]);
   const canSelectLength = useMemo(() => {
-    // if (selectedSource === 'Magisat') {
-    //   return 1;
-    // }
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
       32,
     );
   }, [assetsList, selectedSource]);
 
-  const utxos = useMemo(() => data?.data || [], [data]);
+  const utxos = useMemo(() => data?.data?.map((v) => {
+    const { 
+      Outpoint,
+      Value} = v
+      const [txid, vout] = Outpoint.split(':')
+      return {
+        txid,
+        vout: Number(vout),
+        value: Value,
+        utxo: Outpoint,
+      }
+  }) || [], [data]);
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
@@ -168,42 +177,7 @@ export const BatchBuyFooter = ({
     () => totalBalacne > totalPrice + serviceFee,
     [totalBalacne, totalPrice, serviceFee],
   );
-  //   if (utxos.length) {
-  //     const outputs = [
-  //       {
-  //         address,
-  //         value: 4229912,
-  //       },
-  //       // {
-  //       //   address,
-  //       //   value: DUMMY_UTXO_VALUE,
-  //       // },
-  //       // {
-  //       //   address,
-  //       //   value: DUMMY_UTXO_VALUE,
-  //       // },
-  //       // {
-  //       //   address,
-  //       //   value: DUMMY_UTXO_VALUE,
-  //       // },
-  //       // {
-  //       //   address,
-  //       //   value: DUMMY_UTXO_VALUE,
-  //       // },
-  //       // {
-  //       //   address,
-  //       //   value: DUMMY_UTXO_VALUE,
-  //       // },
-  //     ];
-  //     getSuitableUtxos({
-  //       utxos,
-  //       outputs,
-  //       feeRate: feeRate.value,
-  //       address,
-  //       network,
-  //     });
-  //   }
-  // }, [utxos]);
+
   const findDummyUtxos = async () => {
     const spendableDummyUtxos = dummyUtxos?.slice(0, dummyLength) || [];
     const virtualDummyFee = (170 * 10 + 34 * 3 + 10) * feeRate.value;
@@ -232,7 +206,7 @@ export const BatchBuyFooter = ({
     };
   };
   const calcFee = async () => {
-    if (calcLoading || list.length === 0) {
+    if (calcLoading || list.length === 0 || chain !== 'btc') {
       return;
     }
     if (!insufficientBalanceStatus) {
@@ -375,67 +349,85 @@ export const BatchBuyFooter = ({
         return;
       }
       setLoading(true);
-      const {
-        dummyUtxos: newDummyUtxos,
-        balanceUtxo,
-        spendedUtxos,
-      } = await findDummyUtxos();
-
-      const spendableUtxos = canSpendableUtxos.filter((v) => {
-        const l = !!spendedUtxos.find(
-          (s) => s.txid === v.txid && s.vout === v.vout,
-        );
-        return !l;
-      });
-      if (balanceUtxo) {
-        spendableUtxos.push(balanceUtxo);
-      }
-      const virtualFee =
-        (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
-      const { utxos: filterConsumUtxos } = filterUtxosByValue(
-        spendableUtxos,
-        virtualFee +
-          330 +
-          totalPrice +
-          serviceFee +
-          DUMMY_UTXO_VALUE * dummyLength,
-      );
       let buyRaw = '';
-      console.log('selectedSource', selectedSource);
+      if (chain === 'btc') {
+        const {
+          dummyUtxos: newDummyUtxos,
+          balanceUtxo,
+          spendedUtxos,
+        } = await findDummyUtxos();
 
-      if (selectedSource === 'Magisat') {
-        buyRaw = await buildBuyThirdOrder({
-          order_ids: list.map((v) => v.order_id),
-          fee_rate_tier: 'halfHourFee',
+        const spendableUtxos = canSpendableUtxos.filter((v) => {
+          const l = !!spendedUtxos.find(
+            (s) => s.txid === v.txid && s.vout === v.vout,
+          );
+          return !l;
         });
-      } else {
-        if (raws.length === 0) {
+        if (balanceUtxo) {
+          spendableUtxos.push(balanceUtxo);
+        }
+        const virtualFee =
+          (170 * 10 + 34 * (3 + dummyLength * 3) + 10) * feeRate.value;
+        const { utxos: filterConsumUtxos } = filterUtxosByValue(
+          spendableUtxos,
+          virtualFee +
+            330 +
+            totalPrice +
+            serviceFee +
+            DUMMY_UTXO_VALUE * dummyLength,
+        );
+
+        console.log('selectedSource', selectedSource);
+
+        if (selectedSource === 'Magisat') {
+          buyRaw = await buildBuyThirdOrder({
+            order_ids: list.map((v) => v.order_id),
+            fee_rate_tier: 'halfHourFee',
+          });
+        } else {
+          if (raws.length === 0) {
+            notification.error({
+              message: t('notification.order_buy_failed_title'),
+              description: t('notification.order_buy_failed_description_2'),
+            });
+            setLoading(false);
+            return;
+          }
+          console.log('serviceFee', serviceFee);
+
+          buyRaw = await buildBuyOrder({
+            raws,
+            utxos: filterConsumUtxos,
+            dummyUtxos: newDummyUtxos,
+            serviceFee: serviceFee,
+            feeRate: feeRate.value,
+          });
+        }
+        console.log('buyRaw', buyRaw);
+
+        if (!buyRaw) {
           notification.error({
             message: t('notification.order_buy_failed_title'),
-            description: t('notification.order_buy_failed_description_2'),
+            description: t('notification.order_buy_failed_description_1'),
           });
           setLoading(false);
           return;
         }
-        console.log('serviceFee', serviceFee);
-        
-        buyRaw = await buildBuyOrder({
-          raws,
-          utxos: filterConsumUtxos,
-          dummyUtxos: newDummyUtxos,
-          serviceFee: serviceFee,
-          feeRate: feeRate.value,
-        });
-      }
-      console.log('buyRaw', buyRaw);
-      
-      if (!buyRaw) {
-        notification.error({
-          message: t('notification.order_buy_failed_title'),
-          description: t('notification.order_buy_failed_description_1'),
-        });
-        setLoading(false);
-        return;
+      } else {
+        console.log('utxos', utxos);
+        const NEXT_PUBLIC_SERVICE_ADDRESS =
+          network === 'testnet'
+            ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
+            : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+        const res = await window.sat20.finalizeSellOrder(
+          raws[0],
+          [],
+          address,
+          NEXT_PUBLIC_SERVICE_ADDRESS,
+          network,
+          serviceFee,
+          networkFee,
+        );
       }
       const order_ids = list.map((v) => v.order_id);
       const res = await bulkBuyOrder({

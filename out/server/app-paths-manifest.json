@@ -1,4 +1,7 @@
 {
-  "/account/page": "app/account/page.js",
-  "/account/sell/page": "app/account/sell/page.js"
+  "/tools/transaction/page": "app/tools/transaction/page.js",
+  "/ordx/ticker/page": "app/ordx/ticker/page.js",
+  "/tools/page": "app/tools/page.js",
+  "/market/page": "app/market/page.js",
+  "/account/page": "app/account/page.js"
 }
