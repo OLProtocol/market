@@ -1,7 +1,5 @@
 {
-  "/tools/transaction/page": "app/tools/transaction/page.js",
-  "/ordx/ticker/page": "app/ordx/ticker/page.js",
-  "/tools/page": "app/tools/page.js",
   "/market/page": "app/market/page.js",
+  "/ordx/ticker/page": "app/ordx/ticker/page.js",
   "/account/page": "app/account/page.js"
 }

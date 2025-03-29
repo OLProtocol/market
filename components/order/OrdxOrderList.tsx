@@ -164,6 +164,7 @@ export const OrdxOrderList = ({
   };
   const selectHandler = async (s: boolean, item: any) => {
     if (s) {
+      await unlockHandler(item);
       await buyHandler(item);
     } else {
       await unlockHandler(item);

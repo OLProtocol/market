@@ -13,6 +13,7 @@ import { BatchCart } from './BatchCart';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
+import { tryit } from 'radash';
 import useSWRMutation from 'swr/mutation';
 import { notification } from 'antd';
 import { Decimal } from 'decimal.js';
@@ -39,6 +40,7 @@ import {
 } from '@/api';
 import { useCommonStore } from '@/store';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { log } from 'console';
 
 interface Props {
   list: any[];
@@ -67,7 +69,7 @@ export const BatchBuyFooter = ({
   const { chain } = useCommonStore();
   const [selectMaxPrice, setSelectMaxPrice] = useState(false);
   const [maxPurchasePrice, setMaxPurchasePrice] = useState<any>();
-  const [raws, setRaws] = useState<string[]>([]);
+  const [raws, setRaws] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
   const { list, setList, remove: removeBuy } = useBuyStore();
@@ -79,7 +81,7 @@ export const BatchBuyFooter = ({
   >([]);
   const [networkFee, setNetworkFee] = useState(0);
   const { feeRate, btcHeight } = useCommonStore((state) => state);
-  const { address, network, publicKey } = useReactWalletStore();
+  const { address, network, btcWallet } = useReactWalletStore();
 
   const lockOrderIds = useMemo(() => {
     return list.map((v) => v.order_id);
@@ -113,6 +115,7 @@ export const BatchBuyFooter = ({
       }
     }
   }, [lockData]);
+
   const canSelectLength = useMemo(() => {
     return Math.min(
       assetsList.filter((i) => i.locked === 0 && i.address !== address).length,
@@ -120,18 +123,20 @@ export const BatchBuyFooter = ({
     );
   }, [assetsList, selectedSource]);
 
-  const utxos = useMemo(() => data?.data?.map((v) => {
-    const { 
-      Outpoint,
-      Value} = v
-      const [txid, vout] = Outpoint.split(':')
-      return {
-        txid,
-        vout: Number(vout),
-        value: Value,
-        utxo: Outpoint,
-      }
-  }) || [], [data]);
+  const utxos = useMemo(
+    () =>
+      data?.data?.map((v) => {
+        const { Outpoint, Value } = v;
+        const [txid, vout] = Outpoint.split(':');
+        return {
+          txid,
+          vout: Number(vout),
+          value: Value,
+          utxo: Outpoint,
+        };
+      }) || [],
+    [data],
+  );
   const dummyUtxos = useMemo(
     () => utxos.filter((v) => v.value === DUMMY_UTXO_VALUE),
     [utxos],
@@ -159,6 +164,9 @@ export const BatchBuyFooter = ({
   const serviceFee = useMemo(() => {
     if (selectedSource === 'Magisat') {
       return 0;
+    }
+    if (chain !== 'btc') {
+      return 10;
     }
     if (assets_name === 'btc' && assets_type === 'ns' && btcHeight < 863000) {
       return 0;
@@ -206,6 +214,11 @@ export const BatchBuyFooter = ({
     };
   };
   const calcFee = async () => {
+    if (chain === 'sat20') {
+      setNetworkFee(10);
+      setCalcLoading(false);
+      return;
+    }
     if (calcLoading || list.length === 0 || chain !== 'btc') {
       return;
     }
@@ -419,15 +432,37 @@ export const BatchBuyFooter = ({
           network === 'testnet'
             ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
             : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+        console.log(raws);
+        const buyUtxoInfos: any[] = [];
+        for (let i = 0; i < utxos.length; i++) {
+          const { utxo, price } = utxos[i];
+          const [error2, utxoInfo] = await tryit(clientApi.getUtxoInfo)(utxo);
+          if (error2) {
+            throw error2;
+          }
+          buyUtxoInfos.push({
+            ...utxoInfo.data
+          });
+        }
         const res = await window.sat20.finalizeSellOrder(
-          raws[0],
-          [],
+          raws[0].raw,
+          buyUtxoInfos.map((v) => JSON.stringify(v)),
           address,
           NEXT_PUBLIC_SERVICE_ADDRESS,
           network,
           serviceFee,
           networkFee,
         );
+        console.log('finalizeSellOrder res', res);
+        
+        if (res.code !== 0) {
+          console.log('res', res);
+        }
+        const signedPsbt = await btcWallet?.signPsbt(res.psbt, { chain });
+        if (!signedPsbt) {
+          throw new Error('signPsbt failed');
+        }
+        buyRaw = await window.sat20?.extractTxFromPsbt(signedPsbt, chain);
       }
       const order_ids = list.map((v) => v.order_id);
       const res = await bulkBuyOrder({
