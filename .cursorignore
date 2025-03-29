@@ -3,4 +3,6 @@
 /dist/
 /build/
 /public/
-/public/
+.next
+.husky
+.vscode
