@@ -1,48 +1,9 @@
 'use client';
-import { useMemo, useEffect } from 'react';
-import { MintingTable } from '@/components/home/MintingTable';
-import { ordxSWR } from '@/api';
-import { useRouter } from 'next/navigation';
-
+import { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 export default function Home() {
-  const router = useRouter();
-  const { data: rarePizzaData, trigger: getRarePizza } = ordxSWR.useOrdxInfo({
-    tick: 'rarepizza',
-    network: 'livenet',
-  });
-  const { data: nsListStatusData } = ordxSWR.useNsListStatus({
-    network: 'livenet',
-  });
-  const rarePizzaDetail = useMemo(
-    () => rarePizzaData?.data || {},
-    [rarePizzaData],
-  );
-  const nsDetail = useMemo(
-    () => nsListStatusData?.data || {},
-    [nsListStatusData],
-  );
-
-  const { data: jadesData, trigger: getJades } = ordxSWR.useOrdxInfo({
-    tick: 'jades',
-    network: 'livenet',
-  });
-  const jadesDetail = useMemo(() => jadesData?.data || {}, [jadesData]);
-
   useEffect(() => {
-    getRarePizza();
-    getJades();
-    router.push('/market');
+    redirect('/market');
   }, []);
-  return (
-    <div className="py-4">
-      <div className="mb-4 w-full round-lg">
-        {/* <IndexPage /> */}
-        <MintingTable
-          rarepizza={rarePizzaDetail}
-          jades={jadesDetail}
-          nsDetail={nsDetail}
-        />
-      </div>
-    </div>
-  );
+  return <div className="py-4"></div>;
 }

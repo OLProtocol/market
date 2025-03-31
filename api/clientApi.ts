@@ -88,7 +88,9 @@ class ClientApi {
   getAddressSummary = async (address: string): Promise<any> => {
     return this.request(`v3/address/summary/${address}`);
   }
-
+  getBestHeight = async (): Promise<any> => {
+    return this.request(`bestheight`);
+  }
   getNsListByAddress = async (address: string): Promise<any> => {
     return this.request(`ns/address/${address}`);
   }

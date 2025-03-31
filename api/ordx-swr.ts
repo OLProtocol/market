@@ -41,9 +41,9 @@ export const useNsListStatus = ({ tick, network }: any) => {
   };
 };
 
-export const useBtcHeight = (network: string) => {
+export const useBtcHeight = (network: string, chain: string) => {
   const { data, error, isLoading } = useSWR(
-    `height-${network}`,
+    `height-${network}-${chain}`,
     () => ordx.getBestHeight({ network }),
     {
       refreshInterval: 1000 * 60 * 5,
