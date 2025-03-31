@@ -122,7 +122,7 @@ export const Navbar = () => {
       },
       {
         label: t('pages.explorer.title'),
-        href: `${process.env.NEXT_PUBLIC_ORDX_WEBSITE_HOST}/#/explorer`,
+        href: network === 'testnet' ? 'https://testnet.sat20.org/browser/app/' : 'https://mainnet.sat20.org/browser/app/',
         target: '_blank',
         isActive: true,
       },
