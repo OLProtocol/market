@@ -17,7 +17,7 @@ export const request = async (
   let baseUrl = ''; 
   if (chain === 'btc') {
     baseUrl = process.env.NEXT_PUBLIC_HOST as string;
-    baseUrl += network === 'testnet' ? '/testnet' : '/mainnet';
+    baseUrl += network === 'testnet' ? '/testnet' : '';
   } else if (chain === 'sat20') {
     baseUrl = process.env.NEXT_PUBLIC_SATESTNET_HOST as string;
     baseUrl += network === 'testnet' ? '/satstestnet' : '/satsnet';

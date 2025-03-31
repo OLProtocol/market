@@ -11,6 +11,8 @@ import mempool from './mempool';
 // axios.defaults.headers.common['Authorization'] = process.env.NEXT_PUBLIC_ORDX_API_AUTHORIZATION;
 
 const generateUrl = (url: string, network?: string) => {
+  console.log('network', network);
+  console.log(url);
   url = `${process.env.NEXT_PUBLIC_ORDX_HOST}/btc${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
   console.log('hostname', location.hostname);
 
@@ -19,6 +21,7 @@ const generateUrl = (url: string, network?: string) => {
   } else if (location.hostname.indexOf('dev') > -1) {
     url = url.replace('apiprd', 'apidev');
   }
+  console.log('url', url);
   return url;
 };
 const generateV3Url = (url: string, network?: string) => {
