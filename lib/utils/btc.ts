@@ -17,7 +17,7 @@ export function parseUtxo(utxo: string) {
   };
 }
 
-export function satsToBitcoin(sats): number {
+export function satsToBitcoin(sats: string | number): number {
   if (typeof sats === 'string') {
     sats = sats.trim();
   }
@@ -41,6 +41,7 @@ export function satsToBitcoin(sats): number {
   // Convert Satoshis to BTC
   const btc = satoshis / 1e8;
 
+  // 直接返回 number 类型
   return btc;
 }
 
@@ -224,6 +225,36 @@ export function calcUtxosVirtualGas({
     network,
   });
   return estimateFee;
+}
+
+/**
+ * Formats a BTC amount (number) into a display-friendly string.
+ * Removes trailing zeros and the decimal point if it's an integer.
+ * Handles zero and NaN values.
+ * @param btcValue The BTC amount as a number.
+ * @returns Formatted BTC amount as a string.
+ */
+export function formatBtcAmount(btcValue: number | undefined | null): string {
+  // Handle undefined, null, non-number inputs or NaN results
+  if (typeof btcValue !== 'number' || isNaN(btcValue)) {
+    return '0';
+  }
+
+  // Handle the zero case directly
+  if (btcValue === 0) {
+    return '0';
+  }
+
+  // Format to 8 decimal places initially to preserve precision for small amounts
+  let formattedString = btcValue.toFixed(8);
+
+  // Remove trailing zeros and potentially the decimal point if redundant
+  if (formattedString.includes('.')) {
+    formattedString = formattedString.replace(/0+$/, ''); // Remove trailing zeros
+    formattedString = formattedString.replace(/\.$/, ''); // Remove trailing decimal point if it's now at the end
+  }
+
+  return formattedString;
 }
 
 export async function signAndPushPsbt(psbt) {

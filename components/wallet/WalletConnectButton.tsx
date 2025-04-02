@@ -15,8 +15,9 @@ import {
 } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useAssets } from '@/lib/hooks';
+import { usePlainUtxo } from '@/lib/hooks/usePlainUtxo';
 import { useTheme } from 'next-themes';
-import { hideStr, satsToBitcoin } from '@/lib/utils';
+import { hideStr, satsToBitcoin, formatBtcAmount } from '@/lib/utils';
 import { message } from '@/lib/wallet-sdk';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +38,7 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
-
+  usePlainUtxo();
   const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const [utxoAmount, setUtxoAmount] = useState(0);
@@ -117,7 +118,8 @@ const WalletConnectButton = () => {
     }
   };
   const showAmount = useMemo(() => {
-    return satsToBitcoin(utxoAmount);
+    const btcValue = satsToBitcoin(utxoAmount);
+    return formatBtcAmount(btcValue);
   }, [utxoAmount]);
   const checkSignature = async () => {
     if (signature && publicKey) {
@@ -131,7 +133,7 @@ const WalletConnectButton = () => {
         );
         console.log('publicKey', publicKey);
         console.log('bol', bol);
-        
+
         if (!bol) {
           notification.warning({
             message: 'Signature Verification Failed',

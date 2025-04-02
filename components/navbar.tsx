@@ -44,23 +44,23 @@ export const Navbar = () => {
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
   const { data: heightData } = ordxSWR.useBtcHeight(network as any);
-  const { data, trigger: getUtxos } = useSWRMutation(
-    `getUtxoByValue-${address}-${chain}-${network}`,
-    () => getUtxoByValue({ address, network, value: 0 }),
-  );
-  const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
+  // const { data, trigger: getUtxos } = useSWRMutation(
+  //   `getUtxoByValue-${address}-${chain}-${network}`,
+  //   () => getUtxoByValue({ address, network, value: 0 }),
+  // );
+  // const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 
-  useEffect(() => {
-    if (data?.data?.length) {
-      const list = data.data?.map((item: any) => ({
-        status: 'unspend',
-        location: 'remote',
-        utxo: `${item.txid}:${item.vout}`,
-        ...item,
-      }));
-      setList(list);
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data?.data?.length) {
+  //     const list = data.data?.map((item: any) => ({
+  //       status: 'unspend',
+  //       location: 'remote',
+  //       utxo: `${item.txid}:${item.vout}`,
+  //       ...item,
+  //     }));
+  //     setList(list);
+  //   }
+  // }, [data]);
 
   useEffect(() => {
     const height = heightData?.data?.height;
@@ -68,14 +68,14 @@ export const Navbar = () => {
       setHeight(height);
     }
   }, [heightData]);
-  useEffect(() => {
-    if (btcData?.data?.amount) {
-      setBtcPrice(btcData?.data?.amount);
-    }
-  }, [btcData]);
+  // useEffect(() => {
+  //   if (btcData?.data?.amount) {
+  //     setBtcPrice(btcData?.data?.amount);
+  //   }
+  // }, [btcData]);
   useEffect(() => {
     if (address && network) {
-      getUtxos();
+      // getUtxos();
     }
   }, [address, network]);
   const searchInput = (
