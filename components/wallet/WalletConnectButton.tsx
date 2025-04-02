@@ -85,7 +85,7 @@ const WalletConnectButton = () => {
   };
   const handlerDisconnect = async () => {
     console.log('disconnect success');
-    // setSignature('');
+    setSignature('');
     await disconnect();
   };
   const accountAndNetworkChange = async () => {

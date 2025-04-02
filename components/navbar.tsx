@@ -46,7 +46,7 @@ export const Navbar = () => {
   const { data: heightData } = ordxSWR.useBtcHeight(network as any);
   const { data, trigger: getUtxos } = useSWRMutation(
     `getUtxoByValue-${address}-${chain}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 }),
+    () => getUtxoByValue({ address, network, value: 0 }),
   );
   const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 
