@@ -6,6 +6,7 @@ import {
 } from '@/lib/constants';
 import { addresToScriptPublicKey } from '../wallet/utils';
 import { bitcoin, toPsbtNetwork, NetworkType } from '../wallet';
+import { sleep } from 'radash';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 
 export function parseUtxo(utxo: string) {
@@ -231,6 +232,8 @@ export async function signAndPushPsbt(psbt) {
     throw new Error('No wallet connected');
   }
   const signed = await btcWallet.signPsbt(psbt.toHex());
+  console.log('signed', signed);
+  await sleep(1000);
   const pushedTxId = await btcWallet.pushPsbt(signed!);
   console.log('pushedTxId', pushedTxId);
   try {

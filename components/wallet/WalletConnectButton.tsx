@@ -55,8 +55,6 @@ const WalletConnectButton = () => {
     setUtxoAmount(amount);
   }, [UtxoList]);
   const onConnectSuccess = async (wallet: any) => {
-    console.log('onConnectSuccess');
-
     if (!signature) {
       console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
       try {

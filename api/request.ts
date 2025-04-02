@@ -46,7 +46,7 @@ export const request = async (
   // delete options.data;
   options.headers = headers;
   let res = await axios(url, options);
-  console.log('Signature', res);
+  console.log('res', res);
 
   if ((res as any)?.data.code === -1) {
     if (
