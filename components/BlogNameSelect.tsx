@@ -3,7 +3,7 @@
 import useSWR from 'swr';
 import { Button, SelectItem } from '@nextui-org/react';
 import { useEffect, useMemo, useState } from 'react';
-import { getOrdxAssets, cancelOrder, ordx } from '@/api';
+import { cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { notification, Select } from 'antd';
 import { useRouter } from 'next/navigation';

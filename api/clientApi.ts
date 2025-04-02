@@ -79,7 +79,7 @@ class ClientApi {
     return this.request(`utxo/range/${utxo}`);
   }
   getUtxoInfo = async (utxo: string): Promise<any> => {
-    return this.request(`/v3/utxo/info/${utxo}`);
+    return this.request(`v3/utxo/info/${utxo}`);
   }
   getNsName = async (name: string): Promise<any> => {
     return this.request(`ns/name/${name}`);

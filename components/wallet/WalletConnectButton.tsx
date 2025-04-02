@@ -37,7 +37,6 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
-  console.log('network', network);
 
   const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
@@ -45,7 +44,7 @@ const WalletConnectButton = () => {
 
   const initCheck = async () => {
     await check();
-    await checkSignature();
+    // await checkSignature();
   };
   useEffect(() => {
     initCheck();
@@ -86,7 +85,7 @@ const WalletConnectButton = () => {
   };
   const handlerDisconnect = async () => {
     console.log('disconnect success');
-    setSignature('');
+    // setSignature('');
     await disconnect();
   };
   const accountAndNetworkChange = async () => {
@@ -123,7 +122,7 @@ const WalletConnectButton = () => {
     return satsToBitcoin(utxoAmount);
   }, [utxoAmount]);
   const checkSignature = async () => {
-    if (signature) {
+    if (signature && publicKey) {
       console.log('checkSignature', signature);
 
       try {
@@ -132,6 +131,9 @@ const WalletConnectButton = () => {
           process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
           signature,
         );
+        console.log('publicKey', publicKey);
+        console.log('bol', bol);
+        
         if (!bol) {
           notification.warning({
             message: 'Signature Verification Failed',

@@ -46,7 +46,7 @@ export const request = async (
   // delete options.data;
   options.headers = headers;
   let res = await axios(url, options);
-  console.log(res);
+  console.log('Signature', res);
 
   if ((res as any)?.data.code === -1) {
     if (
@@ -83,6 +83,8 @@ export const getOrdxAssets = async ({
       utxo,
     },
   });
+  console.log('getOrdxAssets res', res);
+  
   return res;
 };
 

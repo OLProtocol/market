@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AssetsTypeList } from '@/components/account/AssetsTypeList';
 import { OrdxCategoryTab } from './OrdxCategoryTab';
 import { AssetsList } from './AssetsList';
@@ -13,18 +12,33 @@ export const OrdxAssetsUtxoList = () => {
   const [assertType, setAssertType] = useState<string>('ticker');
   const [assertName, setAssertName] = useState<string>('');
   const [assertCategory, setAssertCategory] = useState<string | undefined>();
+
   const onAssertChange = (data: string) => {
+    console.log('onAssertChange', data);
     setAssertName(data);
     setAssertCategory('');
   };
+
   const onCategoryChange = (t: string) => {
-    setAssertType(t);
-    setAssertCategory('');
-    setAssertName('');
+    console.log('onCategoryChange', t);
+    if (t !== assertType) {
+      setAssertType(t);
+      setAssertCategory('');
+      if (t === 'rune') {
+        setAssertName('');
+      }
+    }
   };
+
   const onAssertCategoryChange = (t?: string) => {
+    console.log('onAssertCategoryChange', t);
     setAssertCategory(t);
   };
+
+  console.log('assertType', assertType);
+  console.log('assertName', assertName);
+  console.log('assertCategory', assertCategory);
+
   return (
     <div className="py-4">
       <div className="mb-4">

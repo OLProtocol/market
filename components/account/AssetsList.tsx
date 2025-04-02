@@ -1,6 +1,6 @@
 'use client';
 
-import useSWRMutation from 'swr/mutation';
+import { useQuery } from '@tanstack/react-query';
 import { notification, Empty } from 'antd';
 import { getOrdxAssets, cancelOrder, ordx } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
@@ -43,27 +43,51 @@ export const AssetsList = ({
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
 
-  const swrKey = useMemo(() => {
-    return `/ordx/getOrdxAssets-${address}-${chain}-${assets_type}-${assets_name}-${assets_category}-${page}-${size}`;
-  }, [address, page, size, assets_name, assets_type, assets_category, chain]);
-
-  const {
-    data,
-    isMutating: isLoading,
-    trigger,
-  } = useSWRMutation(swrKey, () => {
-    return getOrdxAssets({
+  const queryKey = useMemo(() => {
+    return [
+      'ordxAssets',
       address,
+      chain,
+      assets_type,
       assets_name,
-      category: assets_category,
-      assets_type: assets_type,
-      offset: (page - 1) * size,
+      assets_category,
+      page,
       size,
-    });
+    ];
+  }, [address, page, size, assets_name, assets_type, assets_category, chain]);  
+
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
+    queryKey,
+    queryFn: () =>
+      getOrdxAssets({
+        address,
+        assets_name,
+        category: assets_category,
+        assets_type: assets_type,
+        offset: (page - 1) * size,
+        size,
+      }),
+    enabled: !!(address && (assets_type || assets_name)),
   });
+  console.log('assets_type', assets_type);
+  console.log('assets_name', assets_name);
+  
+  console.log('React Query State:', { isLoading, isFetching, data, error });
+
+  useEffect(() => {
+    if (error) {
+      console.error('React Query Error fetching assets:', error);
+      notification.error({
+        message: t('notification.fetch_error_title'),
+        description: error.message || 'Failed to fetch assets',
+      });
+    }
+  }, [error, t]);
 
   const [list, { set, reset: resetList, push: pushToList, updateAt }] =
     useList<any>([]);
+  console.log('getOrdxAssets data received in useEffect:', data);
+
   useEffect(() => {
     if (data) {
       const { assets = [] } = data?.data || {};
@@ -205,17 +229,18 @@ export const AssetsList = ({
 
   useEffect(() => {
     if (assets_type || assets_name) {
-      trigger();
+      // refetch(); // 如果 queryKey 包含了 page 和 size，React Query 会在它们变化时自动重新查询，可能不再需要手动 refetch
     }
-  }, [page, size]);
+  }, [page, size]); // 移除了 refetch 依赖
+
   useEffect(() => {
     if (assets_type || assets_name) {
       resetList();
       setCanSelect(false);
-      setPage(1);
-      trigger();
+      setPage(1); // 重置页面为 1
+      // refetch(); // queryKey 变化会自动触发查询
     }
-  }, [assets_type, assets_name, assets_category]);
+  }, [assets_type, assets_name, assets_category, resetList]);
   return (
     <div className={`${canSelect ? 'pb-20' : ''}`}>
       <InfiniteScroll

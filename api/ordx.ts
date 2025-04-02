@@ -25,7 +25,7 @@ const generateUrl = (url: string, network?: string) => {
   return url;
 };
 const generateV3Url = (url: string, network?: string) => {
-  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
+  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}/btc${network === 'testnet' ? '/testnet' : '/mainnet'}/${url}`;
   console.log('hostname', location.hostname);
 
   if (location.hostname.indexOf('test') > -1) {

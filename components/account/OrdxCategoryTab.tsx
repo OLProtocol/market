@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardBody, Divider } from '@nextui-org/react';
-import useSWR from 'swr';
-import { useMemo, useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
@@ -15,18 +15,16 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
   const { t } = useTranslation();
   const { address, balance, network } = useReactWalletStore((state) => state);
   const { chain } = useCommonStore();
-  const swrKey = useMemo(() => {
-    return `/ordx/getAddressAssetsSummary-${address}-${chain}-${network}`;
-  }, [address, network]);
+  const isFirstRender = useRef(true);
 
-  const { data, isLoading, mutate } = useSWR(
-    swrKey,
-    () => getAddressAssetsSummary(address),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  const { data, isLoading } = useQuery({
+    queryKey: ['addressAssetsSummary', address, chain, network],
+    queryFn: () => getAddressAssetsSummary(address),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled: !!address,
+  });
+  
   const list = useMemo(() => {
     const tickerInfo = data?.data?.find((v) => v.assets_type === 'ticker');
     const exoticInfo = data?.data?.find((v) => v.assets_type === 'exotic');
@@ -62,15 +60,16 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
   }, [data]);
   const [selected, setSelected] = useState(list[0].key);
 
+  // useEffect(() => {
+  //   if (selected) {
+  //     onChange?.(selected);
+  //   }
+  // }, []);
   useEffect(() => {
-    if (selected) {
+    if (selected && !isFirstRender.current) {
       onChange?.(selected);
     }
-  }, []);
-  useEffect(() => {
-    if (selected) {
-      onChange?.(selected);
-    }
+    isFirstRender.current = false;
   }, [selected]);
 
   return (
