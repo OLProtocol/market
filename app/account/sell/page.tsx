@@ -104,7 +104,7 @@ export default function SellPage() {
     for (let i = 0; i < list.length; i++) {
       const { price, assets_list } = list[i];
       const _p = amountUnit === 'btc' ? btcToSats(price) : price;
-      if (Number(_p) < 330) {
+      if (chain === 'btc' && Number(_p) < 330) {
         notification.error({
           message: t('notification.list_failed_title'),
           description: t('notification.list_failed_min_amount'),
