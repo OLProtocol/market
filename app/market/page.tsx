@@ -52,7 +52,7 @@ export default function Market() {
   });
   const { network } = useReactWalletStore();
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-¥{chain}-${network}-${type}-${interval}-${sortField}-${sortOrder}`,
+    `/ordx/getTopTickers-${chain}-${network}-${type}-${interval}-${sortField}-${sortOrder}-${chain}`,
     () => {
       let res = getTopAssets({
         assets_type: type,

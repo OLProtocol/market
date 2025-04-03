@@ -25,7 +25,7 @@ export const OrderAnalyze = ({
   const { chain } = useCommonStore();
   const swrKey = useMemo(() => {
     return `getAssetsAnalytics-${assets_name}-${assets_type}-${chain}-${network}`;
-  }, [assets_name, network, assets_type]);
+  }, [assets_name, network, assets_type, chain]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getAssetsAnalytics({

@@ -67,7 +67,7 @@ export const OrdxOrderList = ({
       return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${chain}-${network}-${page}-${size}-${sort}-${category}`;
     }
     return `/ordx/getOrders-${assets_name}-${assets_type}-${chain}-${network}-${page}-${size}-${sort}-${category}`;
-  }, [assets_name, address, page, size, network, sort, assets_type, category]);
+  }, [assets_name, address, page, size, network, sort, assets_type, category, chain]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({
@@ -145,12 +145,7 @@ export const OrdxOrderList = ({
   };
   const buyHandler = async (item) => {
     console.log(item);
-    // if (buyList.length >= 1 && selectedSource === 'Magisat') {
-    //   notification.success({
-    //     message: 'Magisat can only place one order for now',
-    //   });
-    //   return;
-    // }
+
     try {
       if (item.locked === 0) {
         addBuy({ ...item, status: 'pending' });

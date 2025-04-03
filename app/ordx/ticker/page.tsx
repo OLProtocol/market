@@ -16,15 +16,16 @@ import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { getTickLabel } from '@/lib/utils';
 import { Icon } from '@iconify/react';
-
+import { useCommonStore } from '@/store/common';
 export default function Page() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
   const { address, network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const ticker = params.get('ticker') as string;
   const assets_type = params.get('assets_type') as string;
-  const { data } = useSWR(`getAssetsSummary`, () => {
+  const { data } = useSWR(`getAssetsSummary-${chain}-${network}-${ticker}-${assets_type}`, () => {
     console.log('app.ordx.ticker.page: ticker: ', ticker);
     try {
       return getAssetsSummary({ assets_name: ticker, assets_type });

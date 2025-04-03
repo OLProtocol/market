@@ -27,7 +27,7 @@ export const OrderItemFooter = ({
 
   return (
     <WalletConnectBus className="flex-1" text={t('buttons.buy')}>
-      {item?.address !== currentAddress && showResale ? (
+      {item?.address === currentAddress && showResale ? (
         <Button
           className="text-tiny h-8 w-full bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 uppercase"
           variant="flat"

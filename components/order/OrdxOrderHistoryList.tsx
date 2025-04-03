@@ -22,7 +22,7 @@ import { Pagination } from '@/components/Pagination';
 import { SortDropdown } from '@/components/SortDropdown';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-
+import { useCommonStore } from '@/store/common';
 interface OrdxOrderHistoryListProps {
   assets_name?: string;
   assets_type?: string;
@@ -35,12 +35,13 @@ export const OrdxOrderHistoryList = ({
 }: OrdxOrderHistoryListProps) => {
   const { t, i18n } = useTranslation();
   const { network } = useReactWalletStore((state) => state);
+  const { chain } = useCommonStore();
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(12);
   const [sort, setSort] = useState(0);
   const [filter, setFilter] = useState<any>(undefined);
   const { data, isLoading } = useSWR(
-    `/ordx/history-${assets_name}-${address}-${page}-${size}-${sort}-${filter}`,
+    `/ordx/history-${assets_name}-${address}-${page}-${size}-${sort}-${filter}-${chain}`,
     () =>
       getHistory({
         offset: (page - 1) * size,
