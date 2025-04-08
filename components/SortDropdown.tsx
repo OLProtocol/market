@@ -32,14 +32,15 @@ export const SortDropdown = ({
   return (
     <Select
       isDisabled={disabled}
-      className="w-48"
+      className="w-[115px] sm:48 sm:m-2 h-10 bg-transparent"
+      style={{ height: '40px' }} // 强制设置高度      
       selectionMode="single"
       selectedKeys={selectKeys}
       defaultSelectedKeys={['0']}
-      onSelectionChange={onSelectionChange}
+      onSelectionChange={onSelectionChange}      
     >
       {sortList.map((animal) => (
-        <SelectItem key={animal.value} value={animal.value}>
+        <SelectItem key={animal.value} value={animal.value} className="text-zinc-300 active:text-zinc-200">
           {animal.label}
         </SelectItem>
       ))}

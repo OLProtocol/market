@@ -496,8 +496,8 @@ export const InscribeOrdxDeploy = ({ onNext, onChange, value }: InscribeOrdxProp
           <Button
             isLoading={loading}
             isDisabled={buttonDisabled}
-            color="primary"
-            className="w-60"
+            color="default"
+            className="w-full sm:w-60 btn-gradient"
             onClick={nextHandler}
           >
             {tickChecked ? t('buttons.next') : 'Check'}

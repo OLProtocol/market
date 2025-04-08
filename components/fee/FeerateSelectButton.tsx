@@ -67,16 +67,16 @@ export const FeerateSelectButton = () => {
       <Button
         variant="ghost"
         isLoading={isLoading}
-        className="bg-transparent"
+        className="bg-transparent sm:px-2 px-[6px] sm:gap-2 gap-[1px] text-xs sm:text-base text-zinc-300 border border-zinc-700"
         onClick={() => onOpen()}
       >
         <Icon icon="mdi:gas-station" className="text-xl0" />
-        {feeRate.value}{' '}
-        <span className="dark:text-gray-400 text-slate-600">sat/vB</span>
+        {feeRate.value}{' sat'}
+        <span  className="hidden sm:inline dark:text-gray-400 text-slate-600">/vB</span>
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
+          <ModalHeader className="flex flex-col gap-2">
             {t('common.gas_fee')}
           </ModalHeader>
           <ModalBody>

@@ -70,7 +70,7 @@ export default function RootLayout({
             {/* <ParticleEffect /> Add the ParticleEffect component here */}
             <Navbar />
             {/* <SystemNoticeModal /> */}
-            <main className="mx-auto w-full px-2 md:px-4 flex-grow">
+            <main className="mx-auto w-full px-0 md:px-4 flex-grow">
               {children}
             </main>
             <footer id="footer">

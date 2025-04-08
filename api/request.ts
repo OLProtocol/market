@@ -15,10 +15,11 @@ export const request = async (
   const { headers = {}, method = 'GET', data, formData } = options;
   const { chain } = useCommonStore.getState();
   let baseUrl = ''; 
-  if (chain === 'btc') {
+  console.log('request chain/network:', chain, network);
+  if (chain === 'Bitcoin') {
     baseUrl = process.env.NEXT_PUBLIC_HOST as string;
     baseUrl += network === 'testnet' ? '/testnet' : '';
-  } else if (chain === 'sat20') {
+  } else if (chain === 'SatoshiNet') {
     baseUrl = process.env.NEXT_PUBLIC_SATESTNET_HOST as string;
     baseUrl += network === 'testnet' ? '/satstestnet' : '/satsnet';
   }

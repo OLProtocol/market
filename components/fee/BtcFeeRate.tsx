@@ -114,7 +114,7 @@ export const BtcFeeRate = ({
         {list.map((item) => (
           <BtcFeeRateItem
             className={
-              type === item.label ? ' border-orange-400 ' : 'border-gray-500'
+              type === item.label ? 'border-[#8000cc] bg-gray-800/90' : 'border-gray-800 bg-gray-800/90'
             }
             key={item.label}
             label={item.name}

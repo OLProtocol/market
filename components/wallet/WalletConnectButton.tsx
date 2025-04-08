@@ -181,16 +181,17 @@ const WalletConnectButton = () => {
         <Popover placement="bottom">
           <PopoverTrigger>
             <Button
-              className="px-0"
+              className="px-0 bg-[#181819]"
               endContent={
-                <div className="px-2 h-full flex justify-center items-center  bg-gray-600">
-                  {address?.slice(-4)}
+                <div className="px-2 h-full flex justify-center items-center text-gray-300 bg-[#282828]">
+                 {/* <Icon icon="mdi-light:wallet" className="w-5 h-5 text-gray-400" /> */}
+                 {address?.slice(-4)}<Icon icon="mdi-light:chevron-down" className=" text-gray-400 text-sm" />
                 </div>
               }
             >
               <div className="flex items-center gap-1 pl-2">
-                <span>{showAmount}</span>
                 <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
+                <span className='text-gray-200 text-xs sm:text-sm'>{showAmount}</span> 
               </div>
             </Button>
           </PopoverTrigger>

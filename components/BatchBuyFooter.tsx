@@ -40,7 +40,7 @@ import {
 } from '@/api';
 import { useCommonStore } from '@/store';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-import { log } from 'console';
+import { Console, log } from 'console';
 
 interface Props {
   list: any[];
@@ -165,7 +165,7 @@ export const BatchBuyFooter = ({
     if (selectedSource === 'Magisat') {
       return 0;
     }
-    if (chain !== 'btc') {
+    if (chain !== 'Bitcoin') {
       return 10;
     }
     if (assets_name === 'btc' && assets_type === 'ns' && btcHeight < 863000) {
@@ -214,12 +214,13 @@ export const BatchBuyFooter = ({
     };
   };
   const calcFee = async () => {
-    if (chain === 'sat20') {
+    console.log("BatchBuyFooter chain/network:", chain,"/", network);
+    if (chain === 'SatoshiNet') {
       setNetworkFee(10);
       setCalcLoading(false);
       return;
     }
-    if (calcLoading || list.length === 0 || chain !== 'btc') {
+    if (calcLoading || list.length === 0 || chain !== 'Bitcoin') {
       return;
     }
     if (!insufficientBalanceStatus) {
@@ -363,7 +364,7 @@ export const BatchBuyFooter = ({
       }
       setLoading(true);
       let buyRaw = '';
-      if (chain === 'btc') {
+      if (chain === 'Bitcoin') {
         const {
           dummyUtxos: newDummyUtxos,
           balanceUtxo,

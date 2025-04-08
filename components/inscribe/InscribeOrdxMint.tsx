@@ -465,11 +465,10 @@ export const InscribeOrdxMint = ({
       </div>
       <div className="w-60 mx-auto flex justify-center">
         <WalletConnectBus>
-          <Button
+            <Button
             isLoading={loading || tickBlurLoading}
-            isDisabled={buttonDisabled}
-            color="primary"
-            className="w-60"
+            isDisabled={buttonDisabled}           
+            className="w-full sm:w-60 btn-gradient"
             onClick={nextHandler}
           >
             {tickChecked ? t('buttons.next') : 'Check'}

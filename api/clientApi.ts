@@ -18,8 +18,9 @@ interface RequestParams {
 class ClientApi {
   private readonly BASE_URL = process.env.NEXT_PUBLIC_ORDX_HOST;
 
-  private generatePath = (path: string, chain: string, network: string): string => {
-    if (chain === 'sat20') {
+  private generatePath = (path: string, chain: string, network: string): string => {    
+    console.log('clientApi chain/network:', chain,"/", network);
+    if (chain === 'SatoshiNet') {
       return `${this.BASE_URL}/satsnet${
         network === 'testnet' ? '/testnet' : '/mainnet'
       }/${path}`;
@@ -127,7 +128,7 @@ class ClientApi {
     const store = useCommonStore.getState();
     const { network } = store;
     const url = `https://apiprd.ordx.market/${
-      network === 'livenet' ? 'btc' : 'testnet/'
+      network === 'MainNet' ? 'btc' : 'testnet/'
     }ordx/GetRecommendedFees`;
     const response = await fetch(url);
     return response.json();

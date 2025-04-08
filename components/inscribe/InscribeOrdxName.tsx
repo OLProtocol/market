@@ -220,8 +220,8 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
       <div className="w-60 mx-auto flex justify-center gap-4">
         <WalletConnectBus>
           <Button
-            className="mx-auto"
-            color="primary"
+            className="mx-auto w-full sm:w-60 btn-gradient"
+            color="default"
             isLoading={loading}
             onClick={nextHandler}
           >
@@ -229,7 +229,7 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
           </Button>
         </WalletConnectBus>
         {removeArr.length > 0 && (
-          <Button className="mx-auto " color="danger" onClick={removeHandler}>
+          <Button className="mx-auto w-full sm:w-60 btn-gradient" color="default" onClick={removeHandler}>
             Remove Error Name
           </Button>
         )}

@@ -17,7 +17,7 @@ export const InscribeOrdx = ({
   value,
 }: InscribeOrdxProps) => {
   const { type: defalutType, ...restValue } = value;
-  
+
   const [type, setType] = useState(defalutType || 'mint');
   const { t } = useTranslation();
   return (

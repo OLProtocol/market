@@ -139,178 +139,112 @@ export default function Market() {
   );
 
   return (
-    <div className="pt-4">
-      <div className="mb-2 flex justify-between items-center">
+    <div className="bg-transparent p-0 sm:pt-2 w-full">
+      <div className="my-2 flex justify-between items-center gap-1">
         <HomeTypeTabs value={type} onChange={typeChange} />
         <SortDropdown
           sortList={sortList}
           value={interval}
           disabled={!list.length}
-          onChange={onSortChange}
+          onChange={onSortChange}         
         ></SortDropdown>
       </div>
       {type === 'ns' && <NameMarketNav />}
-      <Table
-        isHeaderSticky
-        isStriped
-        sortDescriptor={sortDescriptor}
-        onSortChange={onTableSortChange}
-        color="primary"
-        selectionMode="single"
-        onRowAction={toDetail}
-        aria-label="Example table with infinite pagination"
-      >
-        <TableHeader>
-          {columns.map((column) => (
-            <TableColumn
-              key={column.key}
-              allowsSorting={column.allowsSorting}
-              // className="text-sm md:text-base font-extralight"
-              className="text-sm md:text-xl md:font-extrablod font-extralight md:pb-3 md:pt-3"
-            >
-              {column.label}
-            </TableColumn>
-          ))}
-        </TableHeader>
-        <TableBody
-          isLoading={isLoading}
-          items={list}
-          emptyContent={'No Data.'}
-          loadingContent={<Spinner />}
+      <div className="overflow-x-auto w-full">
+        <Table
+          isHeaderSticky
+          // isStriped
+          sortDescriptor={sortDescriptor}
+          onSortChange={onTableSortChange}
+          color="primary"
+          selectionMode="single"
+          onRowAction={toDetail}
+          aria-label="Table with infinite pagination"
+          className='w-full'
+          classNames={{
+            tr: "border-b border-zinc-800", // 为每一行添加下边框
+          }}
+          removeWrapper={true} // 移除外层 div          
         >
-          {(item: any) => (
-            <TableRow
-              key={item.assets_name}
-              className="cursor-pointer text-sm md:text-base"
-            >
-              {(columnKey) => {
-                if (columnKey === 'assets_name') {
-                  const tick = getKeyValue(item, 'assets_name');
-                  const tick_type = getKeyValue(item, 'assets_type');
-                  const nickname = getKeyValue(item, 'nickname');
-                  const logo = getKeyValue(item, 'logo');
-                  return (
-                    <TableCell>
-                      <div className="flex text-sm md:text-base items-left">
-                        {logo ? (
-                          <Image
-                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}
-                            alt="logo"
-                            className="w-14 h-14 min-w-[3.5rem] p-2"
-                          />
-                        ) : tick_type === 'exotic' ? (
-                          <Image
-                            src={`/raresats/${nickname ? nickname : getTickLabel(tick)}.svg`}
-                            alt="logo"
-                            className="w-14 h-14 min-w-[3.5rem] p-2  bg-gray-650"
-                          />
-                        ) : (
-                          <Avatar
-                            name={tick.slice(0, 1).toUpperCase()}
-                            className="text-2xl text-gray-300 font-black w-14 h-14 bg-gray-950"
-                          />
-                        )}
-                        <span className="pt-4 ml-2 break-keep whitespace-nowrap">
-                          {nickname ? nickname : getTickLabel(tick)}
-                        </span>
-                      </div>
-                    </TableCell>
-                  );
-                } else if (columnKey === 'lowest_price') {
-                  return (
-                    <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        {getKeyValue(item, columnKey).toFixed(2) + ' sats'}
-                      </div>
-                    </TableCell>
-                  );
-                } else if (columnKey === 'lowest_price_change') {
-                  const priceChange = getKeyValue(item, columnKey);
-                  return (
-                    <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        {priceChange === '-' && <span>-</span>}
-
-                        {priceChange.length > 1 &&
-                          priceChange.includes('-') && (
-                            <span className="text-red-500">{priceChange}</span>
+          <TableHeader className='bg-zinc-800 h-16'>
+            {columns.map((column) => (
+              <TableColumn
+                key={column.key}
+                allowsSorting={column.allowsSorting}
+                className={`bg-zinc-900 h-14 text-lg font-medium sm:pb-3 sm:pt-3 ${
+                  column.key === 'assets_name' ? 'sticky left-0 pl-5 bg-zinc-900 z-10' : ''
+                }`}
+              >
+                {column.label}
+              </TableColumn>
+            ))}
+          </TableHeader>
+          <TableBody
+            isLoading={isLoading}
+            items={list}
+            emptyContent={'No Data.'}
+            loadingContent={<Spinner />}
+          >
+            {(item: any) => (
+              <TableRow
+                key={item.assets_name}
+                className="cursor-pointer text-sm md:text-base"
+              >
+                {(columnKey) => {
+                  if (columnKey === 'assets_name') {
+                    const tick = getKeyValue(item, 'assets_name');
+                    const tick_type = getKeyValue(item, 'assets_type');
+                    const nickname = getKeyValue(item, 'nickname');
+                    const logo = getKeyValue(item, 'logo');
+                    return (
+                      <TableCell className="flex items-center sticky left-0 bg-black z-10">
+                        <div className="flex items-center text-sm md:text-base items-left">
+                          {logo ? (
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}
+                              alt="logo"
+                              className="w-9 h-9 min-w-[2.25rem] p-0"
+                            />
+                          ) : tick_type === 'exotic' ? (
+                            <Image
+                              src={`/raresats/${nickname ? nickname : getTickLabel(tick)}.svg`}
+                              alt="logo"
+                              className="w-9 h-9 min-w-[2.25rem] p-0"
+                            />
+                          ) : (
+                            <Avatar
+                              name={tick.slice(0, 1).toUpperCase()}
+                              className="text-2xl text-gray-300 font-black w-10 h-10 bg-zinc-800"
+                            />
                           )}
-
-                        {priceChange.length > 1 &&
-                          !priceChange.includes('-') && (
-                            <span className="text-green-500">
-                              {priceChange}
-                            </span>
-                          )}
-                      </div>
-                    </TableCell>
-                  );
-                } else if (columnKey === 'market_cap') {
-                  const value = getKeyValue(item, columnKey);
-                  const btc = (value / 100000000).toFixed(4);
-                  return (
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <div className="flex text-sm md:text-base">
-                          <Icon
-                            icon="cryptocurrency-color:btc"
-                            className="mr-1 mt-0.5"
-                          />
-                          {btc}
+                          <span className="pt-0 ml-2 break-keep whitespace-nowrap">
+                            {nickname ? nickname : getTickLabel(tick)}
+                          </span>
                         </div>
-                        {value > 0 && (
-                          <div className="flex">
-                            $<BtcPrice btc={btc} />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                  );
-                } else if (columnKey === 'tx_total_volume') {
-                  const value = getKeyValue(item, columnKey);
-                  const btc = value.toFixed(4);
-                  return (
-                    <TableCell>
-                      <div className="flex flex-col">
+                      </TableCell>
+                    );
+                  } else if (columnKey === 'lowest_price') {
+                    return (
+                      <TableCell>
                         <div className="flex text-sm md:text-base">
-                          <Icon
-                            icon="cryptocurrency-color:btc"
-                            className="mr-1 mt-0.5"
-                          />
-                          {btc}
+                          {getKeyValue(item, columnKey).toFixed(2) + ' sats'}
                         </div>
-                        {value > 0 && (
-                          <div className="flex">
-                            $<BtcPrice btc={btc} />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                  );
-                } else if (
-                  ['tx_order_count', 'holder_count'].includes(
-                    columnKey.toString(),
-                  )
-                ) {
-                  return (
-                    <TableCell>
-                      <div className="flex text-sm md:text-base">
-                        {thousandSeparator(getKeyValue(item, columnKey))}
-                      </div>
-                    </TableCell>
-                  );
-                } else {
-                  return (
-                    <TableCell className="font-light text-sm md:text-base">
-                      {getKeyValue(item, columnKey)}
-                    </TableCell>
-                  );
-                }
-              }}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                      </TableCell>
+                    );
+                  } else {
+                    // Other columns
+                    return (
+                      <TableCell className="font-light text-sm md:text-base">
+                        {getKeyValue(item, columnKey)}
+                      </TableCell>
+                    );
+                  }
+                }}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

@@ -46,20 +46,20 @@ export default function AccountPage() {
   }, [data]);
   console.log('totalSatValue', totalSatValue);
   return (
-    <div className="py-4">
+    <div className="py-2">
       <Tabs
         aria-label="Options"
-        color="primary"
+        color="default"
         size="lg"
         selectedKey={tabKey}
         variant="underlined"
         onSelectionChange={onTabChange}
         classNames={{
-          tabList:
-            'gap-6 w-full relative rounded-none p-0 border-b border-divider',
-          cursor: 'w-full bg-blue-500',
-          tab: 'max-w-fit px-0 h-12',
-          tabContent: 'group-data-[selected=true]:text-blue-400',
+          tabList: 'gap-2 py-2 w-full relative rounded-none border-b border-divider',
+          tab: 'max-w-fit px-0 sm:px-2 h-12 text-sm font-medium rounded-lg transition-colors',
+          tabContent:
+            'group-data-[selected=true]:bg-zinc-800 group-data-[selected=true]:text-white group-data-[selected=true]:rounded-lg group-data-[selected=true]:px-4 group-data-[selected=true]:py-2',
+            cursor: 'hidden', // 隐藏下划线
         }}
         style={{ width: '100%' }}
       >

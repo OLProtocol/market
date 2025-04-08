@@ -484,7 +484,8 @@ export const InscribeStepThree = ({
           <Button
             size="md"
             isLoading={loading}
-            color="primary"
+            color="default"
+            className='w-full sm:w-60 btn-gradient'
             onClick={submit}
           >
             {t('buttons.submit_payment')}

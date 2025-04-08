@@ -38,6 +38,7 @@ export const NameMarketNav = () => {
           color="default"
           radius="full"
           onClick={() => handlerClick(item)}
+          className="border border-gray-700/90 rounded-xl"
         >
           {item.label}
         </Button>

@@ -37,6 +37,11 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         value: tickerInfo?.total_value || 0,
       },
       {
+        label: 'Runes',
+        key: 'rune',
+        value: 0,
+      },
+      {
         label: 'Rare Sats',
         key: 'exotic',
         value: exoticInfo?.total_value || 0,
@@ -50,12 +55,7 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         label: 'Ordinals NFT',
         key: 'nft',
         value: nftInfo?.total_value || 0,
-      },
-      {
-        label: 'Runes',
-        key: 'rune',
-        value: 0,
-      },
+      },      
     ];
   }, [data]);
   const [selected, setSelected] = useState(list[0].key);
@@ -78,25 +78,28 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
         <Card
           isHoverable
           isPressable
-          className={`px-2 w-full max-w-full ${selected === item.key ? 'bg-gradient-to-r from-[#4361ee] to-[#2b35b8] ' : ''}`}
+          className={`px-2 w-full h-[90px] max-w-full ${selected === item.key 
+            ? 'bg-zinc-900/60 border border-purple-600/80'
+            : 'bg-transparent border border-zinc-800'
+          }`}
           key={item.key}
           onPress={() => {
             item.key !== 'nft' && setSelected(item.key);
           }}
         >
-          <CardHeader>
-            <span className="text-base md:text-lg font-mono text-gray-400">
+          <CardHeader className='px-3 pt-2 pb-0'>
+            <span className="text-sm sm:text-sm font-mono text-gray-400">
               {item.label}
             </span>
           </CardHeader>
-          <Divider className="divide-inherit divide-dashed" />
+          {/* <Divider className="divide-inherit divide-dashed" /> */}
           {item.key === 'rune' ? (
-            <CardBody className="text-left text-md leading-8">
-              <div className="flex">
-                <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-                {item.value}
+            <CardBody className="text-left py-1 leading-8">
+              <div className="flex items-center text-base sm:text-md">
+                <Icon icon="cryptocurrency-color:btc" className="mr-1" />
+                <span className='font-extrabold text-zinc-200'>{item.value}</span>
               </div>
-              <div className="flex text-sm md:font-bold">
+              <div className="flex text-xs sm:font-bold">
                 <span className="text-yellow-400 w-5"> &nbsp;$</span>
                 <span className="text-gray-400 h-5">
                   <BtcPrice btc={item.value} />
@@ -104,12 +107,12 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
               </div>
             </CardBody>
           ) : (
-            <CardBody className="text-left text-md leading-8">
+            <CardBody className="text-left py-1 text-lg leading-8">
               <div className="flex">
                 <Icon icon="cryptocurrency-color:btc" className="mr-1 mt-2" />
-                {item.value}
+                <span className='font-extrabold text-zinc-200'>{item.value}</span>
               </div>
-              <div className="flex text-sm md:font-bold">
+              <div className="flex text-xs sm:font-bold">
                 <span className="text-yellow-400 w-5"> &nbsp;$</span>
                 <span className="text-gray-400 h-5">
                   <BtcPrice btc={item.value} />

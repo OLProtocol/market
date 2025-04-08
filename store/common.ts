@@ -1,20 +1,22 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
-type Chain = 'btc' | 'sat20';
+export type Chain = 'Bitcoin' | 'SatoshiNet';
+export type Network = 'MainNet' | 'TestNet';
+
 interface CommonState {
   feeRate: {
     value: number;
     type?: string;
   };
   chain: Chain;
-  network: string;
+  network: Network; // 将 network 类型改为 Network
   btcHeight: number;
   btcPrice: number;
   appVersion: number;
   signature?: string;
   runtimeEnv: string;
-  changeNetwork: (network: string) => void;
+  changeNetwork: (network: Network) => void; // 修改参数类型为 Network
   setChain: (chain: Chain) => void;
   setAppVersion: (version: number) => void;
   setEnv: (env: string) => void;
@@ -33,8 +35,8 @@ export const useCommonStore = create<CommonState>()(
           value: 1,
           type: 'custom',
         },
-        chain: 'btc',
-        network: 'livenet',
+        chain: 'Bitcoin',
+        network: 'MainNet', // 默认值改为 MainNet
         btcHeight: 0,
         runtimeEnv: 'dev',
         btcPrice: 0,
@@ -103,3 +105,5 @@ export const useCommonStore = create<CommonState>()(
     ),
   ),
 );
+
+

@@ -78,6 +78,7 @@ export const InscribeStepTwo = ({
           isLoading={loading}
           size="md"
           color="secondary"
+          className='w-full sm:w-60 btn-gradient'
           onClick={handleNext}
         >
           {t('buttons.next')}
