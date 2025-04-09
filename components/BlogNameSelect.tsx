@@ -60,7 +60,7 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
         onSelect={onSelectionChange}
         loading={isLoading || loading}
         showSearch
-        className="w-full rounded-full overflow-hidden bg-[#27272A]"
+        className="w-full rounded-xl overflow-hidden bg-[#27272A]"
         placeholder="Select a person"
         filterOption={(input, option) =>
           (option?.label as string).toLowerCase().includes(input.toLowerCase())
@@ -78,11 +78,11 @@ export function BlogNameSelect({ onChange, loading }: IBlogNameSelectProps) {
           <SelectItem key={item.name}>{item.name}</SelectItem>
         ))}
       </Select> */}
-      <div className="flex gap-8 justify-center mt-2">
-        <Button color="primary" onClick={toBuy}>
+      <div className="flex gap-6 justify-center mt-2">
+        <Button color="default" className='w-1/2 sm:w-40 btn-gradient' onPress={toBuy}>
           Buy
         </Button>
-        <Button color="primary" onClick={toMint}>
+        <Button color="default" className='w-1/2 sm:w-40 btn-gradient' onPress={toMint}>
           Inscribe
         </Button>
       </div>

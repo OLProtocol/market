@@ -197,7 +197,7 @@ export default function Market() {
                     const nickname = getKeyValue(item, 'nickname');
                     const logo = getKeyValue(item, 'logo');
                     return (
-                      <TableCell className="flex items-center sticky left-0 bg-black z-10">
+                      <TableCell className="flex items-center sticky left-0 bg-zinc-900/90 z-10">
                         <div className="flex items-center text-sm md:text-base items-left">
                           {logo ? (
                             <Image
@@ -225,7 +225,7 @@ export default function Market() {
                     );
                   } else if (columnKey === 'lowest_price') {
                     return (
-                      <TableCell>
+                      <TableCell className='bg-zinc-900/90'>
                         <div className="flex text-sm md:text-base">
                           {getKeyValue(item, columnKey).toFixed(2) + ' sats'}
                         </div>
@@ -234,7 +234,7 @@ export default function Market() {
                   } else {
                     // Other columns
                     return (
-                      <TableCell className="font-light text-sm md:text-base">
+                      <TableCell className="bg-zinc-900/90 font-light text-sm md:text-base">
                         {getKeyValue(item, columnKey)}
                       </TableCell>
                     );

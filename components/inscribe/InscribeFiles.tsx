@@ -22,7 +22,7 @@ export const InscribeFiles = ({ onChange }: InscribeFilesProps) => {
   };
   return (
     <div>
-      <div className="mb-4 text-center">
+      <div className="mb-4 text-center py-4">
         <p>{t('pages.inscribe.files.upload_title')}</p>
       </div>
       <div className="mb-4">

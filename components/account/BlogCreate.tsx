@@ -262,7 +262,7 @@ export function BlogCreate() {
   }, [selectName]);
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
+    <div className="p-4 max-w-[80rem] mx-auto">
       <h1 className="text-center mb-4 text-xl">{t('pages.blog.title')}</h1>
       <div className="mb-4">
         <h2 className="mb-2">{t('pages.blog.step_1')} </h2>
@@ -283,7 +283,8 @@ export function BlogCreate() {
             </h2>
             <div className="flex justify-center">
               <Button
-                color="primary"
+                color="default"  
+                className='w-full sm:w-40 btn-gradient'
                 // isDisabled={!!templateInscriptionId}
                 onClick={() => {
                   mintTemplate();
@@ -323,7 +324,8 @@ export function BlogCreate() {
                 查看Routing铭文
               </Button>
               <Button
-                color="primary"
+                color="default" 
+                className='w-full sm:w-40 btn-gradient'
                 isDisabled={mintRoutingDisabled}
                 onClick={() => {
                   mintRouting();
@@ -335,8 +337,9 @@ export function BlogCreate() {
           </div>
           <div className="flex justify-center">
             <Button
-              color="primary"
+              color="default"
               variant="light"
+              className="w-full sm:w-40 btn-gradient"
               isDisabled={mintRoutingDisabled}
               onClick={() => {
                 preview();
@@ -352,7 +355,8 @@ export function BlogCreate() {
             </div>
             <div className="flex justify-center">
               <Button
-                color="primary"
+                color="default"
+                className='w-full sm:w-40 btn-gradient'
                 isLoading={checkAvatarLoading}
                 isDisabled={personalMintDisabled}
                 onClick={() => {
@@ -379,7 +383,8 @@ export function BlogCreate() {
             </div>
             <div className="flex justify-center">
               <Button
-                color="primary"
+                color="default"
+                className='w-full sm:w-40 btn-gradient'
                 isDisabled={publishDisabled}
                 onClick={() => {
                   publishHandler();

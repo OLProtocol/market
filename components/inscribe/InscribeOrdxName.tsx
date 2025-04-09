@@ -8,6 +8,7 @@ import { clacTextSize } from '@/lib/inscribe';
 import { useTranslation } from 'react-i18next';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { Icon } from '@iconify/react';
 
 interface InscribeTextProps {
   onNext?: () => void;
@@ -169,26 +170,28 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
 
   return (
     <div>
-      <div className="text-center mb-2">
+      <div className="text-center mb-2 py-4">
         {t('pages.inscribe.name.description_3')}
       </div>
-      <div className="flex gap-2 mb-2">
+      <div className="flex gap-6 mb-2">
         <a
           href="/files/5d.txt"
           download="5d.txt"
-          className="flex-1 h-20 bg-gray-600 flex justify-center items-center text-white text-lg rounded-md"
+          className="flex-1 h-20 bg-zinc-700 flex justify-center items-center text-zinc-300 text-lg border border-zinc-800 rounded-2xl"
         >
-          5d
+          5D
+          <Icon icon="mdi:download" className="w-5 h-5 ml-2 text-zinc-400" />
         </a>
         <a
           href="/files/4l-btc.txt"
           download="4l-btc.txt"
-          className="flex-1 h-20 bg-gray-600 flex justify-center items-center text-white text-lg rounded-md"
+          className="flex-1 h-20 bg-zinc-700 flex justify-center items-center text-zinc-300 text-lg border border-zinc-800 rounded-2xl"
         >
-          4l-btc
+          4L-btc
+          <Icon icon="mdi:download" className="w-5 h-5 ml-2 text-zinc-400" />
         </a>
       </div>
-      <div className="mb-4 text-center">
+      <div className="mb-4 mt-6 text-center">
         <p>{t('pages.inscribe.name.description')}</p>
         <p className="text-gray-500 whitespace-pre-line">
           {t('pages.inscribe.name.description_1')}
@@ -217,7 +220,7 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
           </div>
         )}
       </div>
-      <div className="w-60 mx-auto flex justify-center gap-4">
+      <div className="w-60 mx-auto flex justify-center py-4 gap-4">
         <WalletConnectBus>
           <Button
             className="mx-auto w-full sm:w-60 btn-gradient"

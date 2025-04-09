@@ -1,5 +1,6 @@
 'use client';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
+import { Icon } from '@iconify/react';
 import {
   Card,
   CardBody,
@@ -26,7 +27,7 @@ export default function ToolsPage() {
   const tools = [
     {
       name: 'T',
-      icon: '/icon/t1.png',
+      icon: 'mdi-light:content-duplicate',
       title: t('pages.tools.transaction.title'),
       desc: t('pages.tools.transaction.description'),
       path: '/tools/transaction',
@@ -35,7 +36,7 @@ export default function ToolsPage() {
     },
     {
       name: 'R',
-      icon: '/icon/t3.png',
+      icon: 'mdi-light:magnify',
       title: t('pages.tools.search_sat.title'),
       desc: t('pages.tools.search_sat.description'),
       path: '/tools/sat',
@@ -44,7 +45,7 @@ export default function ToolsPage() {
     },
     {
       name: 'S',
-      icon: '/icon/t3.png',
+      icon: 'mdi-light:share',
       title: '一键转移资产',
       desc: '转移所有铭文资产',
       path: '/tools/transfer',
@@ -59,12 +60,15 @@ export default function ToolsPage() {
           <CardHeader className="justify-between">
             <div className="flex gap-5">
               {/*               <Avatar name={item.name} className="text-2xl" /> */}
-              <Image
+              {/* <Image
                 radius="full"
                 src={item.icon}
                 alt="logo"
                 className="w-20 h-20 p-1 rounded-full bg-gray-950"
-              />
+              /> */}
+
+              <Icon icon={item.icon} className="w-12 h-12 p-2 text-zinc-400  bg-zinc-800/90 rounded-2xl"/>
+
               <div className="flex flex-col gap-1 items-start justify-center">
                 <h4 className="text-small font-semibold leading-none text-default-600">
                   {item.title}
@@ -81,8 +85,7 @@ export default function ToolsPage() {
             <WalletConnectBus className="mx-auto mt-1 block">
               <Button
                 // className="inline-block  border-transparent h-7 tracking-[0.2em] text-small line-clamp-1 py-0 bg-primary-300 rounded-lg shadow-lg font-sans uppercase"
-                className="text-tiny md:text-small tracking-[0.22em]  w-2/3  bg-gradient-to-r from-indigo-500/50 via-purple-500/50 to-pink-500/50 
-                hover:border-none hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 ${buttonStyles.buyNowButton}` "
+                className="text-tiny md:text-small tracking-[0.22em]  w-2/3 btn-gradient"
                 variant="flat"
                 radius="sm"
                 onClick={() => clickHandler(item)}

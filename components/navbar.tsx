@@ -205,7 +205,7 @@ export const Navbar = () => {
                 href={item.href}
                 target={item.target}
                 color="foreground"
-                className="relative flex items-center py-5"
+                className="relative flex items-center py-5 text-zinc-200"
               >
                 {item.label}
                 {/* 渐变下划线 */}

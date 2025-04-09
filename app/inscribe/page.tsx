@@ -663,19 +663,19 @@ export default function Inscribe() {
   // }, [state]);
   return (
     <div className="py-4">
-      <div className="flex flex-col max-w-[80rem] mx-auto pt-8">
+      <div className="flex flex-col max-w-[80rem] mx-auto pt-4">
         {/* <h1 className="text-lg font-bold text-center mb-4">
           {t('pages.inscribe.title')}
         </h1> */}
         <div className="">
           <div className="flex justify-center mb-4">
-          <div className="overflow-x-auto whitespace-nowrap w-full px-4">
-            <ButtonGroup>
+          <div className="overflow-x-auto whitespace-nowrap w-full px-4 pb-2">
+            <ButtonGroup className='border  border-zinc-800 rounded-3xl'>
               {tabList.map((item) => (
                 <Button
                 key={item.key}
                 color="default" // 使用正确的预定义颜色
-                className={tab === item.key ? 'bg-gradient-to-r from-[#8000cc] to-[#a0076d] text-white' : ''}
+                className={tab === item.key ? 'bg-gradient-to-r from-[#8100ccc2] to-[#a0076dd5] text-white' : 'bg-zinc-900 text-gray-300'}
                 onClick={() => handleTabChange(item.key)}
               >
                 {item.label}

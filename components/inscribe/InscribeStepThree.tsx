@@ -479,7 +479,7 @@ export const InscribeStepThree = ({
       {errText && (
         <div className="text-red-500 text-center my-2">{errText}</div>
       )}
-      <div className="w-60 mx-auto flex justify-center">
+      <div className="w-60 mx-auto flex justify-center py-4">
         <WalletConnectBus>
           <Button
             size="md"

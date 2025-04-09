@@ -491,7 +491,7 @@ export const InscribeOrdxDeploy = ({ onNext, onChange, value }: InscribeOrdxProp
           </div>
         </div>
       </div>
-      <div className="w-60 mx-auto flex justify-center">
+      <div className="w-60 mx-auto flex justify-center py-4">
         <WalletConnectBus>
           <Button
             isLoading={loading}

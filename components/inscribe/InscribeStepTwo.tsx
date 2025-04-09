@@ -70,7 +70,7 @@ export const InscribeStepTwo = ({
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4 ">
+      <div className="grid grid-cols-2 gap-4 py-4">
         <Button size="md" color="primary" onClick={onBack}>
           {t('buttons.back')}
         </Button>

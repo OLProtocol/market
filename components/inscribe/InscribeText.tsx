@@ -73,7 +73,7 @@ export const InscribeText = ({ onNext, onChange, value: defaultValue }: Inscribe
           placeholder="utxo value"
         />
       </div> */}
-      <div className="mb-2">
+      <div className="py-4">
         <Textarea
           disableAnimation
           disableAutosize
@@ -86,7 +86,7 @@ export const InscribeText = ({ onNext, onChange, value: defaultValue }: Inscribe
         />
       </div>
       <Button
-        className="mx-auto w-full sm:w-60 btn-gradient block"
+        className="mx-auto w-full sm:w-60 btn-gradient block py-4"
         color="default"
         isDisabled={!data.text}
         onClick={onNext}
