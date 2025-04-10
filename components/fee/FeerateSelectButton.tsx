@@ -35,9 +35,8 @@ export const FeerateSelectButton = () => {
   const feeRateData = useMemo(() => {
     if (data?.code === 200) {
       return data.data;
-    } else {
+    } 
       return {};
-    }
   }, [data]);
   const { setFeeRate, feeRate } = useCommonStore((state) => state);
   const handleOk = () => {

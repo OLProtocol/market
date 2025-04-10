@@ -1,10 +1,16 @@
 /** @type {import('next').NextConfig} */
-// const nextTranslate = require('next-translate-plugin');
+
+const path = require('path');
 const nextConfig = {
   output: 'export',
   distDir: 'out',
+  trailingSlash: true,
   webpack: (config, { isServer }) => {
     // 启用 WebAssembly 实验特性
+    config.resolve.alias['bitcore-lib'] = path.resolve(
+      __dirname,
+      'node_modules/bitcore-lib',
+    );
     config.experiments = {
       ...config.experiments,
       syncWebAssembly: true, // 使用异步 WebAssembly
@@ -14,10 +20,6 @@ const nextConfig = {
 
     return config;
   },
-  staticDirs: [
-    { from: 'public/raresats', to: 'out/raresats' },
-    { from: 'public/icon', to: 'out/icon' },
-  ],
   images: {
     unoptimized: true,
   },

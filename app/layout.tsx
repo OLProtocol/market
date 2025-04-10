@@ -2,7 +2,6 @@
 import '@sat20/btc-connect/dist/style/index.css';
 import '@/styles/globals.css';
 import '@/styles/index.css';
-import { fontSans } from '@/config/fonts';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
@@ -52,7 +51,7 @@ export default function RootLayout({
       <body
         className={clsx(
           'min-h-screen bg-background font-sans antialiased dark:text-white text-black',
-          fontSans.variable,
+          // fontSans.variable,
         )}
       >
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>

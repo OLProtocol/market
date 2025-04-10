@@ -26,7 +26,6 @@ import {
   buildBuyOrder,
   calcBuyOrderFee,
   satsToBitcoin,
-  getSuitableUtxos,
   buildBuyThirdOrder,
 } from '@/lib';
 import {

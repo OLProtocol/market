@@ -31,12 +31,12 @@ import { Icon } from '@iconify/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { ChainSelect } from '@/components/ChainSelect';
 import { NetworkSelect } from '@/components/NetworkSelect';
+import  WalletConnectButton  from '@/components/wallet/WalletConnectButton';
 
-
-const WalletButton = dynamic(
-  () => import('../components/wallet/WalletConnectButton') as any,
-  { ssr: false },
-);
+// const WalletButton = dynamic(
+//   () => import('../components/wallet/WalletConnectButton') as any,
+//   { ssr: false },
+// );
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
@@ -114,12 +114,12 @@ export const Navbar = () => {
       // },
       {
         label: t('pages.market.title'),
-        href: runtimeEnv === 'dev' ? '/market' : '/market.html',
+        href: '/market',
         isActive: true,
       },
       {
         label: t('pages.inscribe.title'),
-        href: runtimeEnv === 'dev' ? '/inscribe' : '/inscribe.html',
+        href: '/inscribe',
         isActive: true,
       },
       {
@@ -131,14 +131,14 @@ export const Navbar = () => {
 
       {
         label: t('pages.my_assets.title'),
-        href: runtimeEnv === 'dev' ? '/account' : '/account.html',
+        href: '/account',
         isActive: false,
       },
     ];
     if (runtimeEnv !== 'prod') {
       menus.push({
         label: t('pages.tools.title'),
-        href: runtimeEnv === 'dev' ? '/tools' : '/tools.html',
+        href: '/tools',
         isActive: false,
       });
     }
@@ -234,7 +234,7 @@ export const Navbar = () => {
           <LanguageSelect />
         </NavbarItem>        
         <NavbarItem className="">
-          <WalletButton />
+          <WalletConnectButton />
         </NavbarItem>
         <NavbarItem className="lg:hidden h-full">
           <NavbarMenuToggle></NavbarMenuToggle>
