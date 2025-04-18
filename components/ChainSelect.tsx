@@ -77,7 +77,10 @@ export const ChainSelect = () => {
             </li>
             <li
               className="px-2 py-2 hover:bg-gray-700/50 text-gray-400 text-sm sm:text-base cursor-pointer rounded-b-xl"
-              onClick={() => handleSelectionChange('SatoshiNet')}
+              onClick={() => {
+                window.open('https://marketsatenet.netlify.app', '_blank');
+                setIsOpen(false); // Close the dropdown after opening the link
+              }}
             >
               SatoshiNet
             </li>
