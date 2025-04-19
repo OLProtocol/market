@@ -27,6 +27,7 @@ import {
   hideStr,
   btcToSats,
 } from '@/lib/utils';
+import { isTaprootAddress } from '@/lib/wallet';
 import { Decimal } from 'decimal.js';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { getAssetsSummary, submitBatchOrders } from '@/api';
@@ -110,6 +111,14 @@ export default function SellPage() {
         });
         return;
       }
+    }
+    const bol = isTaprootAddress(address, network)
+    if (!bol) {
+      notification.error({
+        message: t('notification.list_failed_title'),
+        description: t('notification.list_failed_p2tr_required'),
+      });
+      return;
     }
     setLoading(true);
     try {

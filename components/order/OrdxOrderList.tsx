@@ -41,7 +41,7 @@ export const OrdxOrderList = ({
     remove: removeBuy,
     reset,
   } = useBuyStore();
-  const [hideStatus, setHideStatus] = useState(false);
+  const [hideStatus, setHideStatus] = useState(true);
   const [canSelect, setCanSelect] = useState(false);
   const [modalVisiable, setModalVisiable] = useState(false);
   const [buyItem, setBuyItem] = useState<any>();
@@ -62,10 +62,10 @@ export const OrdxOrderList = ({
 
   const swrKey = useMemo(() => {
     if (address) {
-      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${network}-${page}-${size}-${sort}-${category}`;
+      return `/ordx/getOrders-${assets_name}-${assets_type}-${address}-${network}-${page}-${size}-${sort}-${category}-${hideStatus}`;
     }
-    return `/ordx/getOrders-${assets_name}-${assets_type}-${network}-${page}-${size}-${sort}-${category}`;
-  }, [assets_name, address, page, size, network, sort, assets_type, category]);
+    return `/ordx/getOrders-${assets_name}-${assets_type}-${network}-${page}-${size}-${sort}-${category}-${hideStatus}`;
+  }, [assets_name, address, page, size, network, sort, assets_type, category, hideStatus]);
 
   const { data, isLoading, mutate } = useSWR(swrKey, () =>
     getOrders({
@@ -76,7 +76,7 @@ export const OrdxOrderList = ({
       sort,
       category,
       assets_type,
-      hide_locked: false,
+      hide_locked: hideStatus,
     }),
   );
   const [list, { set, push: pushToList, removeAt, reset: resetList }] =
