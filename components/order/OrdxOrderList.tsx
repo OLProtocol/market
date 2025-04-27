@@ -78,7 +78,7 @@ export const OrdxOrderList = ({
       sort,
       category,
       assets_type,
-      hide_locked: false,
+      hide_locked: hideStatus,
     }),
   );
   const [list, { set, push: pushToList, removeAt, reset: resetList }] =

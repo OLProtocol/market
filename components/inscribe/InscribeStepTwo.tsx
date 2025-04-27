@@ -37,13 +37,13 @@ export const InscribeStepTwo = ({
       project_id: projectMap[project] || 0,
     });
     setLoading(false);
-    if (error || result?.code !== 200) {
-      notification.error({
-        message: t('notification.system_error'),
-      });
-      console.error(error);
-      return;
-    }
+    // if (error || result?.code !== 200) {
+    //   notification.error({
+    //     message: t('notification.system_error'),
+    //   });
+    //   // console.error(error);
+    //   // return;
+    // }
     const feeDiscount = result?.data?.discount || 0;
     onDiscount?.(feeDiscount);
     onNext?.();

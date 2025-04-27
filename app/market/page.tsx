@@ -154,7 +154,7 @@ export default function Market() {
         <Table
           isHeaderSticky
           // isStriped
-          sortDescriptor={sortDescriptor}
+          sortDescriptor={sortDescriptor as any}
           onSortChange={onTableSortChange}
           color="primary"
           selectionMode="single"
