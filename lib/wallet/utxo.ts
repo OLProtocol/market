@@ -1,5 +1,4 @@
 import { Address, Script } from '@cmdcode/tapscript';
-import { Psbt } from '@okxweb3/coin-bitcoin/dist/bitcoinjs-lib/psbt.js';
 
 export interface Utxo {
   txid: string;
