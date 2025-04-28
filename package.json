@@ -81,7 +81,6 @@
   },
   "resolutions": {
     "@antv/g-lite": "2.2.16",
-    "bitcoinjs-lib": "6.1.6",
     "bitcore-lib": "10.0.0"
   }
 }
