@@ -187,7 +187,7 @@ export class Transaction {
     console.log('txSize', txSize);
     console.log('txSize', this.feeRate);
     const fee = Math.ceil(txSize * this.feeRate);
-    return fee + 1;
+    return fee + 10;
   }
 
   addOutput(address: string, value: number, script?: Buffer) {
