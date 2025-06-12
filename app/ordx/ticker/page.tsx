@@ -24,7 +24,7 @@ export default function Page() {
   const { address, network } = useReactWalletStore((state) => state);
   const ticker = params.get('ticker') as string;
   const assets_type = params.get('assets_type') as string;
-  const { data } = useSWR(`getAssetsSummary`, () => {
+  const { data } = useSWR(`getAssetsSummary-${ticker}-${assets_type}`, () => {
     console.log('app.ordx.ticker.page: ticker: ', ticker);
     try {
       return getAssetsSummary({ assets_name: ticker, assets_type });
