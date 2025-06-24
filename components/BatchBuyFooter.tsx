@@ -557,18 +557,10 @@ export const BatchBuyFooter = ({
               color="primary"
               isDisabled={!insufficientBalanceStatus || !list.length}
               isLoading={loading || isLoading}
-            >
-              暂时无法交易
-            </Button>
-            {/* <Button
-              className="btn btn-primary"
-              color="primary"
-              isDisabled={!insufficientBalanceStatus || !list.length}
-              isLoading={loading || isLoading}
               onClick={buyHandler}
             >
               {t('common.buy')}
-            </Button> */}
+            </Button>
             <Button isIconOnly color="danger" onClick={() => setShow(!show)}>
               <Icon icon="mdi:cart" className="text-white text-2xl" />
             </Button>
