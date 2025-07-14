@@ -26,7 +26,6 @@ import {
   buildBuyOrder,
   calcBuyOrderFee,
   satsToBitcoin,
-  getSuitableUtxos,
   buildBuyThirdOrder,
 } from '@/lib';
 import {
@@ -194,13 +193,6 @@ export const BatchBuyFooter = ({
   //       //   value: DUMMY_UTXO_VALUE,
   //       // },
   //     ];
-  //     getSuitableUtxos({
-  //       utxos,
-  //       outputs,
-  //       feeRate: feeRate.value,
-  //       address,
-  //       network,
-  //     });
   //   }
   // }, [utxos]);
   const findDummyUtxos = async () => {
