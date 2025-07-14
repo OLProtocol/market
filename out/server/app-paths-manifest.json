@@ -1,6 +1,4 @@
 {
-  "/page": "app/page.js",
   "/ordx/ticker/page": "app/ordx/ticker/page.js",
-  "/market/page": "app/market/page.js",
-  "/inscribe/page": "app/inscribe/page.js"
+  "/page": "app/page.js"
 }
