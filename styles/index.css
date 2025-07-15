@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap');
+
+body, p, span, div, li, td, th, input, button {
+  font-family: 'Roboto', Arial, sans-serif;
+}
+h1, h2, h3 {
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
 #footer {
   background: #272833;
   padding: 1em 0;

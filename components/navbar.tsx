@@ -157,22 +157,23 @@ export const Navbar = () => {
       onMenuOpenChange={setIsMenuOpen}
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
+        <NavbarBrand as="li" className="gap-1 sm:gap-3 max-w-fit">
           <NextLink
             className="flex justify-start items-center gap-1"
             href="https://ordx.market/"
           >
             <Image
               radius="none"
-              src="/logo.png"
+              src="/logo-black.png"
               alt="logo"
               classNames={{
-                wrapper: 'w-14 h-14 min-w-14',
+                wrapper: 'h-14 flex items-center', // 保证容器高度和居中
+                img: 'object-contain object-center h-full', // 保证图片本身居中
               }}
             />
-            <p className="font-bold text-purple-500/90 hidden md:block">
+            {/* <p className="font-bold text-purple-500/90 hidden md:block">
               SAT20Market
-            </p>
+            </p> */}
           </NextLink>
         </NavbarBrand>
 

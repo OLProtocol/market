@@ -103,6 +103,9 @@ export function UtxoContent({
     }
   }, [utxo, network]);
 
+  console.log('contentSrc: ', contentSrc);
+  console.log('seed: ', seed);
+
   return (
     <div className="h-full w-full">
       {showSpinner && (
