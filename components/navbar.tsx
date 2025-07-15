@@ -167,7 +167,7 @@ export const Navbar = () => {
               src="/logo-black.png"
               alt="logo"
               classNames={{
-                wrapper: 'h-14 flex items-center', // 保证容器高度和居中
+                wrapper: 'h-13 flex items-center', // 保证容器高度和居中
                 img: 'object-contain object-center h-full', // 保证图片本身居中
               }}
             />

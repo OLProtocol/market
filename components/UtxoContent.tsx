@@ -27,7 +27,7 @@ export function UtxoContent({
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   // const [delayLoading, setDelayLoading] = useState(true);
-
+  console.log('UtxoContent: inscriptionId: ', inscriptionId);
   const getSeedByUtxo = async () => {
     setLoading(true);
     // 检查 sessionStorage 中是否已经存在 seed
@@ -88,6 +88,9 @@ export function UtxoContent({
   //   [ranges],
   // );
   const contentSrc = useMemo(() => {
+    console.log('inscriptionId: ', inscriptionId);
+    console.log('seed: ', seed);
+  
     if (inscriptionId && seed) {
       return generateOrdUrl({
         network,
@@ -103,9 +106,7 @@ export function UtxoContent({
     }
   }, [utxo, network]);
 
-  console.log('contentSrc: ', contentSrc);
-  console.log('seed: ', seed);
-
+  
   return (
     <div className="h-full w-full">
       {showSpinner && (
@@ -133,7 +134,7 @@ export function UtxoContent({
           src={contentSrc}
           className="pointer-events-none max-w-full h-full max-h-full"
         ></iframe>
-      )}
+      )}     
     </div>
   );
 }

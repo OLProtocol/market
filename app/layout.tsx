@@ -26,19 +26,19 @@ export default function RootLayout({
     'https://ord-testnet4.ordx.space/content/114fc89be175aabc854c95f55c769c25c045620bd93b9f11b09bc0fe47e1bc8ci0',
     'https://ord-testnet4.ordx.space/content/829ff79163eaf84ea2b81434ba50e089bff7dfaaf7366f1e6aae41aac2058a3fi0',
 
-    'https://ord-mainnet.ordx.space/content/4bd30e1f3877ebe25f8adc3f05229c4a3d02d05207d6064be85529a6dce7149bi0',
-    'https://ord-mainnet.ordx.space/content/645c642e818d3e874535315213f914ef7372d5ab92e1733d55ceb1b8b0914a07i0',
-    'https://ord-mainnet.ordx.space/content/fb13c2ef50866951b1fd064a355125dd228daa1e84d4ee13bc612a1c96042b6ci0',
-    'https://ord-mainnet.ordx.space/content/d5e65e2613fdeff85d40c2fe209c9c9d2e78cd3cf251fd3bc53236882a90f480i0',
-    'https://ord-mainnet.ordx.space/content/63d3feee80ddfc0325ced9abc0ded7878b8447077c1aa2264749d2ce9a0bcab7i0',
+    'https://apiprd.sat20.org/btc/mainnet/ord/content/4bd30e1f3877ebe25f8adc3f05229c4a3d02d05207d6064be85529a6dce7149bi0',
+    'https://apiprd.sat20.org/btc/mainnet/ord/content/645c642e818d3e874535315213f914ef7372d5ab92e1733d55ceb1b8b0914a07i0',
+    'https://apiprd.sat20.org/btc/mainnet/ord/content/fb13c2ef50866951b1fd064a355125dd228daa1e84d4ee13bc612a1c96042b6ci0',
+    'https://apiprd.sat20.org/btc/mainnet/ord/content/d5e65e2613fdeff85d40c2fe209c9c9d2e78cd3cf251fd3bc53236882a90f480i0',
+    'https://apiprd.sat20.org/btc/mainnet/ord/content/63d3feee80ddfc0325ced9abc0ded7878b8447077c1aa2264749d2ce9a0bcab7i0',
   ];
   // const lang = i18nConfig.defaultLocale;
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <head>
-        {contentList.map((content, index) => (
+        {/* {contentList.map((content, index) => (
           <link key={index} rel="preload" href={content} as="script" />
-        ))}
+        ))} */}
 
         {/* <link
           rel="stylesheet"

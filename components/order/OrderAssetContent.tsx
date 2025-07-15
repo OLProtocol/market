@@ -12,12 +12,15 @@ export const OrderAssetContent = ({
 }) => {
   const showContent = (content_type?: string, delegate?: string) => {
     if (!content_type) return false;
+   
     return (
       !!delegate ||
       !['text/plain'].some((type) => content_type.indexOf(type) > -1)
     );
   };
-
+  console.log('assets_name: ', asset?.assets_name, 'content_type:', asset?.content_type, ' delegate: ', asset?.delegate);
+  console.log('Display Rarepizza pic ? : ',  showContent(asset?.content_type, asset?.delegate));
+  const isSFT = asset?.assets_name?.toLowerCase() === 'rarepizza';
   return (
     <div className="flex-1 text-xs tracking-widest antialiased md:text-base">
       <div className="flex-1 justify-center h-full overflow-hidden top-1 left-1">
@@ -28,17 +31,27 @@ export const OrderAssetContent = ({
               alt="logo"
               className="w-16 h-16 md:w-28 md:h-28 top-9 left-[44px] md:top-14 md:left-[72px]"
             />
-          ) : (
-            showContent(asset?.content_type, asset?.delegate) && (
-              <div className="h-full w-full">
-                <UtxoContent
-                  defaultImage="/ordx-utxo-content-default.jpg"
-                  inscriptionId={asset?.inscription_id}
-                  utxo={utxo}
-                />
-              </div>
-            )
-          )}
+          ) :
+          //  ( showContent(asset?.content_type, asset?.delegate) && (              
+          //     <div className="h-full w-full">  
+                           
+          //       <UtxoContent
+          //         defaultImage="/ordx-utxo-content-default.jpg"
+          //         inscriptionId={asset?.inscription_id}
+          //         utxo={utxo}
+          //       />
+          //     </div>
+          //   )
+          // )
+           (isSFT && (
+            <div className="h-full w-full">
+              <UtxoContent
+                defaultImage="/ordx-utxo-content-default.jpg"
+                inscriptionId={asset?.inscription_id}
+                utxo={utxo}
+              />
+            </div>
+          ))}
         </div>
         <AssetContentOverlay
           asset={asset}
@@ -67,9 +80,11 @@ export const OrderAssetContent = ({
   );
 };
 
+
 const AssetContentOverlay = ({ asset, assets_type, showContent }) => (
   <>
-    {showContent(asset?.content_type, asset?.delegate) ? (
+    {/* {showContent(asset?.content_type, asset?.delegate) ? ( */}
+    {asset?.assets_name?.toLowerCase() === 'rarepizza' ? (
       <section className="text-center font-mono absolute top-0 left-0 w-full h-full z-20 flex flex-col justify-end">
         <p className="font-medium text-2xl md:text-3xl mb-1">
           {thousandSeparator(asset?.amount)}
