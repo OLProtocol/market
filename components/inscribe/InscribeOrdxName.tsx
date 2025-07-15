@@ -37,7 +37,7 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
   }, [data.name]);
 
   const checkName = async () => {
-    console.log(`Current Selected Suffix: ${selectedSuffix}`); // Print the currently selected suffix
+    //console.log(`Current Selected Suffix: ${selectedSuffix}`); // Print the currently selected suffix
     let checkStatus = true;
   
     const lines = data.name
@@ -57,7 +57,7 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
         : selectedSuffix
           ? `${line}${selectedSuffix}`
           : line;
-      console.log(`Processed Line: ${processedLine}`, '/selectedSuffix=', selectedSuffix);
+      //console.log(`Processed Line: ${processedLine}`, '/selectedSuffix=', selectedSuffix);
       return processedLine;
     });
   
@@ -270,7 +270,7 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
           </div>
         )}
       </div>
-      <div className="w-60 mx-auto flex justify-center gap-4">
+      <div className="w-80 mx-auto flex justify-center gap-4">
         <WalletConnectBus>
           <Button
             className="mx-auto"
@@ -282,7 +282,7 @@ export const InscribeOrdxName = ({ onNext, onChange, value }: InscribeTextProps)
           </Button>
         </WalletConnectBus>
         {removeArr.length > 0 && (
-          <Button className="mx-auto " color="danger" onClick={removeHandler}>
+          <Button className="mx-auto" color="danger" onClick={removeHandler}>
             Remove Error Name
           </Button>
         )}
