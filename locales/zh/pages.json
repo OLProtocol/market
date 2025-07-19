@@ -64,7 +64,7 @@
       "description": "在BTC上注册一个名字",
       "description_1": "支持后缀：例如 .btc、.x、.pizza，以及无后缀。",
       "description_2": "免费铸造：到达区块856000之前你可以免费铸造以上支持的名字类型。",
-      "description_3": "截止到区块861778，剩下可铸造的名字。",
+      "description_3": "截止到区块906173，剩下可铸造的名字。",
       "name_placeholder": "名字必须是3-32字节长",
       "select_placeholder": "选择后缀",
       "error_1": "名字必须是3-32字节长",
