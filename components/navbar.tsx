@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
+import { ChainSelect } from '@/components/ChainSelect';
 import useSWRMutation from 'swr/mutation';
 import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
@@ -175,6 +176,7 @@ export const Navbar = () => {
               SAT20Market
             </p> */}
           </NextLink>
+          <ChainSelect />
         </NavbarBrand>
 
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
