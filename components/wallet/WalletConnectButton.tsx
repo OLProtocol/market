@@ -13,6 +13,7 @@ import {
   WalletConnectReact,
   useReactWalletStore,
 } from '@sat20/btc-connect/dist/react';
+
 import { Icon } from '@iconify/react';
 
 import { useTheme } from 'next-themes';
