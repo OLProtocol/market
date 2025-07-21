@@ -44,7 +44,9 @@ const WalletConnectButton = () => {
   };
   useEffect(() => {
     console.log('check', connected);
-    check();
+    setTimeout(() => {
+      check();
+    }, 300);
   }, []);
   useEffect(() => {
     const unspendUtxos = getUnspendUtxos();
