@@ -103,7 +103,7 @@ export const Navbar = () => {
     return pathname === href;
   };
   const navMenus = useMemo(() => {
-    
+
     const menus = [
       // {
       //   label: t('pages.home.title'),
@@ -112,7 +112,7 @@ export const Navbar = () => {
       // },
       {
         label: t('pages.market.title'),
-        href:'/market',
+        href: '/market',
         isActive: true,
       },
       {
@@ -133,13 +133,11 @@ export const Navbar = () => {
         isActive: false,
       },
     ];
-    if (runtimeEnv !== 'prod') {
-      menus.push({
-        label: t('pages.tools.title'),
-        href: '/tools',
-        isActive: false,
-      });
-    }
+    menus.push({
+      label: t('pages.tools.title'),
+      href: '/tools',
+      isActive: false,
+    });
     return menus;
   }, [i18n.language, runtimeEnv]);
   useEffect(() => {
