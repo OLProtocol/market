@@ -212,7 +212,7 @@ export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
       hash: psbt.txInputs[i].hash as any,
       index: psbt.txInputs[i].index,
       witnessUtxo: psbt.data.inputs[i].witnessUtxo as any,
-      finalScriptWitness: psbt.data.inputs[i].finalScriptWitness,
+      // finalScriptWitness: psbt.data.inputs[i].finalScriptWitness,
     };
     const batchOutput = psbt.txOutputs[i];
     newPsbt.addInput(batchInput);
