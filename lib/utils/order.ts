@@ -208,12 +208,14 @@ export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
     const newPsbt = new bitcoin.Psbt({
       network: psbtNetwork,
     });
-    const batchInput = {
+    const batchInput: any = {
       hash: psbt.txInputs[i].hash as any,
       index: psbt.txInputs[i].index,
       witnessUtxo: psbt.data.inputs[i].witnessUtxo as any,
-      // finalScriptWitness: psbt.data.inputs[i].finalScriptWitness,
     };
+    if (psbt.data.inputs[i].finalScriptWitness) {
+      batchInput.finalScriptWitness = psbt.data.inputs[i].finalScriptWitness as any;
+    }
     const batchOutput = psbt.txOutputs[i];
     newPsbt.addInput(batchInput);
     newPsbt.addOutput(batchOutput);
