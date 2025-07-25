@@ -76,7 +76,7 @@ export default function RootLayout({
             <footer id="footer">
               <ul className="flex justify-center gap-4 items-center text-gray-500">
                 <li>
-                  <Link href="https://twitter.com/Sat20Nexus/" target="_blank">
+                  <Link href="https://twitter.com/SATSWAPMarket/" target="_blank">
                     <Avatar
                       showFallback
                       fallback={

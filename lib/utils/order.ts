@@ -370,12 +370,14 @@ export const buildBuyOrder = async ({
     const sellPsbt = bitcoin.Psbt.fromHex(raw, {
       network: psbtNetwork,
     });
-    const sellerInput = {
+    const sellerInput: any = {
       hash: sellPsbt.txInputs[0].hash as any,
       index: sellPsbt.txInputs[0].index,
       witnessUtxo: sellPsbt.data.inputs[0].witnessUtxo as any,
-      finalScriptWitness: sellPsbt.data.inputs[0].finalScriptWitness,
     };
+    if (sellPsbt.data.inputs[0]?.finalScriptWitness) {
+      sellerInput.finalScriptWitness = sellPsbt.data.inputs[0].finalScriptWitness as any;
+    }
     console.log(sellerInput);
     sellInputs.push(sellerInput);
     const ordValue = sellPsbt.data.inputs[0].witnessUtxo!.value;
@@ -459,13 +461,14 @@ export const generateBuyInputsAndOutputs = async ({
       network: psbtNetwork,
     });
 
-    const sellerInput = {
+    const sellerInput: any = {
       hash: sellPsbt.txInputs[0].hash as any,
       index: sellPsbt.txInputs[0].index,
       witnessUtxo: sellPsbt.data.inputs[0].witnessUtxo as any,
-      finalScriptWitness: sellPsbt.data.inputs[0].finalScriptWitness,
     };
-
+    if (sellPsbt.data.inputs[0]?.finalScriptWitness) {
+      sellerInput.finalScriptWitness = sellPsbt.data.inputs[0].finalScriptWitness as any;
+    }
     sellInputs.push(sellerInput);
     const ordValue = sellPsbt.data.inputs[0].witnessUtxo!.value;
     const ordOutput = {
