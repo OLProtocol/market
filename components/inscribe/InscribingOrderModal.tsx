@@ -94,7 +94,7 @@ export const InscribingOrderModal = ({
     },
   ];
   const vertualGasFee = useMemo(() => {
-    const fee = (148 * 1 + 34 * 3 + 10) * feeRate.value;
+    const fee = 170 * feeRate.value;
     return fee;
   }, [feeRate]);
   console.log('vertualGasFee feeRate', feeRate);
