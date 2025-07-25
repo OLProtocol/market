@@ -94,9 +94,13 @@ export const InscribingOrderModal = ({
     },
   ];
   const vertualGasFee = useMemo(() => {
-    const fee = (148 * 10 + 34 * 3 + 10) * feeRate.value;
+    const fee = (148 * 1 + 34 * 3 + 10) * feeRate.value;
     return fee;
   }, [feeRate]);
+  console.log('vertualGasFee feeRate', feeRate);
+  
+  console.log('vertualGasFee', vertualGasFee);
+  
   const order = useMemo(() => {
     return findOrder(orderId) as OrderItemType;
   }, [orderId]);
@@ -170,7 +174,7 @@ export const InscribingOrderModal = ({
       value: v.value,
     }));
     const totalNetworkFee = vertualGasFee + totalFee - totalInscriptionSize;
-
+    console.log('totalNetworkFee', totalNetworkFee);
     const totalSpendAmount = totalFee + serviceFee + vertualGasFee;
 
     let pickAmount = totalSpendAmount;
