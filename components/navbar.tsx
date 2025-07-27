@@ -29,11 +29,11 @@ import useSWRMutation from 'swr/mutation';
 import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
 import { useCommonStore, useUtxoStore } from '@/store';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
-
-const WalletButton = dynamic(
-  () => import('../components/wallet/WalletConnectButton') as any,
-  { ssr: false },
-);
+import WalletConnectButton from './wallet/WalletConnectButton';
+// const WalletButton = dynamic(
+//   () => import('../components/wallet/WalletConnectButton') as any,
+//   { ssr: false },
+// );
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
@@ -200,7 +200,7 @@ export const Navbar = () => {
           <LanguageSelect />
         </NavbarItem>
         <NavbarItem className="">
-          <WalletButton />
+          <WalletConnectButton />
         </NavbarItem>
         <NavbarItem className="lg:hidden h-full">
           <NavbarMenuToggle></NavbarMenuToggle>
