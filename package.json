@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky || true",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "deploy": "./scripts/deploy.sh"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.0",
