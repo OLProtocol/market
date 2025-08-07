@@ -53,7 +53,6 @@ export const InscribingOrderModal = ({
   const {
     list: utxoList,
     getUnspendUtxos,
-    add: addUtxo,
     removeUtxos,
   } = useUtxoStore();
   const [sendFee, setSendFee] = useState<number>();

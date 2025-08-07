@@ -8,7 +8,7 @@ import {
   Snippet,
 } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import {
   WalletConnectReact,
   useReactWalletStore,
@@ -24,10 +24,17 @@ import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useUtxoStore } from '@/store';
+
 const WalletConnectButton = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
+  
+  // 使用ref来跟踪事件监听器状态，防止重复绑定
+  const eventListenersBound = useRef(false);
+  const signatureCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initialCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const {
     connected,
     check,
@@ -37,43 +44,114 @@ const WalletConnectButton = () => {
     btcWallet,
     network,
   } = useReactWalletStore((state) => state);
+  
   const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const [utxoAmount, setUtxoAmount] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // 清理超时定时器
+  const clearTimeouts = useCallback(() => {
+    if (signatureCheckTimeoutRef.current) {
+      clearTimeout(signatureCheckTimeoutRef.current);
+      signatureCheckTimeoutRef.current = null;
+    }
+    if (initialCheckTimeoutRef.current) {
+      clearTimeout(initialCheckTimeoutRef.current);
+      initialCheckTimeoutRef.current = null;
+    }
+  }, []);
+
+  // 清理事件监听器
+  const cleanupEventListeners = useCallback(() => {
+    if (btcWallet && eventListenersBound.current) {
+      btcWallet.removeListener('accountsChanged', accountAndNetworkChange);
+      btcWallet.removeListener('networkChanged', accountAndNetworkChange);
+      eventListenersBound.current = false;
+    }
+  }, [btcWallet]);
+
+  // 绑定事件监听器
+  const bindEventListeners = useCallback(() => {
+    if (btcWallet && !eventListenersBound.current) {
+      btcWallet.on('accountsChanged', accountAndNetworkChange);
+      btcWallet.on('networkChanged', accountAndNetworkChange);
+      eventListenersBound.current = true;
+    }
+  }, [btcWallet]);
+
   const toMyAssets = () => {
     router.push('/account');
   };
-  useEffect(() => {
-    console.log('check', connected);
-    setTimeout(() => {
-      check();
-    }, 300);
-  }, []);
-  useEffect(() => {
-    const unspendUtxos = getUnspendUtxos();
-    const amount = unspendUtxos.reduce((acc, cur) => acc + cur.value, 0);
-    setUtxoAmount(amount);
-  }, [UtxoList]);
-  const onConnectSuccess = async (wallet: any) => {
-    if (!signature) {
-      console.log('signature text', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
-      try {
-        const _s = await wallet.signMessage(
+
+  // 优化的签名验证函数
+  const checkSignature = useCallback(async () => {
+    if (!signature || !publicKey || !process.env.NEXT_PUBLIC_SIGNATURE_TEXT) {
+      return;
+    }
+
+    try {
+      const isValid = message.verifyMessageOfECDSA(
+        publicKey,
+        process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+        signature,
+      );
+      
+      if (!isValid) {
+        console.warn('Signature verification failed');
+        notification.warning({
+          message: 'Signature Verification Failed',
+          description: 'Please reconnect your wallet',
+        });
+        await handlerDisconnect();
+      }
+    } catch (error: unknown) {
+      console.error('Signature verification error:', error);
+      notification.warning({
+        message: 'Signature Verification Error',
+        description: 'Please reconnect your wallet',
+      });
+      await handlerDisconnect();
+    }
+  }, [signature, publicKey]);
+
+  // 优化的连接成功处理
+  const onConnectSuccess = useCallback(async (wallet: any) => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      if (!signature && process.env.NEXT_PUBLIC_SIGNATURE_TEXT) {
+        console.log('Requesting signature for:', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
+        const signatureResult = await wallet.signMessage(
           process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
         );
-        setSignature(_s);
-      } catch (error) {
-        await disconnect();
+        setSignature(signatureResult);
       }
+    } catch (error: unknown) {
+      console.error('Signature request failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get signature from wallet';
+      notification.error({
+        message: 'Signature Request Failed',
+        description: errorMessage,
+      });
+      await disconnect();
+    } finally {
+      setIsProcessing(false);
     }
-  };
-  const onConnectError = (error: any) => {
+  }, [signature, isProcessing, setSignature, disconnect]);
+
+  // 优化的连接错误处理
+  const onConnectError = useCallback((error: unknown) => {
     console.error('Connect Wallet Failed', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to connect wallet';
     notification.error({
       message: 'Connect Wallet Failed',
-      description: error.message,
+      description: errorMessage,
     });
-  };
+  }, []);
+
   const toHistory = () => {
     const url = generateMempoolUrl({
       network,
@@ -81,86 +159,102 @@ const WalletConnectButton = () => {
     });
     window.open(url, '_blank');
   };
-  const handlerDisconnect = async () => {
-    console.log('disconnect success');
+
+  // 优化的断开连接处理
+  const handlerDisconnect = useCallback(async () => {
+    console.log('Disconnecting wallet');
+    clearTimeouts();
+    cleanupEventListeners();
     setSignature('');
-    await disconnect();
-  };
-  const accountAndNetworkChange = async () => {
-    console.log('accountAndNetworkChange');
-    console.log('connected', connected);
     reset();
-    const windowState =
-      document.visibilityState === 'visible' || !document.hidden;
+    await disconnect();
+  }, [clearTimeouts, cleanupEventListeners, setSignature, reset, disconnect]);
+
+  // 优化的账户和网络变化处理
+  const accountAndNetworkChange = useCallback(async () => {
+    if (isProcessing) return;
+    
+    console.log('Account or network changed');
+    setIsProcessing(true);
+    
     try {
+      reset();
+      const windowState = document.visibilityState === 'visible' || !document.hidden;
+      
       await check();
-      if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected) {
+      
+      if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected && windowState) {
         try {
-          console.log('checkSignature');
-          console.log(windowState);
-          if (windowState) {
-            const _s = await btcWallet?.signMessage(
-              process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-            );
-            if (_s) {
-              setSignature(_s);
-            }
-          } else {
-            handlerDisconnect();
+          console.log('Requesting new signature after account/network change');
+          const newSignature = await btcWallet?.signMessage(
+            process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+          );
+          if (newSignature) {
+            setSignature(newSignature);
           }
-        } catch (error) {
+        } catch (error: unknown) {
+          console.error('Signature request failed after account/network change:', error);
           await handlerDisconnect();
         }
+      } else if (!windowState) {
+        await handlerDisconnect();
       }
-    } catch (error) {
-      console.log(error);
+          } catch (error: unknown) {
+        console.error('Account/network change handling failed:', error);
+      } finally {
+      setIsProcessing(false);
     }
-  };
+  }, [isProcessing, reset, check, connected, btcWallet, setSignature, handlerDisconnect]);
+
+  // 计算显示金额
   const showAmount = useMemo(() => {
     return satsToBitcoin(utxoAmount);
   }, [utxoAmount]);
-  const checkSignature = async () => {
-    if (signature) {
-      try {
-        const bol = message.verifyMessageOfECDSA(
-          publicKey,
-          process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-          signature,
-        );
-        if (!bol) {
-          notification.warning({
-            message: 'Signature Verification Failed',
-            description: 'Please check your signature and try connect again',
-          });
-          handlerDisconnect();
-        }
-      } catch (error) {
-        console.log('checkSignature', error);
-        notification.warning({
-          message: 'Signature Verification Failed',
-          description: 'Please check your signature and try connect again',
-        });
-        handlerDisconnect();
-      }
-    }
-  };
+
+  // 初始化检查 - 只在组件挂载时执行一次
   useEffect(() => {
-    console.log('connected', connected);
+    console.log('Initial wallet check');
+    initialCheckTimeoutRef.current = setTimeout(() => {
+      check();
+    }, 300);
+
+    return () => {
+      clearTimeouts();
+    };
+  }, []); // 空依赖数组，只在挂载时执行
+
+  // 更新UTXO金额
+  useEffect(() => {
+    const unspendUtxos = getUnspendUtxos();
+    const amount = unspendUtxos.reduce((acc, cur) => acc + cur.value, 0);
+    setUtxoAmount(amount);
+  }, [UtxoList, getUnspendUtxos]);
+
+  // 处理连接状态变化
+  useEffect(() => {
+    console.log('Connection status changed:', connected);
+    
     if (connected) {
-      setTimeout(() => {
+      // 延迟执行签名检查，避免竞态条件
+      signatureCheckTimeoutRef.current = setTimeout(() => {
         checkSignature();
       }, 2000);
-      btcWallet?.on('accountsChanged', accountAndNetworkChange);
-      btcWallet?.on('networkChanged', accountAndNetworkChange);
+      
+      // 绑定事件监听器
+      bindEventListeners();
     } else {
-      btcWallet?.removeListener('accountsChanged', accountAndNetworkChange);
-      btcWallet?.removeListener('networkChanged', accountAndNetworkChange);
+      // 清理资源
+      clearTimeouts();
+      cleanupEventListeners();
     }
+
+    // 清理函数
     return () => {
-      btcWallet?.removeListener('accountsChanged', accountAndNetworkChange);
-      btcWallet?.removeListener('networkChanged', accountAndNetworkChange);
+      clearTimeouts();
+      cleanupEventListeners();
     };
-  }, [connected]);
+  }, [connected, checkSignature, bindEventListeners, cleanupEventListeners, clearTimeouts]);
+
   return (
     <WalletConnectReact
       config={{
@@ -175,8 +269,9 @@ const WalletConnectButton = () => {
           <PopoverTrigger>
             <Button
               className="px-0"
+              disabled={isProcessing}
               endContent={
-                <div className="px-2 h-full flex justify-center items-center  bg-gray-600">
+                <div className="px-2 h-full flex justify-center items-center bg-gray-600">
                   {address?.slice(-4)}
                 </div>
               }
@@ -208,6 +303,7 @@ const WalletConnectButton = () => {
                 color="danger"
                 variant="ghost"
                 onClick={handlerDisconnect}
+                disabled={isProcessing}
               >
                 {t('buttons.disconnect')}
               </Button>

@@ -828,15 +828,15 @@ export const sendBtcPsbt = async (psbt, fromAddress) => {
     const sliceOutputs = psbt.txOutputs.slice(1);
     sliceOutputs.forEach((output, index) => {
       if (output.address === fromAddress) {
-        addUtxo({
-          utxo: `${txId}:${index + 1}`,
-          value: output.value,
-          status: 'unspend',
-          location: 'local',
-          sort: 1,
-          txid: txId,
-          vout: index + 1,
-        });
+        // addUtxo({
+        //   utxo: `${txId}:${index + 1}`,
+        //   value: output.value,
+        //   status: 'unspend',
+        //   location: 'local',
+        //   sort: 1,
+        //   txid: txId,
+        //   vout: index + 1,
+        // });
       }
     });
   }

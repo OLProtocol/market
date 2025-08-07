@@ -7,6 +7,9 @@ LOCAL_PATH="./out"
 SSH_USER="root"
 SSH_KEY=""  # 如果有SSH密钥，可以在这里指定路径
 
+# 密码文件路径
+PASSWORD_FILE="$(dirname "$0")/.password"
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -31,6 +34,24 @@ log_warning() {
     echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
+# 读取密码文件
+read_password() {
+    if [ -f "$PASSWORD_FILE" ]; then
+        # 读取密码文件的第一行，去除前后空格和换行符
+        PASSWORD=$(head -n 1 "$PASSWORD_FILE" | tr -d '\r\n' | xargs)
+        if [ -n "$PASSWORD" ]; then
+            log_success "已从密码文件读取密码"
+            return 0
+        else
+            log_error "密码文件为空"
+            return 1
+        fi
+    else
+        log_error "密码文件不存在: $PASSWORD_FILE"
+        return 1
+    fi
+}
+
 # 检查本地out目录是否存在
 check_local_path() {
     if [ ! -d "$LOCAL_PATH" ]; then
@@ -53,17 +74,52 @@ build_rsync_command() {
     # 如果有SSH密钥，添加密钥参数
     if [ -n "$SSH_KEY" ] && [ -f "$SSH_KEY" ]; then
         rsync_args="$rsync_args -e \"ssh -i $SSH_KEY\""
+    else
+        # 如果没有SSH密钥，使用密码认证
+        rsync_args="$rsync_args -e \"sshpass -p '$PASSWORD' ssh -o StrictHostKeyChecking=no\""
     fi
     
     echo "rsync $rsync_args $LOCAL_PATH/ $SSH_USER@$REMOTE_HOST:$REMOTE_PATH/"
+}
+
+# 检查依赖工具
+check_dependencies() {
+    # 检查rsync
+    if ! command -v rsync &> /dev/null; then
+        log_error "rsync 未安装，请先安装 rsync"
+        exit 1
+    fi
+    
+    # 如果没有SSH密钥，检查sshpass
+    if [ -z "$SSH_KEY" ] || [ ! -f "$SSH_KEY" ]; then
+        if ! command -v sshpass &> /dev/null; then
+            log_error "sshpass 未安装，请先安装 sshpass"
+            log_info "安装方法:"
+            echo "  macOS: brew install sshpass"
+            echo "  Ubuntu/Debian: sudo apt-get install sshpass"
+            echo "  CentOS/RHEL: sudo yum install sshpass"
+            exit 1
+        fi
+    fi
 }
 
 # 执行部署
 deploy() {
     log_info "开始部署..."
     
+    # 检查依赖工具
+    check_dependencies
+    
     # 检查本地路径
     check_local_path
+    
+    # 读取密码（如果没有SSH密钥）
+    if [ -z "$SSH_KEY" ] || [ ! -f "$SSH_KEY" ]; then
+        if ! read_password; then
+            log_error "无法读取密码，部署终止"
+            exit 1
+        fi
+    fi
     
     # 构建rsync命令
     local rsync_command=$(build_rsync_command)
@@ -82,6 +138,7 @@ deploy() {
         echo "2. 检查SSH连接是否正常"
         echo "3. 确认远程目录权限"
         echo "4. 如果使用SSH密钥，请检查密钥文件路径"
+        echo "5. 检查密码是否正确"
         exit 1
     fi
 }
@@ -99,6 +156,8 @@ main() {
     echo "  SSH用户: $SSH_USER"
     if [ -n "$SSH_KEY" ]; then
         echo "  SSH密钥: $SSH_KEY"
+    else
+        echo "  密码文件: $PASSWORD_FILE"
     fi
     echo ""
     

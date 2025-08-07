@@ -31,7 +31,6 @@ export default function Transfer() {
   const [loading, setLoading] = useState(false);
   const { list, remove } = useSellStore();
   const { feeRate } = useCommonStore();
-  const { getUnspendUtxos } = useUtxoStore();
   const [selectedTab, setSelectedTab] = useState('single');
   const { network, btcWallet, address } = useReactWalletStore((state) => state);
   const [singleAddress, setSingleAddress] = useState('');

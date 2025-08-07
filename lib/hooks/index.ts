@@ -1,4 +1,5 @@
 export * from './useCalcFee';
+export * from './useUtxoPolling';
 
 import { useCommonStore } from '@/store';
 import { useMemo } from 'react';

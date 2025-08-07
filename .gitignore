@@ -4,7 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
-
+password.txt
 # testing
 /coverage
 
@@ -21,7 +21,7 @@
 # misc
 .DS_Store
 *.pem
-
+/scripts/.password
 # debug
 npm-debug.log*
 yarn-debug.log*

@@ -23,14 +23,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-use';
 import { hideStr, calcTimeBetweenBlocks } from '@/lib/utils';
 import { clacTextSize, encodeBase64, base64ToHex } from '@/lib/inscribe';
-import { generateMempoolUrl } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { ordx, ordxSWR } from '@/api';
 import { tryit } from 'radash';
-import { useUtxoStore } from '@/store';
 import { useCommonStore } from '@/store';
-import { ColumnsType } from 'antd/es/table';
-import { UtxoSelectTable } from './UtxoSelectTable';
 // import { CopyButton } from '@/components/CopyButton';
 
 const { Dragger } = Upload;

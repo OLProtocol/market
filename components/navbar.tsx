@@ -25,11 +25,11 @@ import { usePathname } from 'next/navigation';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import { ChainSelect } from '@/components/ChainSelect';
-import useSWRMutation from 'swr/mutation';
-import { getUtxoByValue, ordxSWR, getBTCPrice } from '@/api';
-import { useCommonStore, useUtxoStore } from '@/store';
+import { ordxSWR, getBTCPrice } from '@/api';
+import { useCommonStore } from '@/store';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import WalletConnectButton from './wallet/WalletConnectButton';
+import { useUtxoPolling } from '@/lib/hooks';
 // const WalletButton = dynamic(
 //   () => import('../components/wallet/WalletConnectButton') as any,
 //   { ssr: false },
@@ -38,29 +38,25 @@ import WalletConnectButton from './wallet/WalletConnectButton';
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
   const { setHeight, setBtcPrice, runtimeEnv, setEnv } = useCommonStore();
-  const { setList } = useUtxoStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
 
-  const { data: heightData } = ordxSWR.useBtcHeight(network as any);
-  const { data, trigger: getUtxos } = useSWRMutation(
-    `getUtxoByValue-${address}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 }),
-  );
-  const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
+  // 使用新的UTXO定时获取hook
+  useUtxoPolling(address, network, {
+    interval: 30000, // 30秒间隔
+    enabled: true,
+    immediate: true,
+    onSuccess: (data) => {
+      console.log('UTXO数据获取成功:', data);
+    },
+    onError: (error) => {
+      console.error('UTXO数据获取失败:', error);
+    },
+  });
 
-  useEffect(() => {
-    if (data?.data?.length) {
-      const list = data.data?.map((item: any) => ({
-        status: 'unspend',
-        location: 'remote',
-        utxo: `${item.txid}:${item.vout}`,
-        ...item,
-      }));
-      setList(list);
-    }
-  }, [data]);
+  const { data: heightData } = ordxSWR.useBtcHeight(network as any);
+  const { data: btcData } = useSWR(`getBTCPrice`, () => getBTCPrice());
 
   useEffect(() => {
     const height = heightData?.data?.height;
@@ -68,16 +64,13 @@ export const Navbar = () => {
       setHeight(height);
     }
   }, [heightData]);
+  
   useEffect(() => {
     if (btcData?.data?.amount) {
       setBtcPrice(btcData?.data?.amount);
     }
   }, [btcData]);
-  useEffect(() => {
-    if (address && network) {
-      getUtxos();
-    }
-  }, [address, network]);
+
   const searchInput = (
     <Input
       aria-label="Search"
