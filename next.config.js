@@ -3,6 +3,7 @@
 const nextConfig = {
   output: 'export',
   distDir: 'out',
+  strictMode: false,
   trailingSlash: true,
   staticDirs: [
     { from: 'public/raresats', to: 'out/raresats' },
