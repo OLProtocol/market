@@ -11,7 +11,7 @@ import mempool from './mempool';
 // axios.defaults.headers.common['Authorization'] = process.env.NEXT_PUBLIC_ORDX_API_AUTHORIZATION;
 
 const generateUrl = (url: string, network?: string) => {
-  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/${url}`;
+  url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/${url}`;
   console.log('hostname', location.hostname);
 
   if (location.hostname.indexOf('test') > -1) {
@@ -306,7 +306,12 @@ const pushTx = async ({ hex, network }: any) => {
   if (data.code === 0) {
     return data.data;
   } else {
-    throw new Error(data.msg);
+    throw {
+      url: generateUrl(`btc/tx`, network),
+      hex,
+      network,
+      data,
+    };
   }
 };
 

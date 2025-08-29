@@ -257,7 +257,7 @@ export default function HuntSatTool() {
     let utxo;
     let data = await getUtxoByValue({
       address: currentAccount,
-      value: 0,
+      value: 1,
       network,
     });
     if (data.code === 0) {

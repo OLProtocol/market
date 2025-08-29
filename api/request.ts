@@ -429,7 +429,7 @@ export const getUtxoByValue = async ({
   value = 600,
   network,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/utxo/address/${address}/${value}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/utxo/address/${address}/${value}`;
   const res = await fetch(url);
   return res.json();
 };

@@ -7,6 +7,8 @@ import {
 import { addresToScriptPublicKey } from '../wallet/utils';
 import { bitcoin, toPsbtNetwork, NetworkType } from '../wallet';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { Tx } from '@cmdcode/tapscript';
+import { ordx } from '@/api';
 
 export function parseUtxo(utxo: string) {
   const [txid, vout] = utxo.split(':');
@@ -225,17 +227,26 @@ export function calcUtxosVirtualGas({
   return estimateFee;
 }
 
-export async function signAndPushPsbt(psbt) {
+export async function signAndPushPsbt(psbt, network) {
   const { btcWallet } = useReactWalletStore.getState();
   if (!btcWallet) {
     throw new Error('No wallet connected');
   }
   const signed = await btcWallet.signPsbt(psbt.toHex());
-  const pushedTxId = await btcWallet.pushPsbt(signed!);
-  console.log('pushedTxId', pushedTxId);
   try {
-    return JSON.parse(pushedTxId!);
+
+
+    const pushedTxId = await btcWallet.pushPsbt(signed!);
+    // const txdata = psbt.extractTransaction();
+    // const pushedTxId = await ordx.pushTx({ hex: Tx.encode(txdata).hex, network });
+    console.log('pushedTxId', pushedTxId);
+    try {
+      return JSON.parse(pushedTxId!);
+    } catch (error) {
+      return pushedTxId;
+    }
   } catch (error) {
-    return pushedTxId;
+    console.log('error', error);
+    throw error;
   }
 }

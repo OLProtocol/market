@@ -304,7 +304,7 @@ export const InscribingOrderModal = ({
       console.log('psbt', psbt);
 
       console.log('spendUtxos', spendUtxos);
-      txid = await sendBtcPsbt(psbt, currentAccount);
+      txid = await sendBtcPsbt(psbt, currentAccount, network);
       let vout = 0;
       if (metadata?.specialOffsetAmount > 0) {
         vout = 1;
@@ -408,6 +408,7 @@ export const InscribingOrderModal = ({
       console.log('order', order);
       const { commitTx, fee, oneUtxo, tight } = order;
       const commitTxid = (commitTx.txid as any)?.data || commitTx.txid;
+      console.log('commitTxid', commitTxid);
       await sleep(10000);
       let txid;
       if (order.type === 'rune') {
@@ -463,7 +464,7 @@ export const InscribingOrderModal = ({
       await changeStatus(orderId, 'inscribe_fail');
       notification.error({
         message: 'Error',
-        description: error.message || 'error',
+        description: JSON.stringify(error) || 'error',
       });
     }
   };

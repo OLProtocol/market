@@ -334,7 +334,7 @@ export default function TransferTool() {
   const getAvialableTicker = async () => {
     let res = await getUtxoByValue({
       address: address,
-      value: 0,
+      value: 1,
       network,
     });
     if (res.code !== 0) {

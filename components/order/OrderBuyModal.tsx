@@ -68,7 +68,7 @@ export const OrderBuyModal = ({
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data, isLoading } = useSWR(
     `getUtxoByValue-${address}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 }),
+    () => getUtxoByValue({ address, network, value: 1 }),
   );
   const utxos = useMemo(() => data?.data || [], [data]);
   const spendableValue = useMemo(() => {

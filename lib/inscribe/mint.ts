@@ -818,12 +818,12 @@ export const generateSendBtcPsbt = async ({
   });
   return psbt;
 };
-export const sendBtcPsbt = async (psbt, fromAddress) => {
+export const sendBtcPsbt = async (psbt, fromAddress, network) => {
   const { add: addUtxo, removeUtxos } = useUtxoStore.getState();
   console.log('psbt', psbt);
   console.log(psbt.toHex());
 
-  const txId = await signAndPushPsbt(psbt);
+  const txId = await signAndPushPsbt(psbt, network);
   if (psbt.txOutputs.length > 1) {
     const sliceOutputs = psbt.txOutputs.slice(1);
     sliceOutputs.forEach((output, index) => {

@@ -92,7 +92,7 @@ export const BatchBuyFooter = ({
     isMutating: lockLoading,
     trigger: lockTrigger,
   } = useSWRMutation(
-    `getUtxoByValue-${address}-${network}-${JSON.stringify(lockOrderIds)}`,
+    `lockBulkOrder-${address}-${network}-${JSON.stringify(lockOrderIds)}`,
     () => lockBulkOrder({ address, orderIds: lockOrderIds }),
   );
   const orderLength = useMemo(() => list.length || 0, [list]);

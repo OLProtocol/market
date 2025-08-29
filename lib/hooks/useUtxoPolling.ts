@@ -32,7 +32,7 @@ export const useUtxoPolling = (
   // 使用SWR Mutation获取UTXO数据
   const { data, trigger: getUtxos, error, isMutating } = useSWRMutation(
     `getUtxoByValue-${address}-${network}`,
-    () => getUtxoByValue({ address, network, value: 500 }),
+    () => getUtxoByValue({ address, network, value: 1 }),
     {
       onSuccess: (data) => {
         setLastFetchTime(new Date());
