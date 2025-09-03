@@ -3,7 +3,7 @@ export const ChainSelect = () => {
 
   const handleSelectionChange = (value: any) => {
     if (value === 'SatoshiNet') {
-      window.location.href = 'https://satsnet.test.ordx.market/';
+      window.location.href = 'https://satsnet.ordx.market/';
     }
   };
 

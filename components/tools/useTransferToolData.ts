@@ -430,7 +430,7 @@ export function useTransferToolData() {
         publicKey,
       });
 
-      const txid = await signAndPushPsbt(psbt);
+      const txid = await signAndPushPsbt(psbt, network);
       setLoading(false);
       notification.success({
         message: t('notification.transaction_title'),

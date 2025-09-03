@@ -351,7 +351,7 @@ export const InscribingOrderModal = ({
       setLoading(false);
       console.error(error);
       notification.error({
-        message: error.message || JSON.stringify(error),
+        message: JSON.stringify(error),
       });
     }
   };

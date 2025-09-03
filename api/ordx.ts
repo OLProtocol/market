@@ -211,8 +211,7 @@ const getAppVersion = async () => {
 
 const getTxStatus = async ({ txid, network }: any) => {
   const { data } = await axios.get(
-    `https://blockstream.info/${
-      network === 'testnet' ? 'testnet/' : ''
+    `https://blockstream.info/${network === 'testnet' ? 'testnet/' : ''
     }api/tx/${txid}`,
   );
   return data;
@@ -306,12 +305,12 @@ const pushTx = async ({ hex, network }: any) => {
   if (data.code === 0) {
     return data.data;
   } else {
-    throw {
+    throw new Error(JSON.stringify({
       url: generateUrl(`btc/tx`, network),
       hex,
       network,
       data,
-    };
+    }));
   }
 };
 
