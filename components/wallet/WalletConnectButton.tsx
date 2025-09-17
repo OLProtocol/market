@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/store';
 import { generateMempoolUrl } from '@/lib/utils';
 import { useUtxoStore } from '@/store';
+import { sleep } from '@/lib';
 
 const WalletConnectButton = () => {
   console.log('WalletConnectButton component rendering');
@@ -166,9 +167,12 @@ const WalletConnectButton = () => {
   // 优化的连接成功处理
   const onConnectSuccess = useCallback(async (wallet: any) => {
     if (isProcessing) return;
-    
+    await sleep(300);
     setIsProcessing(true);
-    
+    console.log('onConnectSuccess', wallet);
+    console.log('signature', signature);
+    console.log('process.env.NEXT_PUBLIC_SIGNATURE_TEXT', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
+    console.log('wallet.signMessage', wallet.signMessage);
     try {
       if (!signature && process.env.NEXT_PUBLIC_SIGNATURE_TEXT) {
         console.log('Requesting signature for:', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
