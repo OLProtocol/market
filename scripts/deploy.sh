@@ -56,7 +56,7 @@ read_password() {
 check_local_path() {
     if [ ! -d "$LOCAL_PATH" ]; then
         log_error "本地目录不存在: $LOCAL_PATH"
-        log_error "请先运行 npm run build 或 yarn build 生成out目录"
+        log_error "请先运行 bun run build 生成out目录"
         exit 1
     fi
     log_success "本地目录检查通过: $LOCAL_PATH"
@@ -103,12 +103,43 @@ check_dependencies() {
     fi
 }
 
+# 构建项目（生成 out 目录）
+build_project() {
+    log_info "开始构建静态资源(out)..."
+
+    # 确保 Bun 已安装
+    if ! command -v bun >/dev/null 2>&1; then
+        log_error "未检测到 Bun，请先安装 Bun: https://bun.sh"
+        log_info "macOS 安装示例: curl -fsSL https://bun.sh/install | bash"
+        exit 1
+    fi
+
+    local build_cmd="bun run build"
+
+    log_info "执行构建命令: $build_cmd"
+    if ! eval $build_cmd; then
+        log_error "构建失败，部署终止"
+        exit 1
+    fi
+
+    if [ ! -d "$LOCAL_PATH" ]; then
+        log_error "构建完成但未找到目录: $LOCAL_PATH"
+        log_error "请检查 next.config.js 中的 output 和 distDir 配置"
+        exit 1
+    fi
+
+    log_success "构建完成: $LOCAL_PATH"
+}
+
 # 执行部署
 deploy() {
     log_info "开始部署..."
     
     # 检查依赖工具
     check_dependencies
+    
+    # 先进行构建
+    build_project
     
     # 检查本地路径
     check_local_path
