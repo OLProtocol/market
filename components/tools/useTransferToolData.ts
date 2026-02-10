@@ -1,25 +1,61 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useMap, useList } from 'react-use';
+import { useMap } from 'react-use';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useCommonStore } from '@/store';
 import {
-  getOrdxAddressHolders,
-  getOrdxSummary,
-  getSats,
-  getUtxoByValue,
   ordx,
 } from '@/api';
 import {
   calcNetworkFee,
   buildTransaction,
   signAndPushPsbt,
-  hideStr,
-  getTickLabel,
 } from '@/lib';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
+
+// 缓存管理器
+class AssetCache {
+  private cache: Map<string, { data: any; timestamp: number }> = new Map();
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+
+  getKey(address: string, network: string, asset?: string): string {
+    return asset ? `${address}:${network}:${asset}` : `${address}:${network}:summary`;
+  }
+
+  get(address: string, network: string, asset?: string): any | null {
+    const key = this.getKey(address, network, asset);
+    const cached = this.cache.get(key);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      return cached.data;
+    }
+    if (cached) {
+      this.cache.delete(key);
+    }
+    return null;
+  }
+
+  set(address: string, network: string, data: any, asset?: string): void {
+    const key = this.getKey(address, network, asset);
+    this.cache.set(key, { data, timestamp: Date.now() });
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  clearForAddress(address: string, network: string): void {
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(`${address}:${network}`)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+}
+
+// 全局缓存实例
+const globalAssetCache = new AssetCache();
 
 export function useTransferToolData() {
   const { t } = useTranslation();
@@ -28,8 +64,13 @@ export function useTransferToolData() {
   const [loading, setLoading] = useState(false);
   const { address, network, publicKey } = useReactWalletStore((state) => state);
   const [refresh, setRefresh] = useState(0);
-  const [ordxUtxoLimit, setOrdxUtxoLimit] = useState(100);
-  const [plainUtxoLimit, setPlainUtxoLimit] = useState(100);
+
+  // 资产列表（从summary接口获取）
+  const [assetList, setAssetList] = useState<any[]>([]);
+  // 选中的资产
+  const [selectedAsset, setSelectedAsset] = useState<string>('');
+  // 是否正在加载资产UTXO
+  const [loadingAssetUtxos, setLoadingAssetUtxos] = useState(false);
 
   const [inputList, { set: setInputList }] = useMap<any>({
     items: [
@@ -69,39 +110,144 @@ export function useTransferToolData() {
     unit: 'sats',
   });
 
-  const [tickerList, { set: setTickerList }] = useList<any>([]);
+  // 获取资产列表（使用缓存）
+  const fetchAssetList = useCallback(async () => {
+    if (!address || !network) return;
 
-  const handleTickerSelectChange = useCallback(
-    (itemId, ticker) => {
-      const updatedItems = [...inputList.items];
-      updatedItems[itemId - 1].value = {
-        ...updatedItems[itemId - 1].value,
-        ticker,
-        sats: 0,
-        unit: 'sats',
-        utxo: '',
-        utxos: [],
-      };
+    // 检查缓存
+    const cached = globalAssetCache.get(address, network);
+    if (cached) {
+      setAssetList(cached);
+      return;
+    }
 
-      const selectTicker =
-        tickerList?.find((item) => item.ticker === ticker) || [];
-      let utxos = selectTicker.utxos;
-      if (inputList.items.length > 1) {
-        inputList.items.forEach((inItem, index) => {
-          if (index !== itemId - 1) {
-            utxos = utxos.filter(
-              (utxo) => utxo.txid + ':' + utxo.vout !== inItem.value.utxo,
-            );
-            utxos = [...new Set(utxos)];
-          }
+    try {
+      const res = await ordx.getAddressSummayr({
+        address,
+        network,
+      });
+
+      if (res.code !== 0) {
+        notification.error({
+          message: t('notification.transaction_title'),
+          description: res.msg,
         });
+        return;
       }
 
-      updatedItems[itemId - 1].options.utxos = utxos;
-      setInputList('items', updatedItems);
-    },
-    [inputList.items, tickerList],
-  );
+      // 处理资产列表，过滤掉 type 为 * 的
+      const assets = (res.data || []).filter((item: any) => {
+        return item.Name?.Type !== '*';
+      });
+
+      // 缓存结果
+      globalAssetCache.set(address, network, assets);
+      setAssetList(assets);
+    } catch (error) {
+      console.error('Failed to fetch asset list:', error);
+      notification.error({
+        message: t('notification.transaction_title'),
+        description: 'Failed to fetch asset list',
+      });
+    }
+  }, [address, network, t]);
+
+  // 获取资产UTXO详情（使用缓存）
+  const fetchAssetUtxos = useCallback(async (assetName: string) => {
+    if (!address || !network || !assetName) return;
+
+    // 检查缓存
+    const cached = globalAssetCache.get(address, network, assetName);
+    if (cached) {
+      return cached;
+    }
+
+    setLoadingAssetUtxos(true);
+    try {
+      const res = await ordx.getAddressAsset({
+        address,
+        asset: assetName,
+        network,
+      });
+
+      if (res.code !== 0) {
+        notification.error({
+          message: t('notification.transaction_title'),
+          description: res.msg,
+        });
+        return null;
+      }
+
+      // 处理 UTXO 数据
+      const utxos = (res.data || []).map((item: any) => ({
+        txid: item.Outpoint.split(':')[0],
+        vout: Number(item.Outpoint.split(':')[1]),
+        value: item.Value,
+        assetamount: item.Assets?.reduce((sum: number, asset: any) => {
+          return sum + parseInt(asset.Amount || '0', 10);
+        }, 0),
+      }));
+
+      const result = { utxos, total: res.total };
+
+      // 缓存结果
+      globalAssetCache.set(address, network, result, assetName);
+      return result;
+    } catch (error) {
+      console.error('Failed to fetch asset utxos:', error);
+      notification.error({
+        message: t('notification.transaction_title'),
+        description: 'Failed to fetch asset utxos',
+      });
+      return null;
+    } finally {
+      setLoadingAssetUtxos(false);
+    }
+  }, [address, network, t]);
+
+  // 处理资产选择
+  const handleAssetSelect = useCallback(async (assetName: string) => {
+    setSelectedAsset(assetName);
+
+    // 重置输入列表
+    setInputList('items', [
+      {
+        id: 1,
+        value: {
+          ticker: assetName,
+          utxo: '',
+          sats: 0,
+          unit: 'sats',
+          description: '',
+        },
+        options: {
+          tickers: [],
+          utxos: [],
+        },
+      },
+    ]);
+
+    // 获取选中资产的 UTXO
+    const utxoData = await fetchAssetUtxos(assetName);
+    if (utxoData) {
+      setInputList('items', [
+        {
+          id: 1,
+          value: {
+            ticker: assetName,
+            utxo: '',
+            sats: 0,
+            unit: 'sats',
+            description: '',
+          },
+          options: {
+            tickers: [assetName],
+            utxos: utxoData.utxos,
+          },
+        },
+      ]);
+    }
+  }, [fetchAssetUtxos, setInputList]);
 
   const handleUtxoSelectChange = useCallback(
     (itemId, utxo) => {
@@ -118,7 +264,7 @@ export function useTransferToolData() {
         sats: utxoObj?.value || 0,
         utxo,
         description: utxoObj?.assetamount
-          ? `${utxoObj.assetamount} Asset/ ${utxoObj.value} sats`
+          ? `${utxoObj.assetamount} Asset / ${utxoObj.value} sats`
           : `${utxoObj.value} sats`,
       };
 
@@ -178,203 +324,7 @@ export function useTransferToolData() {
     publicKey,
   ]);
 
-  const getTickers = useCallback(async () => {
-    const tickers: any[] = [];
-
-    let res = await getOrdxSummary({
-      address: address,
-      network,
-    });
-
-    if (res.code !== 0) {
-      notification.error({
-        message: t('notification.transaction_title'),
-        description: res.msg,
-      });
-      return;
-    }
-    const detail = res.data.detail;
-
-    await Promise.all(
-      detail.map(async (item) => {
-        if (item.type === 'e' || item.type === 'o') {
-          return;
-        }
-
-        let tickerOrAssetsType = item.type;
-        if (item.type === 'f') {
-          tickerOrAssetsType = item.ticker;
-        }
-        let ticker = item.ticker;
-        if (item.type === 'n' && !item.ticker) {
-          ticker = 'PureName';
-        }
-        if (item.type === 'n') {
-          res = await ordx.getOrdxNsUxtos({
-            start: 0,
-            limit: ordxUtxoLimit,
-            address: address,
-            sub: ticker,
-            network: network,
-          });
-        } else {
-          res = await getOrdxAddressHolders({
-            start: 0,
-            limit: ordxUtxoLimit,
-            address: address,
-            tickerOrAssetsType: tickerOrAssetsType,
-            network: network,
-          });
-        }
-
-        console.log(res);
-
-        const utxosOfTicker: any[] = [];
-        let total = 0;
-        if (res.code === 0) {
-          const details = (item.type === 'n' ? res.data.names : res.data.detail) || [];
-          total = res.data.total;
-          console.log('details = ', details);
-          
-          details.forEach((detail) => {
-            const utxo = {
-              txid: detail.utxo.split(':')[0],
-              vout: Number(detail.utxo.split(':')[1]),
-              value: detail.amount || detail.value,
-              assetamount: detail.assetamount || detail.value,
-            };
-            utxosOfTicker.push(utxo);
-          });
-        }
-        console.log('utxosOfTicker = ', utxosOfTicker);
-        
-        tickers.push({
-          ticker: ticker,
-          type: item.type,
-          total: total,
-          utxos: utxosOfTicker,
-        });
-      }),
-    );
-
-    return tickers;
-  }, [address, network, ordxUtxoLimit, t]);
-
-  const getAvialableTicker = useCallback(async () => {
-    let res = await getUtxoByValue({
-      address: address,
-      value: 1,
-      network,
-    });
-    if (res.code !== 0) {
-      notification.error({
-        message: t('notification.transaction_title'),
-        description: res.msg,
-      });
-      return;
-    }
-    return {
-      ticker: t('pages.tools.transaction.available_utxo'),
-      utxos: res.data,
-    };
-  }, [address, network, t]);
-
-  const getRareSatTicker = useCallback(async () => {
-    const data = await getSats({
-      address: address,
-      network,
-    });
-
-    let tickers: any[] = [];
-
-    if (data.code === 0) {
-      data.data.forEach((item) => {
-        let hasRareStats = false;
-        if (item.sats && item.sats.length > 0) {
-          item.sats.forEach((sat) => {
-            if (sat.satributes && sat.satributes.length > 0) {
-              hasRareStats = true;
-              return;
-            }
-          });
-        }
-
-        if (hasRareStats) {
-          const utxo = {
-            txid: item.utxo.split(':')[0],
-            vout: Number(item.utxo.split(':')[1]),
-            value: item.value,
-          };
-
-          if (tickers.length === 0) {
-            tickers.push({
-              ticker:
-                t('pages.tools.transaction.rare_sats') +
-                '-' +
-                item.sats[0].satributes[0],
-              utxos: [utxo],
-            });
-          } else {
-            let utxoExist = false;
-            tickers.forEach((obj) => {
-              obj.utxos.forEach((tmp) => {
-                if (tmp === utxo.txid + ':' + utxo.vout) {
-                  utxoExist = true;
-                  return;
-                }
-              });
-            });
-            if (!utxoExist) {
-              if (
-                tickers.some(
-                  (obj) =>
-                    obj['ticker'] ===
-                    t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0],
-                )
-              ) {
-                tickers = tickers.map((obj) => {
-                  if (
-                    obj['ticker'] ===
-                    t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0]
-                  ) {
-                    return {
-                      ticker: obj['ticker'],
-                      utxos: [...obj.utxos, utxo],
-                    };
-                  } else {
-                    return obj;
-                  }
-                });
-              } else {
-                tickers.push({
-                  ticker:
-                    t('pages.tools.transaction.rare_sats') +
-                    '-' +
-                    item.sats[0].satributes[0],
-                  utxos: [utxo],
-                });
-              }
-            }
-          }
-        }
-      });
-    }
-
-    return tickers;
-  }, [address, network, t]);
-
-  const getAllTickers = useCallback(async () => {
-    const tickers = await getTickers();
-    const avialableTicker = await getAvialableTicker();
-    tickers?.push(avialableTicker);
-    const rareSatTickers = await getRareSatTicker();
-    const combinedArray = tickers?.concat(rareSatTickers);
-    setTickerList(combinedArray || []);
-  }, [getTickers, getAvialableTicker, getRareSatTicker]);
+  // getAvialableTicker 已移除 - 现在通过资产列表流程获取UTXO
 
   const splitHandler = useCallback(async () => {
     if (!address) {
@@ -437,6 +387,8 @@ export function useTransferToolData() {
         description: t('notification.transaction_spilt_success'),
       });
 
+      // 清除缓存
+      globalAssetCache.clearForAddress(address, network);
       setRefresh((prev) => prev + 1);
     } catch (error: any) {
       console.log('error(transfer sats) = ', error);
@@ -461,7 +413,6 @@ export function useTransferToolData() {
   }, [feeRate, inputList, outputList]);
 
   useEffect(() => {
-    setTickerList([]);
     setInputList('items', [
       {
         id: 1,
@@ -492,10 +443,15 @@ export function useTransferToolData() {
         },
       },
     ]);
+
+    // 重置资产相关状态
+    setSelectedAsset('');
+    setAssetList([]);
+
     if (address) {
-      getAllTickers();
+      fetchAssetList();
     }
-  }, [address, refresh, getAllTickers]);
+  }, [address, refresh, fetchAssetList]);
 
   return useMemo(
     () => ({
@@ -505,8 +461,10 @@ export function useTransferToolData() {
       inputList,
       outputList,
       balance,
-      tickerList,
-      handleTickerSelectChange,
+      assetList,
+      selectedAsset,
+      loadingAssetUtxos,
+      handleAssetSelect,
       handleUtxoSelectChange,
       setInputList,
       setOutputList,
@@ -522,8 +480,10 @@ export function useTransferToolData() {
       inputList,
       outputList,
       balance,
-      tickerList,
-      handleTickerSelectChange,
+      assetList,
+      selectedAsset,
+      loadingAssetUtxos,
+      handleAssetSelect,
       handleUtxoSelectChange,
       splitHandler,
       refresh,

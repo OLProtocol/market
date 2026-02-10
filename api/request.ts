@@ -43,7 +43,7 @@ export const request = async (
     if (
       (res as any)?.data.msg === 'api signature verification failed' ||
       (res as any)?.data.msg ===
-        'public and signature parameters are required in the request headers'
+      'public and signature parameters are required in the request headers'
     ) {
       // disconnect();
       // setSignature('');
@@ -224,7 +224,7 @@ export const bulkBuyOrder = async ({ address, order_ids, raw }: any) => {
     method: 'POST',
     data: { address, order_ids, raw },
   });
-  return res; 
+  return res;
 };
 
 export const getBTCPrice = async () => {
@@ -447,7 +447,7 @@ export const getAppVersion = async () => {
 };
 
 export const getSats = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/exotic/address/${address}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/exotic/address/${address}`;
   const res = await fetch(url);
   return res.json();
 };
@@ -459,20 +459,20 @@ export const getOrdxAddressHolders = async ({
   start,
   limit,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${tickerOrAssetsType}?start=${start}&limit=${limit}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/address/utxolist/${address}/${tickerOrAssetsType}?start=${start}&limit=${limit}`;
   // const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/utxolist/${address}/${ticker}?start=${start}&limit=${limit}`;
   const res = await fetch(url);
   return res.json();
 };
 
 export const getOrdxSummary = async ({ address, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/address/summary/${address}`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/address/summary/${address}`;
   const res = await fetch(url);
   return res.json();
 };
 
 export const getSatsByAddress = async ({ address, sats, network }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/testnet4' : '/mainnet'}/sat/FindSatsInAddress`;
+  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/sat/FindSatsInAddress`;
   const data = {
     address: address,
     sats: sats,

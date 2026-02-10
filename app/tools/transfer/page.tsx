@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useUtxoStore } from '@/store';
 import { tryit } from 'radash';
 
-export default function Transfer() {
+export default function TransferPage() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { list, remove } = useSellStore();

@@ -100,6 +100,18 @@ const getOrdxSummary = async ({ address, network }: any) => {
   );
   return data;
 };
+const getAddressSummayr = async ({ address, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`v3/address/summary/${address}`, network),
+  );
+  return data;
+}
+const getAddressAsset = async ({ address, asset, network }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`v3/address/asset/${address}/${asset}`, network),
+  );
+  return data;
+};
 const getBestHeight = async ({ network }: any) => {
   const { data } = await axios.get(generateUrl(`bestheight`, network));
   return data;
@@ -369,6 +381,8 @@ export const ordx = {
   health,
   getOrdxInfo,
   getOrdxSummary,
+  getAddressSummayr,
+  getAddressAsset,
   getOrdxTickHolders,
   getOrdxAddressHistory,
   getOrdxAddressHolders,

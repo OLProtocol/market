@@ -22,8 +22,10 @@ export default function TransferTool() {
     inputList,
     outputList,
     balance,
-    tickerList,
-    handleTickerSelectChange,
+    assetList,
+    selectedAsset,
+    loadingAssetUtxos,
+    handleAssetSelect,
     handleUtxoSelectChange,
     setInputList,
     setOutputList,
@@ -46,8 +48,10 @@ export default function TransferTool() {
             <InputSection
               loading={loading}
               inputList={inputList}
-              tickerList={tickerList}
-              handleTickerSelectChange={handleTickerSelectChange}
+              assetList={assetList}
+              selectedAsset={selectedAsset}
+              loadingAssetUtxos={loadingAssetUtxos}
+              handleAssetSelect={handleAssetSelect}
               handleUtxoSelectChange={handleUtxoSelectChange}
               setInputList={setInputList}
             />

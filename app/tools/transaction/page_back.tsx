@@ -402,8 +402,8 @@ export default function TransferTool() {
                   (obj) =>
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0],
+                    '-' +
+                    item.sats[0].satributes[0],
                 )
               ) {
                 // the type of rare sat already exists
@@ -411,8 +411,8 @@ export default function TransferTool() {
                   if (
                     obj['ticker'] ===
                     t('pages.tools.transaction.rare_sats') +
-                      '-' +
-                      item.sats[0].satributes[0]
+                    '-' +
+                    item.sats[0].satributes[0]
                   ) {
                     return {
                       ticker: obj['ticker'],

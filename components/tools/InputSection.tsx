@@ -1,12 +1,33 @@
 import { Button, Input, Select, SelectItem } from '@nextui-org/react';
 import { useTranslation } from 'react-i18next';
 import { getTickLabel, hideStr } from '@/lib';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+
+// 格式化资产显示名称
+const formatAssetDisplay = (asset: any): string => {
+  if (!asset?.Name) return 'Unknown';
+  const { Protocol, Type, Ticker } = asset.Name;
+  // 空白聪情况
+  if (!Protocol && !Type && !Ticker) {
+    return 'Plain Sats';
+  }
+  const parts = [Protocol, Type, Ticker].filter(Boolean);
+  return parts.join(':') || 'Unknown';
+};
+
+// 生成资产的 key
+const getAssetKey = (asset: any): string => {
+  if (!asset?.Name) return '';
+  const { Protocol, Type, Ticker } = asset.Name;
+  return `${Protocol || ''}:${Type || ''}:${Ticker || ''}`;
+};
 
 export function InputSection({
   inputList,
-  tickerList,
-  handleTickerSelectChange,
+  assetList,
+  selectedAsset,
+  loadingAssetUtxos,
+  handleAssetSelect,
   handleUtxoSelectChange,
   setInputList,
   loading,
@@ -15,8 +36,6 @@ export function InputSection({
   const [loadingStates, setLoadingStates] = useState({});
 
   const addInputItem = () => {
-    const tickers = tickerList?.map((item) => item.ticker) || [];
-
     const newId = inputList.items.length + 1;
     const newItem = {
       id: newId,
@@ -27,7 +46,7 @@ export function InputSection({
         unit: 'sats',
       },
       options: {
-        tickers: tickers,
+        tickers: [],
         utxos: [],
       },
     };
@@ -50,11 +69,7 @@ export function InputSection({
     setInputList('items', inputList.items);
   };
 
-  const handleTickerChange = async (itemId, ticker) => {
-    setLoadingStates((prev) => ({ ...prev, [itemId]: true }));
-    await handleTickerSelectChange(itemId, ticker);
-    setLoadingStates((prev) => ({ ...prev, [itemId]: false }));
-  };
+  // 已废弃，资产选择在上一层处理
   console.log('inputList', inputList);
   const testUtxos = [
     {
@@ -361,17 +376,17 @@ export function InputSection({
             </div>
             <div className="grid grid-cols-1 gap-2 sm:gap-3">
               <Select
-                label="Ticker"
-                placeholder="Select Ticker"
+                label="Asset"
+                placeholder="Select Asset"
                 size="sm"
                 className="w-full"
-                selectedKeys={item.value?.ticker ? [item.value.ticker] : []}
-                onChange={(e) => handleTickerChange(item.id, e.target.value)}
-                isLoading={loadingStates[item.id] || loading}
+                selectedKeys={selectedAsset ? [selectedAsset] : []}
+                onChange={(e) => handleAssetSelect(e.target.value)}
+                isLoading={loadingAssetUtxos}
               >
-                {tickerList?.map((utxo) => (
-                  <SelectItem key={utxo.ticker} value={utxo.ticker}>
-                    {getTickLabel(utxo.ticker)}
+                {assetList?.map((asset) => (
+                  <SelectItem key={getAssetKey(asset)} value={getAssetKey(asset)}>
+                    {formatAssetDisplay(asset)}
                   </SelectItem>
                 ))}
               </Select>
