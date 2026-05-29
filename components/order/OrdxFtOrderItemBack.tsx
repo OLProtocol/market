@@ -16,7 +16,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { hideStr, thousandSeparator } from '@/lib/utils';
+import { hideStr, thousandSeparator } from '@/lib/utils/format';
 import { BtcPrice } from '../BtcPrice';
 
 interface Props {

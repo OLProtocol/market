@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import useSWRMutation  from 'swr/mutation';
 import { getUtxoByValue } from '@/api';
-import { useUtxoStore } from '@/store';
+import { useUtxoStore } from '@/store/utxo';
 
 interface UseUtxoPollingOptions {
   interval?: number; // 定时间隔，默认30秒

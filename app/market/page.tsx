@@ -15,7 +15,7 @@ import {
   Avatar,
   Image,
 } from '@nextui-org/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Icon } from '@iconify/react';
@@ -31,6 +31,7 @@ export default function Market() {
   const router = useRouter();
   const params = useSearchParams();
   const paramType = params.get('type') || 'ticker';
+  const networkParam = params.get('network');
   const [type, setType] = useState<string>(paramType);
   const [interval, setInterval] = useState<any>(1);
   const [sortField, setSortField] = useState<any>('');
@@ -49,10 +50,26 @@ export default function Market() {
     direction: 'ascending',
   });
   const { network } = useReactWalletStore();
+  const queryNetwork = networkParam === 'testnet'
+    ? 'testnet'
+    : (networkParam === 'mainnet' || networkParam === 'livenet')
+      ? 'livenet'
+      : undefined;
+  const effectiveNetwork = queryNetwork || network;
+
+  useEffect(() => {
+    if (queryNetwork && queryNetwork !== network) {
+      (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+        network: queryNetwork,
+      });
+    }
+  }, [network, queryNetwork]);
+
   const { data, error, isLoading } = useSWR(
-    `/ordx/getTopTickers-${network}-${type}-${interval}-${sortField}-${sortOrder}`,
+    `/ordx/getTopTickers-${effectiveNetwork}-${type}-${interval}-${sortField}-${sortOrder}`,
     () => {
       let res = getTopAssets({
+        network: effectiveNetwork,
         assets_type: type,
         interval,
         top_count: 200,
@@ -192,7 +209,7 @@ export default function Market() {
                       <div className="flex text-sm md:text-base items-left">
                         {logo ? (
                           <Image
-                            src={`${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${logo}`}
+                            src={`${process.env.NEXT_PUBLIC_HOST}${effectiveNetwork === 'testnet' ? '/testnet' : ''}${logo}`}
                             alt="logo"
                             className="w-14 h-14 min-w-[3.5rem] p-2"
                           />

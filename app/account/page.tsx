@@ -3,15 +3,41 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, Tab } from '@nextui-org/react';
 import useSWR from 'swr';
-import { OrdxAssetsUtxoList } from '@/components/account/OrdxAssetsUtxoList';
-import { OrdxOrderHistoryList } from '@/components/order/OrdxOrderHistoryList';
-import { OrdxOrderList } from '@/components/account/OrdxOrderList';
+import dynamic from 'next/dynamic';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
-import { OrdxBillList } from '@/components/account/OrdxBillList';
-import { BlogCreate } from '@/components/account/BlogCreate';
 import { getAddressAssetsValue } from '@/api';
+
+const OrdxAssetsUtxoList = dynamic(
+  () =>
+    import('@/components/account/OrdxAssetsUtxoList').then(
+      (mod) => mod.OrdxAssetsUtxoList,
+    ),
+  { ssr: false },
+);
+const OrdxOrderHistoryList = dynamic(
+  () =>
+    import('@/components/order/OrdxOrderHistoryList').then(
+      (mod) => mod.OrdxOrderHistoryList,
+    ),
+  { ssr: false },
+);
+const OrdxOrderList = dynamic(
+  () =>
+    import('@/components/account/OrdxOrderList').then(
+      (mod) => mod.OrdxOrderList,
+    ),
+  { ssr: false },
+);
+const OrdxBillList = dynamic(
+  () => import('@/components/account/OrdxBillList').then((mod) => mod.OrdxBillList),
+  { ssr: false },
+);
+const BlogCreate = dynamic(
+  () => import('@/components/account/BlogCreate').then((mod) => mod.BlogCreate),
+  { ssr: false },
+);
 
 export default function AccountPage() {
   const { t } = useTranslation();

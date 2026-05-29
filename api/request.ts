@@ -1,7 +1,89 @@
-import { removeObjectEmptyValue } from '@/lib/utils';
-import { useCommonStore } from '@/store';
+import { removeObjectEmptyValue } from '@/lib/utils/format';
+import { useCommonStore } from '@/store/common';
 import axios from 'axios';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+
+const VERIFY_API_PATHS = new Set([
+  '/ordx/GetAddressOrdxAssets',
+  '/ordx/GetOrders',
+  '/ordx/SubmitOrder',
+  '/ordx/CancelOrder',
+  '/ordx/LockOrder',
+  '/ordx/UnlockOrder',
+  '/ordx/BuyOrder',
+  '/ordx/BulkBuyOrder',
+  '/ordx/GetHistory',
+  '/ordx/AddTicker',
+  '/ordx/UpdateTicker',
+  '/ordx/AddChargedTask',
+  '/ordx/AddOrderTask',
+  '/ordx/GetChargedTask',
+  '/ordx/GetOrderTask',
+  '/ordx/GetChargedTaskList',
+  '/ordx/GetOrderTaskList',
+  '/ordx/GetLastOrderTaskByParameters',
+  '/ordx/CreateNameListProject',
+  '/ordx/DeleteNameListProject',
+  '/ordx/AddNameList',
+  '/ordx/RemoveNameList',
+  '/ordx/GetAddressAssetsList',
+]);
+
+let pwaApiSignatureCache: { publicKey: string; signature: string } | null = null;
+let pwaApiSignaturePromise: Promise<string> | null = null;
+
+const isPwaWallet = (wallet: unknown) => {
+  return !!(wallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa;
+};
+
+const ensureApiSignature = async (path: string) => {
+  if (!VERIFY_API_PATHS.has(path)) {
+    return '';
+  }
+
+  const { connected, btcWallet, publicKey } = useReactWalletStore.getState();
+  const { signature, setSignature } = useCommonStore.getState();
+  if (!connected) {
+    return '';
+  }
+
+  if (isPwaWallet(btcWallet) && pwaApiSignatureCache?.publicKey === publicKey) {
+    return pwaApiSignatureCache.signature;
+  }
+
+  if (!isPwaWallet(btcWallet) && signature) {
+    return signature;
+  }
+  if (!process.env.NEXT_PUBLIC_SIGNATURE_TEXT || typeof btcWallet?.signMessage !== 'function') {
+    return '';
+  }
+
+  if (isPwaWallet(btcWallet) && pwaApiSignaturePromise) {
+    return pwaApiSignaturePromise;
+  }
+
+  const sign = async () => {
+    const nextSignature = await btcWallet.signMessage(process.env.NEXT_PUBLIC_SIGNATURE_TEXT!);
+    if (nextSignature) {
+      if (isPwaWallet(btcWallet) && publicKey) {
+        pwaApiSignatureCache = { publicKey, signature: nextSignature };
+      }
+      setSignature(nextSignature);
+    }
+    return nextSignature || '';
+  };
+
+  const nextSignature = isPwaWallet(btcWallet)
+    ? await (pwaApiSignaturePromise = sign().finally(() => {
+      pwaApiSignaturePromise = null;
+    }))
+    : await sign();
+
+  if (nextSignature) {
+    return nextSignature;
+  }
+  return '';
+};
 
 export const request = async (
   path: string,
@@ -9,9 +91,11 @@ export const request = async (
     timeout: 10000,
   },
 ) => {
-  const { publicKey, connected, network, disconnect } =
+  const { publicKey, connected, network: walletNetwork, disconnect } =
     useReactWalletStore.getState();
-  const { signature, reset, setSignature } = useCommonStore.getState();
+  const network = options.network || walletNetwork;
+  const { reset, setSignature } = useCommonStore.getState();
+  const signature = await ensureApiSignature(path);
   const { headers = {}, method = 'GET', data, formData } = options;
   let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
@@ -154,6 +238,7 @@ interface GetTopAssets {
   top_name?: ''; //'recommend' | 'tx_count' | 'tx_amount' | 'tx_volume';
   sort_field: string;
   sort_order: 0 | 1; //'asc' | 'desc';
+  network?: string;
 }
 export const getTopAssets = async ({
   assets_type = '',
@@ -162,9 +247,11 @@ export const getTopAssets = async ({
   top_name = '',
   sort_field = '',
   sort_order = 0,
+  network,
 }: GetTopAssets) => {
   const _interval = interval === 0 ? undefined : interval;
   const res = await request('/ordx/GetTopAssets', {
+    network,
     data: {
       assets_type,
       interval: _interval,

@@ -7,7 +7,7 @@ import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import clsx from 'clsx';
 import '@/locales';
-import { useCommonStore } from '@/store';
+import { useCommonStore } from '@/store/common';
 import { SystemNoticeModal } from '@/components/SystemNoticeModal';
 import { Avatar, Image, Link } from '@nextui-org/react';
 

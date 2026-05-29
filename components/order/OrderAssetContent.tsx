@@ -1,6 +1,6 @@
 import { Image } from '@nextui-org/react';
 import { UtxoContent } from '@/components/UtxoContent';
-import { thousandSeparator } from '@/lib/utils';
+import { thousandSeparator } from '@/lib/utils/format';
 import { BtcPrice } from '../BtcPrice';
 
 export const OrderAssetContent = ({

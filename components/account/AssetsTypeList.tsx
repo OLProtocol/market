@@ -1,13 +1,11 @@
 'use client';
 
 import useSWR from 'swr';
-import { Select, SelectItem, Tabs, Tab } from '@nextui-org/react';
-import { getLabelForAssets } from '@/lib/utils';
+import { Select, SelectItem } from '@nextui-org/react';
+import { getLabelForAssets } from '@/lib/utils/format';
 import { getAddressAssetsList } from '@/api';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useEffect, useMemo, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
 
 interface AssetsTypeListProps {
   onChange?: (ticker: string) => void;
@@ -36,13 +34,17 @@ export const AssetsTypeList = ({
     if (!data?.data) {
       return [];
     }
-    let ret = data?.data;
-    return ret;
+
+    return data.data;
   }, [data]);
+
   useEffect(() => {
     if (list.length > 0) {
       setSelectKey(list[0].assets_name);
       onChange?.(list[0].assets_name);
+    } else {
+      setSelectKey('');
+      onChange?.('');
     }
   }, [list]);
 
@@ -60,7 +62,7 @@ export const AssetsTypeList = ({
             isLoading={isLoading}
             className="w-full max-w-sm"
             selectionMode="single"
-            selectedKeys={[selectKey]}
+            selectedKeys={selectKey ? [selectKey] : []}
             onSelectionChange={onSelectionChange}
           >
             {list.map((item) => (

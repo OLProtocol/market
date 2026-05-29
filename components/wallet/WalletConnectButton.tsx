@@ -17,14 +17,19 @@ import {
 import { Icon } from '@iconify/react';
 
 import { useTheme } from 'next-themes';
-import { hideStr, satsToBitcoin } from '@/lib/utils';
-import { message } from '@/lib/wallet-sdk';
+import { hideStr, satsToBitcoin } from '@/lib/utils/format';
 import { notification } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/store';
-import { generateMempoolUrl } from '@/lib/utils';
-import { useUtxoStore } from '@/store';
-import { sleep } from '@/lib';
+import { useCommonStore } from '@/store/common';
+import { generateMempoolUrl } from '@/lib/utils/url';
+import { useUtxoStore } from '@/store/utxo';
+import { sleep } from '@/lib/utils/format';
+import { installSat20PwaProvider, isSat20PwaEmbedded } from '@/lib/sat20PwaProvider';
+import { message } from '@/lib/wallet-sdk';
+
+const isPwaWallet = (wallet: unknown) => {
+  return !!(wallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa;
+};
 
 const WalletConnectButton = () => {
   console.log('WalletConnectButton component rendering');
@@ -52,6 +57,74 @@ const WalletConnectButton = () => {
   const { setSignature, signature } = useCommonStore((state) => state);
   const [utxoAmount, setUtxoAmount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [pwaEmbedded, setPwaEmbedded] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) {
+      return;
+    }
+
+    const provider = installSat20PwaProvider();
+    setPwaEmbedded(isSat20PwaEmbedded() && !!provider);
+
+    if (!provider) {
+      return;
+    }
+
+    const syncEmbeddedWallet = async (payload?: any) => {
+      let accounts = Array.isArray(payload?.accounts) ? payload.accounts : [];
+      let nextPublicKey = payload?.publicKey || '';
+      let nextNetwork = payload?.network || network;
+
+      if (!accounts.length) {
+        try {
+          accounts = await provider.getAccounts();
+          nextPublicKey = await provider.getPublicKey();
+          nextNetwork = await provider.getNetwork();
+        } catch (error) {
+          console.warn('SAT20 PWA wallet sync failed:', error);
+        }
+      }
+
+      const nextAddress = accounts[0] || '';
+      const currentPublicKey = useReactWalletStore.getState().publicKey;
+      if (nextPublicKey && nextPublicKey !== currentPublicKey) {
+        setSignature('');
+      }
+
+      (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+        connected: !!nextAddress,
+        address: nextAddress,
+        publicKey: nextPublicKey,
+        network: nextNetwork,
+        btcWallet: provider,
+      });
+
+      if (!nextAddress) {
+        setSignature('');
+        reset();
+      }
+    };
+
+    provider.on('ready', syncEmbeddedWallet);
+    provider.on('accountChanged', syncEmbeddedWallet);
+    provider.on('networkChanged', syncEmbeddedWallet);
+    const syncTimer = setTimeout(() => {
+      syncEmbeddedWallet();
+    }, 300);
+
+    return () => {
+      clearTimeout(syncTimer);
+      provider.removeListener('ready', syncEmbeddedWallet);
+      provider.removeListener('accountChanged', syncEmbeddedWallet);
+      provider.removeListener('networkChanged', syncEmbeddedWallet);
+    };
+  }, [mounted, network, reset, setSignature]);
 
   // 清理超时定时器
   const clearTimeouts = useCallback(() => {
@@ -76,11 +149,23 @@ const WalletConnectButton = () => {
     }
     setSignature('');
     reset();
+    if (isPwaWallet(useReactWalletStore.getState().btcWallet)) {
+      (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+        connected: false,
+        address: '',
+        publicKey: '',
+        btcWallet: undefined,
+      });
+      return;
+    }
     await disconnect();
   }, [clearTimeouts, btcWallet, setSignature, reset, disconnect]);
 
   // 优化的签名验证函数
   const checkSignature = useCallback(async () => {
+    if (isPwaWallet(btcWallet)) {
+      return;
+    }
     if (!signature || !publicKey || !process.env.NEXT_PUBLIC_SIGNATURE_TEXT) {
       return;
     }
@@ -91,7 +176,7 @@ const WalletConnectButton = () => {
         process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
         signature,
       );
-      
+
       if (!isValid) {
         console.warn('Signature verification failed');
         notification.warning({
@@ -108,20 +193,49 @@ const WalletConnectButton = () => {
       });
       await handlerDisconnect();
     }
-  }, [signature, publicKey, handlerDisconnect]);
+  }, [signature, publicKey, handlerDisconnect, btcWallet]);
 
   // 优化的账户和网络变化处理
-  const accountAndNetworkChange = useCallback(async () => {
+  const accountAndNetworkChange = useCallback(async (payload?: any) => {
     if (isProcessing) return;
     
     console.log('Account or network changed');
     setIsProcessing(true);
     
     try {
+      if (isPwaWallet(btcWallet)) {
+        const hasAccountPayload = Array.isArray(payload?.accounts)
+          || Array.isArray(payload)
+          || typeof payload === 'string';
+        const accounts = Array.isArray(payload?.accounts)
+          ? payload.accounts
+          : Array.isArray(payload)
+            ? payload
+            : typeof payload === 'string'
+              ? [payload]
+              : [];
+        const nextAddress = accounts[0];
+
+        (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+          ...(hasAccountPayload ? { connected: !!nextAddress, address: nextAddress || '' } : {}),
+          ...(payload?.publicKey ? { publicKey: payload.publicKey } : {}),
+          ...(payload?.network ? { network: payload.network } : {}),
+          btcWallet,
+        });
+
+        if (hasAccountPayload && !nextAddress) {
+          setSignature('');
+          reset();
+        }
+        return;
+      }
+
       reset();
       const windowState = document.visibilityState === 'visible' || !document.hidden;
       
-      await check();
+      if (!isPwaWallet(btcWallet)) {
+        await check();
+      }
       
       if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected && windowState) {
         try {
@@ -227,7 +341,7 @@ const WalletConnectButton = () => {
     console.log('check function available:', typeof check);
     
     // 立即执行一次check
-    if (isComponentMounted.current) {
+    if (isComponentMounted.current && !isSat20PwaEmbedded()) {
       console.log('Executing check function immediately...');
       try {
         check();
@@ -241,6 +355,9 @@ const WalletConnectButton = () => {
     initialCheckTimeoutRef.current = setTimeout(() => {
       if (!isComponentMounted.current) {
         console.log('Component unmounted, skipping delayed check');
+        return;
+      }
+      if (isSat20PwaEmbedded()) {
         return;
       }
       console.log('Executing delayed check function...');
@@ -304,6 +421,64 @@ const WalletConnectButton = () => {
     };
   }, [clearTimeouts, cleanupEventListeners]);
 
+  if (!mounted) {
+    return <Button className="px-0 opacity-0 pointer-events-none">...</Button>;
+  }
+
+  const walletStatus = connected && address ? (
+    <Popover placement="bottom">
+      <PopoverTrigger>
+        <Button
+          className="px-0"
+          disabled={isProcessing}
+          endContent={
+            <div className="px-2 h-full flex justify-center items-center bg-gray-600">
+              {address?.slice(-4)}
+            </div>
+          }
+        >
+          <div className="flex items-center gap-1 pl-2">
+            <span>{showAmount}</span>
+            <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
+          </div>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-2">
+        <div className="flex flex-col gap-2">
+          <div>
+            <Snippet
+              codeString={address}
+              className="bg-transparent text-lg md:text-2xl font-thin items-center"
+              symbol=""
+              variant="flat"
+            >
+              <span className="text-base font-thin text-slate-400">
+                {hideStr(address, 4)}
+              </span>
+            </Snippet>
+          </div>
+          <Button className="w-full" onClick={toHistory}>
+            {t('buttons.to_history')}
+          </Button>
+          {!pwaEmbedded && !isPwaWallet(btcWallet) ? (
+            <Button
+              color="danger"
+              variant="ghost"
+              onClick={handlerDisconnect}
+              disabled={isProcessing}
+            >
+              {t('buttons.disconnect')}
+            </Button>
+          ) : null}
+        </div>
+      </PopoverContent>
+    </Popover>
+  ) : null;
+
+  if (pwaEmbedded) {
+    return walletStatus || <Button className="px-0 opacity-0 pointer-events-none">...</Button>;
+  }
+
   return (
     <WalletConnectReact
       config={{
@@ -314,51 +489,7 @@ const WalletConnectButton = () => {
       onConnectError={onConnectError}
     >
       <>
-        <Popover placement="bottom">
-          <PopoverTrigger>
-            <Button
-              className="px-0"
-              disabled={isProcessing}
-              endContent={
-                <div className="px-2 h-full flex justify-center items-center bg-gray-600">
-                  {address?.slice(-4)}
-                </div>
-              }
-            >
-              <div className="flex items-center gap-1 pl-2">
-                <span>{showAmount}</span>
-                <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
-              </div>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="p-2">
-            <div className="flex flex-col gap-2">
-              <div>
-                <Snippet
-                  codeString={address}
-                  className="bg-transparent text-lg md:text-2xl font-thin items-center"
-                  symbol=""
-                  variant="flat"
-                >
-                  <span className="text-base font-thin text-slate-400">
-                    {hideStr(address, 4)}
-                  </span>
-                </Snippet>
-              </div>
-              <Button className="w-full" onClick={toHistory}>
-                {t('buttons.to_history')}
-              </Button>
-              <Button
-                color="danger"
-                variant="ghost"
-                onClick={handlerDisconnect}
-                disabled={isProcessing}
-              >
-                {t('buttons.disconnect')}
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        {walletStatus}
       </>
     </WalletConnectReact>
   );

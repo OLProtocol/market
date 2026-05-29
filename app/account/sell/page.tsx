@@ -26,6 +26,7 @@ import {
   buildBatchSellOrder,
   hideStr,
   btcToSats,
+  copyToClipboard,
 } from '@/lib/utils';
 import { isTaprootAddress } from '@/lib/wallet';
 import { Decimal } from 'decimal.js';
@@ -204,6 +205,14 @@ export default function SellPage() {
     }
     changeAmountUnit(u);
   };
+  const copyUtxo = async (value?: string | string[]) => {
+    const copied = await copyToClipboard(Array.isArray(value) ? value.join('\n') : value);
+    if (copied) {
+      notification.success({ message: 'Copied' });
+    } else {
+      notification.error({ message: 'Copy failed' });
+    }
+  };
   const totalPrice = useMemo(
     () =>
       list.reduce((a, b) => {
@@ -340,6 +349,7 @@ export default function SellPage() {
                         symbol=""
                         size="lg"
                         variant="flat"
+                        onCopy={copyUtxo}
                       >
                         <span className="font-thin">
                           {hideStr(item?.utxo, 6)}

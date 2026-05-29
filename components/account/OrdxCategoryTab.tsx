@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Icon } from '@iconify/react';
 import { getAddressAssetsSummary } from '@/api';
-import { satsToBitcoin } from '@/lib/utils';
 import { BtcPrice } from '@/components/BtcPrice';
 
 interface IOrdxCategoryTabProps {
@@ -28,10 +27,13 @@ export const OrdxCategoryTab = ({ onChange }: IOrdxCategoryTabProps) => {
     },
   );
   const list = useMemo(() => {
-    const tickerInfo = data?.data?.find((v) => v.assets_type === 'ticker');
-    const exoticInfo = data?.data?.find((v) => v.assets_type === 'exotic');
-    const nftInfo = data?.data?.find((v) => v.assets_type === 'nft');
-    const nsInfo = data?.data?.find((v) => v.assets_type === 'ns');
+    const typeList = Array.isArray(data?.data)
+      ? data.data
+      : data?.data?.type_list || [];
+    const tickerInfo = typeList.find((v) => v.assets_type === 'ticker');
+    const exoticInfo = typeList.find((v) => v.assets_type === 'exotic');
+    const nftInfo = typeList.find((v) => v.assets_type === 'nft');
+    const nsInfo = typeList.find((v) => v.assets_type === 'ns');
     return [
       {
         label: 'SAT20 Token',

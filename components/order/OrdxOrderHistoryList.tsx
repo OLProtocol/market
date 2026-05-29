@@ -15,7 +15,8 @@ import {
 } from '@nextui-org/react';
 import { getHistory } from '@/api';
 import { useMemo, useState } from 'react';
-import { hideStr, resolveMempoolTxLink } from '@/lib/utils';
+import { hideStr } from '@/lib/utils/format';
+import { resolveMempoolTxLink } from '@/lib/utils/url';
 import { Icon } from '@iconify/react';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { Pagination } from '@/components/Pagination';

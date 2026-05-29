@@ -1,9 +1,43 @@
+import { useCommonStore } from '@/store/common';
+
+const SATOSHINET_MARKET_URL =
+  process.env.NEXT_PUBLIC_SATSNET_MARKET_URL
+  || (process.env.NODE_ENV === 'development' ? '' : 'https://satsnet.ordx.market/');
+
+const resolveSatsnetMarketUrl = () => {
+  const baseUrl = SATOSHINET_MARKET_URL
+    || `${window.location.protocol}//${window.location.hostname}:3006/`;
+
+  const url = new URL(baseUrl, window.location.href);
+  const networkParam = new URLSearchParams(window.location.search).get('network');
+  const currentNetwork = useCommonStore.getState().network;
+  const network = networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet'
+    ? networkParam
+    : currentNetwork;
+  url.searchParams.set('network', network === 'testnet' ? 'testnet' : 'mainnet');
+  return url.href;
+};
+
+const navigateMarket = (href: string) => {
+  if (window.parent !== window) {
+    window.parent.postMessage({
+      type: 'SAT20_DAPP_NAVIGATE',
+      protocol: 'sat20-dapp-connect',
+      origin: window.location.origin,
+      href,
+    }, '*');
+    return;
+  }
+
+  window.location.href = href;
+};
+
 export const ChainSelect = () => {
   const chain = 'Bitcoin'
 
   const handleSelectionChange = (value: any) => {
     if (value === 'SatoshiNet') {
-      window.location.href = 'https://satsnet.ordx.market/';
+      navigateMarket(resolveSatsnetMarketUrl());
     }
   };
 

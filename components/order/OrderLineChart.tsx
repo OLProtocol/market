@@ -1,6 +1,6 @@
 'use client';
 
-import { satsToBitcoin } from '@/lib/utils';
+import { satsToBitcoin } from '@/lib/utils/format';
 import { useMemo, useEffect, useRef, useState, use } from 'react';
 import { Chart } from '@antv/g2';
 

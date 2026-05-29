@@ -4,14 +4,13 @@ import {
   CardFooter,
   CardBody,
   Checkbox,
-  Chip,
   Snippet,
-  Image,
 } from '@nextui-org/react';
+import { notification } from 'antd';
 import { Icon } from '@iconify/react';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { hideStr, thousandSeparator } from '@/lib/utils';
+import { copyToClipboard, hideStr } from '@/lib/utils';
 
 import { NameItem } from './NameItem';
 import { Sat20Item } from './Sat20Item';
@@ -123,6 +122,14 @@ export const AssetsItem = ({
     await onCancelOrder?.();
     setLoading(false);
   };
+  const copyUtxo = async (value?: string | string[]) => {
+    const copied = await copyToClipboard(Array.isArray(value) ? value.join('\n') : value || item?.utxo);
+    if (copied) {
+      notification.success({ message: 'Copied' });
+    } else {
+      notification.error({ message: 'Copy failed' });
+    }
+  };
   const showSplit = assets_type === 'ticker' && ['图币测试5', 'pearl', 'rarepizza'].includes(assets_name);
   
   return (
@@ -164,6 +171,7 @@ export const AssetsItem = ({
           symbol=""
           size="sm"
           variant="flat"
+          onCopy={copyUtxo}
         >
           <span className="font-thin md:pl-8">{hideStr(item?.utxo, 6)}</span>
         </Snippet>

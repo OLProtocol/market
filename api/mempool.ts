@@ -1,6 +1,6 @@
 'use client';
 
-import { generateMempoolUrl } from '@/lib/utils';
+import { generateMempoolUrl } from '@/lib/utils/url';
 
 const getTxHex = async (txId: string, network: string) => {
   const url = generateMempoolUrl({

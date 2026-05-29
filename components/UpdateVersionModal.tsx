@@ -10,7 +10,7 @@ import { version } from '@/assets/version';
 import { getAppVersion } from '@/api';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/store';
+import { useCommonStore } from '@/store/common';
 
 export const UpdateVersionModal = () => {
   const { setAppVersion } = useCommonStore();

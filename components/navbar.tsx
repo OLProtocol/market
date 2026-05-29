@@ -26,10 +26,10 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import { ChainSelect } from '@/components/ChainSelect';
 import { ordxSWR, getBTCPrice } from '@/api';
-import { useCommonStore } from '@/store';
+import { useCommonStore } from '@/store/common';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import WalletConnectButton from './wallet/WalletConnectButton';
-import { useUtxoPolling } from '@/lib/hooks';
+import { useUtxoPolling } from '@/lib/hooks/useUtxoPolling';
 // const WalletButton = dynamic(
 //   () => import('../components/wallet/WalletConnectButton') as any,
 //   { ssr: false },
@@ -37,7 +37,7 @@ import { useUtxoPolling } from '@/lib/hooks';
 
 export const Navbar = () => {
   const { address, network } = useReactWalletStore();
-  const { setHeight, setBtcPrice, runtimeEnv, setEnv } = useCommonStore();
+  const { setHeight, setBtcPrice, runtimeEnv, setEnv, changeNetwork } = useCommonStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
@@ -134,12 +134,21 @@ export const Navbar = () => {
     return menus;
   }, [i18n.language, runtimeEnv]);
   useEffect(() => {
+    const networkParam = new URLSearchParams(window.location.search).get('network');
+    if (networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet') {
+      const nextNetwork = networkParam === 'mainnet' ? 'livenet' : networkParam;
+      changeNetwork(nextNetwork);
+      (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+        network: nextNetwork,
+      });
+    }
+
     if (location.hostname.startsWith('test')) {
       setEnv('test');
     } else if (location.hostname.indexOf('ordx') > -1) {
       setEnv('prod');
     }
-  }, []);
+  }, [changeNetwork, setEnv]);
   return (
     <NextUINavbar
       maxWidth="full"

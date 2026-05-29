@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { Decimal } from 'decimal.js';
-import { filterUtxosByValue } from '@/lib';
+import { filterUtxosByValue } from '@/lib/wallet/utxo';
 import { last, sort } from 'radash';
 
 export interface UtxoItem {

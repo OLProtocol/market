@@ -1,7 +1,7 @@
 export * from './useCalcFee';
 export * from './useUtxoPolling';
 
-import { useCommonStore } from '@/store';
+import { useCommonStore } from '@/store/common';
 import { useMemo } from 'react';
 import { Decimal } from 'decimal.js';
 

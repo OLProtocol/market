@@ -24,6 +24,7 @@ export const WalletConnectBus = ({
   // }
   const { t } = useTranslation();
   const { connected, setModalVisible } = useReactWalletStore((state) => state);
+
   return connected || keepStyle ? (
     <>{children}</>
   ) : (
