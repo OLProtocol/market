@@ -2,6 +2,7 @@ import { removeObjectEmptyValue } from '@/lib/utils/format';
 import { useCommonStore } from '@/store/common';
 import axios from 'axios';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
+import { message } from '@/lib/wallet-sdk';
 
 const VERIFY_API_PATHS = new Set([
   '/ordx/GetAddressOrdxAssets',
@@ -36,6 +37,23 @@ const isPwaWallet = (wallet: unknown) => {
   return !!(wallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa;
 };
 
+const isValidApiSignature = (publicKey: string, signature: string) => {
+  if (!process.env.NEXT_PUBLIC_SIGNATURE_TEXT) {
+    return false;
+  }
+
+  try {
+    return message.verifyMessageOfECDSA(
+      publicKey,
+      process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+      signature,
+    );
+  } catch (error) {
+    console.warn('Stored API signature verification failed:', error);
+    return false;
+  }
+};
+
 const ensureApiSignature = async (path: string) => {
   if (!VERIFY_API_PATHS.has(path)) {
     return '';
@@ -52,7 +70,10 @@ const ensureApiSignature = async (path: string) => {
   }
 
   if (!isPwaWallet(btcWallet) && signature) {
-    return signature;
+    if (publicKey && isValidApiSignature(publicKey, signature)) {
+      return signature;
+    }
+    setSignature('');
   }
   if (!process.env.NEXT_PUBLIC_SIGNATURE_TEXT || typeof btcWallet?.signMessage !== 'function') {
     return '';
