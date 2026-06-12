@@ -23,6 +23,11 @@ interface InscribeOrdxMintProps {
 }
 
 const MAX_REPEAT = 1000;
+const toPermissionAmount = (amount: unknown) => {
+  const value = Number(amount ?? 0);
+  return Number.isFinite(value) ? value : 0;
+};
+
 export const InscribeOrdxMint = ({
   onNext,
   onChange,
@@ -87,7 +92,7 @@ export const InscribeOrdxMint = ({
     let utxos: any = [];
     if (ticker) {
       set('limit', limit);
-      const { amount = 0 } = permissionInfo.data || {};
+      const amount = toPermissionAmount(permissionInfo.data?.amount);
       let _max = limit;
       if (max > 0) {
         _max = min([_max, max, amount]);
@@ -190,7 +195,7 @@ export const InscribeOrdxMint = ({
         delegate,
         selfmint,
       } = info || {};
-      const selfMintAmount = permissionInfo?.amount || 0;
+      const selfMintAmount = toPermissionAmount(permissionInfo?.amount);
       const isSpecial = rarity !== 'unknow' && rarity !== 'common' && !!rarity;
       let _maxAmount;
       let _singleMaxAmount = limit || 0;

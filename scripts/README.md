@@ -15,6 +15,7 @@
 - 远程路径：`/var/www/app.ordx.market`
 - 本地路径：`./out`（项目根目录下的out文件夹）
 - SSH用户：`root`
+- SSH端口：`20222`
 
 ## 使用方法
 
@@ -87,6 +88,14 @@ const CONFIG = {
 SSH_USER="your-username"  # 修改为你的用户名
 ```
 
+### 修改SSH端口
+
+默认 SSH 端口是 `20222`。临时指定端口：
+
+```bash
+DEPLOY_SSH_PORT=20222 npm run deploy
+```
+
 ### 使用SSH密钥
 
 如果需要使用SSH密钥，请在脚本中配置密钥路径：
@@ -134,13 +143,13 @@ SSH_KEY="/path/to/your/private/key"  # 添加密钥路径
 ### 手动测试SSH连接
 
 ```bash
-ssh root@103.103.245.177
+ssh -p 20222 root@103.103.245.177
 ```
 
 ### 手动测试rsync
 
 ```bash
-rsync -avz --dry-run ./out/ root@103.103.245.177:/var/www/app.ordx.market/
+rsync -avz -e "ssh -p 20222" --dry-run ./out/ root@103.103.245.177:/var/www/app.ordx.market/
 ```
 
 ## 注意事项

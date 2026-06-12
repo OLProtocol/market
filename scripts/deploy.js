@@ -10,6 +10,7 @@ const CONFIG = {
   remotePath: '/var/www/app.ordx.market',
   localPath: path.join(__dirname, '..', 'out'),
   sshUser: 'root', // 可以根据实际情况修改用户名
+  sshPort: process.env.DEPLOY_SSH_PORT || '20222',
   sshKey: '', // 如果有SSH密钥文件，可以在这里指定路径
 };
 
@@ -68,7 +69,9 @@ function buildRsyncCommand() {
 
   // 如果有SSH密钥，添加密钥参数
   if (CONFIG.sshKey && fs.existsSync(CONFIG.sshKey)) {
-    args.push(`-e "ssh -i ${CONFIG.sshKey}"`);
+    args.push(`-e "ssh -p ${CONFIG.sshPort} -i ${CONFIG.sshKey}"`);
+  } else {
+    args.push(`-e "ssh -p ${CONFIG.sshPort}"`);
   }
 
   // 添加源路径和目标路径
