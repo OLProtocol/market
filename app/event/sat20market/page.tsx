@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import { Button } from '@nextui-org/react';
 import {
   bindTwitterAccount,
@@ -13,7 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { useTranslation } from 'react-i18next';
 
-export default function BtcNameEvent() {
+function Sat20MarketEventContent() {
   const params = useSearchParams();
   const { i18n, t } = useTranslation();
   const paramId = params.get('id') || 1;
@@ -274,4 +275,8 @@ export default function BtcNameEvent() {
       </div>
     </div>
   );
+}
+
+export default function Sat20MarketEvent() {
+  return <Suspense fallback={null}><Sat20MarketEventContent /></Suspense>;
 }

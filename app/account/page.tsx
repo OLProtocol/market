@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Tabs, Tab } from '@nextui-org/react';
@@ -39,7 +40,7 @@ const BlogCreate = dynamic(
   { ssr: false },
 );
 
-export default function AccountPage() {
+function AccountPageContent() {
   const { t } = useTranslation();
   const params = useSearchParams();
   const paramTab = params.get('source') || 'utxo';
@@ -106,4 +107,8 @@ export default function AccountPage() {
       </Tabs>
     </div>
   );
+}
+
+export default function AccountPage() {
+  return <Suspense fallback={null}><AccountPageContent /></Suspense>;
 }

@@ -28,7 +28,7 @@ export const UpdateVersionModal = () => {
       }
     },
   });
-  const timer = useRef<any>();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refresh = () => {
     setOpen(false);

@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 
 import {
   addOrderTask,
@@ -29,7 +30,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useList, useMap } from 'react-use';
 
-export default function HuntSatTool() {
+function HuntSatToolContent() {
   const { t, i18n } = useTranslation();
   const params = useSearchParams();
   const txid = params.get('txid') as string;
@@ -448,4 +449,8 @@ export default function HuntSatTool() {
       </Card>
     </div>
   );
+}
+
+export default function HuntSatTool() {
+  return <Suspense fallback={null}><HuntSatToolContent /></Suspense>;
 }

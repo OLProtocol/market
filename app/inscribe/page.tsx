@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import { Button, ButtonGroup, Card, CardBody } from '@nextui-org/react';
 // import { useLocation } from 'react-router-dom';
 // import { useToast } from '@chakra-ui/react';
@@ -30,7 +31,7 @@ import { OrderList } from '@/components/inscribe/OrderList';
 // import { useCommonStore } from '@/store';
 type InscribeType = 'text' | 'brc20' | 'brc100' | 'files' | 'ordx';
 
-export default function Inscribe() {
+function InscribeContent() {
   const params = useSearchParams();
   const nav = useRouter();
   const { inscribeData, reset: resetInscribeData } = useInscribeStore();
@@ -733,4 +734,8 @@ export default function Inscribe() {
       </div>
     </div>
   );
+}
+
+export default function Inscribe() {
+  return <Suspense fallback={null}><InscribeContent /></Suspense>;
 }

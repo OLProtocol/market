@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 
 import { getTopAssets } from '@/api';
 import useSWR from 'swr';
@@ -26,7 +27,7 @@ import { BtcPrice } from '@/components/BtcPrice';
 import { HomeTypeTabs } from '@/components/market/HomeTypeTabs';
 import { NameMarketNav } from '@/components/market/NameMarketNav';
 
-export default function Market() {
+function MarketContent() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
@@ -328,4 +329,8 @@ export default function Market() {
       </Table>
     </div>
   );
+}
+
+export default function Market() {
+  return <Suspense fallback={null}><MarketContent /></Suspense>;
 }

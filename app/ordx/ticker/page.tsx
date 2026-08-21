@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 
 import useSWR from 'swr';
 import { Card, CardBody, Button, Avatar, Image } from '@nextui-org/react';
@@ -17,7 +18,7 @@ import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { getTickLabel } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 
-export default function Page() {
+function TickerPageContent() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
@@ -205,4 +206,8 @@ export default function Page() {
       </div>
     </div>
   );
+}
+
+export default function Page() {
+  return <Suspense fallback={null}><TickerPageContent /></Suspense>;
 }

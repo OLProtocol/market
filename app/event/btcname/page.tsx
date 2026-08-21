@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import { Button } from '@nextui-org/react';
 import {
   bindTwitterAccount,
@@ -14,7 +15,7 @@ import { useReactWalletStore } from '@sat20/btc-connect/dist/react';
 import { WalletConnectBus } from '@/components/wallet/WalletConnectBus';
 import { useTranslation } from 'react-i18next';
 
-export default function BtcNameEvent() {
+function BtcNameEventContent() {
   const params = useSearchParams();
   const { i18n, t } = useTranslation();
   const paramId = params.get('id') || 1;
@@ -276,4 +277,8 @@ export default function BtcNameEvent() {
       </div>
     </div>
   );
+}
+
+export default function BtcNameEvent() {
+  return <Suspense fallback={null}><BtcNameEventContent /></Suspense>;
 }
