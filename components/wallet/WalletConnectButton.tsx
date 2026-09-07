@@ -24,8 +24,21 @@ import { useCommonStore } from '@/store/common';
 import { generateMempoolUrl } from '@/lib/utils/url';
 import { useUtxoStore } from '@/store/utxo';
 import { sleep } from '@/lib/utils/format';
-import { installSat20PwaProvider, isSat20PwaEmbedded } from '@/lib/sat20PwaProvider';
+import {
+  installSat20PwaProvider,
+  isSat20PwaEmbedded,
+} from '@/lib/sat20PwaProvider';
 import { message } from '@/lib/wallet-sdk';
+
+const SAT20_PWA_MARKET_CAPABILITIES = [
+  'accounts:read',
+  'public-key:read',
+  'network:read',
+  'network:switch',
+  'transaction:prepare',
+  'transaction:sign',
+  'transaction:broadcast',
+] as const;
 
 const isPwaWallet = (wallet: unknown) => {
   return !!(wallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa;
@@ -109,10 +122,13 @@ const setSharedWalletIdentity = (identity: SharedWalletIdentity) => {
   if (!identity.address || !identity.publicKey) {
     return;
   }
-  setSharedCookie(SHARED_IDENTITY_COOKIE, JSON.stringify({
-    ...identity,
-    updatedAt: Date.now(),
-  }));
+  setSharedCookie(
+    SHARED_IDENTITY_COOKIE,
+    JSON.stringify({
+      ...identity,
+      updatedAt: Date.now(),
+    }),
+  );
   setSharedCookie(SHARED_DISCONNECT_COOKIE, '', 0);
 };
 
@@ -122,7 +138,11 @@ const getReusableSharedSignature = (publicKey?: string) => {
     return '';
   }
   const sharedIdentity = getSharedWalletIdentity();
-  if (publicKey && sharedIdentity?.publicKey && sharedIdentity.publicKey !== publicKey) {
+  if (
+    publicKey &&
+    sharedIdentity?.publicKey &&
+    sharedIdentity.publicKey !== publicKey
+  ) {
     return '';
   }
   return sharedSignature;
@@ -165,14 +185,14 @@ const WalletConnectButton = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
-  
+
   // 使用ref来跟踪事件监听器状态，防止重复绑定
   const eventListenersBound = useRef(false);
   const signatureCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const initialCheckTimeoutRefs = useRef<NodeJS.Timeout[]>([]);
   const isComponentMounted = useRef(true);
   const restoreInProgressRef = useRef(false);
-  
+
   const {
     connected,
     check,
@@ -183,7 +203,7 @@ const WalletConnectButton = () => {
     network,
     initStatus,
   } = useReactWalletStore((state) => state);
-  
+
   const { reset, getUnspendUtxos, list: UtxoList } = useUtxoStore();
   const { setSignature, signature } = useCommonStore((state) => state);
   const [utxoAmount, setUtxoAmount] = useState(0);
@@ -208,17 +228,20 @@ const WalletConnectButton = () => {
     }
 
     const syncEmbeddedWallet = async (payload?: any) => {
-      let accounts = Array.isArray(payload?.accounts) ? payload.accounts : [];
+      const hasAccountSnapshot = Array.isArray(payload?.accounts);
+      let accounts = hasAccountSnapshot ? payload.accounts : [];
       let nextPublicKey = payload?.publicKey || '';
       let nextNetwork = payload?.network || network;
 
-      if (!accounts.length) {
+      if (!hasAccountSnapshot) {
         try {
           accounts = await provider.getAccounts();
           nextPublicKey = await provider.getPublicKey();
           nextNetwork = await provider.getNetwork();
-        } catch (error) {
-          console.warn('SAT20 PWA wallet sync failed:', error);
+        } catch {
+          // A ready/network event without an account snapshot is not a
+          // disconnect signal. Preserve the current authorized session.
+          return;
         }
       }
 
@@ -228,7 +251,11 @@ const WalletConnectButton = () => {
         setSignature('');
       }
 
-      (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+      (
+        useReactWalletStore.setState as (
+          partial: Record<string, unknown>,
+        ) => void
+      )({
         connected: !!nextAddress,
         address: nextAddress,
         publicKey: nextPublicKey,
@@ -286,7 +313,11 @@ const WalletConnectButton = () => {
     }
     reset();
     if (isPwaWallet(currentWallet)) {
-      (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+      (
+        useReactWalletStore.setState as (
+          partial: Record<string, unknown>,
+        ) => void
+      )({
         connected: false,
         address: '',
         publicKey: '',
@@ -299,16 +330,18 @@ const WalletConnectButton = () => {
 
   // 优化的签名验证函数
   const checkSignature = useCallback(async () => {
-    const {
-      publicKey: currentPublicKey,
-      btcWallet: currentWallet,
-    } = useReactWalletStore.getState();
+    const { publicKey: currentPublicKey, btcWallet: currentWallet } =
+      useReactWalletStore.getState();
     const currentSignature = useCommonStore.getState().signature || signature;
 
     if (isPwaWallet(currentWallet)) {
       return;
     }
-    if (!currentSignature || !currentPublicKey || !process.env.NEXT_PUBLIC_SIGNATURE_TEXT) {
+    if (
+      !currentSignature ||
+      !currentPublicKey ||
+      !process.env.NEXT_PUBLIC_SIGNATURE_TEXT
+    ) {
       return;
     }
 
@@ -343,82 +376,113 @@ const WalletConnectButton = () => {
   }, [signature, publicKey, handlerDisconnect, btcWallet, setSignature]);
 
   // 优化的账户和网络变化处理
-  const accountAndNetworkChange = useCallback(async (payload?: any) => {
-    if (isProcessing) return;
-    
-    console.log('Account or network changed');
-    setIsProcessing(true);
-    
-    try {
-      if (isPwaWallet(btcWallet)) {
-        const hasAccountPayload = Array.isArray(payload?.accounts)
-          || Array.isArray(payload)
-          || typeof payload === 'string';
-        const accounts = Array.isArray(payload?.accounts)
-          ? payload.accounts
-          : Array.isArray(payload)
-            ? payload
-            : typeof payload === 'string'
-              ? [payload]
-              : [];
-        const nextAddress = accounts[0];
+  const accountAndNetworkChange = useCallback(
+    async (payload?: any) => {
+      if (isProcessing) return;
 
-        (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
-          ...(hasAccountPayload ? { connected: !!nextAddress, address: nextAddress || '' } : {}),
-          ...(payload?.publicKey ? { publicKey: payload.publicKey } : {}),
-          ...(payload?.network ? { network: payload.network } : {}),
-          btcWallet,
-        });
+      console.log('Account or network changed');
+      setIsProcessing(true);
 
-        if (hasAccountPayload && !nextAddress) {
-          setSignature('');
-          reset();
+      try {
+        if (isPwaWallet(btcWallet)) {
+          const hasAccountPayload =
+            Array.isArray(payload?.accounts) ||
+            Array.isArray(payload) ||
+            typeof payload === 'string';
+          const accounts = Array.isArray(payload?.accounts)
+            ? payload.accounts
+            : Array.isArray(payload)
+              ? payload
+              : typeof payload === 'string'
+                ? [payload]
+                : [];
+          const nextAddress = accounts[0];
+
+          (
+            useReactWalletStore.setState as (
+              partial: Record<string, unknown>,
+            ) => void
+          )({
+            ...(hasAccountPayload
+              ? { connected: !!nextAddress, address: nextAddress || '' }
+              : {}),
+            ...(payload?.publicKey ? { publicKey: payload.publicKey } : {}),
+            ...(payload?.network ? { network: payload.network } : {}),
+            btcWallet,
+          });
+
+          if (hasAccountPayload && !nextAddress) {
+            setSignature('');
+            reset();
+          }
+          return;
         }
-        return;
-      }
 
-      reset();
-      const windowState = document.visibilityState === 'visible' || !document.hidden;
-      
-      if (!isPwaWallet(btcWallet)) {
-        await check();
-      }
-      
-      if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && connected && windowState) {
-        try {
-          const currentState = useReactWalletStore.getState() as any;
-          const sharedSignature = getReusableSharedSignature(currentState.publicKey);
-          if (sharedSignature) {
-            setSignature(sharedSignature);
-            return;
+        reset();
+        const windowState =
+          document.visibilityState === 'visible' || !document.hidden;
+
+        if (!isPwaWallet(btcWallet)) {
+          await check();
+        }
+
+        if (
+          process.env.NEXT_PUBLIC_SIGNATURE_TEXT &&
+          connected &&
+          windowState
+        ) {
+          try {
+            const currentState = useReactWalletStore.getState() as any;
+            const sharedSignature = getReusableSharedSignature(
+              currentState.publicKey,
+            );
+            if (sharedSignature) {
+              setSignature(sharedSignature);
+              return;
+            }
+            console.log(
+              'Requesting new signature after account/network change',
+            );
+            const newSignature = await btcWallet?.signMessage(
+              process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+            );
+            if (newSignature) {
+              setSignature(newSignature);
+              saveSharedWalletState({
+                address: currentState.address,
+                publicKey: currentState.publicKey,
+                network: currentState.network,
+                connectorId:
+                  currentState.localConnectorId || currentState.connectorId,
+                signature: newSignature,
+              });
+            }
+          } catch (error: unknown) {
+            console.error(
+              'Signature request failed after account/network change:',
+              error,
+            );
+            await handlerDisconnect();
           }
-          console.log('Requesting new signature after account/network change');
-          const newSignature = await btcWallet?.signMessage(
-            process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
-          );
-          if (newSignature) {
-            setSignature(newSignature);
-            saveSharedWalletState({
-              address: currentState.address,
-              publicKey: currentState.publicKey,
-              network: currentState.network,
-              connectorId: currentState.localConnectorId || currentState.connectorId,
-              signature: newSignature,
-            });
-          }
-        } catch (error: unknown) {
-          console.error('Signature request failed after account/network change:', error);
+        } else if (!windowState) {
           await handlerDisconnect();
         }
-      } else if (!windowState) {
-        await handlerDisconnect();
+      } catch (error: unknown) {
+        console.error('Account/network change handling failed:', error);
+      } finally {
+        setIsProcessing(false);
       }
-    } catch (error: unknown) {
-      console.error('Account/network change handling failed:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [isProcessing, reset, check, connected, btcWallet, setSignature, handlerDisconnect]);
+    },
+    [
+      isProcessing,
+      reset,
+      check,
+      connected,
+      btcWallet,
+      setSignature,
+      handlerDisconnect,
+    ],
+  );
 
   // 清理事件监听器
   const cleanupEventListeners = useCallback(() => {
@@ -439,66 +503,118 @@ const WalletConnectButton = () => {
   }, [btcWallet, accountAndNetworkChange]);
 
   // 优化的连接成功处理
-  const onConnectSuccess = useCallback(async (wallet: any) => {
-    if (isProcessing) return;
-    await sleep(300);
-    setIsProcessing(true);
-    console.log('onConnectSuccess', wallet);
-    console.log('signature', signature);
-    console.log('process.env.NEXT_PUBLIC_SIGNATURE_TEXT', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
-    console.log('wallet.signMessage', wallet.signMessage);
-    try {
-      if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && !isPwaWallet(wallet)) {
-        const walletState = useReactWalletStore.getState() as any;
-        const connectorId = walletState.localConnectorId || walletState.connectorId;
-        const sharedSignature = getReusableSharedSignature(walletState.publicKey);
-        if (sharedSignature) {
-          setSignature(sharedSignature);
-          saveSharedWalletState({
-            address: walletState.address,
-            publicKey: walletState.publicKey,
-            network: walletState.network,
-            connectorId,
-            signature: sharedSignature,
-          });
-        } else {
-          setSignature('');
-          console.log('Requesting signature for:', process.env.NEXT_PUBLIC_SIGNATURE_TEXT);
-          const signatureResult = await wallet.signMessage(
-            process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+  const onConnectSuccess = useCallback(
+    async (wallet: any) => {
+      if (isProcessing) return;
+      await sleep(300);
+      setIsProcessing(true);
+      console.log('onConnectSuccess', wallet);
+      console.log('signature', signature);
+      console.log(
+        'process.env.NEXT_PUBLIC_SIGNATURE_TEXT',
+        process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+      );
+      console.log('wallet.signMessage', wallet.signMessage);
+      try {
+        if (process.env.NEXT_PUBLIC_SIGNATURE_TEXT && !isPwaWallet(wallet)) {
+          const walletState = useReactWalletStore.getState() as any;
+          const connectorId =
+            walletState.localConnectorId || walletState.connectorId;
+          const sharedSignature = getReusableSharedSignature(
+            walletState.publicKey,
           );
-          setSignature(signatureResult);
-          saveSharedWalletState({
-            address: walletState.address,
-            publicKey: walletState.publicKey,
-            network: walletState.network,
-            connectorId,
-            signature: signatureResult,
-          });
+          if (sharedSignature) {
+            setSignature(sharedSignature);
+            saveSharedWalletState({
+              address: walletState.address,
+              publicKey: walletState.publicKey,
+              network: walletState.network,
+              connectorId,
+              signature: sharedSignature,
+            });
+          } else {
+            setSignature('');
+            console.log(
+              'Requesting signature for:',
+              process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+            );
+            const signatureResult = await wallet.signMessage(
+              process.env.NEXT_PUBLIC_SIGNATURE_TEXT,
+            );
+            setSignature(signatureResult);
+            saveSharedWalletState({
+              address: walletState.address,
+              publicKey: walletState.publicKey,
+              network: walletState.network,
+              connectorId,
+              signature: signatureResult,
+            });
+          }
         }
+      } catch (error: unknown) {
+        console.error('Signature request failed:', error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Failed to get signature from wallet';
+        notification.error({
+          message: 'Signature Request Failed',
+          description: errorMessage,
+        });
+        await disconnect();
+      } finally {
+        setIsProcessing(false);
       }
-    } catch (error: unknown) {
-      console.error('Signature request failed:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to get signature from wallet';
+    },
+    [signature, isProcessing, setSignature, disconnect],
+  );
+
+  // 优化的连接错误处理
+  const onConnectError = useCallback(
+    (error: unknown) => {
+      console.error('Connect Wallet Failed', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to connect wallet';
       notification.error({
-        message: 'Signature Request Failed',
+        message: 'Connect Wallet Failed',
         description: errorMessage,
       });
-      await disconnect();
+    },
+    [setSignature],
+  );
+
+  const handlePwaConnect = useCallback(async () => {
+    const provider = installSat20PwaProvider();
+    if (!provider || isProcessing) return;
+
+    setIsProcessing(true);
+    try {
+      const accounts = await provider.requestAccounts({
+        capabilities: [...SAT20_PWA_MARKET_CAPABILITIES],
+        sessionOnly: true,
+      });
+      const [nextPublicKey, nextNetwork] = await Promise.all([
+        provider.getPublicKey(),
+        provider.getNetwork(),
+      ]);
+      const nextAddress = accounts[0] || '';
+      (
+        useReactWalletStore.setState as (
+          partial: Record<string, unknown>,
+        ) => void
+      )({
+        connected: !!nextAddress,
+        address: nextAddress,
+        publicKey: nextPublicKey,
+        network: nextNetwork,
+        btcWallet: provider,
+      });
+    } catch (error) {
+      onConnectError(error);
     } finally {
       setIsProcessing(false);
     }
-  }, [signature, isProcessing, setSignature, disconnect]);
-
-  // 优化的连接错误处理
-  const onConnectError = useCallback((error: unknown) => {
-    console.error('Connect Wallet Failed', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to connect wallet';
-    notification.error({
-      message: 'Connect Wallet Failed',
-      description: errorMessage,
-    });
-  }, [setSignature]);
+  }, [isProcessing, onConnectError]);
 
   const toMyAssets = () => {
     router.push('/account');
@@ -537,10 +653,11 @@ const WalletConnectButton = () => {
       }
 
       const sharedIdentity = getSharedWalletIdentity();
-      const connectorId = walletState.localConnectorId
-        || walletState.connectorId
-        || sharedIdentity?.connectorId
-        || getSharedConnectorId();
+      const connectorId =
+        walletState.localConnectorId ||
+        walletState.connectorId ||
+        sharedIdentity?.connectorId ||
+        getSharedConnectorId();
       if (connectorId) {
         const connector = walletState.connectors?.find(
           (item: any) => item.id === connectorId && item.installed,
@@ -548,14 +665,21 @@ const WalletConnectButton = () => {
         if (!connector) {
           return false;
         }
-        if (!walletState.connectorId && typeof walletState.switchConnector === 'function') {
+        if (
+          !walletState.connectorId &&
+          typeof walletState.switchConnector === 'function'
+        ) {
           walletState.switchConnector(connectorId);
         }
       } else {
-        const installedConnectors = walletState.connectors?.filter(
-          (connector: any) => connector.installed,
-        ) || [];
-        if (installedConnectors.length !== 1 || typeof walletState.switchConnector !== 'function') {
+        const installedConnectors =
+          walletState.connectors?.filter(
+            (connector: any) => connector.installed,
+          ) || [];
+        if (
+          installedConnectors.length !== 1 ||
+          typeof walletState.switchConnector !== 'function'
+        ) {
           return false;
         }
         walletState.switchConnector(installedConnectors[0].id);
@@ -563,20 +687,34 @@ const WalletConnectButton = () => {
 
       await walletState.check();
       let nextState = useReactWalletStore.getState();
-      if (!nextState.connected && sharedIdentity?.address && sharedIdentity?.publicKey) {
-        (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({
+      if (
+        !nextState.connected &&
+        sharedIdentity?.address &&
+        sharedIdentity?.publicKey
+      ) {
+        (
+          useReactWalletStore.setState as (
+            partial: Record<string, unknown>,
+          ) => void
+        )({
           connected: true,
           address: sharedIdentity.address,
           publicKey: sharedIdentity.publicKey,
-          ...(sharedIdentity.network ? { network: sharedIdentity.network } : {}),
+          ...(sharedIdentity.network
+            ? { network: sharedIdentity.network }
+            : {}),
         });
         nextState = useReactWalletStore.getState();
       }
       if (nextState.connected && nextState.publicKey) {
-        const nextConnectorId = (nextState as any).localConnectorId || (nextState as any).connectorId || connectorId;
-        const nextSignature = getReusableSharedSignature(nextState.publicKey)
-          || useCommonStore.getState().signature
-          || '';
+        const nextConnectorId =
+          (nextState as any).localConnectorId ||
+          (nextState as any).connectorId ||
+          connectorId;
+        const nextSignature =
+          getReusableSharedSignature(nextState.publicKey) ||
+          useCommonStore.getState().signature ||
+          '';
         setSignature(nextSignature);
         saveSharedWalletState({
           address: nextState.address,
@@ -602,7 +740,10 @@ const WalletConnectButton = () => {
 
     isComponentMounted.current = true;
     console.log('Initial wallet restore - useEffect triggered');
-    if (restoreInProgressRef.current || useReactWalletStore.getState().connected) {
+    if (
+      restoreInProgressRef.current ||
+      useReactWalletStore.getState().connected
+    ) {
       return;
     }
     clearRestoreTimers();
@@ -612,10 +753,10 @@ const WalletConnectButton = () => {
     const runRestore = (delay: number) => {
       const timeout = setTimeout(() => {
         if (
-          cancelled
-          || restoreInProgressRef.current
-          || !isComponentMounted.current
-          || isSat20PwaEmbedded()
+          cancelled ||
+          restoreInProgressRef.current ||
+          !isComponentMounted.current ||
+          isSat20PwaEmbedded()
         ) {
           return;
         }
@@ -656,13 +797,13 @@ const WalletConnectButton = () => {
   // 处理连接状态变化
   useEffect(() => {
     console.log('Connection status changed:', connected);
-    
+
     if (connected) {
       // 延迟执行签名检查，避免竞态条件
       signatureCheckTimeoutRef.current = setTimeout(() => {
         checkSignature();
       }, 2000);
-      
+
       // 绑定事件监听器
       bindEventListeners();
     } else {
@@ -676,7 +817,13 @@ const WalletConnectButton = () => {
       clearTimeouts();
       cleanupEventListeners();
     };
-  }, [connected, checkSignature, bindEventListeners, cleanupEventListeners, clearTimeouts]);
+  }, [
+    connected,
+    checkSignature,
+    bindEventListeners,
+    cleanupEventListeners,
+    clearTimeouts,
+  ]);
 
   // 组件卸载时的清理
   useEffect(() => {
@@ -693,58 +840,69 @@ const WalletConnectButton = () => {
     return <Button className="px-0 opacity-0 pointer-events-none">...</Button>;
   }
 
-  const walletStatus = connected && address ? (
-    <Popover placement="bottom">
-      <PopoverTrigger>
-        <Button
-          className="px-0"
-          disabled={isProcessing}
-          endContent={
-            <div className="px-2 h-full flex justify-center items-center bg-gray-600">
-              {address?.slice(-4)}
+  const walletStatus =
+    connected && address ? (
+      <Popover placement="bottom">
+        <PopoverTrigger>
+          <Button
+            className="px-0"
+            disabled={isProcessing}
+            endContent={
+              <div className="px-2 h-full flex justify-center items-center bg-gray-600">
+                {address?.slice(-4)}
+              </div>
+            }
+          >
+            <div className="flex items-center gap-1 pl-2">
+              <span>{showAmount}</span>
+              <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
             </div>
-          }
-        >
-          <div className="flex items-center gap-1 pl-2">
-            <span>{showAmount}</span>
-            <Icon icon="cryptocurrency-color:btc" className="w-4 h-4" />
-          </div>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="p-2">
-        <div className="flex flex-col gap-2">
-          <div>
-            <Snippet
-              codeString={address}
-              className="bg-transparent text-lg md:text-2xl font-thin items-center"
-              symbol=""
-              variant="flat"
-            >
-              <span className="text-base font-thin text-slate-400">
-                {hideStr(address, 4)}
-              </span>
-            </Snippet>
-          </div>
-          <Button className="w-full" onClick={toHistory}>
-            {t('buttons.to_history')}
           </Button>
-          {!pwaEmbedded && !isPwaWallet(btcWallet) ? (
-            <Button
-              color="danger"
-              variant="ghost"
-              onClick={handlerDisconnect}
-              disabled={isProcessing}
-            >
-              {t('buttons.disconnect')}
+        </PopoverTrigger>
+        <PopoverContent className="p-2">
+          <div className="flex flex-col gap-2">
+            <div>
+              <Snippet
+                codeString={address}
+                className="bg-transparent text-lg md:text-2xl font-thin items-center"
+                symbol=""
+                variant="flat"
+              >
+                <span className="text-base font-thin text-slate-400">
+                  {hideStr(address, 4)}
+                </span>
+              </Snippet>
+            </div>
+            <Button className="w-full" onClick={toHistory}>
+              {t('buttons.to_history')}
             </Button>
-          ) : null}
-        </div>
-      </PopoverContent>
-    </Popover>
-  ) : null;
+            {!pwaEmbedded && !isPwaWallet(btcWallet) ? (
+              <Button
+                color="danger"
+                variant="ghost"
+                onClick={handlerDisconnect}
+                disabled={isProcessing}
+              >
+                {t('buttons.disconnect')}
+              </Button>
+            ) : null}
+          </div>
+        </PopoverContent>
+      </Popover>
+    ) : null;
 
   if (pwaEmbedded) {
-    return walletStatus || <Button className="px-0 opacity-0 pointer-events-none">...</Button>;
+    return (
+      walletStatus || (
+        <Button
+          className="px-4"
+          disabled={isProcessing}
+          onClick={handlePwaConnect}
+        >
+          {t('buttons.connect')}
+        </Button>
+      )
+    );
   }
 
   return (
@@ -756,9 +914,7 @@ const WalletConnectButton = () => {
       onConnectSuccess={onConnectSuccess}
       onConnectError={onConnectError}
     >
-      <>
-        {walletStatus}
-      </>
+      <>{walletStatus}</>
     </WalletConnectReact>
   );
 };

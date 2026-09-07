@@ -11,18 +11,33 @@ type PendingRequest = {
 
 type Sat20PwaProvider = {
   isSat20Pwa: true;
-  requestAccounts: () => Promise<string[]>;
+  requestAccounts: (options?: {
+    capabilities?: string[];
+    sessionOnly?: boolean;
+  }) => Promise<string[]>;
   getAccounts: () => Promise<string[]>;
   getPublicKey: () => Promise<string>;
   getNetwork: () => Promise<string>;
   switchNetwork: (network: string) => Promise<unknown>;
-  signPsbt: (psbtHex: string, options?: Record<string, unknown>) => Promise<string>;
+  signPsbt: (
+    psbtHex: string,
+    options?: Record<string, unknown>,
+  ) => Promise<string>;
   signMessage: (message: string) => Promise<string>;
-  pushPsbt: (psbtHex: string, options?: Record<string, unknown>) => Promise<unknown>;
-  pushTx: (rawtx: string, options?: Record<string, unknown>) => Promise<unknown>;
+  pushPsbt: (
+    psbtHex: string,
+    options?: Record<string, unknown>,
+  ) => Promise<unknown>;
+  pushTx: (
+    rawtx: string,
+    options?: Record<string, unknown>,
+  ) => Promise<unknown>;
   extractTxFromPsbt: (...args: unknown[]) => Promise<unknown>;
   on: (event: string, handler: (...args: unknown[]) => void) => void;
-  removeListener: (event: string, handler: (...args: unknown[]) => void) => void;
+  removeListener: (
+    event: string,
+    handler: (...args: unknown[]) => void,
+  ) => void;
   [method: string]: unknown;
 };
 
@@ -56,7 +71,9 @@ const createRequestId = () => {
 const createNonce = () => {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(
+    '',
+  );
 };
 
 const requestWalletReady = () => {
@@ -64,13 +81,16 @@ const requestWalletReady = () => {
     return;
   }
 
-  window.parent.postMessage({
-    type: 'SAT20_DAPP_CLIENT_READY',
-    protocol: SAT20_DAPP_PROTOCOL,
-    origin: window.location.origin,
-    href: window.location.href,
-    nonce: createNonce(),
-  }, walletOrigin);
+  window.parent.postMessage(
+    {
+      type: 'SAT20_DAPP_CLIENT_READY',
+      protocol: SAT20_DAPP_PROTOCOL,
+      origin: window.location.origin,
+      href: window.location.href,
+      nonce: createNonce(),
+    },
+    walletOrigin,
+  );
 };
 
 const installLocationReporter = () => {
@@ -97,13 +117,14 @@ const installLocationReporter = () => {
   window.addEventListener('pageshow', report);
 };
 
-const sendRequest = (action: string, params: unknown[] = []) => {
+const sendRequest = (action: string, params: unknown = []) => {
   if (!isSat20PwaEmbedded()) {
     return Promise.reject(new Error('SAT20 PWA wallet is not available'));
   }
 
   const requestId = createRequestId();
-  const expiresAt = Date.now() + REQUEST_TIMEOUT;
+  const now = Date.now();
+  const expiresAt = now + REQUEST_TIMEOUT;
 
   return new Promise<unknown>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
@@ -113,16 +134,20 @@ const sendRequest = (action: string, params: unknown[] = []) => {
 
     pendingRequests.set(requestId, { resolve, reject, timeoutId });
 
-    window.parent.postMessage({
-      type: 'SAT20_DAPP_REQUEST',
-      protocol: SAT20_DAPP_PROTOCOL,
-      requestId,
-      origin: window.location.origin,
-      action,
-      params,
-      nonce: createNonce(),
-      expiresAt,
-    }, walletOrigin);
+    window.parent.postMessage(
+      {
+        type: 'SAT20_DAPP_REQUEST',
+        protocol: SAT20_DAPP_PROTOCOL,
+        requestId,
+        origin: window.location.origin,
+        action,
+        params,
+        nonce: createNonce(),
+        timestamp: String(now),
+        expiresAt,
+      },
+      walletOrigin,
+    );
   });
 };
 
@@ -209,28 +234,38 @@ const handleMessage = (event: MessageEvent) => {
   if (message.success) {
     pending.resolve(message.result);
   } else {
-    pending.reject(new Error(message.error?.message || 'SAT20 PWA request failed'));
+    pending.reject(
+      new Error(message.error?.message || 'SAT20 PWA request failed'),
+    );
   }
 };
 
 const createProvider = (): Sat20PwaProvider => {
-  const requestMethod = (method: string) => (...args: unknown[]) => sendRequest(method, args);
+  const requestMethod =
+    (method: string) =>
+    (...args: unknown[]) =>
+      sendRequest(method, args);
 
   return {
     isSat20Pwa: true,
-    requestAccounts: () => sendRequest('requestAccounts') as Promise<string[]>,
+    requestAccounts: (options) =>
+      sendRequest('requestAccounts', options ?? []) as Promise<string[]>,
     getAccounts: () => sendRequest('getAccounts') as Promise<string[]>,
     getPublicKey: () => sendRequest('getPublicKey') as Promise<string>,
     getNetwork: () => sendRequest('getNetwork') as Promise<string>,
     switchNetwork: (network: string) => sendRequest('switchNetwork', [network]),
     signPsbt: async (psbtHex: string, options?: Record<string, unknown>) => {
-      return normalizeSignedPsbt(await sendRequest('signPsbt', [psbtHex, options]));
+      return normalizeSignedPsbt(
+        await sendRequest('signPsbt', [psbtHex, options]),
+      );
     },
     signMessage: async (message: string) => {
       return normalizeSignature(await sendRequest('signMessage', [message]));
     },
-    pushPsbt: (psbtHex: string, options?: Record<string, unknown>) => sendRequest('pushPsbt', [psbtHex, options]),
-    pushTx: (rawtx: string, options?: Record<string, unknown>) => sendRequest('pushTx', [rawtx, options]),
+    pushPsbt: (psbtHex: string, options?: Record<string, unknown>) =>
+      sendRequest('pushPsbt', [psbtHex, options]),
+    pushTx: (rawtx: string, options?: Record<string, unknown>) =>
+      sendRequest('pushTx', [rawtx, options]),
     extractTxFromPsbt: requestMethod('extractTxFromPsbt'),
     on: (event: string, handler: (...args: unknown[]) => void) => {
       const handlers = listeners.get(event) ?? new Set();
