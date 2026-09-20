@@ -21,8 +21,9 @@ import { FeerateSelectButton } from '@/components/fee/FeerateSelectButton';
 import { SearchIcon } from '@/components/icons';
 import { useTranslation } from 'react-i18next';
 // import useTranslation from 'next-translate/useTranslation';
-import { usePathname } from 'next/navigation';
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { marketNavigation } from '@/lib/marketNavigation';
+import { Suspense, useState, useMemo, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import { ChainSelect } from '@/components/ChainSelect';
 import { ordxSWR, getBTCPrice } from '@/api';
@@ -35,12 +36,17 @@ import { useUtxoPolling } from '@/lib/hooks/useUtxoPolling';
 //   { ssr: false },
 // );
 
-export const Navbar = () => {
+export const Navbar = () => <Suspense><NavbarContentWithQuery /></Suspense>;
+
+const NavbarContentWithQuery = () => {
   const { address, network } = useReactWalletStore();
   const { setHeight, setBtcPrice, runtimeEnv, setEnv, changeNetwork } = useCommonStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const routeNetwork = searchParams.get('network');
+  const effectiveNetwork = routeNetwork === 'testnet' || routeNetwork === 'mainnet' || routeNetwork === 'livenet' ? routeNetwork : network;
 
   // 使用新的UTXO定时获取hook
   useUtxoPolling(address, network, {
@@ -93,7 +99,7 @@ export const Navbar = () => {
   );
 
   const isActive = (href: string) => {
-    return pathname === href;
+    return pathname === href.split('?')[0];
   };
   const navMenus = useMemo(() => {
 
@@ -105,7 +111,7 @@ export const Navbar = () => {
       // },
       {
         label: t('pages.market.title'),
-        href: '/market',
+        href: marketNavigation('/market', searchParams.toString(), effectiveNetwork),
         isActive: true,
       },
       {
@@ -132,7 +138,7 @@ export const Navbar = () => {
       isActive: false,
     });
     return menus;
-  }, [i18n.language, runtimeEnv]);
+  }, [i18n.language, runtimeEnv, searchParams, effectiveNetwork]);
   useEffect(() => {
     const networkParam = new URLSearchParams(window.location.search).get('network');
     if (networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet') {

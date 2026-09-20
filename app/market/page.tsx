@@ -1,5 +1,6 @@
 'use client';
 import { Suspense } from 'react';
+import { marketNavigation } from '@/lib/marketNavigation';
 
 import { getTopAssets } from '@/api';
 import useSWR from 'swr';
@@ -89,7 +90,7 @@ function MarketContent() {
     return data?.data || [];
   }, [data]);
   const toDetail = (e) => {
-    router.push(`/ordx/ticker?ticker=${e}&assets_type=${type}`);
+    router.push(marketNavigation('/ordx/ticker', params.toString(), effectiveNetwork, { ticker: String(e), assets_type: type }));
   };
   const typeChange = (e: string) => {
     setType(e);
