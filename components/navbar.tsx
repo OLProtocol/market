@@ -46,7 +46,7 @@ const NavbarContentWithQuery = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const routeNetwork = searchParams.get('network');
-  const effectiveNetwork = routeNetwork === 'testnet' || routeNetwork === 'mainnet' || routeNetwork === 'livenet' ? routeNetwork : network;
+  const effectiveNetwork = routeNetwork === 'testnet' || routeNetwork === 'mainnet' || routeNetwork === 'livenet' || routeNetwork === 'regtest' ? routeNetwork : network;
 
   // 使用新的UTXO定时获取hook
   useUtxoPolling(address, network, {
@@ -119,12 +119,12 @@ const NavbarContentWithQuery = () => {
         href: '/inscribe',
         isActive: true,
       },
-      {
+      ...(effectiveNetwork === 'regtest' ? [] : [{
         label: t('pages.explorer.title'),
         href: `${process.env.NEXT_PUBLIC_ORDX_WEBSITE_HOST}/#/explorer`,
         target: '_blank',
         isActive: true,
-      },
+      }]),
 
       {
         label: t('pages.my_assets.title'),
@@ -141,7 +141,7 @@ const NavbarContentWithQuery = () => {
   }, [i18n.language, runtimeEnv, searchParams, effectiveNetwork]);
   useEffect(() => {
     const networkParam = new URLSearchParams(window.location.search).get('network');
-    if (networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet') {
+    if (networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet' || networkParam === 'regtest') {
       const nextNetwork = networkParam === 'mainnet' ? 'livenet' : networkParam;
       changeNetwork(nextNetwork);
       (useReactWalletStore.setState as (partial: Record<string, unknown>) => void)({

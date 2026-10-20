@@ -30,7 +30,7 @@ export const useCommonStore = create<CommonState>()(
           value: 1,
           type: 'custom',
         },
-        network: 'livenet',
+        network: process.env.NEXT_PUBLIC_NETWORK === 'regtest' ? 'regtest' : 'livenet',
         btcHeight: 0,
         runtimeEnv: 'dev',
         btcPrice: 0,

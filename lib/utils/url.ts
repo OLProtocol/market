@@ -30,6 +30,11 @@ export const generateMempoolUrl = ({
   path?: string;
   locale?: string;
 }) => {
+  if (network === 'regtest') {
+    const base = process.env.NEXT_PUBLIC_REGTEST_L1_MEMPOOL_URL;
+    if (!base) throw new Error('Regtest explorer URL is not configured');
+    return `${base.replace(/\/$/, '')}${path ? '/' + path : ''}`;
+  }
   const base = 'https://mempool.space';
   let url = base;
   if (locale) {

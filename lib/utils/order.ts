@@ -47,7 +47,7 @@ export async function buildBatchSellOrder({
     address,
   );
   const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network === 'regtest' ? NetworkType.REGTEST : network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
   const batchSell = new bitcoin.Psbt({
     network: psbtNetwork,
@@ -195,7 +195,7 @@ export async function generateTransferPsbt({
 export const splitBatchSignedPsbt = (signedHex: string, network: string) => {
   console.log('split batch signed psbt', signedHex);
   const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network === 'regtest' ? NetworkType.REGTEST : network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
   const psbt = bitcoin.Psbt.fromHex(signedHex, {
     network: psbtNetwork,
@@ -235,9 +235,95 @@ interface BuyOrderProps {
   dummyUtxos: any[];
   fee: number;
 }
+const waitForPwaDummyUtxo = async ({ txid, network, output, walletSnapshot }: any) => {
+  const outpoint = `${txid}:0`;
+  const expectedScript = Buffer.from(output.script).toString('base64');
+  const deadline = Date.now() + 30_000;
+  let retryWaitCount = 0;
+  const assertWalletIdentity = () => {
+    const current = useReactWalletStore.getState();
+    if (
+      current.btcWallet !== walletSnapshot.btcWallet ||
+      current.address !== walletSnapshot.address ||
+      current.publicKey !== walletSnapshot.publicKey ||
+      current.network !== walletSnapshot.network ||
+      current.connected !== walletSnapshot.connected
+    ) {
+      throw new Error(`已广播后钱包身份变化: ${txid}`);
+    }
+  };
+  const waitBeforeRetry = async () => {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) return false;
+    retryWaitCount++;
+    const delay = Math.min(retryWaitCount * 1000, remaining);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    assertWalletIdentity();
+    return Date.now() < deadline;
+  };
+
+  while (true) {
+    assertWalletIdentity();
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+
+    let result: any;
+    try {
+      result = await ordx.getUtxoInfo({
+        utxo: outpoint,
+        network,
+        timeout: Math.min(3000, remaining),
+      });
+    } catch (error: any) {
+      assertWalletIdentity();
+      const retryableNetworkError =
+        !error?.response &&
+        ['ECONNABORTED', 'ETIMEDOUT', 'ERR_NETWORK', 'ECONNRESET', 'EAI_AGAIN'].includes(error?.code);
+      if (!retryableNetworkError) {
+        throw new Error(`已广播后索引器读取失败 ${txid}: ${error?.message || 'unknown error'}`);
+      }
+      if (!(await waitBeforeRetry())) break;
+      continue;
+    }
+
+    assertWalletIdentity();
+    if (Date.now() >= deadline) break;
+    if (result?.code === 0) {
+      const indexedOutput = result.data;
+      if (
+        !indexedOutput ||
+        indexedOutput.Outpoint !== outpoint ||
+        indexedOutput.Value !== output.value ||
+        indexedOutput.PkScript !== expectedScript
+      ) {
+        throw new Error(`已广播但索引输出不匹配: ${txid}`);
+      }
+      return;
+    }
+
+    const notFound =
+      result?.code !== 0 &&
+      typeof result?.msg === 'string' &&
+      /can't find utxo|not found/i.test(result.msg);
+    if (!notFound) {
+      throw new Error(`已广播后索引器返回错误: ${txid}`);
+    }
+    if (!(await waitBeforeRetry())) break;
+  }
+
+  throw new Error(`已广播/未就绪: ${txid}`);
+};
+
 export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
-  const { btcWallet, publicKey, address, network } =
-    useReactWalletStore.getState();
+  const walletState = useReactWalletStore.getState();
+  const { btcWallet, publicKey, address, network } = walletState;
+  const walletSnapshot = {
+    btcWallet,
+    address,
+    publicKey,
+    network,
+    connected: walletState.connected,
+  };
   const outputs: any = [];
   for (let i = 0; i < num; i++) {
     outputs.push({
@@ -265,10 +351,17 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
         console.log(error);
       }
     }
+    if (txid && (btcWallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa) {
+      const output = psbt.txOutputs?.[0];
+      if (!output?.script) {
+        throw new Error(`已广播后缺少预期输出信息: ${txid}`);
+      }
+      await waitForPwaDummyUtxo({ txid, network, output, walletSnapshot });
+    }
     for (let i = 0; i < num; i++) {
       dummyUtxos.push({
         txid,
-        vout: 0,
+        vout: i,
         value: DUMMY_UTXO_VALUE,
       });
     }
@@ -286,8 +379,9 @@ export const buildDummyUtxos = async ({ utxos, feeRate, num = 2 }) => {
   };
 };
 export const buildBuyThirdOrder = async ({ order_ids, fee_rate_tier }: any) => {
-  const { btcWallet, network, address, publicKey } =
+  const { btcWallet, network: walletNetwork, address, publicKey } =
     useReactWalletStore.getState();
+  const network: string = walletNetwork;
   const thirdRes = await bulkBuyingThirdOrder({
     address,
     publickey: publicKey,
@@ -296,7 +390,7 @@ export const buildBuyThirdOrder = async ({ order_ids, fee_rate_tier }: any) => {
     receiver_address: address,
   });
   const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network === 'regtest' ? NetworkType.REGTEST : network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
   if (thirdRes?.code === 200 && btcWallet && thirdRes.data) {
     const buyRaw = thirdRes.data;
@@ -322,16 +416,22 @@ export const buildBuyOrder = async ({
   feeRate,
   dummyUtxos,
 }: any) => {
-  const { btcWallet, network, address, publicKey } =
+  const { btcWallet, network: walletNetwork, address, publicKey } =
     useReactWalletStore.getState();
+  const network: string = walletNetwork;
   const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
   const NEXT_PUBLIC_SERVICE_ADDRESS =
-    network === 'testnet'
-      ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
-      : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+    network === 'regtest'
+      ? process.env.NEXT_PUBLIC_REGTEST_SERVICE_ADDRESS
+      : network === 'testnet'
+        ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
+        : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+  if (network === 'regtest' && serviceFee && NEXT_PUBLIC_SERVICE_FEE && !NEXT_PUBLIC_SERVICE_ADDRESS) {
+    throw new Error('Regtest service fee address is not configured');
+  }
 
   const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network === 'regtest' ? NetworkType.REGTEST : network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
 
   const btcUtxos = convertUtxosToBtcUtxos({
@@ -353,7 +453,7 @@ export const buildBuyOrder = async ({
 
   const psbtTx = new Transaction({
     address,
-    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network: network === 'regtest' ? NetworkType.REGTEST : network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
     feeRate,
   });
   console.log(btcUtxos);
@@ -437,9 +537,10 @@ export const generateBuyInputsAndOutputs = async ({
   raws,
   dummyUtxos,
 }: any) => {
-  const { network, address } = useReactWalletStore.getState();
+  const { network: walletNetwork, address } = useReactWalletStore.getState();
+  const network: string = walletNetwork;
   const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network === 'regtest' ? NetworkType.REGTEST : network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
   const dummyInputs: any[] = dummyUtxos.map((v) => {
     return {
@@ -497,16 +598,22 @@ export const calcBuyOrderFee = async ({
   feeRate,
   dummyUtxos,
 }: any) => {
-  const { btcWallet, network, address, publicKey } =
+  const { btcWallet, network: walletNetwork, address, publicKey } =
     useReactWalletStore.getState();
+  const network: string = walletNetwork;
   const NEXT_PUBLIC_SERVICE_FEE = process.env.NEXT_PUBLIC_SERVICE_FEE;
   const NEXT_PUBLIC_SERVICE_ADDRESS =
-    network === 'testnet'
-      ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
-      : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+    network === 'regtest'
+      ? process.env.NEXT_PUBLIC_REGTEST_SERVICE_ADDRESS
+      : network === 'testnet'
+        ? process.env.NEXT_PUBLIC_SERVICE_TESTNET_ADDRESS
+        : process.env.NEXT_PUBLIC_SERVICE_ADDRESS;
+  if (network === 'regtest' && serviceFee && NEXT_PUBLIC_SERVICE_FEE && !NEXT_PUBLIC_SERVICE_ADDRESS) {
+    throw new Error('Regtest service fee address is not configured');
+  }
 
   const psbtNetwork = toPsbtNetwork(
-    network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network === 'regtest' ? NetworkType.REGTEST : network === 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
   );
 
   const btcUtxos = convertUtxosToBtcUtxos({
@@ -528,7 +635,7 @@ export const calcBuyOrderFee = async ({
 
   const psbtTx = new Transaction({
     address,
-    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network: network === 'regtest' ? NetworkType.REGTEST : network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
     feeRate,
   });
   psbtTx.setEnableRBF(false);

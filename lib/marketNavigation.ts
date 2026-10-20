@@ -2,6 +2,6 @@
 export function marketNavigation(path: string, query: string, network: string, updates: Record<string, string> = {}): string {
   const params = new URLSearchParams(query)
   for (const [key, value] of Object.entries(updates)) params.set(key, value)
-  params.set('network', network === 'testnet' ? 'testnet' : 'mainnet')
+  params.set('network', network === 'regtest' ? 'regtest' : network === 'testnet' ? 'testnet' : 'mainnet')
   return `${path}?${params.toString()}`
 }

@@ -450,7 +450,7 @@ export const BatchBuyFooter = ({
       console.log('buy order error', error);
       notification.error({
         message: t('notification.order_buy_failed_title'),
-        description: error,
+        description: error?.message || String(error),
       });
       console.error(error);
     } finally {

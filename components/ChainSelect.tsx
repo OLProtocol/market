@@ -11,10 +11,10 @@ const resolveSatsnetMarketUrl = () => {
   const url = new URL(baseUrl, window.location.href);
   const networkParam = new URLSearchParams(window.location.search).get('network');
   const currentNetwork = useCommonStore.getState().network;
-  const network = networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet'
+  const network = networkParam === 'testnet' || networkParam === 'mainnet' || networkParam === 'livenet' || networkParam === 'regtest'
     ? networkParam
     : currentNetwork;
-  url.searchParams.set('network', network === 'testnet' ? 'testnet' : 'mainnet');
+  url.searchParams.set('network', network === 'regtest' ? 'regtest' : network === 'testnet' ? 'testnet' : 'mainnet');
   return url.href;
 };
 
@@ -43,6 +43,7 @@ export const ChainSelect = () => {
 
   return (
     <div className="flex items-center gap-1">
+      {process.env.NEXT_PUBLIC_NETWORK === 'regtest' && <span className="text-xs text-amber-400" title="Fixed reference price for regtest, not a live quote">Regtest<br />BTC ref $100,000</span>}
       <button
         className={`px-3 py-1.5 rounded-full min-w-[90px] text-sm transition-colors ${chain === 'Bitcoin'
           ? 'text-white hover:opacity-80'

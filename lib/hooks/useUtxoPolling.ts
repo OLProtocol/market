@@ -38,8 +38,8 @@ export const useUtxoPolling = (
         setLastFetchTime(new Date());
         
         // 处理UTXO数据
-        if (data?.data?.length) {
-          const list = data.data?.map((item: any) => ({
+        if (Array.isArray(data?.data)) {
+          const list = data.data.map((item: any) => ({
             status: 'unspend',
             location: 'remote',
             utxo: `${item.txid}:${item.vout}`,

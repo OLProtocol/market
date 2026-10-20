@@ -30,16 +30,6 @@ import {
 } from '@/lib/sat20PwaProvider';
 import { message } from '@/lib/wallet-sdk';
 
-const SAT20_PWA_MARKET_CAPABILITIES = [
-  'accounts:read',
-  'public-key:read',
-  'network:read',
-  'network:switch',
-  'transaction:prepare',
-  'transaction:sign',
-  'transaction:broadcast',
-] as const;
-
 const isPwaWallet = (wallet: unknown) => {
   return !!(wallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa;
 };
@@ -583,38 +573,6 @@ const WalletConnectButton = () => {
     [setSignature],
   );
 
-  const handlePwaConnect = useCallback(async () => {
-    const provider = installSat20PwaProvider();
-    if (!provider || isProcessing) return;
-
-    setIsProcessing(true);
-    try {
-      const accounts = await provider.requestAccounts({
-        capabilities: [...SAT20_PWA_MARKET_CAPABILITIES],
-        sessionOnly: true,
-      });
-      const [nextPublicKey, nextNetwork] = await Promise.all([
-        provider.getPublicKey(),
-        provider.getNetwork(),
-      ]);
-      const nextAddress = accounts[0] || '';
-      (
-        useReactWalletStore.setState as (
-          partial: Record<string, unknown>,
-        ) => void
-      )({
-        connected: !!nextAddress,
-        address: nextAddress,
-        publicKey: nextPublicKey,
-        network: nextNetwork,
-        btcWallet: provider,
-      });
-    } catch (error) {
-      onConnectError(error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [isProcessing, onConnectError]);
 
   const toMyAssets = () => {
     router.push('/account');
@@ -894,13 +852,7 @@ const WalletConnectButton = () => {
   if (pwaEmbedded) {
     return (
       walletStatus || (
-        <Button
-          className="px-4"
-          disabled={isProcessing}
-          onClick={handlePwaConnect}
-        >
-          {t('buttons.connect')}
-        </Button>
+        <span role="status" className="px-4" aria-live="polite">…</span>
       )
     );
   }
@@ -908,7 +860,7 @@ const WalletConnectButton = () => {
   return (
     <WalletConnectReact
       config={{
-        network: 'livenet' as any,
+        network: (process.env.NEXT_PUBLIC_NETWORK === 'regtest' ? 'regtest' : 'livenet') as any,
       }}
       theme={theme === 'dark' ? 'dark' : 'light'}
       onConnectSuccess={onConnectSuccess}

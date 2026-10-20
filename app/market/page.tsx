@@ -285,7 +285,7 @@ function MarketContent() {
                   );
                 } else if (columnKey === 'tx_total_volume') {
                   const value = getKeyValue(item, columnKey);
-                  const btc = value.toFixed(4);
+                  const btc = value.toFixed(8);
                   return (
                     <TableCell>
                       <div className="flex flex-col">

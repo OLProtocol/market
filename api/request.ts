@@ -30,8 +30,12 @@ const VERIFY_API_PATHS = new Set([
   '/ordx/GetAddressAssetsList',
 ]);
 
-let pwaApiSignatureCache: { publicKey: string; signature: string } | null = null;
-let pwaApiSignaturePromise: Promise<string> | null = null;
+let pwaApiSignatureCache: { publicKey: string; network: string; signature: string } | null = null;
+let pwaApiSignaturePromise: {
+  publicKey: string;
+  network: string;
+  promise: Promise<string>;
+} | null = null;
 
 const isPwaWallet = (wallet: unknown) => {
   return !!(wallet as { isSat20Pwa?: boolean } | null)?.isSat20Pwa;
@@ -54,18 +58,23 @@ const isValidApiSignature = (publicKey: string, signature: string) => {
   }
 };
 
-const ensureApiSignature = async (path: string) => {
+const ensureApiSignature = async (path: string, requestNetwork: string) => {
   if (!VERIFY_API_PATHS.has(path)) {
     return '';
   }
 
-  const { connected, btcWallet, publicKey } = useReactWalletStore.getState();
+  const { connected, btcWallet, publicKey, network: walletNetwork } =
+    useReactWalletStore.getState();
   const { signature, setSignature } = useCommonStore.getState();
   if (!connected) {
     return '';
   }
 
-  if (isPwaWallet(btcWallet) && pwaApiSignatureCache?.publicKey === publicKey) {
+  if (
+    isPwaWallet(btcWallet) &&
+    pwaApiSignatureCache?.publicKey === publicKey &&
+    pwaApiSignatureCache?.network === requestNetwork
+  ) {
     return pwaApiSignatureCache.signature;
   }
 
@@ -79,26 +88,59 @@ const ensureApiSignature = async (path: string) => {
     return '';
   }
 
-  if (isPwaWallet(btcWallet) && pwaApiSignaturePromise) {
-    return pwaApiSignaturePromise;
+  if (
+    isPwaWallet(btcWallet) &&
+    pwaApiSignaturePromise?.publicKey === publicKey &&
+    pwaApiSignaturePromise?.network === requestNetwork
+  ) {
+    return pwaApiSignaturePromise.promise;
   }
 
   const sign = async () => {
     const nextSignature = await btcWallet.signMessage(process.env.NEXT_PUBLIC_SIGNATURE_TEXT!);
+    if (isPwaWallet(btcWallet)) {
+      const current = useReactWalletStore.getState();
+      if (
+        !current.connected ||
+        !isPwaWallet(current.btcWallet) ||
+        current.publicKey !== publicKey ||
+        current.network !== walletNetwork
+      ) {
+        throw new Error('Wallet identity or network changed while preparing the API signature');
+      }
+    }
     if (nextSignature) {
       if (isPwaWallet(btcWallet) && publicKey) {
-        pwaApiSignatureCache = { publicKey, signature: nextSignature };
+        pwaApiSignatureCache = {
+          publicKey,
+          network: requestNetwork,
+          signature: nextSignature,
+        };
+      } else if (!isPwaWallet(btcWallet)) {
+        setSignature(nextSignature);
       }
-      setSignature(nextSignature);
     }
     return nextSignature || '';
   };
 
-  const nextSignature = isPwaWallet(btcWallet)
-    ? await (pwaApiSignaturePromise = sign().finally(() => {
-      pwaApiSignaturePromise = null;
-    }))
-    : await sign();
+  let nextSignature: string;
+  if (isPwaWallet(btcWallet)) {
+    const inFlight = {
+      publicKey: publicKey ?? '',
+      network: requestNetwork,
+      promise: sign(),
+    };
+    pwaApiSignaturePromise = inFlight;
+    try {
+      nextSignature = await inFlight.promise;
+    } finally {
+      if (pwaApiSignaturePromise === inFlight) {
+        pwaApiSignaturePromise = null;
+      }
+    }
+  } else {
+    nextSignature = await sign();
+  }
 
   if (nextSignature) {
     return nextSignature;
@@ -114,11 +156,29 @@ export const request = async (
 ) => {
   const { publicKey, connected, network: walletNetwork, disconnect } =
     useReactWalletStore.getState();
-  const network = options.network || walletNetwork;
+  const network = process.env.NEXT_PUBLIC_NETWORK === 'regtest' ? 'regtest' : options.network || walletNetwork;
   const { reset, setSignature } = useCommonStore.getState();
-  const signature = await ensureApiSignature(path);
+  const pwaWallet = isPwaWallet(useReactWalletStore.getState().btcWallet);
+  const signature = await ensureApiSignature(path, network);
+  if (pwaWallet) {
+    const current = useReactWalletStore.getState();
+    const currentRequestNetwork = process.env.NEXT_PUBLIC_NETWORK === 'regtest'
+      ? 'regtest'
+      : options.network || current.network;
+    if (
+      !current.connected ||
+      !isPwaWallet(current.btcWallet) ||
+      current.publicKey !== publicKey ||
+      current.network !== walletNetwork ||
+      currentRequestNetwork !== network
+    ) {
+      throw new Error('Wallet identity or network changed while preparing the API request');
+    }
+  }
   const { headers = {}, method = 'GET', data, formData } = options;
-  let url = `${process.env.NEXT_PUBLIC_HOST}${network === 'testnet' ? '/testnet' : ''}${path}`;
+  const base = network === 'regtest' ? process.env.NEXT_PUBLIC_REGTEST_L1_INDEXER_URL : process.env.NEXT_PUBLIC_HOST;
+  if (!base) throw new Error('Market API URL is not configured');
+  let url = `${base}${network === 'testnet' ? '/testnet' : ''}${path}`;
   if (location.hostname.indexOf('test') > -1) {
     url = url.replace('apiprd', 'apitest');
   } else if (location.hostname.indexOf('dev') > -1) {
@@ -336,6 +396,9 @@ export const bulkBuyOrder = async ({ address, order_ids, raw }: any) => {
 };
 
 export const getBTCPrice = async () => {
+  if (process.env.NEXT_PUBLIC_NETWORK === 'regtest') {
+    return { code: 0, data: { amount: '100000' } };
+  }
   const res = await request('/ordx/GetBTCPrice', {});
   return res;
 };
@@ -537,9 +600,84 @@ export const getUtxoByValue = async ({
   value = 600,
   network,
 }: any) => {
-  const url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/utxo/address/${address}/${value}`;
+  const base = network === 'regtest' ? process.env.NEXT_PUBLIC_REGTEST_L1_INDEXER_URL : `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}`;
+  const url = `${base}/utxo/address/${address}/${value}`;
+  const initialWallet = useReactWalletStore.getState();
+  const pwaWallet = initialWallet.btcWallet as {
+    isSat20Pwa?: boolean;
+    getAllLockedUtxo?: (walletAddress: string) => Promise<unknown>;
+  } | null;
+  const pwa = isPwaWallet(pwaWallet);
+
+  if (!pwa) {
+    const res = await fetch(url);
+    return res.json();
+  }
+
+  const identity = {
+    address: initialWallet.address,
+    publicKey: initialWallet.publicKey,
+    network: initialWallet.network,
+    btcWallet: pwaWallet,
+  };
+  const assertWalletIdentity = () => {
+    const current = useReactWalletStore.getState();
+    if (
+      !current.connected ||
+      !isPwaWallet(current.btcWallet) ||
+      current.address !== identity.address ||
+      current.publicKey !== identity.publicKey ||
+      current.network !== identity.network ||
+      current.btcWallet !== identity.btcWallet ||
+      identity.address !== address ||
+      (network !== undefined && identity.network !== network)
+    ) {
+      throw new Error('Wallet identity or network changed while reading locked UTXOs');
+    }
+  };
+
+  assertWalletIdentity();
+  if (!pwaWallet || !address || typeof pwaWallet.getAllLockedUtxo !== 'function') {
+    throw new Error('SAT20 PWA locked UTXO provider is not available');
+  }
   const res = await fetch(url);
-  return res.json();
+  const result = await res.json();
+  assertWalletIdentity();
+
+  const lockedUtxos = await pwaWallet.getAllLockedUtxo(address);
+  assertWalletIdentity();
+  if (
+    !lockedUtxos ||
+    typeof lockedUtxos !== 'object' ||
+    Array.isArray(lockedUtxos) ||
+    Object.prototype.toString.call(lockedUtxos) !== '[object Object]'
+  ) {
+    throw new Error('SAT20 PWA returned a malformed locked UTXO response');
+  }
+  const lockedOutpoints = new Set<string>();
+  for (const [outpoint, lockValue] of Object.entries(lockedUtxos)) {
+    if (!/^[0-9a-f]{64}:\d+$/i.test(outpoint) || typeof lockValue !== 'string') {
+      throw new Error('SAT20 PWA returned a malformed locked UTXO response');
+    }
+    lockedOutpoints.add(outpoint.toLowerCase());
+  }
+  if (!result || typeof result !== 'object' || Array.isArray(result) || !Array.isArray(result.data)) {
+    return result;
+  }
+  const available = result.data.filter((utxo: any) => {
+    if (
+      !utxo ||
+      typeof utxo !== 'object' ||
+      typeof utxo.txid !== 'string' ||
+      !/^[0-9a-f]{64}$/i.test(utxo.txid) ||
+      !Number.isSafeInteger(utxo.vout) ||
+      utxo.vout < 0
+    ) {
+      throw new Error('Indexer returned a malformed UTXO response');
+    }
+    return !lockedOutpoints.has(`${utxo.txid}:${utxo.vout}`.toLowerCase());
+  });
+  return { ...result, data: available };
 };
 
 // export const fetchChainFeeRate = async (network: 'main' | 'testnet') => {

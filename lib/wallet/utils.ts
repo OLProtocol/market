@@ -20,8 +20,9 @@ export function isTaprootAddress(address, network = 'mainnet') {
     // 通过 bitcoinjs-lib 检查
     const decoded = bitcoin.address.fromBech32(address);
     const isBech32m =
-      (decoded.prefix === 'bc' && network !== 'testnet') ||
-      (decoded.prefix === 'tb' && network === 'testnet');
+      (decoded.prefix === 'bc' && network !== 'testnet' && network !== 'regtest') ||
+      (decoded.prefix === 'tb' && network === 'testnet') ||
+      (decoded.prefix === 'bcrt' && network === 'regtest');
     const isVersion1 = decoded.version === 1;
 
     console.log(isBech32m);
@@ -57,7 +58,7 @@ export async function calcNetworkFee({
   });
   const tx = new Transaction({
     address,
-    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network: network === 'regtest' ? NetworkType.REGTEST : network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
     feeRate,
   });
   tx.setEnableRBF(true);
@@ -98,7 +99,7 @@ export async function buildTransaction({
 
   const tx = new Transaction({
     address,
-    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network: network === 'regtest' ? NetworkType.REGTEST : network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
     feeRate,
   });
   console.log(outputs);
@@ -140,7 +141,7 @@ export async function generateTransaction({
 
   const tx = new Transaction({
     address,
-    network: network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
+    network: network === 'regtest' ? NetworkType.REGTEST : network == 'testnet' ? NetworkType.TESTNET : NetworkType.MAINNET,
     feeRate,
   });
   console.log(btcUtxos);

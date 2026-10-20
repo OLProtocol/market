@@ -11,6 +11,11 @@ import mempool from './mempool';
 // axios.defaults.headers.common['Authorization'] = process.env.NEXT_PUBLIC_ORDX_API_AUTHORIZATION;
 
 const generateUrl = (url: string, network?: string) => {
+  if (network === 'regtest' || process.env.NEXT_PUBLIC_NETWORK === 'regtest') {
+    const base = process.env.NEXT_PUBLIC_REGTEST_L1_INDEXER_URL;
+    if (!base) throw new Error('Regtest L1 indexer URL is not configured');
+    return `${base.replace(/\/$/, '')}/${url}`;
+  }
   url = `${process.env.NEXT_PUBLIC_ORDX_HOST}${network === 'testnet' ? '/btc/testnet' : '/btc/mainnet'}/${url}`;
   console.log('hostname', location.hostname);
 
@@ -181,6 +186,14 @@ const getOrdxTickHistory = async ({ start, limit, ticker, network }: any) => {
 const getUtxoByValue = async ({ address, value = 600, network }: any) => {
   const { data } = await axios.get(
     generateUrl(`utxo/address/${address}/${value}`, network),
+  );
+  return data;
+};
+
+const getUtxoInfo = async ({ utxo, network, timeout = 3000 }: any) => {
+  const { data } = await axios.get(
+    generateUrl(`v3/utxo/info/${utxo}`, network),
+    { timeout },
   );
   return data;
 };
@@ -388,6 +401,7 @@ export const ordx = {
   getOrdxAddressHolders,
   getOrdxTickHistory,
   getUtxoByValue,
+  getUtxoInfo,
   savePaidOrder,
   getInscriptiontInfo,
   getAppVersion,

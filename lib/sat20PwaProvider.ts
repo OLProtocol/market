@@ -2,6 +2,8 @@
 
 const SAT20_DAPP_PROTOCOL = 'sat20-dapp-connect';
 const REQUEST_TIMEOUT = 180_000;
+const MARKET_API_MESSAGE = 'ordx-marketplace';
+const SAT20_WALLET_MESSAGE_FORMAT = 'sat20-wallet-message-v1';
 
 type PendingRequest = {
   resolve: (value: unknown) => void;
@@ -18,6 +20,7 @@ type Sat20PwaProvider = {
   getAccounts: () => Promise<string[]>;
   getPublicKey: () => Promise<string>;
   getNetwork: () => Promise<string>;
+  getAllLockedUtxo: (address: string) => Promise<unknown>;
   switchNetwork: (network: string) => Promise<unknown>;
   signPsbt: (
     psbtHex: string,
@@ -170,6 +173,33 @@ const normalizeSignature = (result: unknown) => {
   throw new Error('SAT20 PWA wallet did not return a signature');
 };
 
+const normalizeSignedMessage = (result: unknown, message: string) => {
+  const signature = normalizeSignature(result);
+  if (message !== MARKET_API_MESSAGE) {
+    return signature;
+  }
+
+  if (!result || typeof result !== 'object') {
+    throw new Error('SAT20 PWA wallet did not return the signed message context');
+  }
+  const value = result as Record<string, unknown>;
+  const data = value.data && typeof value.data === 'object'
+    ? value.data as Record<string, unknown>
+    : undefined;
+  const domainPayload = typeof value.domainPayload === 'string'
+    ? value.domainPayload
+    : data?.domainPayload;
+  if (typeof domainPayload !== 'string' || domainPayload.length === 0) {
+    throw new Error('SAT20 PWA wallet did not return the signed message context');
+  }
+
+  return JSON.stringify({
+    format: SAT20_WALLET_MESSAGE_FORMAT,
+    payload: domainPayload,
+    signature,
+  });
+};
+
 const normalizeSignedPsbt = (result: unknown) => {
   if (typeof result === 'string') {
     return result;
@@ -253,6 +283,8 @@ const createProvider = (): Sat20PwaProvider => {
     getAccounts: () => sendRequest('getAccounts') as Promise<string[]>,
     getPublicKey: () => sendRequest('getPublicKey') as Promise<string>,
     getNetwork: () => sendRequest('getNetwork') as Promise<string>,
+    getAllLockedUtxo: (address: string) =>
+      sendRequest('GET_ALL_LOCKED_UTXO', { address }),
     switchNetwork: (network: string) => sendRequest('switchNetwork', [network]),
     signPsbt: async (psbtHex: string, options?: Record<string, unknown>) => {
       return normalizeSignedPsbt(
@@ -260,7 +292,10 @@ const createProvider = (): Sat20PwaProvider => {
       );
     },
     signMessage: async (message: string) => {
-      return normalizeSignature(await sendRequest('signMessage', [message]));
+      return normalizeSignedMessage(
+        await sendRequest('signMessage', [message]),
+        message,
+      );
     },
     pushPsbt: (psbtHex: string, options?: Record<string, unknown>) =>
       sendRequest('pushPsbt', [psbtHex, options]),
